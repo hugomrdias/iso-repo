@@ -32,5 +32,15 @@
     "skipLibCheck": true,
     "stripInternal": true,
     "resolveJsonModule": true
+  },
+  "typedocOptions": {
+    "entryPointStrategy": "packages",
+    "entryPoints": ["packages/iso-base"],
+    "excludeExternals": true,
+    "darkHighlightTheme": "github-dark",
+    "navigationLinks": {
+      "Github": "https://github.com/hugomrdias/iso-base"
+    },
+    "customCss": "./.github/typedoc.css"
   }
 }

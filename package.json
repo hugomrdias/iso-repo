@@ -21,6 +21,9 @@
     "lint-staged": "^13.2.0",
     "prettier": "2.8.7",
     "simple-git-hooks": "^2.8.1",
+    "type": "^2.7.2",
+    "typedoc": "^0.23.28",
+    "typedoc-plugin-missing-exports": "^1.0.0",
     "typescript": "5.0.2",
     "wrangler": "^2.13.0"
   },
@@ -34,5 +37,6 @@
   "prettier": "hd-scripts/prettier.config.js",
   "engines": {
     "node": ">=18"
-  }
+  },
+  "packageManager": "pnpm@8.0.0"
 }

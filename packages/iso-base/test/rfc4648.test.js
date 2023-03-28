@@ -1,7 +1,6 @@
 import assert from 'assert'
-import * as BASES from '../src/index.js'
-
-const utf8 = BASES.utf8
+import * as BASES from '../src/rfc4648.js'
+import { utf8 } from '../src/utf8.js'
 const VECTORS = [
   ['base16', '', ''],
   ['base16', utf8.encode(Uint8Array.from([0x01])), '01'],
@@ -96,10 +95,7 @@ describe('others', function () {
       new Uint8Array(Buffer.from(vector[1], 'hex'))
     )
 
-    assert.deepStrictEqual(
-      BASES.hex.decode(vector[1]),
-      BASES.utf8.decode(vector[0])
-    )
+    assert.deepStrictEqual(BASES.hex.decode(vector[1]), utf8.decode(vector[0]))
 
     assert.deepStrictEqual(BASES.hex.encode(vector[0]), vector[1].toLowerCase())
   })

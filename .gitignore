@@ -25,3 +25,5 @@ kv-data
 *.njsproj
 *.sln
 *.sw?
+
+docs
