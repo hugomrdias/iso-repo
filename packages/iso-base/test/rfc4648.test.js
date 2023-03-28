@@ -86,6 +86,9 @@ describe('encode/decode', function () {
 
 describe('others', function () {
   it('hex matches node', function () {
+    if (!globalThis.Buffer) {
+      this.skip()
+    }
     const vector = ['foobar', '666F6F626172']
 
     assert.deepStrictEqual(
@@ -102,6 +105,9 @@ describe('others', function () {
   })
 
   it('base64 matches node', function () {
+    if (!globalThis.Buffer) {
+      this.skip()
+    }
     const vector = ['foob', 'Zm9vYg==']
 
     assert.deepStrictEqual(BASES.base64.encode(vector[0]), vector[1])
@@ -113,6 +119,9 @@ describe('others', function () {
   })
 
   it('base64url matches node', function () {
+    if (!globalThis.Buffer) {
+      this.skip()
+    }
     const vector = ['÷ïÿo', 'w7fDr8O_bw']
 
     assert.deepStrictEqual(BASES.base64url.encode(vector[0]), vector[1])

@@ -46,9 +46,12 @@ export default function Login(props) {
             // authenticatorAttachment: 'cross-platform',
             userVerification: 'required',
             // requireResidentKey: true,
-            // residentKey: 'required',
+            residentKey: 'required',
           },
           extensions: {
+            largeBlob: {
+              support: 'preferred',
+            },
             prf: {
               eval: {
                 first: salt.buffer,
