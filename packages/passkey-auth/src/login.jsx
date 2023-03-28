@@ -1,4 +1,4 @@
-import { utf8 } from 'iso-base'
+import { utf8 } from 'iso-base/utf8'
 import { useEffect, useState } from 'preact/hooks'
 import { useWebNative } from './hooks/use-webnative.js'
 import { program, credentialsCreate, credentialsGet } from './webauthn/api.js'
