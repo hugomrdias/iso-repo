@@ -26,7 +26,7 @@ jobs:
     needs: release
     if: |
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-base') ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/package2')
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-filecoin')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

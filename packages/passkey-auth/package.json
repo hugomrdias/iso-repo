@@ -17,7 +17,7 @@
     "@peculiar/asn1-schema": "^2.3.6",
     "cbor-x": "^1.5.1",
     "idb-keyval": "^6.2.0",
-    "iso-base": "workspace:^0.0.1",
+    "iso-base": "workspace:^0.1.0",
     "preact": "^10.13.2",
     "preact-router": "^4.1.0",
     "water.css": "^2.1.1",
