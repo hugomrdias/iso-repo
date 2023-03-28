@@ -8,6 +8,7 @@
     "url": "hugomrdias/iso-repo",
     "directory": "packages/iso-filecoin"
   },
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-filecoin",
   "keywords": [
     "token",
     "filecoin",
