@@ -48,4 +48,4 @@ jobs:
     if: |
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-base') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-filecoin')
-    uses: './.github/reusable-docs.yml'
+    uses: './.github/workflows/reusable-docs.yml'
