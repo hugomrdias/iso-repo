@@ -1,4 +1,6 @@
-import { base64url, utf8 } from 'iso-base'
+import { base64url } from 'iso-base/rfc4648'
+import { utf8 } from 'iso-base/utf8'
+
 import { cbor, cborStable } from './cbor.js'
 
 /**

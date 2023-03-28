@@ -1,6 +1,7 @@
 import * as DID from '@ipld/dag-ucan/did'
 import * as ed from '@noble/ed25519'
-import { concat, u8, utf8 } from 'iso-base'
+import { utf8 } from 'iso-base/utf8'
+import { concat, u8 } from 'iso-base/utils'
 import { webcrypto } from 'iso-base/crypto'
 
 import * as Webnative from 'webnative'
