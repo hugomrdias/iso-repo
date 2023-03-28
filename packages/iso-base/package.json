@@ -1,13 +1,20 @@
 {
   "name": "iso-base",
   "version": "0.1.1",
-  "description": "Cloudflare Workers Utils",
+  "description": "Isomorphic Utils",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
   "repository": {
     "url": "hugomrdias/iso-repo",
     "directory": "packages/iso-base"
   },
+  "keywords": [
+    "utf8",
+    "base",
+    "crypto",
+    "rfc4648",
+    "uint8array"
+  ],
   "type": "module",
   "main": "src/index.js",
   "types": "dist/src/index.d.ts",
