@@ -1,6 +1,6 @@
 {
   "name": "iso-base",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cloudflare Workers Utils",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
