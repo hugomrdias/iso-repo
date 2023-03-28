@@ -35,7 +35,7 @@
   },
   "typedocOptions": {
     "entryPointStrategy": "packages",
-    "entryPoints": ["packages/iso-base"],
+    "entryPoints": ["packages/iso-base", "packages/iso-filecoin"],
     "excludeExternals": true,
     "darkHighlightTheme": "github-dark",
     "navigationLinks": {

@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "lib": ["ESNext", "DOM"],
+    "emitDeclarationOnly": true
+  },
+  "references": [
+    {
+      "path": "../iso-base"
+    }
+  ],
+  "include": ["src", "scripts", "test", "package.json"],
+  "exclude": ["node_modules", "dist", "out"]
+}
