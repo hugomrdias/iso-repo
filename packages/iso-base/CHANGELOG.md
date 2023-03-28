@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.1.0...iso-base-v0.1.1) (2023-03-28)
+
+
+### Bug Fixes
+
+* add readme ([4914455](https://github.com/hugomrdias/iso-repo/commit/4914455a9bafc0cf926ec4b36529254ffe04b9d0))
+
 ## [0.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.0.1...iso-base-v0.1.0) (2023-03-28)
 
 
