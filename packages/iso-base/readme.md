@@ -7,3 +7,7 @@
 ```bash
 pnpm install iso-base
 ```
+
+## License
+
+MIT © [Hugo Dias](http://hugodias.me)
