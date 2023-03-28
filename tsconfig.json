@@ -39,7 +39,7 @@
     "excludeExternals": true,
     "darkHighlightTheme": "github-dark",
     "navigationLinks": {
-      "Github": "https://github.com/hugomrdias/iso-base"
+      "Github": "https://github.com/hugomrdias/iso-repo"
     },
     "customCss": "./.github/typedoc.css"
   }

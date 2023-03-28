@@ -14,6 +14,10 @@ pnpm install iso-filecoin
 import { Token, Wallet } from 'iso-filecoin'
 ```
 
+## Docs
+
+Check <https://hugomrdias.github.io/iso-repo/modules/iso_filecoin.html>
+
 ## License
 
 MIT © [Hugo Dias](http://hugodias.me)
