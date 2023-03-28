@@ -8,6 +8,12 @@
 pnpm install iso-filecoin
 ```
 
+## Usage
+
+```js
+import { Token, Wallet } from 'iso-filecoin'
+```
+
 ## License
 
 MIT © [Hugo Dias](http://hugodias.me)

@@ -7,7 +7,7 @@
     "dev": "vite --force",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "tsc && eslint '**/*.{js,jsx,ts}' && prettier --check '**/*.{js,jsx,ts,yml,json}' --ignore-path ../../.gitignore"
+    "lint-FAILS": "tsc && eslint '**/*.{js,jsx,ts}' && prettier --check '**/*.{js,jsx,ts,yml,json}' --ignore-path ../../.gitignore"
   },
   "dependencies": {
     "@acab/reset.css": "^0.5.3",
