@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.1.1...iso-base-v0.1.2) (2023-03-28)
+
+
+### Bug Fixes
+
+* tweaks ([fa46725](https://github.com/hugomrdias/iso-repo/commit/fa467256f88134b1bf0cec63874bc61dbde989a1))
+
 ## [0.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.1.0...iso-base-v0.1.1) (2023-03-28)
 
 
