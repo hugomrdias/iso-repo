@@ -27,4 +27,20 @@ describe('wallet', function () {
       'f17levgrkmq7jeloew44ixqokvl4qdozvmacidp7i'
     )
   })
+
+  it('should generate create account from mnemonic metamask', function () {
+    const seed = Wallet.mnemonicToSeed(
+      'already turtle birth enroll since owner keep patch skirt drift any dinner'
+    )
+    const account = Wallet.accountFromSeed(
+      seed,
+      Wallet.SIGNATURES.SECP256K1,
+      "m/44'/461'/0'/0/0"
+    )
+
+    assert.strictEqual(
+      account.address.toString(),
+      'f1jbnosztqwadgh4smvsnojdvwjgqxsmtzy5n5imi'
+    )
+  })
 })
