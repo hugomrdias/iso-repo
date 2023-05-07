@@ -1,6 +1,5 @@
 import { base64url } from 'iso-base/rfc4648'
 import { utf8 } from 'iso-base/utf8'
-
 import { cbor, cborStable } from './cbor.js'
 
 /**
@@ -169,12 +168,17 @@ export function parseCreationOptionsFromJSON(options) {
   }
 
   return {
+    pubKeyCredParams: [-8, -7, -257].map((id) => ({
+      alg: id,
+      type: 'public-key',
+    })),
     ...options,
     challenge: base64url.decode(options.challenge),
     user: {
       ...options.user,
       id: utf8.decode(options.user.id),
     },
+
     excludeCredentials,
   }
 }

@@ -2,18 +2,9 @@
 import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 import * as wn from 'webnative'
+import { defaultConfig } from '../webnative/common.js'
 
-const config = {
-  namespace: {
-    creator: 'HD',
-    name: 'Passkey auth',
-  },
-  debug: true,
-  debugging: {
-    injectIntoGlobalContext: true,
-  },
-}
-
+/** @type {import('webnative').Session | null} */
 let cacheSession = null
 
 export function useWebNative({
@@ -25,6 +16,10 @@ export function useWebNative({
     /** @type {import('webnative').Session | null} */ (cacheSession)
   )
 
+  /**
+   *
+   * @param {import('webnative').Session | null} session
+   */
   function updateSession(session) {
     cacheSession = session
     setSession(cacheSession)
@@ -32,10 +27,12 @@ export function useWebNative({
 
   async function setup() {
     if (!session && !cacheSession) {
-      const program = await wn.program(config)
-
+      const program = await wn.program(defaultConfig)
       setIsValidating(false)
       setSession(program.session)
+    }
+    if (session) {
+      setIsValidating(false)
     }
   }
 
@@ -58,5 +55,5 @@ export function useWebNative({
     }
   }, [redirectIfFound, redirectTo, isValidating, session])
 
-  return { session, setSession: updateSession, config }
+  return { session, setSession: updateSession, isValidating }
 }

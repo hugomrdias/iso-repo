@@ -1,7 +1,8 @@
 import * as ed from '@noble/ed25519'
 import { ECDSASigValue } from '@peculiar/asn1-ecc'
 import { AsnParser } from '@peculiar/asn1-schema'
-import { base64url, concat } from 'iso-base'
+import { base64url } from 'iso-base/rfc4648'
+import { concat } from 'iso-base/utils'
 import {
   COSEKEYS_MAP,
   getCoseKeyType,
@@ -116,7 +117,7 @@ export async function validateOKP(data, key) {
     throw new Error(`unsupported curve ${crv}`)
   }
 
-  return await ed.verify(signature, sigBase, x)
+  return ed.verify(signature, sigBase, x)
 }
 
 /**

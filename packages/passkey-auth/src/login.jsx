@@ -1,118 +1,21 @@
-import { utf8 } from 'iso-base/utf8'
-import { useEffect, useState } from 'preact/hooks'
+/* eslint-disable unicorn/no-useless-undefined */
+import { useState } from 'preact/hooks'
 import { useWebNative } from './hooks/use-webnative.js'
-import { program, credentialsCreate, credentialsGet } from './webauthn/api.js'
+import { isUsernameAvailable, register, login } from './webnative/index.js'
 
 /**
  * @param {import('preact').Attributes} props
  */
 export default function Login(props) {
-  const { session, setSession, config } = useWebNative({
+  const { setSession } = useWebNative({
     redirectTo: '/',
     redirectIfFound: true,
   })
 
-  const [errorMsg, setErrorMsg] = useState('')
-  const [isLogginIn, setIsLogginIn] = useState(false)
-  const salt = utf8.decode('webauthn-passkey-prf-salt')
-
-  /**
-   * @type {import('preact').JSX.GenericEventHandler<HTMLFormElement>}
-   */
-  // eslint-disable-next-line unicorn/consistent-function-scoping
-  async function onSubmit(event) {
-    event.preventDefault()
-
-    const username = event.currentTarget?.username.value
-
-    try {
-      await credentialsCreate({
-        publicKey: {
-          challenge: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          rp: {
-            name: 'passkey-auth',
-          },
-          user: {
-            displayName: username,
-            id: username,
-            name: username,
-          },
-          pubKeyCredParams: [-8, -7, -257].map((id) => ({
-            alg: id,
-            type: 'public-key',
-          })),
-          attestation: 'none',
-          authenticatorSelection: {
-            // authenticatorAttachment: 'cross-platform',
-            userVerification: 'required',
-            // requireResidentKey: true,
-            residentKey: 'required',
-          },
-          extensions: {
-            largeBlob: {
-              support: 'preferred',
-            },
-            prf: {
-              eval: {
-                first: salt.buffer,
-              },
-            },
-          },
-        },
-      })
-    } catch (error) {
-      console.error('An unexpected error happened:', error)
-      setErrorMsg(error.message)
-    }
-  }
-
-  /**
-   * @type {import('preact').JSX.GenericEventHandler<HTMLButtonElement>}
-   */
-  // eslint-disable-next-line unicorn/consistent-function-scoping
-  async function onLogin(event) {
-    setIsLogginIn(true)
-    try {
-      const credential = await credentialsGet({
-        mediation: 'required',
-
-        publicKey: {
-          challenge: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          allowCredentials: [],
-          userVerification: 'required',
-          extensions: {
-            // @ts-ignore
-            prf: {
-              eval: {
-                first: salt.buffer,
-              },
-            },
-          },
-        },
-      })
-      console.log('🚀 ~ file: login.jsx:87 ~ onLogin ~ credential', credential)
-
-      // @ts-ignore
-      const key = credential.clientExtensionResults.prf.results.first
-
-      const p = await program(key, config, credential.userHandle)
-
-      console.log('🚀 ~ file: login.jsx:96 ~ onLogin ~ p?.session', p?.session)
-      setSession(p?.session)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   return (
     <>
       <div className="login">
-        <Form
-          errorMessage={errorMsg}
-          onSubmit={onSubmit}
-          onLogin={onLogin}
-          isLogginIn={isLogginIn}
-        />
+        <Form setSession={setSession} />
       </div>
 
       <style jsx>{`
@@ -128,15 +31,56 @@ export default function Login(props) {
   )
 }
 
-/**
- *
- * @param {object} props
- * @param {string} props.errorMessage
- * @param {import('preact').JSX.GenericEventHandler<HTMLFormElement>} props.onSubmit
- * @param {import('preact').JSX.GenericEventHandler<HTMLButtonElement>} props.onLogin
- * @param {boolean} props.isLogginIn
- */
-function Form({ errorMessage, onSubmit, onLogin, isLogginIn }) {
+function Form({ setSession }) {
+  const [errorMsg, setErrorMsg] = useState('')
+  const [mode, setMode] = useState(
+    /** @type { 'register' | 'login' | undefined} */ (undefined)
+  )
+
+  /** @type {import('preact/src/jsx.js').JSXInternal.GenericEventHandler<HTMLInputElement>} */
+  async function onInput(event) {
+    const username = event.currentTarget.value
+
+    try {
+      const res = await isUsernameAvailable(username)
+      setMode(res === true ? 'register' : 'login')
+      setErrorMsg('')
+    } catch (error) {
+      setMode(undefined)
+      // @ts-ignore
+      setErrorMsg(error.message)
+      console.error(error)
+    }
+  }
+
+  /** @type {import('preact/src/jsx.js').JSXInternal.GenericEventHandler<HTMLFormElement>} */
+  async function onSubmit(event) {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const username = /** @type {string | null} */ (formData.get('username'))
+
+    if (mode === 'register' && username) {
+      try {
+        const session = await register(username)
+        setSession(session)
+        setErrorMsg('')
+      } catch (error) {
+        // @ts-ignore
+        setErrorMsg(error.message)
+        console.error(error)
+      }
+    } else {
+      try {
+        const session = await login(username)
+        setSession(session)
+        setErrorMsg('')
+      } catch (error) {
+        // @ts-ignore
+        setErrorMsg(error.message)
+        console.error(error)
+      }
+    }
+  }
   return (
     <form autoComplete="on" onSubmit={onSubmit}>
       <label>
@@ -147,16 +91,14 @@ function Form({ errorMessage, onSubmit, onLogin, isLogginIn }) {
           placeholder="joe"
           autoFocus
           autoComplete="username webauthn"
+          onInput={onInput}
         />
       </label>
 
-      <button type="submit">Register</button>
+      {mode === 'register' && <button type="submit">Register</button>}
+      {mode === 'login' && <button type="submit">Login</button>}
 
-      {errorMessage && <p className="error">{errorMessage}</p>}
-
-      <button type="button" onClick={onLogin}>
-        {!isLogginIn ? 'Login' : 'Loading...'}
-      </button>
+      {errorMsg && <p className="error">{errorMsg}</p>}
 
       <style jsx>{`
         form,

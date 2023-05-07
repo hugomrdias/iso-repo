@@ -1,6 +1,100 @@
-import { Program, Storage } from 'webnative'
+import type { Program, Storage } from 'webnative'
 
 export type Base64URLString = string
+
+export interface AuthenticationExtensionsPRFValues {
+  first: BufferSource
+  second?: BufferSource
+}
+/**
+ * PRF extension inputs
+ *
+ * @see https://w3c.github.io/webauthn/#dictdef-authenticationextensionsprfinputs
+ */
+export interface AuthenticationExtensionsPRFInputs {
+  /**
+   * One or two inputs on which to evaluate PRF. Not all authenticators support evaluating the PRFs during credential creation so outputs may, or may not, be provided. If not, then an assertion is needed in order to obtain the outputs.
+   */
+  eval: AuthenticationExtensionsPRFValues
+  /**
+   * A record mapping base64url encoded credential IDs to PRF inputs to evaluate for that credential. Only applicable during assertions when allowCredentials is not empty.
+   */
+  evalByCredential?: Record<string, AuthenticationExtensionsPRFValues>
+}
+
+/**
+ * PRF extension outputs
+ *
+ * @see https://w3c.github.io/webauthn/#dictdef-authenticationextensionsprfoutputs
+ */
+export interface AuthenticationExtensionsPRFOutputs {
+  /**
+   * True if, and only if, the one or two PRFs are available for use with the created credential. This is only reported during registration and is not present in the case of authentication.
+   */
+  enabled?: boolean
+  /**
+   * The results of evaluating the PRF for the inputs given in eval or evalByCredential. Outputs may not be available during registration;
+   */
+  results?: AuthenticationExtensionsPRFValues
+}
+
+/**
+ * LargeBlob extension inputs
+ *
+ * @see https://w3c.github.io/webauthn/#dictdef-authenticationextensionslargeblobinputs
+ */
+export interface AuthenticationExtensionsLargeBlobInputs {
+  /**
+   * Only valid during registration.
+   */
+  support?: 'required' | 'preferred'
+  /**
+   * A boolean that indicates that the Relying Party would like to fetch the previously-written blob associated with the asserted credential. Only valid during authentication.
+   */
+  read?: boolean
+  /**
+   * An opaque byte string that the Relying Party wishes to store with the existing credential. Only valid during authentication.
+   */
+  write?: BufferSource
+}
+
+/**
+ * LargeBlob extension outputs
+ *
+ * @see https://w3c.github.io/webauthn/#dictdef-authenticationextensionslargebloboutputs
+ */
+export interface AuthenticationExtensionsLargeBlobOutputs {
+  /**
+   * True if, and only if, the created credential supports storing large blobs. Only present in registration outputs.
+   */
+  supported?: boolean
+  /**
+   * The opaque byte string that was associated with the credential identified by rawId. Only valid if read was true.
+   */
+  blob?: ArrayBuffer
+  /**
+   * A boolean that indicates that the contents of write were successfully stored on the authenticator, associated with the specified credential.
+   */
+  written?: boolean
+}
+
+/**
+ * Extends the `AuthenticationExtensionsClientInputs` from `lib.dom.d.ts` with LargeBlob  and prf types
+ */
+export interface AuthenticationExtensionsClientInputs
+  extends globalThis.AuthenticationExtensionsClientInputs {
+  largeBlob?: AuthenticationExtensionsLargeBlobInputs
+  prf?: AuthenticationExtensionsPRFInputs
+}
+
+/**
+ * Extends the `AuthenticationExtensionsClientOutputs` from `lib.dom.d.ts` with largeBlob and prf types
+ */
+export interface AuthenticationExtensionsClientOutputs
+  extends globalThis.AuthenticationExtensionsClientOutputs {
+  largeBlob?: AuthenticationExtensionsLargeBlobOutputs
+  prf?: AuthenticationExtensionsPRFOutputs
+}
 
 /**
  * PublicKeyCredentialDescriptor encoded as JSON
@@ -45,7 +139,7 @@ export interface PublicKeyCredentialCreationOptionsJSON {
   rp: PublicKeyCredentialRpEntity
   user: PublicKeyCredentialUserEntityJSON
   challenge: Base64URLString
-  pubKeyCredParams: PublicKeyCredentialParameters[]
+  pubKeyCredParams?: PublicKeyCredentialParameters[]
   timeout?: number
   excludeCredentials?: PublicKeyCredentialDescriptorJSON[]
   authenticatorSelection?: AuthenticatorSelectionCriteria
@@ -96,6 +190,11 @@ export interface CredentialCreationOptionsJSON {
   signal?: AbortSignal
 }
 
+export interface AuthenticatorAttestationResponse
+  extends globalThis.AuthenticatorAttestationResponse {
+  getTransports: () => AuthenticatorTransport[]
+}
+
 /**
  * Credential from credentials.create()
  */
@@ -103,6 +202,7 @@ export interface RegistrationPublicKeyCredential extends PublicKeyCredential {
   response: AuthenticatorAttestationResponse
   type: PublicKeyCredentialType
   authenticatorAttachment: AuthenticatorAttachment | null
+  getClientExtensionResults: () => AuthenticationExtensionsClientOutputs
 }
 
 /**

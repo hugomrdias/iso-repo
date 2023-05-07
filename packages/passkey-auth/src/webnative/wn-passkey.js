@@ -12,7 +12,7 @@ import * as WebnativeManners from 'webnative/components/manners/implementation/b
 import * as FileSystemProtocol from 'webnative/fs/protocol/basic'
 import PublicFile from 'webnative/fs/v1/PublicFile'
 import PublicTree from 'webnative/fs/v1/PublicTree'
-import { ED25519_DID_PREFIX } from './cose.js'
+import { ED25519_DID_PREFIX } from '../webauthn/cose.js'
 
 export const READ_KEY_PATH = Webnative.path.file(
   Webnative.path.RootBranch.Public,
@@ -35,11 +35,11 @@ export class WebnativePasskey {
   }
 
   /**
-   * @param {ArrayBuffer} keyMaterial
+   * @param {BufferSource} keyMaterial
    * @param {import('webnative').Configuration} configuration
    */
   static async create(keyMaterial, configuration) {
-    const inputKeyMaterial = new Uint8Array(keyMaterial)
+    const inputKeyMaterial = u8(keyMaterial)
 
     // import key material
     const keyDerivationKey = await crypto.subtle.importKey(
@@ -68,7 +68,7 @@ export class WebnativePasskey {
     return new WebnativePasskey({
       encryptionKey,
       signingKey: inputKeyMaterial,
-      publicKey: await ed.getPublicKey(inputKeyMaterial),
+      publicKey: await ed.getPublicKeyAsync(inputKeyMaterial),
       defaultCrypto: await BrowserCrypto.implementation({
         storeName: Webnative.namespace(configuration),
         exchangeKeyName: 'exchange-key',
@@ -147,7 +147,7 @@ export class WebnativePasskey {
    * @param {string | Uint8Array} data
    */
   sign(data) {
-    return ed.sign(data, this.opts.signingKey)
+    return ed.signAsync(data, this.opts.signingKey)
   }
 
   /**
@@ -155,7 +155,7 @@ export class WebnativePasskey {
    * @param {import('webnative/components/crypto/implementation.js').VerifyArgs} opts
    */
   verify(opts) {
-    return ed.verify(
+    return ed.verifyAsync(
       opts.signature,
       opts.message,
       opts.publicKey || this.opts.publicKey
