@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@acab/reset.css": "^0.5.3",
+    "@ipld/dag-ucan": "^3.3.2",
     "@noble/ed25519": "^2.0.0",
     "@oddjs/odd": "^0.37.1",
     "@peculiar/asn1-ecc": "^2.3.6",

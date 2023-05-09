@@ -119,6 +119,9 @@ importers:
       '@acab/reset.css':
         specifier: ^0.5.3
         version: 0.5.3
+      '@ipld/dag-ucan':
+        specifier: ^3.3.2
+        version: 3.3.2
       '@noble/ed25519':
         specifier: ^2.0.0
         version: 2.0.0
@@ -218,7 +221,7 @@ packages:
       '@babel/traverse': 7.21.5
       '@babel/types': 7.21.5
       convert-source-map: 1.9.0
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.0
@@ -425,7 +428,7 @@ packages:
       '@babel/helper-split-export-declaration': 7.18.6
       '@babel/parser': 7.21.8
       '@babel/types': 7.21.5
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -1194,10 +1197,34 @@ packages:
       multiformats: 11.0.2
     dev: false
 
+  /@ipld/dag-cbor@9.0.0:
+    resolution: {integrity: sha512-zdsiSiYDEOIDW7mmWOYWC9gukjXO+F8wqxz/LfN7iSwTfIyipC8+UQrCbPupFMRb/33XQTZk8yl3My8vUQBRoA==}
+    engines: {node: '>=16.0.0', npm: '>=7.0.0'}
+    dependencies:
+      cborg: 1.10.1
+      multiformats: 11.0.2
+    dev: false
+
+  /@ipld/dag-json@10.0.1:
+    resolution: {integrity: sha512-XE1Eqw3eNVrSfOhtqCM/gwCxEgYFBzkDlkwhEeMmMvhd0rLBfSyVzXbahZSlv97tiTPEIx5rt41gcFAda3W8zg==}
+    engines: {node: '>=16.0.0', npm: '>=7.0.0'}
+    dependencies:
+      cborg: 1.10.1
+      multiformats: 11.0.2
+    dev: false
+
   /@ipld/dag-pb@3.0.2:
     resolution: {integrity: sha512-ge+llKU/CNc6rX5ZcUhCrPXJjKjN1DsolDOJ99zOsousGOhepoIgvT01iAP8s7QN9QFciOE+a1jHdccs+CyhBA==}
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dependencies:
+      multiformats: 11.0.2
+    dev: false
+
+  /@ipld/dag-ucan@3.3.2:
+    resolution: {integrity: sha512-EhuOrAfnudsVYIbzEIgi3itHAEo3WZNOt1VNPsYhxKBhOzDMeoTXh6/IHc7ZKBW1T2vDQHdgj4m1r64z6MssGA==}
+    dependencies:
+      '@ipld/dag-cbor': 9.0.0
+      '@ipld/dag-json': 10.0.1
       multiformats: 11.0.2
     dev: false
 
@@ -1312,7 +1339,7 @@ packages:
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dependencies:
       '@libp2p/interface-peer-id': 2.0.2
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       interface-datastore: 8.2.0
       multiformats: 11.0.2
     transitivePeerDependencies:
@@ -1655,7 +1682,7 @@ packages:
       '@prefresh/vite': 2.3.0(preact@10.13.2)(vite@4.2.1)
       '@rollup/pluginutils': 4.2.1
       babel-plugin-transform-hook-names: 1.0.2(@babel/core@7.21.3)
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       kolorist: 1.8.0
       resolve: 1.22.2
       vite: 4.2.1
@@ -2775,17 +2802,6 @@ packages:
       ms: 2.1.3
     dev: true
 
-  /debug@4.3.4:
-    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-    dependencies:
-      ms: 2.1.2
-
   /debug@4.3.4(supports-color@8.1.1):
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
     engines: {node: '>=6.0'}
@@ -2797,7 +2813,6 @@ packages:
     dependencies:
       ms: 2.1.2
       supports-color: 8.1.1
-    dev: true
 
   /decamelize@4.0.0:
     resolution: {integrity: sha512-9iE1PgSik9HeIIw2JO94IidnE3eBoQrFJ3w7sFuzSX4DpmZ3v5sZpUiV5Swcf6mQEF+Y0ru8Neo+p+nyh2J+hQ==}
@@ -2901,7 +2916,7 @@ packages:
     resolution: {integrity: sha512-Lm/eXB7yAQLJ5WxlBGwYfBY7utduXPZykcSmcG6K7ozM0wrZFvxZavhT6PqI0kd/5CUTfev/RrEFQqyU4CGPew==}
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dependencies:
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       native-fetch: 4.0.2(undici@5.22.0)
       receptacle: 1.3.2
       undici: 5.22.0
@@ -3883,7 +3898,6 @@ packages:
   /has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
-    dev: true
 
   /has-property-descriptors@1.0.0:
     resolution: {integrity: sha512-62DVLZGoiEBDHQyqG4w9xCuZ7eJEwNmJRWw2VY84Oedb7WFcA27fiEVe8oUQx9hAUJ4ekurquucTGwsyO1XGdQ==}
@@ -4110,7 +4124,7 @@ packages:
       '@multiformats/multiaddr': 11.6.1
       cborg: 1.10.1
       datastore-core: 8.0.4
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       fnv1a: 1.1.1
       interface-blockstore: 3.0.2
       interface-datastore: 7.0.4
@@ -4131,7 +4145,7 @@ packages:
       bytes: 3.1.2
       cborg: 1.10.1
       datastore-core: 8.0.4
-      debug: 4.3.4
+      debug: 4.3.4(supports-color@8.1.1)
       err-code: 3.0.1
       interface-blockstore: 3.0.2
       interface-datastore: 7.0.4
@@ -6176,7 +6190,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       has-flag: 4.0.0
-    dev: true
 
   /supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
