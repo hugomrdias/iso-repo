@@ -56,10 +56,6 @@ export default function Login(props) {
     }
   }
 
-  if (isLoading) {
-    return <div>Loading...</div>
-  }
-
   useEffect(() => {
     async function run() {
       if (program) {
@@ -76,10 +72,14 @@ export default function Login(props) {
       }
     }
 
-    run().catch((err) => {
-      console.log(err)
+    run().catch((error) => {
+      console.log(error)
     })
   }, [program])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <>
