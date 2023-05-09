@@ -30,7 +30,7 @@ export async function credentialsGet(options) {
     }
 
     if (options.publicKey?.allowCredentials?.length !== 0) {
-      throw new Error('Conditional mediation empty allow credentials.')
+      throw new Error('Conditional mediation require empty allow credentials.')
     }
 
     const webauthnInputs = document.querySelectorAll(

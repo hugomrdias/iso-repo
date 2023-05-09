@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 /* eslint-disable unicorn/no-useless-undefined */
-import { useEffect, useState } from 'preact/hooks'
-import { useOdd } from './odd-passkey-preact/index.jsx'
-import { Auth } from './odd-passkey-core/index.js'
 import pDebounce from 'p-debounce'
+import { route } from 'preact-router'
+import { useState } from 'preact/hooks'
+import { useOdd } from './odd-passkey-preact/index.jsx'
 
 /**
  * @param {import('preact').Attributes} props
  */
-export default function Login(props) {
+export default function Register(props) {
   const { program, isLoading, isUsernameAvailable } = useOdd({
     redirectTo: '/',
     redirectIfFound: true,
@@ -16,12 +16,12 @@ export default function Login(props) {
 
   const [errorMsg, setErrorMsg] = useState('')
   const [mode, setMode] = useState(false)
-  const [isLoggingIn, setIsLoggingIn] = useState(false)
 
   /** @type {import('preact/src/jsx.js').JSXInternal.GenericEventHandler<HTMLInputElement>} */
   async function onChange(event) {
     // @ts-ignore
     const username = event.target.value
+
     try {
       const res = await isUsernameAvailable(username)
       setMode(res)
@@ -41,45 +41,26 @@ export default function Login(props) {
     const formData = new FormData(event.currentTarget)
     const username = /** @type {string | null} */ (formData.get('username'))
 
-    if (!username || !program) return
-    setIsLoggingIn(true)
+    if (!username) return
 
     try {
-      await Auth.login(program, username)
-      setErrorMsg('')
+      const reg = await program?.auth.register({ username })
+      if (reg && reg.success) {
+        setErrorMsg('')
+        route('/login')
+      } else {
+        setErrorMsg('Registration failed')
+      }
     } catch (error) {
-      console.error(error)
       // @ts-ignore
       setErrorMsg(error.message)
-    } finally {
-      setIsLoggingIn(false)
+      console.error(error)
     }
   }
 
   if (isLoading) {
     return <div>Loading...</div>
   }
-
-  useEffect(() => {
-    async function run() {
-      if (program) {
-        try {
-          await Auth.login(program)
-          setErrorMsg('')
-        } catch (error) {
-          console.error(error)
-          // @ts-ignore
-          setErrorMsg(error.message)
-        } finally {
-          setIsLoggingIn(false)
-        }
-      }
-    }
-
-    run().catch((err) => {
-      console.log(err)
-    })
-  }, [program])
 
   return (
     <>
@@ -96,10 +77,9 @@ export default function Login(props) {
             />
           </label>
 
-          <button type="submit" disabled={mode || isLoggingIn}>
-            {isLoggingIn ? 'Logging In...' : 'Login'}
+          <button type="submit" disabled={!mode}>
+            Register
           </button>
-          {mode && <a href="/register">Register</a>}
 
           {errorMsg && <p className="error">{errorMsg}</p>}
           <p>
