@@ -83,7 +83,7 @@ export default function Register(props) {
 
           {errorMsg && <p className="error">{errorMsg}</p>}
           <p>
-            Navigate to
+            Navigate to{' '}
             <code>
               chrome://flags/#enable-experimental-web-platform-features
             </code>{' '}

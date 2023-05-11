@@ -10,6 +10,7 @@ import {
 } from 'preact/hooks'
 import * as odd from '@oddjs/odd'
 import { route } from 'preact-router'
+import { Auth } from '../odd-passkey-core/index.js'
 
 /** @type {import('preact').Context<import('./types').OddContext>} */
 // @ts-ignore - TODO fix this
@@ -18,9 +19,8 @@ const OddContext = createContext({
   error: undefined,
   session: null,
   program: undefined,
-  isUsernameAvailable: () => {
-    throw new Error('Needs program.')
-  },
+  isUsernameAvailable: undefined,
+  login: undefined,
 })
 /**
  *
@@ -33,7 +33,7 @@ export function OddContextProvider({
   config,
   children,
 }) {
-  const [isLoading, setIsLoading] = useState(true)
+  // State
   const [error, setError] = useState(
     /** @type {odd.ProgramError |undefined} */ (undefined)
   )
@@ -43,6 +43,8 @@ export function OddContextProvider({
   const [session, setSession] = useState(
     /** @type {import('@oddjs/odd').Session | null} */ (null)
   )
+
+  // Effects
   useEffect(() => {
     let mounted = true
 
@@ -62,10 +64,8 @@ export function OddContextProvider({
           })
           setProgram(program)
           setSession(program.session)
-          setIsLoading(false)
         } catch (error) {
           setError(/** @type {odd.ProgramError} */ (error))
-          setIsLoading(false)
         }
       }
     }
@@ -103,15 +103,26 @@ export function OddContextProvider({
     [program]
   )
 
+  const login = useCallback(
+    async (/** @type {string | undefined} */ username) => {
+      if (!program) {
+        throw new Error('Needs program.')
+      }
+      return await Auth.login(program, username)
+    },
+    [program]
+  )
+
   /** @type {import('./types').OddContext} */
   const value = useMemo(() => {
-    if (isLoading) {
+    if (!program) {
       return {
         isLoading: true,
         error: undefined,
         session: null,
         program: undefined,
         isUsernameAvailable,
+        login,
       }
     }
 
@@ -122,6 +133,17 @@ export function OddContextProvider({
         session: null,
         program: undefined,
         isUsernameAvailable,
+        login,
+      }
+    }
+    if (program) {
+      return {
+        isLoading: false,
+        error,
+        session,
+        program,
+        isUsernameAvailable,
+        login,
       }
     }
 
@@ -131,8 +153,9 @@ export function OddContextProvider({
       session,
       program,
       isUsernameAvailable,
+      login,
     }
-  }, [isLoading, error, session, program, isUsernameAvailable])
+  }, [program, error, session, isUsernameAvailable, login])
 
   return <OddContext.Provider value={value}>{children}</OddContext.Provider>
 }

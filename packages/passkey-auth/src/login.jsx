@@ -2,14 +2,13 @@
 /* eslint-disable unicorn/no-useless-undefined */
 import { useEffect, useState } from 'preact/hooks'
 import { useOdd } from './odd-passkey-preact/index.jsx'
-import { Auth } from './odd-passkey-core/index.js'
 import pDebounce from 'p-debounce'
 
 /**
  * @param {import('preact').Attributes} props
  */
 export default function Login(props) {
-  const { program, isLoading, isUsernameAvailable } = useOdd({
+  const { program, isLoading, isUsernameAvailable, login } = useOdd({
     redirectTo: '/',
     redirectIfFound: true,
   })
@@ -45,7 +44,7 @@ export default function Login(props) {
     setIsLoggingIn(true)
 
     try {
-      await Auth.login(program, username)
+      await login(username)
       setErrorMsg('')
     } catch (error) {
       console.error(error)
@@ -60,7 +59,7 @@ export default function Login(props) {
     async function run() {
       if (program) {
         try {
-          await Auth.login(program)
+          await login()
           setErrorMsg('')
         } catch (error) {
           console.error(error)
@@ -75,7 +74,7 @@ export default function Login(props) {
     run().catch((error) => {
       console.log(error)
     })
-  }, [program])
+  }, [login, program])
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -103,7 +102,7 @@ export default function Login(props) {
 
           {errorMsg && <p className="error">{errorMsg}</p>}
           <p>
-            Navigate to
+            Navigate to{' '}
             <code>
               chrome://flags/#enable-experimental-web-platform-features
             </code>{' '}

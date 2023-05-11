@@ -4,6 +4,7 @@ import type {
   Configuration,
   Components,
   ProgramError,
+  Maybe,
 } from '@oddjs/odd'
 
 export type OddContext =
@@ -13,6 +14,7 @@ export type OddContext =
       session: null
       program: undefined
       isUsernameAvailable: (username: string) => Promise<boolean>
+      login: (username?: string) => Promise<Maybe<Session>>
     }
   | {
       isLoading: false
@@ -20,13 +22,23 @@ export type OddContext =
       session: null
       program: undefined
       isUsernameAvailable: (username: string) => Promise<boolean>
+      login: (username?: string) => Promise<Maybe<Session>>
     }
   | {
       isLoading: false
       error: undefined
       session: Session | null
-      program: Program | undefined
+      program: Program
       isUsernameAvailable: (username: string) => Promise<boolean>
+      login: (username?: string) => Promise<Maybe<Session>>
+    }
+  | {
+      isLoading: false
+      error: undefined
+      session: Session | null
+      program: Program
+      isUsernameAvailable: (username: string) => Promise<boolean>
+      login: (username?: string) => Promise<Maybe<Session>>
     }
 
 export interface OddContextProviderProps {
