@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.1.2...iso-filecoin-v0.1.3) (2023-05-11)
+
+
+### Bug Fixes
+
+* update deps ([c5a562f](https://github.com/hugomrdias/iso-repo/commit/c5a562fd8219e99f602e5ac2400bdc0f0dd14336))
+
 ## [0.1.2](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.1.1...iso-filecoin-v0.1.2) (2023-03-28)
 
 
