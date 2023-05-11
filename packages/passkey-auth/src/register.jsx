@@ -3,7 +3,7 @@
 import pDebounce from 'p-debounce'
 import { route } from 'preact-router'
 import { useState } from 'preact/hooks'
-import { useOdd } from './odd-passkey-preact/index.jsx'
+import { useOdd } from './odd-preact/index.jsx'
 
 /**
  * @param {import('preact').Attributes} props

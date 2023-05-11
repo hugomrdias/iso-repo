@@ -3,7 +3,7 @@
 import * as odd from '@oddjs/odd'
 import { isFile } from '@oddjs/odd/fs/types/check'
 import { useEffect, useState } from 'preact/hooks'
-import { useOdd } from './odd-passkey-preact/index.jsx'
+import { useOdd } from './odd-preact/index.jsx'
 
 const branch = odd.path.RootBranch.Private
 

@@ -78,11 +78,11 @@
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.15.10",
     "assert": "^2.0.0",
-    "hd-scripts": "^5.0.0",
+    "hd-scripts": "^6.0.0",
     "micro-bmark": "^0.3.1",
     "mocha": "^10.2.0",
-    "playwright-test": "^8.2.0",
-    "typescript": "5.0.2"
+    "playwright-test": "^9.0.0",
+    "typescript": "5.0.4"
   },
   "eslintConfig": {
     "extends": [

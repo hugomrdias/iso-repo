@@ -11,7 +11,8 @@ pnpm install iso-filecoin
 ## Usage
 
 ```js
-import { Token, Wallet } from 'iso-filecoin'
+import { Token } from 'iso-filecoin/token'
+import { Wallet } from 'iso-filecoin/wallet'
 ```
 
 ## Docs

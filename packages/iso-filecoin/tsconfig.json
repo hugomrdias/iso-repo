@@ -11,5 +11,11 @@
     }
   ],
   "include": ["src", "scripts", "test", "package.json"],
-  "exclude": ["node_modules", "dist", "out"]
+  "exclude": ["node_modules", "dist", "out"],
+  "typedocOptions": {
+    "entryPoints": ["src/wallet.js", "src/token.js"],
+    "includeVersion": true,
+    "excludeExternals": true,
+    "internalModule": "<internal>"
+  }
 }

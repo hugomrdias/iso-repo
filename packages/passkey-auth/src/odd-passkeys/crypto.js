@@ -2,8 +2,8 @@ import * as ed from '@noble/ed25519'
 import * as odd from '@oddjs/odd'
 import { webcrypto } from 'iso-base/crypto'
 import { concat, u8 } from 'iso-base/utils'
-import { ED25519_DID_PREFIX } from '../webauthn/cose.js'
 
+export const ED25519_DID_PREFIX = new Uint8Array([0xed, 0x01])
 /**
  * Encrypt data with AES-GCM
  *

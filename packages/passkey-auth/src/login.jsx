@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable unicorn/no-useless-undefined */
 import { useEffect, useState } from 'preact/hooks'
-import { useOdd } from './odd-passkey-preact/index.jsx'
+import { useOdd } from './odd-preact/index.jsx'
 import pDebounce from 'p-debounce'
 
 /**

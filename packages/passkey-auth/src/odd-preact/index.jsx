@@ -10,9 +10,9 @@ import {
 } from 'preact/hooks'
 import * as odd from '@oddjs/odd'
 import { route } from 'preact-router'
-import { Auth } from '../odd-passkey-core/index.js'
+import { Auth } from '../odd-passkeys/index.js'
 
-/** @type {import('preact').Context<import('./types').OddContext>} */
+/** @type {import('preact').Context<import('./types.js').OddContext>} */
 // @ts-ignore - TODO fix this
 const OddContext = createContext({
   isLoading: true,
@@ -24,7 +24,7 @@ const OddContext = createContext({
 })
 /**
  *
- * @param {import('./types').OddContextProviderProps & {children : import('preact').ComponentChildren}} props
+ * @param {import('./types.js').OddContextProviderProps & {children : import('preact').ComponentChildren}} props
  * @returns
  */
 export function OddContextProvider({
@@ -113,7 +113,7 @@ export function OddContextProvider({
     [program]
   )
 
-  /** @type {import('./types').OddContext} */
+  /** @type {import('./types.js').OddContext} */
   const value = useMemo(() => {
     if (!program) {
       return {

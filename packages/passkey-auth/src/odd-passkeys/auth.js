@@ -6,8 +6,7 @@ import * as Session from '@oddjs/odd/session'
 import { base64url } from 'iso-base/rfc4648'
 import { utf8 } from 'iso-base/utf8'
 import { u8 } from 'iso-base/utils'
-import { credentialsCreate, credentialsGet } from '../webauthn/api.js'
-import { ED25519_DID_PREFIX } from '../webauthn/cose.js'
+import { credentialsCreate, credentialsGet } from 'iso-passkeys'
 import * as Crypto from './crypto.js'
 
 /**
@@ -35,9 +34,7 @@ export async function createEncryptionKey(keyMaterial) {
     },
     keyDerivationKey,
     { name: 'AES-GCM', length: 256 },
-    // No need for exportability because we can deterministically
-    // recreate this key
-    true,
+    false,
     ['encrypt', 'decrypt']
   )
 
@@ -114,7 +111,7 @@ export async function registerPasskey(username, storage, config) {
  *
  * @param {import('@oddjs/odd').Configuration} config
  * @param {import('@oddjs/odd/components/storage/implementation').Implementation} storage
- * @param {import('../webauthn/types.js').CredentialMediationRequirement} [mediation]
+ * @param {import('iso-passkeys/types').CredentialMediationRequirement} [mediation]
  */
 async function getPasskey(config, storage, mediation) {
   const rp = rpFromConfig(config)
@@ -156,21 +153,6 @@ async function getPasskey(config, storage, mediation) {
 
   const publicKey = await ed.getPublicKeyAsync(u8(secret1))
 
-  const crypto = {
-    did: {
-      keyTypes: {
-        ed25519: {
-          magicBytes: ED25519_DID_PREFIX,
-        },
-      },
-    },
-  }
-
-  // @ts-ignore
-  const did = publicKeyToDid(crypto, publicKey, 'ed25519')
-  await storage.setItem('passkey/public-key', publicKey)
-  await storage.setItem('passkey/did', did)
-
   if (!secret2) {
     throw new Error('PRF second secret not supported.')
   }
@@ -178,7 +160,6 @@ async function getPasskey(config, storage, mediation) {
   await storage.setItem('passkey/encryption-key', encryptionKey)
   return {
     publicKey,
-    did,
     assertion,
     privateKey: u8(secret1),
     userHandle: assertion.userHandle,
@@ -247,7 +228,7 @@ export async function login(program, username) {
     return program.session
   }
 
-  const { did, privateKey, publicKey, userHandle } = await getPasskey(
+  const { privateKey, publicKey, userHandle } = await getPasskey(
     program.configuration,
     program.components.storage,
     username ? undefined : 'conditional'
@@ -256,6 +237,12 @@ export async function login(program, username) {
   if (!username && !userHandle) {
     throw new Error('Username is required')
   }
+
+  const crypto = await Crypto.implementation(
+    program.configuration,
+    publicKey,
+    privateKey
+  )
 
   // Create an account UCAN
   const accountUcan = await odd.ucan.build({
@@ -271,7 +258,7 @@ export async function login(program, username) {
     lifetimeInSeconds: 60 * 60 * 24 * 30 * 12 * 1000, // a lot of time
 
     audience: await odd.did.ucan(program.components.crypto),
-    issuer: did,
+    issuer: publicKeyToDid(crypto, publicKey, 'ed25519'),
   })
 
   // Save account UCAN

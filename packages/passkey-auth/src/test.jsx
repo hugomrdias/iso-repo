@@ -4,15 +4,14 @@ import { utf8 } from 'iso-base/utf8'
 import { useForm } from 'react-hook-form'
 import { useEffect, useState } from 'preact/hooks'
 import { signal, effect } from '@preact/signals'
-import { credentialsCreate, credentialsGet } from './webauthn/api.js'
-import { supports } from './webauthn/utils.js'
+import { credentialsCreate, credentialsGet, supports } from 'iso-passkeys'
 import { set, get } from 'idb-keyval'
 
 // Signals
 const supportsLargeBlob = signal(false)
 const supportsPrf = signal(false)
 const credentials = signal(
-  /** @type { import('./webauthn/types.js').PublicKeyCredentialDescriptorJSON[] | undefined} */ (
+  /** @type { import('iso-passkeys/types').PublicKeyCredentialDescriptorJSON[] | undefined} */ (
     undefined
   )
 )

@@ -6,5 +6,16 @@
     "emitDeclarationOnly": true
   },
   "include": ["src", "scripts", "test", "package.json"],
-  "exclude": ["node_modules", "dist", "out"]
+  "exclude": ["node_modules", "dist", "out"],
+  "typedocOptions": {
+    "entryPoints": [
+      "src/rfc4648.js",
+      "src/crypto.js",
+      "src/utf8.js",
+      "src/utils.js"
+    ],
+    "includeVersion": true,
+    "excludeExternals": true,
+    "internalModule": "<internal>"
+  }
 }
