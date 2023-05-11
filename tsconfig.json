@@ -35,12 +35,15 @@
   },
   "typedocOptions": {
     "entryPointStrategy": "packages",
-    "entryPoints": ["packages/iso-base", "packages/iso-filecoin"],
+    "entryPoints": [
+      "packages/iso-base",
+      "packages/iso-filecoin",
+      "packages/iso-passkeys"
+    ],
     "excludeExternals": true,
     "darkHighlightTheme": "github-dark",
     "navigationLinks": {
       "Github": "https://github.com/hugomrdias/iso-repo"
-    },
-    "customCss": "./.github/typedoc.css"
+    }
   }
 }

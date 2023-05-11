@@ -2,6 +2,7 @@
   "separate-pull-requests": true,
   "packages": {
     "packages/iso-base": {},
-    "packages/iso-filecoin": {}
+    "packages/iso-filecoin": {},
+    "packages/iso-passkeys": {}
   }
 }
