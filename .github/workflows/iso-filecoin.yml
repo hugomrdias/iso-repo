@@ -9,6 +9,7 @@ on:
     paths:
       - 'packages/iso-filecoin/**'
       - '.github/workflows/iso-filecoin.yml'
+      - '.github/workflows/release.yml'
       - 'pnpm-lock.yaml'
   pull_request:
     paths:

@@ -9,6 +9,7 @@ on:
     paths:
       - 'packages/iso-did/**'
       - '.github/workflows/iso-did.yml'
+      - '.github/workflows/release.yml'
       - 'pnpm-lock.yaml'
   pull_request:
     paths:

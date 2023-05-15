@@ -9,6 +9,7 @@ on:
     paths:
       - 'packages/iso-base/**'
       - '.github/workflows/iso-base.yml'
+      - '.github/workflows/release.yml'
       - 'pnpm-lock.yaml'
   pull_request:
     paths:
