@@ -50,12 +50,12 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "@ipld/dag-ucan": "^3.3.2",
     "@noble/ed25519": "^2.0.0",
     "@peculiar/asn1-ecc": "^2.3.6",
     "@peculiar/asn1-schema": "^2.3.6",
     "cbor-x": "^1.5.2",
-    "iso-base": "workspace:^"
+    "iso-base": "workspace:^",
+    "iso-did": "workspace:^"
   },
   "devDependencies": {
     "@types/assert": "^1.5.6",
