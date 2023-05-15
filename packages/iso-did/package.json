@@ -91,7 +91,8 @@
     "ignores": [
       "@types/*",
       "hd-scripts",
-      "assert"
+      "assert",
+      "type-fest"
     ]
   }
 }
