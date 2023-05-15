@@ -131,7 +131,7 @@ export function rfc4648(base, padding = true, normalize) {
         return buf(input).toString('hex')
       }
 
-      if (base === 'base64' && globalThis.Buffer) {
+      if (base === 'base64' && globalThis.Buffer && !pad) {
         return buf(input).toString('base64')
       }
 
@@ -183,6 +183,7 @@ export const base16 = rfc4648('base16')
 export const base32 = rfc4648('base32')
 export const base32hex = rfc4648('base32hex')
 export const base64 = rfc4648('base64')
+export const base64pad = rfc4648('base64', true)
 /**
  * Base 64 URL
  *
