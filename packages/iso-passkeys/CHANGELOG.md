@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.1.0...iso-passkeys-v0.1.1) (2023-05-15)
+
+
+### Bug Fixes
+
+* use iso-did ([eb0648f](https://github.com/hugomrdias/iso-repo/commit/eb0648f046015d52be8fb71307365ab509a889d3))
+
 ## [0.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.0.1...iso-passkeys-v0.1.0) (2023-05-11)
 
 
