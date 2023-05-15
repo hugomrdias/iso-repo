@@ -1,0 +1,3 @@
+ignore: []
+url: passkeys-test.fission.app
+build: ./dist

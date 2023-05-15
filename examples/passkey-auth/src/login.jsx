@@ -88,7 +88,7 @@ export default function Login(props) {
             <input
               type="text"
               name="username"
-              placeholder="username"
+              placeholder="username-hello"
               autoFocus
               autoComplete="username webauthn"
               onChange={debouncedFn}
