@@ -1,6 +1,6 @@
 # iso-did [![NPM Version](https://img.shields.io/npm/v/iso-did.svg)](https://www.npmjs.com/package/iso-did) [![License](https://img.shields.io/npm/l/iso-did.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-did](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-did.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-did.yml)
 
-> Isomorphic did tooling
+> Isomorphic did core and did key tooling
 
 ## Install
 
