@@ -1,0 +1,34 @@
+name: iso-did
+env:
+  CI: true
+  FORCE_COLOR: 1
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/iso-did/**'
+      - '.github/workflows/iso-did.yml'
+      - 'pnpm-lock.yaml'
+  pull_request:
+    paths:
+      - 'packages/iso-did/**'
+      - '.github/workflows/iso-did.yml'
+      - 'pnpm-lock.yaml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm run build
+      - run: pnpm -r --filter iso-did run lint
+      - run: pnpm -r --filter iso-did run test
+      - run: pnpm -r --filter iso-did exec depcheck

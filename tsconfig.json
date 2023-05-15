@@ -38,7 +38,8 @@
     "entryPoints": [
       "packages/iso-base",
       "packages/iso-filecoin",
-      "packages/iso-passkeys"
+      "packages/iso-passkeys",
+      "packages/iso-did"
     ],
     "excludeExternals": true,
     "darkHighlightTheme": "github-dark",

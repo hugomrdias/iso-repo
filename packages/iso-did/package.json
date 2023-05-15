@@ -1,0 +1,97 @@
+{
+  "name": "iso-did",
+  "version": "0.1.0",
+  "description": "DID tooling.",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-did"
+  },
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-did",
+  "keywords": [
+    "did",
+    "did:key"
+  ],
+  "type": "module",
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./key": {
+      "types": "./dist/src/key.d.ts",
+      "import": "./src/key.js"
+    },
+    "./core": {
+      "types": "./dist/src/key.d.ts",
+      "import": "./src/key.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "dist/src/index"
+      ],
+      "core": [
+        "dist/src/core"
+      ],
+      "key": [
+        "dist/src/key"
+      ]
+    }
+  },
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
+  "scripts": {
+    "lint": "tsc --build && eslint '**/*.{js,ts}' && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
+    "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
+    "test:node": "mocha 'test/**/!(*.browser).test.js'",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+  },
+  "dependencies": {
+    "did-resolver": "^4.1.0",
+    "iso-base": "workspace:^",
+    "multiformats": "^11.0.2"
+  },
+  "devDependencies": {
+    "@types/assert": "^1.5.6",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.15.10",
+    "assert": "^2.0.0",
+    "hd-scripts": "^6.0.0",
+    "mocha": "^10.2.0",
+    "playwright-test": "^9.0.0",
+    "type-fest": "^3.10.0",
+    "typescript": "5.0.4"
+  },
+  "eslintConfig": {
+    "extends": [
+      "../../node_modules/hd-scripts/eslint/index.js"
+    ],
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "env": {
+      "mocha": true
+    },
+    "ignorePatterns": [
+      "dist"
+    ]
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*",
+      "hd-scripts",
+      "assert"
+    ]
+  }
+}

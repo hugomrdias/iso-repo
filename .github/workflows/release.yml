@@ -27,7 +27,8 @@ jobs:
     if: |
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-base') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-filecoin') ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-passkeys')
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-passkeys') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-did')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -49,5 +50,6 @@ jobs:
     if: |
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-base') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-filecoin') ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-passkeys')
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-passkeys') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-did')
     uses: './.github/workflows/reusable-docs.yml'
