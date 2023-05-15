@@ -76,8 +76,12 @@ export default function Test(props) {
                   {' '}
                   {cred.id}
                   {JSON.stringify(cred.transports?.join(','))}{' '}
-                  {JSON.stringify(cred.clientExtensionResults)}
                   {JSON.stringify(
+                    // @ts-ignore
+                    cred.clientExtensionResults
+                  )}
+                  {JSON.stringify(
+                    // @ts-ignore
                     cred.attestationObject.authData.extensionsData
                   )}
                 </li>
@@ -185,13 +189,10 @@ function Login() {
  */
 function Registration() {
   const [errorMsg, setErrorMsg] = useState('')
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm()
+  const { register, handleSubmit } = useForm()
 
   /** @type {import('react-hook-form').SubmitHandler<import('react-hook-form').FieldValues>} */
+  // @ts-ignore
   const onSubmit = async (data) => {
     console.log(data)
     // reset supports

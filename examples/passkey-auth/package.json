@@ -7,7 +7,7 @@
     "dev": "vite --force",
     "build": "vite build",
     "preview": "vite preview",
-    "lint-FAILS": "tsc && eslint '**/*.{js,jsx,ts}' && prettier --check '**/*.{js,jsx,ts,yml,json}' --ignore-path ../../.gitignore",
+    "lint": "tsc && eslint '**/*.{js,jsx,ts}' && prettier --check '**/*.{js,jsx,ts,yml,json}' --ignore-path ../../.gitignore",
     "deploy": "vite build && wrangler pages publish --project-name passkey --branch main dist"
   },
   "dependencies": {
@@ -32,7 +32,8 @@
     "@babel/core": "^7.21.8",
     "@preact/preset-vite": "^2.5.0",
     "typescript": "^5.0.4",
-    "vite": "^4.3.5"
+    "vite": "^4.3.5",
+    "wrangler": "^2.20.0"
   },
   "eslintConfig": {
     "extends": [
