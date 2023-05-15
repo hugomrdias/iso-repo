@@ -11,7 +11,8 @@
   "homepage": "https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-did",
   "keywords": [
     "did",
-    "did:key"
+    "did:key",
+    "did-core"
   ],
   "type": "module",
   "main": "src/index.js",
@@ -91,7 +92,8 @@
     "ignores": [
       "@types/*",
       "hd-scripts",
-      "assert"
+      "assert",
+      "type-fest"
     ]
   }
 }
