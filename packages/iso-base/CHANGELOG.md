@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.1.3...iso-base-v0.1.4) (2023-05-15)
+
+
+### Bug Fixes
+
+* add base64pad ([ffb56df](https://github.com/hugomrdias/iso-repo/commit/ffb56dfc40bd91484389a7b56eb1f8a6f4434133))
+
 ## [0.1.3](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.1.2...iso-base-v0.1.3) (2023-05-11)
 
 
