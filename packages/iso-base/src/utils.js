@@ -99,7 +99,7 @@ export function isObjectOfType(type) {
  * @param {unknown} value
  * @returns {value is import("./types").TypedArray}
  */
-export function isTypeArray(value) {
+export function isTypedArray(value) {
   return isTypedArrayName(getObjectType(value))
 }
 
@@ -115,7 +115,7 @@ export const isArrayBuffer = isObjectOfType('ArrayBuffer')
  * @returns {value is BufferSource}
  */
 export function isBufferSource(value) {
-  return isTypeArray(value) || isArrayBuffer(value)
+  return isTypedArray(value) || isArrayBuffer(value)
 }
 
 /**
@@ -130,7 +130,7 @@ export function u8(arr) {
 }
 
 /**
- * Cast typedarray to Buffer
+ * Cast TypedArray to Buffer
  *
  * @param {BufferSource | string} arr
  * @param {BufferEncoding} [encoding]

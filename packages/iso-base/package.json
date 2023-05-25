@@ -43,6 +43,18 @@
     "./rfc4648": {
       "types": "./dist/src/rfc4648.d.ts",
       "import": "./src/rfc4648.js"
+    },
+    "./base-x": {
+      "types": "./dist/src/base-x.d.ts",
+      "import": "./src/base-x.js"
+    },
+    "./varint": {
+      "types": "./dist/src/varint.d.ts",
+      "import": "./src/varint.js"
+    },
+    "./ec-compression": {
+      "types": "./dist/src/ec-compression.d.ts",
+      "import": "./src/ec-compression.js"
     }
   },
   "typesVersions": {
@@ -58,6 +70,15 @@
       ],
       "rfc4648": [
         "dist/src/rfc4648"
+      ],
+      "base-x": [
+        "dist/src/base-x"
+      ],
+      "varint": [
+        "dist/src/varint"
+      ],
+      "ec-compression": [
+        "dist/src/ec-compression"
       ]
     }
   },
@@ -107,5 +128,9 @@
       "hd-scripts",
       "assert"
     ]
+  },
+  "dependencies": {
+    "base-x": "^4.0.0",
+    "bigint-mod-arith": "^3.2.1"
   }
 }
