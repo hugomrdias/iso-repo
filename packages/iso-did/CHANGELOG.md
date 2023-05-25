@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.0.0...iso-did-v1.1.0) (2023-05-25)
+
+
+### Features
+
+* refactor types and add fission rsa old format ([1f8eff6](https://github.com/hugomrdias/iso-repo/commit/1f8eff6f8f68475d2771909f7b9393d245496476))
+
 ## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v0.1.5...iso-did-v1.0.0) (2023-05-25)
 
 
