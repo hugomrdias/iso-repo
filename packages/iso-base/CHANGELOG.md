@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.1.5...iso-base-v0.2.0) (2023-05-25)
+
+
+### Features
+
+* **iso-base:** add ec-compression, base-x, varint ([51de8ba](https://github.com/hugomrdias/iso-repo/commit/51de8ba13dedfe7e194d2df0c647314d2340fce5))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.1.4...iso-base-v0.1.5) (2023-05-15)
 
 
