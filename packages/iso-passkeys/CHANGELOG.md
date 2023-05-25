@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.1.5...iso-passkeys-v0.1.6) (2023-05-25)
+
+
+### Bug Fixes
+
+* **iso-passkeys:** few tweaks to exports and ec compression extracted to iso-base ([66dff70](https://github.com/hugomrdias/iso-repo/commit/66dff707b45ecc7d47385df80d457685bffcc6da))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.1.1...iso-passkeys-v0.1.5) (2023-05-15)
 
 
