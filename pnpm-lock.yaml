@@ -51,7 +51,7 @@ importers:
         version: 2.3.6
       '@preact/signals':
         specifier: ^1.1.3
-        version: 1.1.3(preact@10.13.2)
+        version: 1.1.3(preact@10.15.0)
       cbor-x:
         specifier: ^1.5.2
         version: 1.5.2
@@ -68,11 +68,11 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       preact:
-        specifier: ^10.13.2
-        version: 10.13.2
+        specifier: ^10.15.0
+        version: 10.15.0
       preact-router:
-        specifier: ^4.1.0
-        version: 4.1.0(preact@10.13.2)
+        specifier: ^4.1.1
+        version: 4.1.1(preact@10.15.0)
       react-hook-form:
         specifier: ^7.43.9
         version: 7.43.9(react@18.2.0)
@@ -85,18 +85,25 @@ importers:
         version: 7.21.8
       '@preact/preset-vite':
         specifier: ^2.5.0
-        version: 2.5.0(@babel/core@7.21.8)(preact@10.13.2)(vite@4.3.5)
+        version: 2.5.0(@babel/core@7.21.8)(preact@10.15.0)(vite@4.3.8)
       typescript:
         specifier: ^5.0.4
         version: 5.0.4
       vite:
-        specifier: ^4.3.5
-        version: 4.3.5
+        specifier: ^4.3.8
+        version: 4.3.8
       wrangler:
         specifier: ^2.20.0
         version: 2.20.0
 
   packages/iso-base:
+    dependencies:
+      base-x:
+        specifier: ^4.0.0
+        version: 4.0.0
+      bigint-mod-arith:
+        specifier: ^3.2.1
+        version: 3.2.1
     devDependencies:
       '@scure/base':
         specifier: ^1.1.1
@@ -123,14 +130,17 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^9.0.0
-        version: 9.0.0
+        specifier: ^9.1.0
+        version: 9.1.0
       typescript:
         specifier: 5.0.4
         version: 5.0.4
 
   packages/iso-did:
     dependencies:
+      '@noble/ed25519':
+        specifier: ^2.0.0
+        version: 2.0.0
       did-resolver:
         specifier: ^4.1.0
         version: 4.1.0
@@ -160,11 +170,11 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^9.0.0
-        version: 9.0.0
+        specifier: ^9.1.0
+        version: 9.1.0
       type-fest:
-        specifier: ^3.10.0
-        version: 3.10.0(typescript@5.0.4)
+        specifier: ^3.11.0
+        version: 3.11.0
       typescript:
         specifier: 5.0.4
         version: 5.0.4
@@ -209,8 +219,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^9.0.0
-        version: 9.0.0
+        specifier: ^9.1.0
+        version: 9.1.0
       typescript:
         specifier: 5.0.4
         version: 5.0.4
@@ -255,8 +265,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^9.0.0
-        version: 9.0.0
+        specifier: ^9.1.0
+        version: 9.1.0
       typescript:
         specifier: 5.0.4
         version: 5.0.4
@@ -1750,7 +1760,7 @@ packages:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: true
 
-  /@preact/preset-vite@2.5.0(@babel/core@7.21.8)(preact@10.13.2)(vite@4.3.5):
+  /@preact/preset-vite@2.5.0(@babel/core@7.21.8)(preact@10.15.0)(vite@4.3.8):
     resolution: {integrity: sha512-BUhfB2xQ6ex0yPkrT1Z3LbfPzjpJecOZwQ/xJrXGFSZD84+ObyS//41RdEoQCMWsM0t7UHGaujUxUBub7WM1Jw==}
     peerDependencies:
       '@babel/core': 7.x
@@ -1759,13 +1769,13 @@ packages:
       '@babel/core': 7.21.8
       '@babel/plugin-transform-react-jsx': 7.21.5(@babel/core@7.21.8)
       '@babel/plugin-transform-react-jsx-development': 7.18.6(@babel/core@7.21.8)
-      '@prefresh/vite': 2.3.0(preact@10.13.2)(vite@4.3.5)
+      '@prefresh/vite': 2.3.0(preact@10.15.0)(vite@4.3.8)
       '@rollup/pluginutils': 4.2.1
       babel-plugin-transform-hook-names: 1.0.2(@babel/core@7.21.8)
       debug: 4.3.4(supports-color@8.1.1)
       kolorist: 1.8.0
       resolve: 1.22.2
-      vite: 4.3.5
+      vite: 4.3.8
     transitivePeerDependencies:
       - preact
       - supports-color
@@ -1775,32 +1785,32 @@ packages:
     resolution: {integrity: sha512-M+M3ZOtd1dtV/uasyk4SZu1vbfEJ4NeENv0F7F12nijZYedB5wSgbtZcuACyssnTznhF4ctUyrR0dZHuHfyWKA==}
     dev: false
 
-  /@preact/signals@1.1.3(preact@10.13.2):
+  /@preact/signals@1.1.3(preact@10.15.0):
     resolution: {integrity: sha512-N09DuAVvc90bBZVRwD+aFhtGyHAmJLhS3IFoawO/bYJRcil4k83nBOchpCEoS0s5+BXBpahgp0Mjf+IOqP57Og==}
     peerDependencies:
       preact: 10.x
     dependencies:
       '@preact/signals-core': 1.3.0
-      preact: 10.13.2
+      preact: 10.15.0
     dev: false
 
   /@prefresh/babel-plugin@0.5.0:
     resolution: {integrity: sha512-joAwpkUDwo7ZqJnufXRGzUb+udk20RBgfA8oLPBh5aJH2LeStmV1luBfeJTztPdyCscC2j2SmZ/tVxFRMIxAEw==}
     dev: true
 
-  /@prefresh/core@1.5.0(preact@10.13.2):
+  /@prefresh/core@1.5.0(preact@10.15.0):
     resolution: {integrity: sha512-C8zcVW77HD/jh47sLJ4vX2//qFrdr6kpBwsLDD84bSl2cvmCamZImnaDvimxrhxcN9oeC+8qnUl92SxQFQY0rg==}
     peerDependencies:
       preact: ^10.0.0
     dependencies:
-      preact: 10.13.2
+      preact: 10.15.0
     dev: true
 
   /@prefresh/utils@1.2.0:
     resolution: {integrity: sha512-KtC/fZw+oqtwOLUFM9UtiitB0JsVX0zLKNyRTA332sqREqSALIIQQxdUCS1P3xR/jT1e2e8/5rwH6gdcMLEmsQ==}
     dev: true
 
-  /@prefresh/vite@2.3.0(preact@10.13.2)(vite@4.3.5):
+  /@prefresh/vite@2.3.0(preact@10.15.0)(vite@4.3.8):
     resolution: {integrity: sha512-3ekbngrfWYeKGTy54wPCwRx9qBPnMe0lVe33z0rWjW3rgXWTBVZusFLub5QgJYEZNjYjJJBlSv1flekIjpI5Rw==}
     peerDependencies:
       preact: ^10.4.0
@@ -1808,11 +1818,11 @@ packages:
     dependencies:
       '@babel/core': 7.21.8
       '@prefresh/babel-plugin': 0.5.0
-      '@prefresh/core': 1.5.0(preact@10.13.2)
+      '@prefresh/core': 1.5.0(preact@10.15.0)
       '@prefresh/utils': 1.2.0
       '@rollup/pluginutils': 4.2.1
-      preact: 10.13.2
-      vite: 4.3.5
+      preact: 10.15.0
+      vite: 4.3.8
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2373,8 +2383,17 @@ packages:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
     dev: true
 
+  /base-x@4.0.0:
+    resolution: {integrity: sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==}
+    dev: false
+
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
+
+  /bigint-mod-arith@3.2.1:
+    resolution: {integrity: sha512-roLlzeQ0okNjT8Ph9zL9Nvw85ucHSQkNndLRfAR2CVaYOEAMtbpIK3f6oJb3Jv/hg9mkrYaw/DknysTuvc8QhA==}
+    engines: {node: '>=10.4.0'}
+    dev: false
 
   /bignumber.js@9.1.1:
     resolution: {integrity: sha512-pHm4LsMJ6lzgNGVfZHjMoO8sdoRhOzOH4MLmY65Jg70bpxCKu5iOHNJyfF6OyvYw7t8Fpf35RuzUyqnQsj8Vig==}
@@ -5466,8 +5485,8 @@ packages:
     hasBin: true
     dev: true
 
-  /playwright-test@9.0.0:
-    resolution: {integrity: sha512-fqhnC2i5485cu2OYxm1qPlheP7eABNKrRHDJeCefwo/ly0rr8BsCe/QkZ9J+0u3kuR1aRI0jL/a0924xSrIHTQ==}
+  /playwright-test@9.1.0:
+    resolution: {integrity: sha512-3o4VtURBBwCVx3UC2nu3Bz1JtPHxFfNzruQTQKVPVnDnFy0he3IUwbfa6UdkvLth9MOVUsgrU1IP+MryNc9qVg==}
     engines: {node: '>=16.0.0'}
     hasBin: true
     dependencies:
@@ -5528,16 +5547,16 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
-  /preact-router@4.1.0(preact@10.13.2):
-    resolution: {integrity: sha512-y1w2YvVpKAju9FMV+fAVR1NpH4MW5q07BZrziMZeg6F/rGJ9KvLUZtjOqsy2I8fDYiX36AM1AQTXIIK3jigBhA==}
+  /preact-router@4.1.1(preact@10.15.0):
+    resolution: {integrity: sha512-+LGrB3b2nR7+8vzyHw8i2/TjZazs3oMJovIEgBChPBXMDSISmwj2WDynZh8KDxZRK2GuXlqHPk15mMjaYWZH4g==}
     peerDependencies:
       preact: '>=10'
     dependencies:
-      preact: 10.13.2
+      preact: 10.15.0
     dev: false
 
-  /preact@10.13.2:
-    resolution: {integrity: sha512-q44QFLhOhty2Bd0Y46fnYW0gD/cbVM9dUVtNTDKPcdXSMA7jfY+Jpd6rk3GB0lcQss0z5s/6CmVP0Z/hV+g6pw==}
+  /preact@10.15.0:
+    resolution: {integrity: sha512-nZSa8M2R2m1n7nJSBlzDpxRJaIsejrTO1vlFbdpFvyC8qM1iU+On2y0otfoUm6SRB5o0lF0CKDFxg6grEFU0iQ==}
 
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -5825,8 +5844,8 @@ packages:
       estree-walker: 0.6.1
     dev: true
 
-  /rollup@3.21.7:
-    resolution: {integrity: sha512-KXPaEuR8FfUoK2uHwNjxTmJ18ApyvD6zJpYv9FOJSqLStmt6xOY84l1IjK2dSolQmoXknrhEFRaPRgOPdqCT5w==}
+  /rollup@3.23.0:
+    resolution: {integrity: sha512-h31UlwEi7FHihLe1zbk+3Q7z1k/84rb9BSwmBSr/XjOCEaBJ2YyedQDuM0t/kfOS0IxM+vk1/zI9XxYj9V+NJQ==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
@@ -6410,13 +6429,9 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  /type-fest@3.10.0(typescript@5.0.4):
-    resolution: {integrity: sha512-hmAPf1datm+gt3c2mvu0sJyhFy6lTkIGf0GzyaZWxRLnabQfPUqg6tF95RPg6sLxKI7nFLGdFxBcf2/7+GXI+A==}
+  /type-fest@3.11.0:
+    resolution: {integrity: sha512-JaPw5U9ixP0XcpUbQoVSbxSDcK/K4nww20C3kjm9yE6cDRRhptU28AH60VWf9ltXmCrIfIbtt9J+2OUk2Uqiaw==}
     engines: {node: '>=14.16'}
-    peerDependencies:
-      typescript: '>=4.7.0'
-    dependencies:
-      typescript: 5.0.4
     dev: true
 
   /typed-array-length@1.0.4:
@@ -6567,8 +6582,8 @@ packages:
     resolution: {integrity: sha512-cXEIW6cfr15lFv563k4GuVuW/fiwjknytD37jIOLSdSWuOI6WnO/oKwmP2FQTU2l01LP8/M5TSAJpzUaGe3uWg==}
     dev: false
 
-  /vite@4.3.5:
-    resolution: {integrity: sha512-0gEnL9wiRFxgz40o/i/eTBwm+NEbpUeTWhzKrZDSdKm6nplj+z4lKz8ANDgildxHm47Vg8EUia0aicKbawUVVA==}
+  /vite@4.3.8:
+    resolution: {integrity: sha512-uYB8PwN7hbMrf4j1xzGDk/lqjsZvCDbt/JC5dyfxc19Pg8kRm14LinK/uq+HSLNswZEoKmweGdtpbnxRtrAXiQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -6594,7 +6609,7 @@ packages:
     dependencies:
       esbuild: 0.17.19
       postcss: 8.4.23
-      rollup: 3.21.7
+      rollup: 3.23.0
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
