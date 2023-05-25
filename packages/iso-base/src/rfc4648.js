@@ -1,3 +1,9 @@
+/**
+ * RFC4648 codec factory and predefines `base2`, `base8`, `hex`, `base16`, `base32`, `base32hex`, `base64` and `base64url` alphabets and {@link Codec | Codecs}.
+ *
+ * @module
+ */
+
 /* eslint-disable unicorn/prefer-math-trunc */
 /* eslint-disable unicorn/no-for-loop */
 /** @typedef {import('./types').Codec} Codec */

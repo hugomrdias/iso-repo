@@ -1,3 +1,8 @@
+/**
+ * UTF-8 codec
+ *
+ * @module
+ */
 import { buf, isBufferSource, u8 } from './utils.js'
 
 const textDecoder = new TextDecoder()

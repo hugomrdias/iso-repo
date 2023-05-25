@@ -1,3 +1,11 @@
+/**
+ * Fast base encoding / decoding of any given alphabet using bitcoin style leading zero compression.
+ *
+ * Uses {@link https://github.com/cryptocoinjs/base-x | cryptocoinjs/base-x} to build a {@link Codec} factory and prefines `base10`, `base36` and `base58btc` alphabets and {@link Codec | Codecs}.
+ *
+ * @module
+ */
+
 import _baseX from 'base-x'
 import { utf8 } from './utf8.js'
 import { isBufferSource, u8 } from './utils.js'
@@ -12,7 +20,7 @@ const bases = {
 }
 
 /**
- * RFC4648 Factory
+ * Base X Factory
  *
  * @param {string} base
  * @returns {Codec}

@@ -1,3 +1,8 @@
+/**
+ * Variable length integer encoding with helpers for tagging Uint8Arrays with multicodec prefixes.
+ *
+ * @module
+ */
 /* eslint-disable no-nested-ternary */
 const MSB = 0x80
 const REST = 0x7f

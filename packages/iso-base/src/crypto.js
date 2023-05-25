@@ -1,3 +1,8 @@
+/**
+ * Isomorphic web crypto and random bytes exports
+ *
+ * @module
+ */
 import crypto from 'crypto'
 
 export const webcrypto = /** @type {Crypto} */ (crypto.webcrypto)

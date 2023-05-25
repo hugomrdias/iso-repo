@@ -1,3 +1,15 @@
+/**
+ * Elliptic Curve point compression
+ *
+ * Decompress a compressed public key in SEC format.
+ * See section 2.3.3 in {@link https://www.secg.org/sec1-v2.pdf | SEC 1 v2}
+ *
+ * - https://stackoverflow.com/questions/17171542/algorithm-for-elliptic-curve-point-compression/30431547#30431547
+ * - https://github.com/w3c-ccg/did-method-key/issues/32
+ *
+ *
+ * @module
+ */
 import * as bigintModArith from 'bigint-mod-arith'
 import { base10 } from './base-x.js'
 import { concat } from './utils.js'
@@ -90,13 +102,6 @@ export function compress(pubkeyBytes) {
 
 /**
  * Elliptic Curve point decompression
- *
- * Decompress a compressed public key in SEC format.
- * See section 2.3.3 in SEC 1 v2 : https://www.secg.org/sec1-v2.pdf.
- *
- * Code based on: https://stackoverflow.com/questions/17171542/algorithm-for-elliptic-curve-point-compression/30431547#30431547
- *
- * https://github.com/w3c-ccg/did-method-key/issues/32
  *
  * @param {Uint8Array} comp - Compressed public key. 1st byte: 0x02 for even or 0x03 for odd. Following curve size n bytes: x coordinate expressed as big-endian.
  * @param {Curve} curve
