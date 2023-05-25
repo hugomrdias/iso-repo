@@ -25,13 +25,13 @@
     },
     "./types": {
       "types": "./dist/src/types.d.ts",
-      "import": "./src/types.js"
+      "import": "./src/types.ts"
     }
   },
   "typesVersions": {
     "*": {
       ".": [
-        "dist/src/types"
+        "dist/src/index"
       ],
       "types": [
         "dist/src/types"

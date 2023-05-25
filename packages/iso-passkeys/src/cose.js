@@ -1,12 +1,7 @@
-// import * as DID from '@ipld/dag-ucan/did'
 import { utf8 } from 'iso-base/utf8'
 import { DIDKey } from 'iso-did/key'
 import { webcrypto } from 'iso-base/crypto'
 import { concat } from 'iso-base/utils'
-import { compressP256Pubkey } from './utils.js'
-
-// export const P256_DID_PREFIX = new Uint8Array([0x80, 0x24])
-// export const ED25519_DID_PREFIX = new Uint8Array([0xed, 0x01])
 
 /**
  * COSE Keys
@@ -109,17 +104,19 @@ export function mapCoseAlgToWebCryptoAlg(alg) {
 export function didFromCose(key) {
   const x = key[COSEKEYS_MAP.x]
   const y = key[COSEKEYS_MAP.y]
+  // const crv = key[COSEKEYS_MAP.crv]
 
   const keyType = getCoseKeyType(key)
 
+  // TODO: DID type should come from the COSE key crv
   switch (keyType) {
     case 'EC2': {
       const buf = concat([[4], x, y])
 
-      return DIDKey.fromPublicKey('P256', compressP256Pubkey(buf)).toString()
+      return DIDKey.fromPublicKey('P-256', buf).toString()
     }
     case 'OKP': {
-      return DIDKey.fromPublicKey('ED25519', x).toString()
+      return DIDKey.fromPublicKey('Ed25519', x).toString()
     }
 
     default: {
