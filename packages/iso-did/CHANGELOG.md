@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v0.1.5...iso-did-v1.0.0) (2023-05-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* add signatures and changes types names
+
+### Features
+
+* add signatures and changes types names ([982270e](https://github.com/hugomrdias/iso-repo/commit/982270ec803ad1a1bc3f955c9ce2cf2c1d123a8f))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/iso-did-v0.1.0...iso-did-v0.1.5) (2023-05-15)
 
 
