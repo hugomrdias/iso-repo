@@ -1,31 +1,31 @@
 import { base58btc } from 'multiformats/bases/base58'
-import { varint } from 'multiformats'
-import { DIDCore } from './core.js'
 import { u8 } from 'iso-base/utils'
+import { tag, varint } from 'iso-base/varint'
+import { DIDCore } from './core.js'
+import * as EC from 'iso-base/ec-compression'
 
 /* eslint-disable unicorn/numeric-separators-style */
 const TYPE_CODE = /** @type {const} */ ({
-  ED25519: 0xed,
+  Ed25519: 0xed,
   RSA: 0x1205,
-  P256: 0x1200,
-  P384: 0x1201,
-  P521: 0x1202,
-  SECP256K1: 0xe7,
+  'P-256': 0x1200,
+  'P-384': 0x1201,
+  'P-521': 0x1202,
+  secp256k1: 0xe7,
 })
 
 const CODE_TYPE = /** @type {const} */ ({
-  0xed: 'ED25519',
+  0xed: 'Ed25519',
   0x1205: 'RSA',
-  0x1200: 'P256',
-  0x1201: 'P384',
-  0x1202: 'P521',
-  0xe7: 'SECP256K1',
+  0x1200: 'P-256',
+  0x1201: 'P-384',
+  0x1202: 'P-521',
+  0xe7: 'secp256k1',
 })
 
 /**
- * @typedef {typeof TYPE_CODE} CodecMap
- * @typedef {CodecMap[keyof CodecMap]} Code
- * @typedef {keyof CodecMap} PublicKeyType
+ * @typedef {TYPE_CODE[keyof TYPE_CODE]} Code
+ * @typedef {keyof TYPE_CODE} KeyType
  */
 
 const DID_KEY_PREFIX = `did:key:`
@@ -38,35 +38,46 @@ const DID_KEY_PREFIX = `did:key:`
  */
 function validateRawPublicKeyLength(code, key) {
   switch (code) {
-    case TYPE_CODE.SECP256K1: {
+    case TYPE_CODE.secp256k1: {
       if (key.length !== 33) {
         throw new RangeError(`Secp256k1 public keys must be 33 bytes.`)
       }
-      return
+      return key
     }
-    case TYPE_CODE.ED25519: {
+    case TYPE_CODE.Ed25519: {
       if (key.length !== 32) {
         throw new RangeError(`ed25519 public keys must be 32 bytes.`)
       }
-      return
+      return key
     }
-    case TYPE_CODE.P256: {
-      if (key.length !== 33) {
+    case TYPE_CODE['P-256']: {
+      if (EC.isUncompressed(key)) {
+        key = EC.compress(key)
+      }
+
+      if (EC.isCompressed(key) && key.length !== 33) {
         throw new RangeError(`p256 public keys must be 33 bytes.`)
       }
-      return
+
+      return key
     }
-    case TYPE_CODE.P384: {
-      if (key.length !== 49) {
+    case TYPE_CODE['P-384']: {
+      if (EC.isUncompressed(key)) {
+        key = EC.compress(key)
+      }
+      if (EC.isCompressed(key) && key.length !== 49) {
         throw new RangeError(`p384 public keys must be 49 bytes.`)
       }
-      return
+      return key
     }
-    case TYPE_CODE.P521: {
-      if (key.length !== 67) {
+    case TYPE_CODE['P-521']: {
+      if (EC.isUncompressed(key)) {
+        key = EC.compress(key)
+      }
+      if (EC.isCompressed(key) && key.length !== 67) {
         throw new RangeError(`p521 public keys must be 67 bytes.`)
       }
-      return
+      return key
     }
 
     case TYPE_CODE.RSA: {
@@ -75,7 +86,7 @@ function validateRawPublicKeyLength(code, key) {
           `RSA public keys must be 270 bytes for 2048 bits or 526 bytes for 4096 bits.`
         )
       }
-      return
+      return key
     }
     default: {
       throw new RangeError(
@@ -92,15 +103,14 @@ export class DIDKey extends DIDCore {
   /**
    *
    * @param {import('./types').DID} did
-   * @param {Code} code
+   * @param {KeyType} type
    * @param {Uint8Array} key
-   * @param {PublicKeyType} type
    */
-  constructor(did, code, key, type) {
+  constructor(did, type, key) {
     super(did)
-    this.code = code
-    this.key = key
     this.type = type
+    this.publicKey = key
+    this.code = TYPE_CODE[type]
   }
 
   /**
@@ -113,14 +123,10 @@ export class DIDKey extends DIDCore {
 
     if (did.method === 'key') {
       const encodedKey = base58btc.decode(did.id)
-      const [code, size] = /** @type {[Code, number]} */ (
-        varint.decode(encodedKey)
-      )
-      const key = encodedKey.slice(size)
+      const [code, size] = varint.decode(encodedKey)
+      const key = validateRawPublicKeyLength(code, encodedKey.slice(size))
 
-      validateRawPublicKeyLength(code, key)
-
-      return new DIDKey(did, code, key, CODE_TYPE[code])
+      return new DIDKey(did, CODE_TYPE[/** @type {Code} */ (code)], key)
     } else {
       throw new TypeError(`Invalid DID "${did}", method must be 'key'`)
     }
@@ -129,31 +135,27 @@ export class DIDKey extends DIDCore {
   /**
    * Create a DIDKey from a public key bytes
    *
-   * @param {PublicKeyType} type
+   * @param {KeyType} type
    * @param {BufferSource} key
    */
   static fromPublicKey(type, key) {
-    const keyBytes = u8(key)
     const code = TYPE_CODE[type]
     if (!code) {
       throw new TypeError(`Unsupported key type "${type}"`)
     }
 
-    const codeLenth = varint.encodingLength(code)
-    const codedBytes = new Uint8Array(codeLenth + keyBytes.length)
-    varint.encodeTo(code, codedBytes)
-    codedBytes.set(keyBytes, codeLenth)
+    const keyBytes = validateRawPublicKeyLength(code, u8(key))
+    const id = base58btc.encode(tag(code, keyBytes))
 
     return new DIDKey(
       {
-        did: `${DID_KEY_PREFIX}${base58btc.encode(codedBytes)}`,
-        didUrl: `${DID_KEY_PREFIX}${base58btc.encode(codedBytes)}`,
-        id: `${base58btc.encode(codedBytes)}`,
+        did: `${DID_KEY_PREFIX}${id}`,
+        didUrl: `${DID_KEY_PREFIX}${id}`,
+        id,
         method: 'key',
       },
-      code,
-      keyBytes,
-      type
+      type,
+      keyBytes
     )
   }
 }

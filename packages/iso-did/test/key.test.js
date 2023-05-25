@@ -3,12 +3,12 @@ import { DIDKey } from '../src/key.js'
 import { base64pad } from 'iso-base/rfc4648'
 
 /**
- * @typedef {import('../src/key').PublicKeyType} PublicKeyType
+ * @typedef {import('../src/key').KeyType} PublicKeyType
  */
 
 /** @type {Record<PublicKeyType, {did: string, pub: Uint8Array}[]>} */
 const VECTORS = {
-  ED25519: [
+  Ed25519: [
     {
       did: 'did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp',
       pub: base64pad.decode('O2onvM62pC1io6jQKm8Nc2UyFXcd4kOmOsBIoYtZ2ik='),
@@ -35,13 +35,13 @@ const VECTORS = {
       ),
     },
   ],
-  P256: [
+  'P-256': [
     {
       did: 'did:key:zDnaerDaTF5BXEavCrfRZEk316dpbLsfPDZ3WJ5hRTPFU2169',
       pub: base64pad.decode('A38jWDDdPe+nIu8aoknWoN27pPmQsIF1OJM/VzZAZTVC'),
     },
   ],
-  P384: [
+  'P-384': [
     {
       did: 'did:key:z82Lm1MpAkeJcix9K8TMiLd5NMAhnwkjjCBeWHXyu3U4oT2MVJJKXkcVBgjGhnLBn2Kaau9',
       pub: base64pad.decode(
@@ -49,7 +49,7 @@ const VECTORS = {
       ),
     },
   ],
-  P521: [
+  'P-521': [
     {
       did: 'did:key:z2J9gaYxrKVpdoG9A4gRnmpnRCcxU6agDtFVVBVdn1JedouoZN7SzcyREXXzWgt3gGiwpoHq7K68X4m32D8HgzG8wv3sY5j7',
       pub: base64pad.decode(
@@ -57,7 +57,7 @@ const VECTORS = {
       ),
     },
   ],
-  SECP256K1: [
+  secp256k1: [
     {
       did: 'did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme',
       pub: base64pad.decode('A4dMFcf9og5TnG5bpXPBOYhMNRGIeZ9UWLS0H3kk8jXN'),
@@ -74,7 +74,7 @@ describe('did', function () {
   )) {
     for (const { did, pub } of fixtures) {
       it(`should parse ${type}`, function () {
-        assert.deepStrictEqual(DIDKey.fromString(did).key, pub)
+        assert.deepStrictEqual(DIDKey.fromString(did).publicKey, pub)
       })
 
       it(`should create did from ${type} public key`, function () {
