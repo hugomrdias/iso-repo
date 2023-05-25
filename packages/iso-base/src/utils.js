@@ -1,3 +1,9 @@
+/**
+ * Utilities to work with TypedArrays, BufferSource, and other bytes sources.
+ *
+ * @module
+ */
+
 const typedArrayTypeNames = /** @type {const} */ ([
   'Int8Array',
   'Uint8Array',
@@ -167,4 +173,25 @@ export function concat(arrays, length) {
   }
 
   return output
+}
+
+/**
+ * Checks if two Uint8Arrays are equal
+ *
+ * @param {Uint8Array} aa
+ * @param {Uint8Array} bb
+ */
+export function equals(aa, bb) {
+  if (aa === bb) return true
+  if (aa.byteLength !== bb.byteLength) {
+    return false
+  }
+
+  for (let ii = 0; ii < aa.byteLength; ii++) {
+    if (aa[ii] !== bb[ii]) {
+      return false
+    }
+  }
+
+  return true
 }
