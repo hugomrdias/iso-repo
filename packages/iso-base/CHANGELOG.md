@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.2.1...iso-base-v0.3.0) (2023-05-25)
+
+
+### Features
+
+* add equals to utils ([4e89e36](https://github.com/hugomrdias/iso-repo/commit/4e89e3616b138f8912a20262ad6b0676348595ed))
+
+
+### Bug Fixes
+
+* add more module documentation ([561eb1e](https://github.com/hugomrdias/iso-repo/commit/561eb1e1747c417904786e088b78fa00e0347db4))
+
 ## [0.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.2.0...iso-base-v0.2.1) (2023-05-25)
 
 
