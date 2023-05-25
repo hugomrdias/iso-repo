@@ -2,18 +2,32 @@
 import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
 import { DIDKey } from '../../key.js'
-import { createEcdsaParams, keyTypeToAlg } from '../common.js'
+import { keyTypeToAlg } from '../../common.js'
+import { createEcdsaParams } from '../utils.js'
 
 /**
  * @typedef {import('./types.js').ISigner<CryptoKeyPair>} ISigner
+ * @typedef {Extract<import('../../types.js').SignatureAlgorithm, 'ES256' | 'ES384' | 'ES512'>} ECDSAAlg
  */
 
 /**
+ * @param {string} alg
+ */
+function asECDSAAlg(alg) {
+  if (alg.startsWith('ES')) {
+    return /** @type {ECDSAAlg} */ (alg)
+  }
+  throw new TypeError(`Unsupported algorithm ${alg}`)
+}
+
+/**
+ * ECDSA signer
+ *
  * @implements {ISigner}
  */
 export class ECDSASigner {
   /**
-   * @param {import('../types.js').SignatureAlgorithm} alg
+   * @param {ECDSAAlg} alg
    * @param {Uint8Array} publicKey
    * @param {CryptoKeyPair} keypair
    */
@@ -29,18 +43,14 @@ export class ECDSASigner {
   /**
    * Generate a new signer
    *
-   * @param {import('../types.js').SignatureAlgorithm} alg
+   * @param {ECDSAAlg} alg
    */
   static async generate(alg) {
     const params = createEcdsaParams(alg)
-    const cryptoKeyPair = await webcrypto.subtle.generateKey(
-      {
-        name: params.name,
-        namedCurve: params.namedCurve,
-      },
-      false,
-      ['sign', 'verify']
-    )
+    const cryptoKeyPair = await webcrypto.subtle.generateKey(params, false, [
+      'sign',
+      'verify',
+    ])
 
     const publicKey = await webcrypto.subtle.exportKey(
       'raw',
@@ -51,29 +61,24 @@ export class ECDSASigner {
   }
 
   /**
+   * Import a signer from a JWK
    *
    * @param {import('../types.js').PrivateKeyJwk} jwk
    */
   static async importJwk(jwk) {
-    const alg = keyTypeToAlg(jwk.crv)
+    const alg = asECDSAAlg(keyTypeToAlg(jwk.crv))
     const params = createEcdsaParams(alg)
     const privateKey = await webcrypto.subtle.importKey(
       'jwk',
       jwk,
-      {
-        name: params.name,
-        namedCurve: params.namedCurve,
-      },
+      params,
       false,
       ['sign']
     )
     const publicKeyJWK = await webcrypto.subtle.importKey(
       'jwk',
       { ...jwk, d: undefined },
-      {
-        name: params.name,
-        namedCurve: params.namedCurve,
-      },
+      params,
       true,
       ['verify']
     )
@@ -87,12 +92,14 @@ export class ECDSASigner {
   }
 
   /**
+   * Import a signer from a CryptoKeyPair
+   *
    * @param {CryptoKeyPair} key
    */
   static async import(key) {
     const publicKey = await webcrypto.subtle.exportKey('raw', key.publicKey)
 
-    /** @type {'ES256' | 'ES384' | 'ES512' } */
+    /** @type { ECDSAAlg } */
     let alg
     switch (publicKey.byteLength) {
       case 65: {
@@ -116,11 +123,13 @@ export class ECDSASigner {
   }
 
   /**
+   * Sign a message
+   *
    * @param {Uint8Array} message
    */
   async sign(message) {
     const buf = await webcrypto.subtle.sign(
-      { name: this.params.name, hash: { name: this.params.hash } },
+      this.params,
       this.keypair.privateKey,
       message
     )
@@ -128,6 +137,11 @@ export class ECDSASigner {
     return u8(buf)
   }
 
+  /**
+   * Export the signer as a CryptoKeyPair
+   *
+   * @returns {CryptoKeyPair}
+   */
   export() {
     return this.keypair
   }

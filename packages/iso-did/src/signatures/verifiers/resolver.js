@@ -35,12 +35,14 @@ function memoryCache() {
 }
 
 /**
+ * Verifier resolver
+ *
  * @implements {IResolver}
  */
 export class Resolver {
   /**
    *
-   * @param {import('./types').VerifierRegistry<import('../types').SignatureAlgorithm>} registry
+   * @param {import('./types').VerifierRegistry<import('../../types').SignatureAlgorithm>} registry
    * @param {import('./types').ResolverOptions} options
    */
   constructor(registry = {}, options = {}) {

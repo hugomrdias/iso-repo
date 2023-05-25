@@ -1,7 +1,7 @@
 import assert from 'assert'
 import * as EdDSA from '../src/signatures/verifiers/eddsa.js'
 import { base64url } from 'iso-base/rfc4648'
-import { Ed25519Signer } from '../src/signatures/signers/ed25519.js'
+import { EdDSASigner } from '../src/signatures/signers/eddsa.js'
 
 const fixtures = {
   ed25519: [
@@ -27,7 +27,7 @@ describe('Verifier EdDSA', function () {
   for (const { pub, priv } of fixtures.ed25519) {
     it(`should verify ${base64url.encode(priv)}`, async function () {
       const message = new TextEncoder().encode('hello world')
-      const signer = await Ed25519Signer.generate(priv)
+      const signer = await EdDSASigner.generate(priv)
 
       assert.deepStrictEqual(pub, signer.publicKey)
 

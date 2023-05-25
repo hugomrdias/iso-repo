@@ -2,26 +2,22 @@
 import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
 import { DIDKey } from '../../key.js'
-import { spki } from '../spki.js'
 
 /**
  * @typedef {import('./types.js').ISigner<CryptoKeyPair>} ISigner
  */
 
 /**
- * RSA signer
+ * RSA Old fission format signer
  *
  * @implements {ISigner}
  */
-export class RSASigner {
-  /** @type {Extract<import('../../types.js').SignatureAlgorithm, "RS256">} */
-  static alg = 'RS256'
+export class RSAOldSigner {
+  /** @type {Extract<import('../../types.js').SignatureAlgorithm, "RS256_OLD">} */
+  static alg = 'RS256_OLD'
 
-  /** @type {Extract<import('../../types.js').KeyType, "RSA">} */
-  static type = 'RSA'
-
-  // multicodec code for RSA private key
-  static code = 0x1305
+  /** @type {Extract<import('../../types.js').KeyType, "RSA_OLD">} */
+  static type = 'RSA_OLD'
 
   /**
    * @param {Uint8Array} publicKey
@@ -30,10 +26,9 @@ export class RSASigner {
   constructor(publicKey, keypair) {
     this.keypair = keypair
     this.publicKey = publicKey
-    this.alg = RSASigner.alg
-    this.type = RSASigner.type
-    this.code = RSASigner.code
-    this.did = DIDKey.fromPublicKey(RSASigner.type, this.publicKey)
+    this.alg = RSAOldSigner.alg
+    this.type = RSAOldSigner.type
+    this.did = DIDKey.fromPublicKey(RSAOldSigner.type, this.publicKey)
   }
 
   /**
@@ -57,7 +52,7 @@ export class RSASigner {
       cryptoKeyPair.publicKey
     )
 
-    return new RSASigner(spki.decode(u8(publicKey)), cryptoKeyPair)
+    return new RSAOldSigner(u8(publicKey), cryptoKeyPair)
   }
 
   /**
@@ -89,7 +84,7 @@ export class RSASigner {
 
     const publicKey = await webcrypto.subtle.exportKey('spki', publicKeyJWK)
 
-    return new RSASigner(spki.decode(u8(publicKey)), {
+    return new RSAOldSigner(u8(publicKey), {
       privateKey,
       publicKey: publicKeyJWK,
     })
@@ -106,7 +101,7 @@ export class RSASigner {
       keypair.publicKey
     )
 
-    return new RSASigner(spki.decode(u8(publicKey)), keypair)
+    return new RSAOldSigner(u8(publicKey), keypair)
   }
 
   /**

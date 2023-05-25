@@ -1,20 +1,3 @@
-// https://www.iana.org/assignments/cose/cose.xhtml#algorithms
-export type SignatureAlgorithm =
-  | 'EdDSA'
-  | 'ES256'
-  | 'ES384'
-  | 'ES512'
-  | 'RS256'
-  | 'ES256K'
-
-export type KeyType =
-  | 'Ed25519'
-  | 'P-256'
-  | 'P-384'
-  | 'P-521'
-  | 'secp256k1'
-  | 'RSA'
-
 export interface PublicKeyJwk {
   kty: string
   crv: string

@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
-import { spki } from '../signers/spki.js'
+import { spki } from '../spki.js'
 
 /** @type {import('./types.js').Verify} */
 export async function verify({ signature, message, publicKey }) {

@@ -1,11 +1,11 @@
 /* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
 import { decompress, isCompressed } from 'iso-base/ec-compression'
-import { createEcdsaParams } from '../common.js'
+import { createEcdsaParams } from '../utils.js'
 
 /**
  *
- * @param {import('../types.js').SignatureAlgorithm} type
+ * @param {import('../../types.js').SignatureAlgorithm} type
  */
 function createVerifier(type) {
   const params = createEcdsaParams(type)

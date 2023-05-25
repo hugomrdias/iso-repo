@@ -1,8 +1,11 @@
 import assert from 'assert'
-import { Ed25519Signer } from '../src/signatures/signers/ed25519.js'
+import { EdDSASigner } from '../src/signatures/signers/eddsa.js'
+import { RSAOldSigner } from '../src/signatures/signers/rsa-old.js'
 import { Resolver } from '../src/signatures/verifiers/resolver.js'
 import * as EdDSA from '../src/signatures/verifiers/eddsa.js'
-import * as ES256 from '../src/signatures/verifiers/ecdsa.js'
+import * as ECDSA from '../src/signatures/verifiers/ecdsa.js'
+import * as RSA from '../src/signatures/verifiers/rsa.js'
+import * as RSA_OLD from '../src/signatures/verifiers/rsa-old.js'
 
 describe('Verifier Resolver', function () {
   it(`should verify`, async function () {
@@ -10,12 +13,27 @@ describe('Verifier Resolver', function () {
     const resolver = new Resolver({
       ...EdDSA.verifier,
     })
-    const signer = await Ed25519Signer.generate()
+    const signer = await EdDSASigner.generate()
     const signature = await signer.sign(message)
     const verified = await resolver.verify({
       signature,
       message,
       ...signer,
+    })
+    assert.ok(verified)
+  })
+
+  it(`should verify from did`, async function () {
+    const message = new TextEncoder().encode('hello world')
+    const resolver = new Resolver({
+      ...EdDSA.verifier,
+    })
+    const signer = await EdDSASigner.generate()
+    const signature = await signer.sign(message)
+    const verified = await resolver.verify({
+      signature,
+      message,
+      ...signer.did,
     })
     assert.ok(verified)
   })
@@ -28,7 +46,7 @@ describe('Verifier Resolver', function () {
       },
       { cache: true }
     )
-    const signer = await Ed25519Signer.generate()
+    const signer = await EdDSASigner.generate()
     const signature = await signer.sign(message)
     const verified = await resolver.verify({
       signature,
@@ -42,12 +60,12 @@ describe('Verifier Resolver', function () {
     const message = new TextEncoder().encode('hello world')
     const resolver = new Resolver(
       {
-        ...ES256.verifier,
+        ...ECDSA.verifier,
         ...EdDSA.verifier,
       },
       { cache: true }
     )
-    const signer = await Ed25519Signer.generate()
+    const signer = await EdDSASigner.generate()
     const signature = await signer.sign(message)
     const verified = await resolver.verify({
       signature,
@@ -60,7 +78,7 @@ describe('Verifier Resolver', function () {
   it(`should throw when no verifiers`, async function () {
     const message = new TextEncoder().encode('hello world')
     const resolver = new Resolver({})
-    const signer = await Ed25519Signer.generate()
+    const signer = await EdDSASigner.generate()
     const signature = await signer.sign(message)
     await assert.rejects(
       async () => {
@@ -74,5 +92,23 @@ describe('Verifier Resolver', function () {
         message: 'Unsupported signature type "EdDSA"',
       }
     )
+  })
+
+  it(`should verify rsa old`, async function () {
+    const message = new TextEncoder().encode('hello world')
+    const resolver = new Resolver({
+      ...ECDSA.verifier,
+      ...EdDSA.verifier,
+      ...RSA_OLD.verifier,
+      ...RSA.verifier,
+    })
+    const signer = await RSAOldSigner.generate()
+    const signature = await signer.sign(message)
+    const verified = await resolver.verify({
+      signature,
+      message,
+      ...signer,
+    })
+    assert.ok(verified)
   })
 })

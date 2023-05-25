@@ -1,4 +1,4 @@
-import type { SignatureAlgorithm } from '../types.js'
+import type { SignatureAlgorithm } from '../../types.js'
 
 export interface VerifyInput {
   signature: Uint8Array

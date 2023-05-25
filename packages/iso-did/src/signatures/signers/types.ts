@@ -1,5 +1,5 @@
-import type { DIDKey, KeyType } from '../../key.js'
-import type { SignatureAlgorithm } from '../types.js'
+import type { DIDKey } from '../../key.js'
+import type { SignatureAlgorithm, KeyType } from '../../types.js'
 
 export interface ISigner<Export extends CryptoKeyPair | string> {
   /**

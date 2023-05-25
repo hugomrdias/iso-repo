@@ -13,13 +13,15 @@ if (!globalThis.crypto) globalThis.crypto = webcrypto
  */
 
 /**
+ * EdDSA signer
+ *
  * @implements {ISigner}
  */
-export class Ed25519Signer {
-  /** @type {Extract<import('../types.js').SignatureAlgorithm, "EdDSA">} */
+export class EdDSASigner {
+  /** @type {Extract<import('../../types.js').SignatureAlgorithm, "EdDSA">} */
   static alg = 'EdDSA'
 
-  /** @type {Extract<import('../types.js').KeyType, "Ed25519">} */
+  /** @type {Extract<import('../../types.js').KeyType, "Ed25519">} */
   static type = 'Ed25519'
 
   static code = 0x1300
@@ -31,39 +33,48 @@ export class Ed25519Signer {
   constructor(publicKey, privateKey) {
     this.privateKey = privateKey
     this.publicKey = publicKey
-    this.alg = Ed25519Signer.alg
-    this.type = Ed25519Signer.type
-    this.code = Ed25519Signer.code
-    this.did = DIDKey.fromPublicKey(Ed25519Signer.type, this.publicKey)
+    this.alg = EdDSASigner.alg
+    this.type = EdDSASigner.type
+    this.code = EdDSASigner.code
+    this.did = DIDKey.fromPublicKey(EdDSASigner.type, this.publicKey)
   }
 
   /**
+   * Generate a new signer
+   *
    * @param {Uint8Array} [bytes]
    */
   static async generate(bytes) {
     const privateKey = bytes || utils.randomPrivateKey()
     const publicKey = await getPublicKeyAsync(privateKey)
-    return new Ed25519Signer(publicKey, privateKey)
+    return new EdDSASigner(publicKey, privateKey)
   }
 
   /**
+   * Import a signer from a encoded string
+   *
    * @param {string} encoded
    */
   static async import(encoded) {
-    const privateKey = untag(Ed25519Signer.code, base64pad.decode(encoded))
+    const privateKey = untag(EdDSASigner.code, base64pad.decode(encoded))
     const publicKey = await getPublicKeyAsync(privateKey)
 
-    return new Ed25519Signer(publicKey, privateKey)
+    return new EdDSASigner(publicKey, privateKey)
   }
 
   /**
+   * Sign a message
+   *
    * @param {Uint8Array} message
    */
   async sign(message) {
     return signAsync(message, this.privateKey)
   }
 
+  /**
+   * Export the signer as a encoded string
+   */
   export() {
-    return base64pad.encode(tag(Ed25519Signer.code, this.privateKey))
+    return base64pad.encode(tag(EdDSASigner.code, this.privateKey))
   }
 }
