@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.2.0...iso-base-v0.2.1) (2023-05-25)
+
+
+### Bug Fixes
+
+* add new export to docs ([cbc13e5](https://github.com/hugomrdias/iso-repo/commit/cbc13e5ecc106b45bef16f33bb78f246e7ede1dd))
+
 ## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.1.5...iso-base-v0.2.0) (2023-05-25)
 
 
