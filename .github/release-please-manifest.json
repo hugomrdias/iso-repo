@@ -1,5 +1,5 @@
 {
-  "packages/iso-base": "0.1.5",
+  "packages/iso-base": "0.2.0",
   "packages/iso-filecoin": "0.1.5",
   "packages/iso-passkeys": "0.1.5",
   "packages/iso-did": "1.0.0"
