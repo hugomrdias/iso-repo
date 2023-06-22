@@ -193,11 +193,14 @@ export class Token {
   }
 
   toBytes() {
+    if (this.val.isZero()) {
+      return new Uint8Array(0)
+    }
     const sign = this.val.isNegative() ? '01' : '00'
 
     return concat([
       base16.decode(sign),
-      bigToUint8Array(BigInt(this.val.toString())),
+      bigToUint8Array(BigInt(this.val.abs().toString())),
     ])
   }
 }

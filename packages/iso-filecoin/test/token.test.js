@@ -1,5 +1,6 @@
 import assert from 'assert'
 import { Token } from '../src/token.js'
+import { base16 } from 'iso-base/rfc4648'
 
 describe('token', function () {
   it('zero', function () {
@@ -72,4 +73,25 @@ describe('token', function () {
       '11231.000001100000000011'
     )
   })
+
+  const vectors = [
+    ['0', ''],
+    ['9', '0009'],
+    ['22', '0016'],
+    ['-18', '0112'],
+    ['-26118', '016606'],
+    ['-20368000000000000', '01485c968cc90000'],
+    ['23752000000000000', '0054625172b48000'],
+    ['4171000000000000', '000ed1809d5bb000'],
+    ['6098800000000000000000000', '00050b789c4844bc17c00000'],
+    ['-6180700000000000000000000', '01051cd06b1a8ff003f00000'],
+  ]
+
+  for (const [atto, serialized] of vectors) {
+    it(`serialize ${atto}`, function () {
+      const s = base16.encode(Token.fromAttoFIL(atto).toBytes()).toLowerCase()
+
+      assert.strictEqual(s, serialized)
+    })
+  }
 })

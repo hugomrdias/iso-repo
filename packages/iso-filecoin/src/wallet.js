@@ -120,6 +120,7 @@ export function getPublicKey(privateKey, network) {
 }
 
 /**
+ * Sign filecoin message
  *
  * @param {Uint8Array} privateKey
  * @param {import('./types.js').SignatureType} type
@@ -128,9 +129,21 @@ export function getPublicKey(privateKey, network) {
  */
 export function signMessage(privateKey, type, message) {
   const msg = new Message(message).serialize()
+  return sign(privateKey, type, msg)
+}
+
+/**
+ * Sign message
+ *
+ * @param {Uint8Array} privateKey
+ * @param {import('./types.js').SignatureType} type
+ * @param {string | Uint8Array} message
+ * @returns
+ */
+export function sign(privateKey, type, message) {
   const cid = concat([
     Uint8Array.from([0x01, 0x71, 0xa0, 0xe4, 0x02, 0x20]),
-    blake2b(msg, {
+    blake2b(message, {
       dkLen: 32,
     }),
   ])
