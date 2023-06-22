@@ -2,5 +2,5 @@
   "packages/iso-base": "1.0.0",
   "packages/iso-filecoin": "0.2.0",
   "packages/iso-passkeys": "0.1.6",
-  "packages/iso-did": "1.1.0"
+  "packages/iso-did": "1.2.0"
 }
