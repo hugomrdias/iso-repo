@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.2.1...iso-filecoin-v0.2.2) (2023-06-22)
+
+
+### Bug Fixes
+
+* fix token.toBytes and add raw sign ([2611be0](https://github.com/hugomrdias/iso-repo/commit/2611be03a9b92c6f3ad14f98e3b96f0c288d99dc))
+
 ## [0.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.2.0...iso-filecoin-v0.2.1) (2023-06-22)
 
 
