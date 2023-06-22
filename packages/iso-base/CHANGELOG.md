@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.3.0...iso-base-v1.0.0) (2023-06-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* base64 no longer matches node (padding)
+
+### Features
+
+* add, msg, sig, rpc ([f574e7b](https://github.com/hugomrdias/iso-repo/commit/f574e7bbba8fcc783f534a669ef156071afc804f))
+* base64 no longer matches node (padding) ([179ab3d](https://github.com/hugomrdias/iso-repo/commit/179ab3d6cc10f5133d974896110e388d06ea7f7a))
+
 ## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.2.1...iso-base-v0.3.0) (2023-05-25)
 
 
