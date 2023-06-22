@@ -14,12 +14,12 @@ const VECTORS = [
 
   ['base32', '', ''],
   ['base32', 'yes mani !', 'PFSXGIDNMFXGSIBB'],
-  ['base32', 'f', 'MY======'],
-  ['base32', 'fo', 'MZXQ===='],
-  ['base32', 'foo', 'MZXW6==='],
-  ['base32', 'foob', 'MZXW6YQ='],
+  ['base32', 'f', 'MY'],
+  ['base32', 'fo', 'MZXQ'],
+  ['base32', 'foo', 'MZXW6'],
+  ['base32', 'foob', 'MZXW6YQ'],
   ['base32', 'fooba', 'MZXW6YTB'],
-  ['base32', 'foobar', 'MZXW6YTBOI======'],
+  ['base32', 'foobar', 'MZXW6YTBOI'],
 
   ['base32hex', '', ''],
   ['base32hex', 'yes mani !', 'F5IN683DC5N6I811'],
@@ -32,13 +32,13 @@ const VECTORS = [
 
   ['base64', '', ''],
   ['base64', '÷ïÿ', 'w7fDr8O/'],
-  ['base64', 'f', 'Zg=='],
-  ['base64', 'fo', 'Zm8='],
+  ['base64', 'f', 'Zg'],
+  ['base64', 'fo', 'Zm8'],
   ['base64', 'foo', 'Zm9v'],
-  ['base64', 'foob', 'Zm9vYg=='],
-  ['base64', 'fooba', 'Zm9vYmE='],
+  ['base64', 'foob', 'Zm9vYg'],
+  ['base64', 'fooba', 'Zm9vYmE'],
   ['base64', 'foobar', 'Zm9vYmFy'],
-  ['base64', '÷ïÿ🥰÷ïÿ😎🥶🤯', 'w7fDr8O/8J+lsMO3w6/Dv/CfmI7wn6W28J+krw=='],
+  ['base64', '÷ïÿ🥰÷ïÿ😎🥶🤯', 'w7fDr8O/8J+lsMO3w6/Dv/CfmI7wn6W28J+krw'],
 
   ['base64url', '', ''],
   ['base64url', 'f', 'Zg'],
@@ -98,20 +98,6 @@ describe('others', function () {
     assert.deepStrictEqual(BASES.hex.decode(vector[1]), utf8.decode(vector[0]))
 
     assert.deepStrictEqual(BASES.hex.encode(vector[0]), vector[1].toLowerCase())
-  })
-
-  it('base64 matches node', function () {
-    if (!globalThis.Buffer) {
-      this.skip()
-    }
-    const vector = ['foob', 'Zm9vYg==']
-
-    assert.deepStrictEqual(BASES.base64.encode(vector[0]), vector[1])
-
-    assert.deepStrictEqual(
-      BASES.base64.encode(vector[0]),
-      Buffer.from(vector[0]).toString('base64')
-    )
   })
 
   it('base64url matches node', function () {
