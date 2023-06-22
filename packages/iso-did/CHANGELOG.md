@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.1.0...iso-did-v1.2.0) (2023-06-22)
+
+
+### Features
+
+* add, msg, sig, rpc ([f574e7b](https://github.com/hugomrdias/iso-repo/commit/f574e7bbba8fcc783f534a669ef156071afc804f))
+
 ## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.0.0...iso-did-v1.1.0) (2023-05-25)
 
 
