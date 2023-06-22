@@ -46,6 +46,10 @@
     "./message": {
       "types": "./dist/src/message.d.ts",
       "import": "./src/message.js"
+    },
+    "./utils": {
+      "types": "./dist/src/utils.d.ts",
+      "import": "./src/utils.js"
     }
   },
   "typesVersions": {
@@ -70,6 +74,9 @@
       ],
       "types": [
         "dist/src/types"
+      ],
+      "utils": [
+        "dist/src/utils"
       ]
     }
   },

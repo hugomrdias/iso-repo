@@ -1,2 +1,7 @@
+export * as Address from './address.js'
+export * as Message from './message.js'
+export * as RPC from './rpc.js'
+export * as Signature from './signature.js'
 export * as Token from './token.js'
 export * as Wallet from './wallet.js'
+export * as Utils from './utils.js'
