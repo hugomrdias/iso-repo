@@ -9,7 +9,7 @@
 /** @typedef {import('./types').Codec} Codec */
 
 import { utf8 } from './utf8.js'
-import { buf, isBufferSource, u8 } from './utils.js'
+import { isBufferSource, u8 } from './utils.js'
 /**
  * @param {string} string
  * @param {string} alphabet
@@ -133,18 +133,6 @@ export function rfc4648(base, padding = false, normalize) {
   const [bits, alphabet] = bases[base]
   return {
     encode(input, pad) {
-      if (base === 'hex' && globalThis.Buffer) {
-        return buf(input).toString('hex')
-      }
-
-      if (base === 'base64' && globalThis.Buffer && !pad) {
-        return buf(input).toString('base64')
-      }
-
-      if (base === 'base64url' && globalThis.Buffer && !pad) {
-        return buf(input).toString('base64url')
-      }
-
       if (typeof input === 'string') {
         if (normalize) {
           input = normalize(input)
@@ -157,17 +145,6 @@ export function rfc4648(base, padding = false, normalize) {
     decode(input) {
       if (isBufferSource(input)) {
         input = utf8.encode(input)
-      }
-      if (base === 'hex' && globalThis.Buffer) {
-        return u8(buf(input, 'hex'))
-      }
-
-      if (base === 'base64' && globalThis.Buffer) {
-        return u8(buf(input, 'base64'))
-      }
-
-      if (base === 'base64url' && globalThis.Buffer) {
-        return u8(buf(input, 'base64url'))
       }
 
       if (normalize) {
@@ -187,7 +164,7 @@ export const base2 = rfc4648('base2')
 export const base8 = rfc4648('base8')
 export const base16 = rfc4648('base16')
 export const base32 = rfc4648('base32')
-export const base32hex = rfc4648('base32hex')
+export const base32hex = rfc4648('base32hex', true)
 export const base64 = rfc4648('base64')
 export const base64pad = rfc4648('base64', true)
 /**
