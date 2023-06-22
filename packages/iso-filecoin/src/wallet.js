@@ -1,48 +1,12 @@
-import * as bip39 from '@scure/bip39'
-import { HDKey } from '@scure/bip32'
-import { wordlist } from '@scure/bip39/wordlists/english.js'
 import { secp256k1 as secp } from '@noble/curves/secp256k1'
+import { HDKey } from '@scure/bip32'
+import * as bip39 from '@scure/bip39'
+import { wordlist } from '@scure/bip39/wordlists/english.js'
+import { getNetworkFromPath } from './utils.js'
+import { fromPublicKey } from './address.js'
+import { Message } from './message.js'
 import { blake2b } from '@noble/hashes/blake2b'
-
-import { base16, base32 } from 'iso-base/rfc4648'
 import { concat } from 'iso-base/utils'
-
-/**
- * Enumerates the possible signature types filecoin network has to sign transactions
- */
-export const SIGNATURES = /** @type {const} */ ({
-  SECP256K1: 1,
-  BLS: 3,
-})
-
-/**
- * Enumerates the possible signature types filecoin network has to sign transactions
- */
-export const NETWORKS = /** @type {const} */ ({
-  Mainnet: 'f',
-  Testnet: 't',
-})
-
-/**
- * @typedef {typeof SIGNATURES} SignaturesType
- * @typedef {SignaturesType[keyof SignaturesType]} Signature
- * @typedef {typeof NETWORKS} NetworkType
- * @typedef {NetworkType[keyof NetworkType]} Network
- */
-
-/**
- * Returns the third position from path
- *
- * @param {string} path - path to parse
- * @returns coin type
- */
-export function getNetworkFromPath(path) {
-  const type = path.split('/')[2].slice(0, -1)
-  if (type === '1') {
-    return NETWORKS.Testnet
-  }
-  return NETWORKS.Mainnet
-}
 
 /**
  *
@@ -61,15 +25,27 @@ export function mnemonicToSeed(mnemonic, password) {
 }
 
 /**
+ * @param {string} mnemonic
+ * @param {import('./types.js').SignatureType} type
+ * @param {string} path
+ * @param {string} [password]
+ * @param {import('./types.js').Network} [network]
+ */
+export function accountFromMnemonic(mnemonic, type, path, password, network) {
+  const seed = mnemonicToSeed(mnemonic, password)
+  return accountFromSeed(seed, type, path, network)
+}
+
+/**
  *
  * @param {Uint8Array} seed
- * @param {Signature} type
+ * @param {import('./types.js').SignatureType} type
  * @param {string} path
- * @param {Network} [network]
+ * @param {import('./types.js').Network} [network]
  */
 export function accountFromSeed(seed, type, path, network) {
   switch (type) {
-    case SIGNATURES.SECP256K1: {
+    case 'SECP256K1': {
       const masterKey = HDKey.fromMasterSeed(seed)
       const privateKey = masterKey.derive(path).privateKey
 
@@ -99,33 +75,81 @@ export function accountFromSeed(seed, type, path, network) {
 }
 
 /**
+ * Account from private key
+ *
  * @param {Uint8Array} privateKey
- * @param {Network} network
+ * @param {import('./types.js').SignatureType} type
+ * @param {import('./types.js').Network} network
+ * @param {string} [path]
  */
-export function getPublicKey(privateKey, network) {
-  const publicKey = secp.getPublicKey(privateKey, false)
+export function accountFromPrivateKey(privateKey, type, network, path) {
+  switch (type) {
+    case 'SECP256K1': {
+      if (privateKey.length !== 32) {
+        throw new Error('Private key should be 32 bytes.')
+      }
 
-  const payload = blake2b(publicKey, {
-    dkLen: 20,
-  })
+      const { address, pubKey } = getPublicKey(privateKey, network)
 
-  return {
-    pubKey: publicKey,
-    address: getSecp256k1Address(payload, network),
+      return {
+        type,
+        privateKey,
+        pubKey,
+        address,
+        path,
+      }
+    }
+
+    default: {
+      throw new Error('Not supported.')
+    }
   }
 }
 
 /**
- * @param {Uint8Array} payload
- * @param {Network} network
+ * @param {Uint8Array} privateKey
+ * @param {import('./types.js').Network} network
  */
-export function getSecp256k1Address(payload, network) {
-  const protocol = 1
-  const checksum = blake2b(concat([base16.decode(`0${protocol}`), payload]), {
-    dkLen: 4,
+export function getPublicKey(privateKey, network) {
+  const publicKey = secp.getPublicKey(privateKey, false)
+
+  return {
+    pubKey: publicKey,
+    address: fromPublicKey(publicKey, network, 'SECP256K1'),
+  }
+}
+
+/**
+ *
+ * @param {Uint8Array} privateKey
+ * @param {import('./types.js').SignatureType} type
+ * @param {import('./types.js').MessageObj} message
+ * @returns
+ */
+export function signMessage(privateKey, type, message) {
+  const msg = new Message(message).serialize()
+  const cid = concat([
+    Uint8Array.from([0x01, 0x71, 0xa0, 0xe4, 0x02, 0x20]),
+    blake2b(msg, {
+      dkLen: 32,
+    }),
+  ])
+
+  const digest = blake2b(cid, {
+    dkLen: 32,
   })
 
-  return `${network}${protocol}${base32
-    .encode(concat([payload, checksum]), false)
-    .toLowerCase()}`
+  switch (type) {
+    case 'SECP256K1': {
+      const signature = secp.sign(digest, privateKey)
+      return concat([
+        signature.toCompactRawBytes(),
+        // @ts-ignore
+        Uint8Array.from([signature.recovery]),
+      ])
+    }
+    default: {
+      throw new Error('Not supported.')
+    }
+  }
 }

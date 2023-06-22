@@ -7,7 +7,6 @@
  * - https://stackoverflow.com/questions/17171542/algorithm-for-elliptic-curve-point-compression/30431547#30431547
  * - https://github.com/w3c-ccg/did-method-key/issues/32
  *
- *
  * @module
  */
 import * as bigintModArith from 'bigint-mod-arith'
@@ -94,6 +93,7 @@ export function compress(pubkeyBytes) {
   const y = unprefixed.subarray(unprefixed.length / 2, unprefixed.length)
   const out = new Uint8Array(x.length + 1)
 
+  // eslint-disable-next-line unicorn/prefer-at
   out[0] = 2 + (y[y.length - 1] & 1)
   out.set(x, 1)
 

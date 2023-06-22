@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { Token } from '../src/token.js'
 
-describe('should convert', function () {
+describe('token', function () {
   it('zero', function () {
     assert.strictEqual(new Token(0).toAttoFIL(), '0')
     assert.strictEqual(new Token(0).toFemtoFIL(), '0')

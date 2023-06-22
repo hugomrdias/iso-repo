@@ -1,4 +1,6 @@
 import BigNumber from 'bignumber.js'
+import { base16 } from 'iso-base/rfc4648'
+import { concat } from 'iso-base/utils'
 
 export const ATTO_DECIMALS = 18
 export const FEMTO_DECIMALS = 15
@@ -16,6 +18,11 @@ const MILLI_MUL = 10n ** BigInt(FEMTO_DECIMALS)
 const WHOLE_MUL = 10n ** BigInt(ATTO_DECIMALS)
 
 const symbol = Symbol.for('filecoin-token')
+BigNumber.config({
+  EXPONENTIAL_AT: 1e9,
+  DECIMAL_PLACES: 40,
+  ALPHABET: '0123456789abcdef',
+})
 
 /**
  * @typedef {number | string | BigNumber.Instance | bigint | Token} Value
@@ -184,4 +191,46 @@ export class Token {
   toFIL() {
     return this.div(WHOLE_MUL).toString()
   }
+
+  toBytes() {
+    const sign = this.val.isNegative() ? '01' : '00'
+
+    return concat([
+      base16.decode(sign),
+      bigToUint8Array(BigInt(this.val.toString())),
+    ])
+  }
+}
+
+const big0 = BigInt(0)
+const big1 = BigInt(1)
+const big8 = BigInt(8)
+
+/**
+ *
+ * @see https://jackieli.dev/posts/bigint-to-uint8array/
+ * @param {bigint} big
+ */
+function bigToUint8Array(big) {
+  // @ts-ignore
+  if (big < big0) {
+    const bits = (BigInt(big.toString(2).length) / big8 + big1) * big8
+    const prefix1 = big1 << bits
+    // @ts-ignore
+    big += prefix1
+  }
+  let hex = big.toString(16)
+  if (hex.length % 2) {
+    hex = '0' + hex
+  }
+  const len = hex.length / 2
+  const u8 = new Uint8Array(len)
+  let i = 0
+  let j = 0
+  while (i < len) {
+    u8[i] = Number.parseInt(hex.slice(j, j + 2), 16)
+    i += 1
+    j += 2
+  }
+  return u8
 }

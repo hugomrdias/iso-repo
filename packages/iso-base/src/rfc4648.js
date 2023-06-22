@@ -129,7 +129,7 @@ const bases = {
  * @param {((str: string) => string)} [normalize]
  * @returns {Codec}
  */
-export function rfc4648(base, padding = true, normalize) {
+export function rfc4648(base, padding = false, normalize) {
   const [bits, alphabet] = bases[base]
   return {
     encode(input, pad) {
