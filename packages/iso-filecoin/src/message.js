@@ -97,22 +97,29 @@ export class Message {
    * @param {import('./rpc.js').RPC} rpc
    */
   async prepare(rpc) {
-    const nonce = await rpc.nonce(this.from)
-    if (nonce.error) {
-      throw new Error(nonce.error.message)
+    if (this.nonce === 0) {
+      const nonce = await rpc.nonce(this.from)
+      if (nonce.error) {
+        throw new Error(nonce.error.message)
+      }
+
+      this.nonce = nonce.result
     }
 
-    this.nonce = nonce.result
+    if (
+      (this.gasLimit === 0 && this.gasFeeCap === '0') ||
+      this.gasPremium === '0'
+    ) {
+      const gas = await rpc.gasEstimate(this)
 
-    const gas = await rpc.gasEstimate(this)
+      if (gas.error) {
+        throw new Error(gas.error.message)
+      }
 
-    if (gas.error) {
-      throw new Error(gas.error.message)
+      this.gasLimit = gas.result.GasLimit
+      this.gasFeeCap = gas.result.GasFeeCap
+      this.gasPremium = gas.result.GasPremium
     }
-
-    this.gasLimit = gas.result.GasLimit
-    this.gasFeeCap = gas.result.GasFeeCap
-    this.gasPremium = gas.result.GasPremium
 
     return this
   }
