@@ -6,6 +6,8 @@ import * as Wallet from '../src/wallet.js'
 const API = 'https://api.calibration.node.glif.io'
 
 describe('lotus rpc', function () {
+  this.retries(3)
+  this.timeout(10_000)
   it(`version`, async function () {
     const rpc = new RPC({ api: API })
 
