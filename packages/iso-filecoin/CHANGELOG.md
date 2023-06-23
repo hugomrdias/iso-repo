@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.2.2...iso-filecoin-v0.2.3) (2023-06-23)
+
+
+### Bug Fixes
+
+* dont prepare a msg with all the params ([eb32843](https://github.com/hugomrdias/iso-repo/commit/eb32843a8d98a64300a03aa79dffa1c598fe18d6))
+
 ## [0.2.2](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.2.1...iso-filecoin-v0.2.2) (2023-06-22)
 
 
