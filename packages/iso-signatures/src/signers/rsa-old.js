@@ -1,10 +1,10 @@
 /* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
-import { DIDKey } from '../../key.js'
+import { DIDKey } from 'iso-did/key'
 
 /**
- * @typedef {import('./types.js').ISigner<CryptoKeyPair>} ISigner
+ * @typedef {import('../types.js').ISigner<CryptoKeyPair>} ISigner
  */
 
 /**
@@ -13,10 +13,10 @@ import { DIDKey } from '../../key.js'
  * @implements {ISigner}
  */
 export class RSAOldSigner {
-  /** @type {Extract<import('../../types.js').SignatureAlgorithm, "RS256_OLD">} */
+  /** @type {Extract<import('iso-did/types').SignatureAlgorithm, "RS256_OLD">} */
   static alg = 'RS256_OLD'
 
-  /** @type {Extract<import('../../types.js').KeyType, "RSA_OLD">} */
+  /** @type {Extract<import('iso-did/types').KeyType, "RSA_OLD">} */
   static type = 'RSA_OLD'
 
   /**

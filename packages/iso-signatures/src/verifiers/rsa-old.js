@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
 
-/** @type {import('./types.js').Verify} */
+/** @type {import('../types.js').Verify} */
 export async function verify({ signature, message, publicKey }) {
   const key = await webcrypto.subtle.importKey(
     'spki',
@@ -19,7 +19,7 @@ export async function verify({ signature, message, publicKey }) {
   )
 }
 
-/** @type {import('./types.js').Verifier<'RS256_OLD'>} */
+/** @type {import('../types.js').Verifier<'RS256_OLD'>} */
 export const verifier = {
   RS256_OLD: verify,
 }

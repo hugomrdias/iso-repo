@@ -2,7 +2,7 @@
 import { webcrypto } from 'iso-base/crypto'
 import { spki } from '../spki.js'
 
-/** @type {import('./types.js').Verify} */
+/** @type {import('../types.js').Verify} */
 export async function verify({ signature, message, publicKey }) {
   const key = await webcrypto.subtle.importKey(
     'spki',
@@ -20,7 +20,7 @@ export async function verify({ signature, message, publicKey }) {
   )
 }
 
-/** @type {import('./types.js').Verifier<'RS256'>} */
+/** @type {import('../types.js').Verifier<'RS256'>} */
 export const verifier = {
   RS256: verify,
 }

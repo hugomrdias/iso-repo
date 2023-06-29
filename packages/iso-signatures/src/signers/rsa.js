@@ -1,11 +1,11 @@
 /* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
-import { DIDKey } from '../../key.js'
+import { DIDKey } from 'iso-did/key'
 import { spki } from '../spki.js'
 
 /**
- * @typedef {import('./types.js').ISigner<CryptoKeyPair>} ISigner
+ * @typedef {import('../types.js').ISigner<CryptoKeyPair>} ISigner
  */
 
 /**
@@ -14,10 +14,10 @@ import { spki } from '../spki.js'
  * @implements {ISigner}
  */
 export class RSASigner {
-  /** @type {Extract<import('../../types.js').SignatureAlgorithm, "RS256">} */
+  /** @type {Extract<import('iso-did/types').SignatureAlgorithm, "RS256">} */
   static alg = 'RS256'
 
-  /** @type {Extract<import('../../types.js').KeyType, "RSA">} */
+  /** @type {Extract<import('iso-did/types').KeyType, "RSA">} */
   static type = 'RSA'
 
   // multicodec code for RSA private key

@@ -1,11 +1,11 @@
 import assert from 'assert'
-import { EdDSASigner } from '../src/signatures/signers/eddsa.js'
-import { RSAOldSigner } from '../src/signatures/signers/rsa-old.js'
-import { Resolver } from '../src/signatures/verifiers/resolver.js'
-import * as EdDSA from '../src/signatures/verifiers/eddsa.js'
-import * as ECDSA from '../src/signatures/verifiers/ecdsa.js'
-import * as RSA from '../src/signatures/verifiers/rsa.js'
-import * as RSA_OLD from '../src/signatures/verifiers/rsa-old.js'
+import { EdDSASigner } from '../src/signers/eddsa.js'
+import { RSAOldSigner } from '../src/signers/rsa-old.js'
+import { Resolver } from '../src/verifiers/resolver.js'
+import * as EdDSA from '../src/verifiers/eddsa.js'
+import * as ECDSA from '../src/verifiers/ecdsa.js'
+import * as RSA from '../src/verifiers/rsa.js'
+import * as RSA_OLD from '../src/verifiers/rsa-old.js'
 
 describe('Verifier Resolver', function () {
   it(`should verify`, async function () {

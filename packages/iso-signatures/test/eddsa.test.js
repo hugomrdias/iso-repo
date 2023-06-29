@@ -1,7 +1,7 @@
 import assert from 'assert'
-import * as EdDSA from '../src/signatures/verifiers/eddsa.js'
+import * as EdDSA from '../src/verifiers/eddsa.js'
 import { base64url } from 'iso-base/rfc4648'
-import { EdDSASigner } from '../src/signatures/signers/eddsa.js'
+import { EdDSASigner } from '../src/signers/eddsa.js'
 
 const fixtures = {
   ed25519: [

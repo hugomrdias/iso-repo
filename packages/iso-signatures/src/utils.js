@@ -1,7 +1,7 @@
 /**
  * Create web crypto params for ECDSA.
  *
- * @param {import("../types").SignatureAlgorithm} alg
+ * @param {import("iso-did/types").SignatureAlgorithm} alg
  * @returns {{name: 'ECDSA', namedCurve: 'P-256' | 'P-384' | 'P-521', hash: 'SHA-256' | 'SHA-384' | 'SHA-512'}}
  */
 export function createEcdsaParams(alg) {

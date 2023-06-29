@@ -6,6 +6,8 @@ import { base58btc } from 'multiformats/bases/base58'
 import { CODE_KEY_TYPE, KEY_TYPE_CODE, keyTypeToAlg } from './common.js'
 import { DIDCore } from './core.js'
 
+export * from './common.js'
+
 const DID_KEY_PREFIX = `did:key:`
 
 /**

@@ -1,7 +1,7 @@
 import assert from 'assert'
-import * as ECDSA from '../src/signatures/verifiers/ecdsa.js'
+import * as ECDSA from '../src/verifiers/ecdsa.js'
 import { base64url } from 'iso-base/rfc4648'
-import { ECDSASigner } from '../src/signatures/signers/ecdsa.js'
+import { ECDSASigner } from '../src/signers/ecdsa.js'
 import { concat } from 'iso-base/utils'
 
 const fixtures = {

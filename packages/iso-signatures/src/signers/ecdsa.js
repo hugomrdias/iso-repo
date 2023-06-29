@@ -1,13 +1,12 @@
 /* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
-import { DIDKey } from '../../key.js'
-import { keyTypeToAlg } from '../../common.js'
+import { DIDKey, keyTypeToAlg } from 'iso-did/key'
 import { createEcdsaParams } from '../utils.js'
 
 /**
- * @typedef {import('./types.js').ISigner<CryptoKeyPair>} ISigner
- * @typedef {Extract<import('../../types.js').SignatureAlgorithm, 'ES256' | 'ES384' | 'ES512'>} ECDSAAlg
+ * @typedef {import('../types.js').ISigner<CryptoKeyPair>} ISigner
+ * @typedef {Extract<import('iso-did/types').SignatureAlgorithm, 'ES256' | 'ES384' | 'ES512'>} ECDSAAlg
  */
 
 /**

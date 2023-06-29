@@ -1,8 +1,8 @@
 import assert from 'assert'
-import * as RS256 from '../src/signatures/verifiers/rsa.js'
+import * as RS256 from '../src/verifiers/rsa.js'
 import { base64url } from 'iso-base/rfc4648'
-import { RSASigner } from '../src/signatures/signers/rsa.js'
-import { encodeInt, encodeSequence } from '../src/signatures/asn1.js'
+import { RSASigner } from '../src/signers/rsa.js'
+import { encodeInt, encodeSequence } from '../src/asn1.js'
 
 const fixtures = {
   // https://github.com/w3c-ccg/did-method-key/blob/main/test-vectors/nist-curves.json

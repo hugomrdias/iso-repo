@@ -3,13 +3,13 @@ import { getPublicKeyAsync, signAsync, utils } from '@noble/ed25519'
 import { webcrypto } from 'iso-base/crypto'
 import { base64pad } from 'iso-base/rfc4648'
 import { tag, untag } from 'iso-base/varint'
-import { DIDKey } from '../../key.js'
+import { DIDKey } from 'iso-did/key'
 
 // @ts-ignore
 if (!globalThis.crypto) globalThis.crypto = webcrypto
 
 /**
- * @typedef {import('./types.js').ISigner<string>} ISigner
+ * @typedef {import('../types.js').ISigner<string>} ISigner
  */
 
 /**
@@ -18,10 +18,10 @@ if (!globalThis.crypto) globalThis.crypto = webcrypto
  * @implements {ISigner}
  */
 export class EdDSASigner {
-  /** @type {Extract<import('../../types.js').SignatureAlgorithm, "EdDSA">} */
+  /** @type {Extract<import('iso-did/types').SignatureAlgorithm, "EdDSA">} */
   static alg = 'EdDSA'
 
-  /** @type {Extract<import('../../types.js').KeyType, "Ed25519">} */
+  /** @type {Extract<import('iso-did/types').KeyType, "Ed25519">} */
   static type = 'Ed25519'
 
   static code = 0x1300

@@ -1,11 +1,11 @@
 /**
- * @typedef {import('./types').IResolver} IResolver
+ * @typedef {import('../types').IResolver} IResolver
  */
 
 /**
  * No cache
  *
- * @type {import('./types').Cache}
+ * @type {import('../types').Cache}
  */
 function noCache(input, verify) {
   return verify(input)
@@ -14,12 +14,12 @@ function noCache(input, verify) {
 /**
  * Memory cache factory
  *
- * @returns {import('./types').Cache}
+ * @returns {import('../types').Cache}
  */
 function memoryCache() {
   const cache = new Map()
 
-  /** @type {import('./types').Cache} */
+  /** @type {import('../types').Cache} */
   async function fn(input, verify) {
     const key = JSON.stringify(input)
     if (cache.has(key)) {
@@ -42,8 +42,8 @@ function memoryCache() {
 export class Resolver {
   /**
    *
-   * @param {import('./types').VerifierRegistry<import('../../types').SignatureAlgorithm>} registry
-   * @param {import('./types').ResolverOptions} options
+   * @param {import('../types').VerifierRegistry<import('iso-did/types').SignatureAlgorithm>} registry
+   * @param {import('../types').ResolverOptions} options
    */
   constructor(registry = {}, options = {}) {
     this.registry = registry
