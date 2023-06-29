@@ -3,6 +3,7 @@
   "packages": {
     "packages/iso-base": {},
     "packages/iso-did": {},
+    "packages/iso-signatures": {},
     "packages/iso-filecoin": {},
     "packages/iso-passkeys": {}
   }
