@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.2.0...iso-did-v1.3.0) (2023-06-29)
+
+
+### Features
+
+* **iso-signatures:** initial commit for iso-signatures ([#34](https://github.com/hugomrdias/iso-repo/issues/34)) ([a2e6265](https://github.com/hugomrdias/iso-repo/commit/a2e6265ad14e1e2bb39d86642efbd79ee09a5357))
+
 ## [1.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.1.0...iso-did-v1.2.0) (2023-06-22)
 
 
