@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.1.6...iso-passkeys-v0.2.0) (2023-06-29)
+
+
+### Features
+
+* add, msg, sig, rpc ([f574e7b](https://github.com/hugomrdias/iso-repo/commit/f574e7bbba8fcc783f534a669ef156071afc804f))
+
 ## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.1.5...iso-passkeys-v0.1.6) (2023-05-25)
 
 
