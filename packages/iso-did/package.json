@@ -41,6 +41,9 @@
       ],
       "key": [
         "dist/src/key"
+      ],
+      "types": [
+        "dist/src/types"
       ]
     }
   },
@@ -56,7 +59,6 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "@noble/ed25519": "^2.0.0",
     "did-resolver": "^4.1.0",
     "iso-base": "workspace:^",
     "multiformats": "^12.0.1"
