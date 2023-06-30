@@ -68,6 +68,14 @@
     "./verifiers/resolver": {
       "types": "./dist/src/verifiers/resolver.d.ts",
       "import": "./src/verifiers/resolver.js"
+    },
+    "./asn1": {
+      "types": "./dist/src/asn1.d.ts",
+      "import": "./src/asn1.js"
+    },
+    "./spki": {
+      "types": "./dist/src/spki.d.ts",
+      "import": "./src/spki.js"
     }
   },
   "typesVersions": {
@@ -86,7 +94,11 @@
   "files": [
     "src",
     "dist/src/*.d.ts",
-    "dist/src/*.d.ts.map"
+    "dist/src/*.d.ts.map",
+    "dist/src/signers.d.ts",
+    "dist/src/signers.d.ts.map",
+    "dist/src/verifiers.d.ts",
+    "dist/src/verifiers.d.ts.map"
   ],
   "scripts": {
     "lint": "tsc --build && eslint '**/*.{js,ts}' && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",

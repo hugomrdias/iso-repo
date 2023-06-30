@@ -16,7 +16,12 @@
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
   "typedocOptions": {
-    "entryPoints": ["src/signers/*.js", "src/verifiers/*.js"],
+    "entryPoints": [
+      "src/signers/*.js",
+      "src/verifiers/*.js",
+      "src/asn1.js",
+      "src/spki.js"
+    ],
     "includeVersion": true,
     "excludeExternals": true,
     "internalModule": "<internal>"
