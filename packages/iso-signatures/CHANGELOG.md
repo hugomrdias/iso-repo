@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.5...iso-signatures-v0.1.6) (2023-06-30)
+
+
+### Bug Fixes
+
+* add more types definitions to npm files and export asn1 and spki ([80860de](https://github.com/hugomrdias/iso-repo/commit/80860dea9ddebda44ed7cb6ea1438dd08e62f66f))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.0.1...iso-signatures-v0.1.5) (2023-06-29)
 
 
