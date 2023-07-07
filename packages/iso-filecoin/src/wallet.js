@@ -1,7 +1,7 @@
 import { secp256k1 as secp } from '@noble/curves/secp256k1'
 import { HDKey } from '@scure/bip32'
 import * as bip39 from '@scure/bip39'
-import { wordlist } from '@scure/bip39/wordlists/english.js'
+import { wordlist } from '@scure/bip39/wordlists/english'
 import { getNetworkFromPath } from './utils.js'
 import { fromPublicKey } from './address.js'
 import { Message } from './message.js'
