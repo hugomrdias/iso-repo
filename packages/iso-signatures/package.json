@@ -88,17 +88,19 @@
       ],
       "verifiers/*": [
         "dist/src/verifiers/*"
+      ],
+      "./asn1": [
+        "./dist/src/asn1"
+      ],
+      "./spki": [
+        "./dist/src/spki"
       ]
     }
   },
   "files": [
     "src",
-    "dist/src/*.d.ts",
-    "dist/src/*.d.ts.map",
-    "dist/src/signers.d.ts",
-    "dist/src/signers.d.ts.map",
-    "dist/src/verifiers.d.ts",
-    "dist/src/verifiers.d.ts.map"
+    "dist/src/**/*.d.ts",
+    "dist/src/**/*.d.ts.map"
   ],
   "scripts": {
     "lint": "tsc --build && eslint '**/*.{js,ts}' && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
