@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.2.4...iso-filecoin-v1.0.0) (2023-07-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* Token `to*` methods return bignumber instead of string and added new toFormat method
+
+### Features
+
+* Token `to*` methods return bignumber instead of string and added new toFormat method ([d27f5bc](https://github.com/hugomrdias/iso-repo/commit/d27f5bc8cea879c038e856342ce415fbc078ead9))
+
 ## [0.2.4](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.2.3...iso-filecoin-v0.2.4) (2023-07-07)
 
 
