@@ -1,6 +1,6 @@
 {
   "name": "iso-filecoin",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Filecoin Utils",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",

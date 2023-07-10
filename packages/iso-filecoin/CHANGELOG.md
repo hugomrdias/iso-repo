@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.4](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.2.3...iso-filecoin-v0.2.4) (2023-07-07)
+
+
+### Bug Fixes
+
+* **iso-filecoin:** fix bip39 wordlist import ([168478d](https://github.com/hugomrdias/iso-repo/commit/168478d2de7280bc4847d5d59b257e078d03aacb))
+
 ## [0.2.3](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.2.2...iso-filecoin-v0.2.3) (2023-06-23)
 
 
