@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.7](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.6...iso-signatures-v0.1.7) (2023-07-10)
+
+
+### Bug Fixes
+
+* add missing type exports and declarations ([#39](https://github.com/hugomrdias/iso-repo/issues/39)) ([3456e89](https://github.com/hugomrdias/iso-repo/commit/3456e89a448a3668f01c3572b276e4b63df8c294))
+
 ## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.5...iso-signatures-v0.1.6) (2023-06-30)
 
 
