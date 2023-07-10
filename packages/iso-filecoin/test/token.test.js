@@ -4,72 +4,102 @@ import { base16 } from 'iso-base/rfc4648'
 
 describe('token', function () {
   it('zero', function () {
-    assert.strictEqual(new Token(0).toAttoFIL(), '0')
-    assert.strictEqual(new Token(0).toFemtoFIL(), '0')
-    assert.strictEqual(new Token(0).toPicoFIL(), '0')
-    assert.strictEqual(new Token(0).toNanoFIL(), '0')
-    assert.strictEqual(new Token(0).toMicroFIL(), '0')
-    assert.strictEqual(new Token(0).toMilliFIL(), '0')
-    assert.strictEqual(new Token(0).toFIL(), '0')
+    assert.strictEqual(new Token(0).toAttoFIL().toString(), '0')
+    assert.strictEqual(new Token(0).toFemtoFIL().toString(), '0')
+    assert.strictEqual(new Token(0).toPicoFIL().toString(), '0')
+    assert.strictEqual(new Token(0).toNanoFIL().toString(), '0')
+    assert.strictEqual(new Token(0).toMicroFIL().toString(), '0')
+    assert.strictEqual(new Token(0).toMilliFIL().toString(), '0')
+    assert.strictEqual(new Token(0).toFIL().toString(), '0')
   })
 
   it('positive', function () {
-    assert.strictEqual(Token.fromFIL(1).toAttoFIL(), '1000000000000000000')
-    assert.strictEqual(Token.fromFIL(1).toFemtoFIL(), '1000000000000000')
-    assert.strictEqual(Token.fromFIL(1).toPicoFIL(), '1000000000000')
-    assert.strictEqual(Token.fromFIL(1).toNanoFIL(), '1000000000')
-    assert.strictEqual(Token.fromFIL(1).toMicroFIL(), '1000000')
-    assert.strictEqual(Token.fromFIL(1).toMilliFIL(), '1000')
-    assert.strictEqual(Token.fromFIL(1).toFIL(), '1')
+    assert.strictEqual(
+      Token.fromFIL(1).toAttoFIL().toString(),
+      '1000000000000000000'
+    )
+    assert.strictEqual(
+      Token.fromFIL(1).toFemtoFIL().toString(),
+      '1000000000000000'
+    )
+    assert.strictEqual(Token.fromFIL(1).toPicoFIL().toString(), '1000000000000')
+    assert.strictEqual(Token.fromFIL(1).toNanoFIL().toString(), '1000000000')
+    assert.strictEqual(Token.fromFIL(1).toMicroFIL().toString(), '1000000')
+    assert.strictEqual(Token.fromFIL(1).toMilliFIL().toString(), '1000')
+    assert.strictEqual(Token.fromFIL(1).toFIL().toString(), '1')
   })
 
   it('negative', function () {
-    assert.strictEqual(Token.fromFIL(-1).toAttoFIL(), '-1000000000000000000')
-    assert.strictEqual(Token.fromFIL(-1).toFemtoFIL(), '-1000000000000000')
-    assert.strictEqual(Token.fromFIL(-1).toPicoFIL(), '-1000000000000')
-    assert.strictEqual(Token.fromFIL(-1).toNanoFIL(), '-1000000000')
-    assert.strictEqual(Token.fromFIL(-1).toMicroFIL(), '-1000000')
-    assert.strictEqual(Token.fromFIL(-1).toMilliFIL(), '-1000')
-    assert.strictEqual(Token.fromFIL(-1).toFIL(), '-1')
+    assert.strictEqual(
+      Token.fromFIL(-1).toAttoFIL().toString(),
+      '-1000000000000000000'
+    )
+    assert.strictEqual(
+      Token.fromFIL(-1).toFemtoFIL().toString(),
+      '-1000000000000000'
+    )
+    assert.strictEqual(
+      Token.fromFIL(-1).toPicoFIL().toString(),
+      '-1000000000000'
+    )
+    assert.strictEqual(Token.fromFIL(-1).toNanoFIL().toString(), '-1000000000')
+    assert.strictEqual(Token.fromFIL(-1).toMicroFIL().toString(), '-1000000')
+    assert.strictEqual(Token.fromFIL(-1).toMilliFIL().toString(), '-1000')
+    assert.strictEqual(Token.fromFIL(-1).toFIL().toString(), '-1')
   })
 
   it('float', function () {
-    assert.strictEqual(Token.fromFIL(0.001).toAttoFIL(), '1000000000000000')
-    assert.strictEqual(Token.fromFIL(0.001).toFemtoFIL(), '1000000000000')
-    assert.strictEqual(Token.fromFIL(0.001).toPicoFIL(), '1000000000')
-    assert.strictEqual(Token.fromFIL(0.001).toNanoFIL(), '1000000')
-    assert.strictEqual(Token.fromFIL(0.001).toMicroFIL(), '1000')
-    assert.strictEqual(Token.fromFIL(0.001).toMilliFIL(), '1')
-    assert.strictEqual(Token.fromFIL(0.001).toFIL(), '0.001')
+    assert.strictEqual(
+      Token.fromFIL(0.001).toAttoFIL().toString(),
+      '1000000000000000'
+    )
+    assert.strictEqual(
+      Token.fromFIL(0.001).toFemtoFIL().toString(),
+      '1000000000000'
+    )
+    assert.strictEqual(
+      Token.fromFIL(0.001).toPicoFIL().toString(),
+      '1000000000'
+    )
+    assert.strictEqual(Token.fromFIL(0.001).toNanoFIL().toString(), '1000000')
+    assert.strictEqual(Token.fromFIL(0.001).toMicroFIL().toString(), '1000')
+    assert.strictEqual(Token.fromFIL(0.001).toMilliFIL().toString(), '1')
+    assert.strictEqual(Token.fromFIL(0.001).toFIL().toString(), '0.001')
   })
 
   it('precision bigint', function () {
     assert.strictEqual(
-      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toAttoFIL(),
+      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toAttoFIL().toString(),
       '11231000001100000000011'
     )
     assert.strictEqual(
-      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toFemtoFIL(),
+      Token.fromAttoFIL(11_231_000_001_100_000_000_011n)
+        .toFemtoFIL()
+        .toString(),
       '11231000001100000000.011'
     )
     assert.strictEqual(
-      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toPicoFIL(),
+      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toPicoFIL().toString(),
       '11231000001100000.000011'
     )
     assert.strictEqual(
-      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toNanoFIL(),
+      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toNanoFIL().toString(),
       '11231000001100.000000011'
     )
     assert.strictEqual(
-      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toMicroFIL(),
+      Token.fromAttoFIL(11_231_000_001_100_000_000_011n)
+        .toMicroFIL()
+        .toString(),
       '11231000001.100000000011'
     )
     assert.strictEqual(
-      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toMilliFIL(),
+      Token.fromAttoFIL(11_231_000_001_100_000_000_011n)
+        .toMilliFIL()
+        .toString(),
       '11231000.001100000000011'
     )
     assert.strictEqual(
-      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toFIL(),
+      Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toFIL().toString(),
       '11231.000001100000000011'
     )
   })
