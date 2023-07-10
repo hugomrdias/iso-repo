@@ -89,10 +89,10 @@
       "verifiers/*": [
         "dist/src/verifiers/*"
       ],
-      "./asn1": [
+      "asn1": [
         "./dist/src/asn1"
       ],
-      "./spki": [
+      "spki": [
         "./dist/src/spki"
       ]
     }
