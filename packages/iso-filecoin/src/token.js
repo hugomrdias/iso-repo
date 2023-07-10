@@ -22,6 +22,7 @@ BigNumber.config({
   EXPONENTIAL_AT: 1e9,
   DECIMAL_PLACES: 40,
   ALPHABET: '0123456789abcdef',
+  ROUNDING_MODE: BigNumber.ROUND_HALF_DOWN,
 })
 
 /**
@@ -164,32 +165,45 @@ export class Token {
     return this.val.toString(base)
   }
 
+  /**
+   * @param {number} [decimalPlaces]
+   * @param {BigNumber.RoundingMode} [roundingMode]
+   * @param {BigNumber.Format} [format]
+   */
+  toFormat(
+    decimalPlaces = 2,
+    roundingMode = BigNumber.ROUND_HALF_DOWN,
+    format
+  ) {
+    return this.val.toFormat(decimalPlaces, roundingMode, format)
+  }
+
   toAttoFIL() {
-    return this.toString()
+    return this
   }
 
   toFemtoFIL() {
-    return this.div(FEMTO_MUL).toString()
+    return this.div(FEMTO_MUL)
   }
 
   toPicoFIL() {
-    return this.div(PICO_MUL).toString()
+    return this.div(PICO_MUL)
   }
 
   toNanoFIL() {
-    return this.div(NANO_MUL).toString()
+    return this.div(NANO_MUL)
   }
 
   toMicroFIL() {
-    return this.div(MICRO_MUL).toString()
+    return this.div(MICRO_MUL)
   }
 
   toMilliFIL() {
-    return this.div(MILLI_MUL).toString()
+    return this.div(MILLI_MUL)
   }
 
   toFIL() {
-    return this.div(WHOLE_MUL).toString()
+    return this.div(WHOLE_MUL)
   }
 
   toBytes() {
