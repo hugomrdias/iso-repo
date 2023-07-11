@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.7...iso-signatures-v0.1.8) (2023-07-11)
+
+
+### Bug Fixes
+
+* typos in typesVersions ([#42](https://github.com/hugomrdias/iso-repo/issues/42)) ([d17c7e1](https://github.com/hugomrdias/iso-repo/commit/d17c7e15279a00ba52f7b0fbf38b8c32ef5bae82))
+
 ## [0.1.7](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.6...iso-signatures-v0.1.7) (2023-07-10)
 
 
