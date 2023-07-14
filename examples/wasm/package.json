@@ -1,0 +1,69 @@
+{
+  "name": "wasm",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "dist/nodejs/wasm.cjs",
+  "module": "dist/bundler/wasm.js",
+  "types": "dist/nodejs/wasm.d.ts",
+  "exports": {
+    ".": {
+      "workerd": "./dist/web/workerd.js",
+      "node": "./dist/nodejs/wasm.cjs",
+      "default": "./dist/bundler/wasm.js",
+      "types": "./dist/nodejs/wasm.d.ts"
+    },
+    "./nodejs": {
+      "default": "./dist/nodejs/wasm.cjs",
+      "types": "./dist/nodejs/wasm.d.ts"
+    },
+    "./web": {
+      "default": "./dist/web/wasm.js",
+      "types": "./dist/web/wasm.d.ts"
+    },
+    "./workerd": {
+      "default": "./dist/web/workerd.js",
+      "types": "./dist/web/wasm.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "target": "rimraf dist/$TARGET && pnpm run compile && pnpm run bindgen && pnpm run opt",
+    "compile": "cargo build --target wasm32-unknown-unknown --profile release",
+    "bindgen": "wasm-bindgen --weak-refs --target $TARGET --out-dir dist/$TARGET target/wasm32-unknown-unknown/release/wasm.wasm",
+    "opt": "wasm-opt -O4 dist/$TARGET/wasm_bg.wasm -o dist/$TARGET/wasm_bg.wasm",
+    "build": "cross-env TARGET=nodejs pnpm run target && move-file dist/nodejs/wasm.js dist/nodejs/wasm.cjs && cross-env TARGET=web pnpm run target && cpy --flat src/workerd.js dist/web && cross-env TARGET=bundler pnpm run target",
+    "test": "pw-test --mode node && pw-test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/assert": "^1.5.6",
+    "@types/mocha": "^10.0.1",
+    "assert": "^2.0.0",
+    "cpy-cli": "^5.0.0",
+    "cross-env": "^7.0.3",
+    "mocha": "^10.2.0",
+    "move-file-cli": "^3.0.0",
+    "playwright-test": "^12.1.1",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.1.6"
+  },
+  "eslintConfig": {
+    "extends": [
+      "../../node_modules/hd-scripts/eslint/index.js"
+    ],
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "env": {
+      "mocha": true
+    },
+    "ignorePatterns": [
+      "dist"
+    ]
+  }
+}

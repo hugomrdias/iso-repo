@@ -6,6 +6,7 @@ import { OddContextProvider } from './odd-preact/index.jsx'
 import Register from './register.jsx'
 import Test from './test.jsx'
 import * as OddPasskey from './odd-passkeys/index.js'
+import { add } from 'wasm'
 
 /** @type {import('@oddjs/odd').Configuration} */
 const config = {
@@ -27,6 +28,7 @@ export function App() {
         componentsFactory={OddPasskey.createComponents}
       >
         <main className="App">
+          <h1>{add(1, 1)}</h1>
           <Router>
             <Home path="/" />
             <Test path="/test" />
