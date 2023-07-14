@@ -27,3 +27,5 @@ kv-data
 *.sw?
 
 docs
+target
+Cargo.lock
