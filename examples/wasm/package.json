@@ -34,7 +34,7 @@
     "compile": "cargo build --target wasm32-unknown-unknown --profile release",
     "bindgen": "wasm-bindgen --weak-refs --target $TARGET --out-dir dist/$TARGET target/wasm32-unknown-unknown/release/wasm.wasm",
     "opt": "wasm-opt -O4 dist/$TARGET/wasm_bg.wasm -o dist/$TARGET/wasm_bg.wasm",
-    "build": "cross-env TARGET=nodejs pnpm run target && move-file dist/nodejs/wasm.js dist/nodejs/wasm.cjs && cross-env TARGET=web pnpm run target && cpy --flat src/workerd.js dist/web && cross-env TARGET=bundler pnpm run target",
+    "build-wasm": "cross-env TARGET=nodejs pnpm run target && move-file dist/nodejs/wasm.js dist/nodejs/wasm.cjs && cross-env TARGET=web pnpm run target && cpy --flat src/workerd.js dist/web && cross-env TARGET=bundler pnpm run target",
     "test": "pw-test --mode node && pw-test"
   },
   "keywords": [],
