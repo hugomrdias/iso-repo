@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.0.0...iso-filecoin-v1.1.0) (2023-07-21)
+
+
+### Features
+
+* add delegated address and eth address ([852a7fb](https://github.com/hugomrdias/iso-repo/commit/852a7fb03483f2fa005107f5849e88ae13d5bef2))
+
 ## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v0.2.4...iso-filecoin-v1.0.0) (2023-07-10)
 
 
