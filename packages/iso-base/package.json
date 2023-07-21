@@ -55,6 +55,10 @@
     "./ec-compression": {
       "types": "./dist/src/ec-compression.d.ts",
       "import": "./src/ec-compression.js"
+    },
+    "./leb128": {
+      "types": "./dist/src/leb128.d.ts",
+      "import": "./src/leb128.js"
     }
   },
   "typesVersions": {
@@ -79,6 +83,9 @@
       ],
       "ec-compression": [
         "dist/src/ec-compression"
+      ],
+      "leb128": [
+        "dist/src/leb128"
       ]
     }
   },
