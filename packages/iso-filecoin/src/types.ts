@@ -5,6 +5,17 @@ import type {
 } from './signature.js'
 import type { z } from 'zod'
 
+export interface Address {
+  protocol: number
+  payload: Uint8Array
+  network: Network
+  networkPrefix: NetworkPrefix
+  namespace?: number
+  toString: () => string
+  toBytes: () => Uint8Array
+  checksum: () => Uint8Array
+}
+
 export interface DerivationPathComponents {
   purpose: number
   coinType: number

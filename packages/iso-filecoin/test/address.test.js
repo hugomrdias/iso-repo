@@ -1,5 +1,12 @@
 import assert from 'assert'
-import { fromBytes, fromString, fromPublicKey } from '../src/address.js'
+import {
+  fromBytes,
+  fromString,
+  fromPublicKey,
+  isEthAddress,
+  fromEthAddress,
+  toEthAddress,
+} from '../src/address.js'
 import { base16, base64pad } from 'iso-base/rfc4648'
 
 const secp = [
@@ -22,6 +29,21 @@ const secp = [
   [
     'f12fiakbhe2gwd5cnmrenekasyn6v5tnaxaqizq6a',
     '01d1500504e4d1ac3e89ac891a4502586fabd9b417',
+  ],
+]
+
+const delegated = [
+  [
+    'f410feot7hrogmplrcupubsdbbqarkdewmb4vkwc5qqq',
+    '040a23a7f3c5c663d71151f40c8610c01150c9660795',
+  ],
+  [
+    'f410fek3n2tlnqghc5phd2lqatisj7d57j2lf5hgcs2q',
+    '040a22b6dd4d6d818e2ebce3d2e009a249f8fbf4e965',
+  ],
+  [
+    'f410firjm446mw5tqabmlxjp4sxwshdhrff7adk4srea',
+    '040a4452ce73ccb76700058bba5fc95ed238cf1297e0',
   ],
 ]
 
@@ -53,5 +75,50 @@ describe('address', function () {
       a.toString(),
       'f1eyo4qsoe7kjpehccfhhxlvd6wfo6mbi3ikfiheq'
     )
+  })
+
+  for (const [address, expected] of delegated) {
+    it(`delegated vectors ${address}`, function () {
+      const a = fromString(address)
+
+      assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
+    })
+
+    it(`delegated vectors ${address} fromBytes`, function () {
+      const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
+
+      assert.strictEqual(a.toString(), address)
+    })
+  }
+
+  it('is eth address', function () {
+    assert.ok(isEthAddress('0xd388ab098ed3e84c0d808776440b48f685198498'))
+  })
+
+  it('should convert from eth address', function () {
+    const f4 = fromEthAddress(
+      '0xd388ab098ed3e84c0d808776440b48f685198498',
+      'testnet'
+    )
+
+    assert.strictEqual(
+      f4.toString(),
+      't410f2oekwcmo2pueydmaq53eic2i62crtbeyuzx2gmy'
+    )
+  })
+
+  it('should convert from f4 to eth address', function () {
+    const f4 = fromString('f410f2oekwcmo2pueydmaq53eic2i62crtbeyuzx2gmy')
+
+    assert.strictEqual(
+      toEthAddress(f4),
+      '0xd388ab098ed3e84c0d808776440b48f685198498'
+    )
+  })
+
+  it('should fail convert from f1 to eth address', function () {
+    const f1 = fromString('f1wbxhu3ypkuo6eyp6hjx6davuelxaxrvwb2kuwva')
+
+    assert.throws(() => toEthAddress(f1))
   })
 })
