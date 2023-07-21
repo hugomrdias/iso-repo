@@ -6,6 +6,8 @@ import {
   isEthAddress,
   fromEthAddress,
   toEthAddress,
+  isAddress,
+  from,
 } from '../src/address.js'
 import { base16, base64pad } from 'iso-base/rfc4648'
 
@@ -49,9 +51,10 @@ const delegated = [
 
 describe('address', function () {
   for (const [address, expected] of secp) {
-    it(`sepc256k1 vectors ${address}`, function () {
+    it(`sepc256k1 vectors ${address} fromString`, function () {
       const a = fromString(address)
-
+      assert.ok(isAddress(a))
+      assert.equal(a.protocol, 1)
       assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
     })
 
@@ -59,6 +62,16 @@ describe('address', function () {
       const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
 
       assert.strictEqual(a.toString(), address)
+    })
+
+    it(`sepc256k1 vectors ${address} from`, function () {
+      const a = from(base16.decode(expected.toUpperCase()), 'mainnet')
+      assert.strictEqual(a.toString(), address)
+      assert.ok(isAddress(a))
+
+      const b = from(address)
+      assert.equal(a.protocol, 1)
+      assert.strictEqual(base16.encode(b.toBytes()).toLowerCase(), expected)
     })
   }
 
@@ -81,6 +94,8 @@ describe('address', function () {
     it(`delegated vectors ${address}`, function () {
       const a = fromString(address)
 
+      assert.ok(isAddress(a))
+      assert.equal(a.protocol, 4)
       assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
     })
 
@@ -100,6 +115,15 @@ describe('address', function () {
       '0xd388ab098ed3e84c0d808776440b48f685198498',
       'testnet'
     )
+
+    assert.strictEqual(
+      f4.toString(),
+      't410f2oekwcmo2pueydmaq53eic2i62crtbeyuzx2gmy'
+    )
+  })
+
+  it('should convert from eth address with "from" ', function () {
+    const f4 = from('0xd388ab098ed3e84c0d808776440b48f685198498', 'testnet')
 
     assert.strictEqual(
       f4.toString(),

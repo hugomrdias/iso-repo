@@ -101,6 +101,25 @@ export class RPC {
   }
 
   /**
+   * StateWaitMsg looks back in the chain for a message. If not found, it blocks until the message arrives on chain, and gets to the indicated confidence depth.
+   *
+   * @param {{ "/": string }} cid
+   * @param {number} confidence
+   * @param {number} lookBackLimit
+   */
+  async stateWaitMsg(cid, confidence = 2, lookBackLimit = 100) {
+    return /** @type {any} */ (
+      await this.call(
+        'Filecoin.StateWaitMsg',
+        cid,
+        confidence,
+        lookBackLimit,
+        false
+      )
+    )
+  }
+
+  /**
    * Generic method to call any method on the lotus rpc api.
    *
    * @template R

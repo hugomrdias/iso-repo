@@ -1,3 +1,4 @@
+import type { PROTOCOL_INDICATOR } from './address.js'
 import type { Schemas as MessageSchemas } from './message.js'
 import type {
   Schemas as SignatureSchemas,
@@ -5,8 +6,11 @@ import type {
 } from './signature.js'
 import type { z } from 'zod'
 
+export type ProtocolIndicator = typeof PROTOCOL_INDICATOR
+export type ProtocolIndicatorCode = ProtocolIndicator[keyof ProtocolIndicator]
+
 export interface Address {
-  protocol: number
+  protocol: ProtocolIndicatorCode
   payload: Uint8Array
   network: Network
   networkPrefix: NetworkPrefix

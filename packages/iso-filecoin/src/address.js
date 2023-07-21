@@ -1,22 +1,38 @@
 import { NETWORKS, checkNetworkPrefix, getNetwork } from './utils.js'
 import { base32, base16 } from 'iso-base/rfc4648'
-import { concat, equals } from 'iso-base/utils'
+import { concat, equals, isBufferSource, u8 } from 'iso-base/utils'
 import { blake2b } from '@noble/hashes/blake2b'
 import * as leb128 from 'iso-base/leb128'
 
 /**
- * @typedef {import('./types.js').Address} Address
+ * @typedef {import('./types.js').Address} IAddress
+ */
+
+/**
+ * @typedef { string | IAddress | BufferSource} Value
  */
 
 /**
  * Protocol indicator
  */
-const PROTOCOL_INDICATOR = {
+export const PROTOCOL_INDICATOR = /** @type {const} */ ({
   ID: 0,
   SECP256K1: 1,
   ACTOR: 2,
   BLS: 3,
   DELEGATED: 4,
+})
+
+const symbol = Symbol.for('filecoin-address')
+
+/**
+ * Check if object is a {@link IAddress} instance
+ *
+ * @param {any} val
+ * @returns {val is IAddress}
+ */
+export function isAddress(val) {
+  return Boolean(val?.[symbol])
 }
 
 /**
@@ -53,9 +69,31 @@ export function fromEthAddress(address, network) {
 }
 
 /**
+ * @param {Value} value - Value to convert to address
+ * @param {import('./types.js').Network} [network] - Network
+ */
+export function from(value, network = 'mainnet') {
+  if (isBufferSource(value)) {
+    return fromBytes(u8(value), network)
+  }
+
+  if (isAddress(value)) {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    return isEthAddress(value)
+      ? fromEthAddress(value, network)
+      : fromString(value)
+  }
+
+  throw new Error(`Invalid value: ${value}`)
+}
+
+/**
  * Ethereum address from address
  *
- * @param {Address} address
+ * @param {IAddress} address
  */
 export function toEthAddress(address) {
   if (address.protocol !== PROTOCOL_INDICATOR.DELEGATED) {
@@ -70,7 +108,7 @@ export function toEthAddress(address) {
  * Address from string
  *
  * @param {string} address
- * @returns {Address}
+ * @returns {IAddress}
  */
 export function fromString(address) {
   const type = Number.parseInt(address[1])
@@ -95,7 +133,7 @@ export function fromString(address) {
  *
  * @param {Uint8Array} bytes
  * @param {import('./types.js').Network} network
- * @returns {Address}
+ * @returns {IAddress}
  */
 export function fromBytes(bytes, network) {
   const type = bytes[0]
@@ -120,7 +158,7 @@ export function fromBytes(bytes, network) {
  * @param {Uint8Array} bytes
  * @param {import('./types.js').Network} network
  * @param {import('./types.js').SignatureType} type
- * @returns Address
+ * @returns IAddress
  */
 export function fromPublicKey(bytes, network, type) {
   switch (type) {
@@ -137,9 +175,12 @@ export function fromPublicKey(bytes, network, type) {
 /**
  * Secp256k1 address
  *
- * @implements {Address}
+ * @implements {IAddress}
  */
-export class AddressSecp256k1 {
+class Address {
+  /** @type {boolean} */
+  [symbol] = true
+
   /**
    *
    * @param {Uint8Array} payload
@@ -149,6 +190,42 @@ export class AddressSecp256k1 {
     this.payload = payload
     this.network = network
     this.networkPrefix = NETWORKS[network]
+    /** @type {import('./types.js').ProtocolIndicatorCode} */
+    this.protocol = PROTOCOL_INDICATOR.ID
+  }
+
+  toString() {
+    return `${this.networkPrefix}${this.protocol}${base32
+      .encode(concat([this.payload, this.checksum()]), false)
+      .toLowerCase()}`
+  }
+
+  toBytes() {
+    return concat([base16.decode(`0${this.protocol}`), this.payload])
+  }
+
+  checksum() {
+    return blake2b(this.toBytes(), {
+      dkLen: 4,
+    })
+  }
+}
+
+/**
+ * Secp256k1 address
+ *
+ * @see https://spec.filecoin.io/appendix/address/#section-appendix.address.protocol-1-libsecpk1-elliptic-curve-public-keys
+ *
+ * @implements {IAddress}
+ */
+export class AddressSecp256k1 extends Address {
+  /**
+   *
+   * @param {Uint8Array} payload
+   * @param {import("./types.js").Network} network
+   */
+  constructor(payload, network) {
+    super(payload, network)
     this.protocol = PROTOCOL_INDICATOR.SECP256K1
 
     if (payload.length !== 20) {
@@ -216,22 +293,6 @@ export class AddressSecp256k1 {
     })
     return new AddressSecp256k1(payload, network)
   }
-
-  toString() {
-    return `${this.networkPrefix}${this.protocol}${base32
-      .encode(concat([this.payload, this.checksum()]), false)
-      .toLowerCase()}`
-  }
-
-  toBytes() {
-    return concat([base16.decode(`0${this.protocol}`), this.payload])
-  }
-
-  checksum() {
-    return blake2b(this.toBytes(), {
-      dkLen: 4,
-    })
-  }
 }
 
 /**
@@ -240,18 +301,16 @@ export class AddressSecp256k1 {
  * @see https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0048.md
  *
  * @example t410f2oekwcmo2pueydmaq53eic2i62crtbeyuzx2gmy
- * @implements {Address}
+ * @implements {IAddress}
  */
-export class AddressDelegated {
+export class AddressDelegated extends Address {
   /**
    * @param {number} namespace
    * @param {Uint8Array} payload
    * @param {import("./types.js").Network} network
    */
   constructor(namespace, payload, network) {
-    this.payload = payload
-    this.network = network
-    this.networkPrefix = NETWORKS[network]
+    super(payload, network)
     this.protocol = PROTOCOL_INDICATOR.DELEGATED
     this.namespace = namespace
 
@@ -336,11 +395,5 @@ export class AddressDelegated {
     const protocol = leb128.unsigned.encode(this.protocol)
     const namespace = leb128.unsigned.encode(this.namespace)
     return concat([protocol, namespace, this.payload])
-  }
-
-  checksum() {
-    return blake2b(this.toBytes(), {
-      dkLen: 4,
-    })
   }
 }
