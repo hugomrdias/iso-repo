@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v1.0.0...iso-base-v1.1.0) (2023-07-21)
+
+
+### Features
+
+* add leb128 ([ea4f7b5](https://github.com/hugomrdias/iso-repo/commit/ea4f7b5939351ba546fcadd8dd9fa67ca323ca0b))
+
 ## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v0.3.0...iso-base-v1.0.0) (2023-06-22)
 
 
