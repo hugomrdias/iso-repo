@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.1.0...iso-filecoin-v1.1.1) (2023-07-21)
+
+
+### Bug Fixes
+
+* add Address.from ([ef89490](https://github.com/hugomrdias/iso-repo/commit/ef89490efc62f82ba43908491e6de2de8c664f1f))
+
 ## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.0.0...iso-filecoin-v1.1.0) (2023-07-21)
 
 
