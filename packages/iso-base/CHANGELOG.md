@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v1.1.0...iso-base-v1.1.1) (2023-07-21)
+
+
+### Bug Fixes
+
+* add more keywords ([afae7f6](https://github.com/hugomrdias/iso-repo/commit/afae7f67131438477cfd235d3738d294d7592eb3))
+
 ## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v1.0.0...iso-base-v1.1.0) (2023-07-21)
 
 
