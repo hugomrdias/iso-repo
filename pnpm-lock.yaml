@@ -78,14 +78,11 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1(preact@10.16.0)
       react-hook-form:
-        specifier: ^7.45.1
-        version: 7.45.1(react@18.2.0)
+        specifier: ^7.45.2
+        version: 7.45.2(react@18.2.0)
       vite-plugin-wasm:
         specifier: ^3.2.2
         version: 3.2.2(vite@4.4.4)
-      wasm:
-        specifier: workspace:^
-        version: link:../wasm
       water.css:
         specifier: ^2.1.1
         version: 2.1.1
@@ -238,8 +235,8 @@ importers:
         specifier: ^12.1.1
         version: 12.1.1
       type-fest:
-        specifier: ^3.13.0
-        version: 3.13.0
+        specifier: ^4.0.0
+        version: 4.0.0
       typescript:
         specifier: 5.1.6
         version: 5.1.6
@@ -376,8 +373,8 @@ importers:
         specifier: ^12.1.1
         version: 12.1.1
       type-fest:
-        specifier: ^3.13.0
-        version: 3.13.0
+        specifier: ^4.0.0
+        version: 4.0.0
       typescript:
         specifier: 5.1.6
         version: 5.1.6
@@ -5939,8 +5936,8 @@ packages:
       strip-json-comments: 2.0.1
     dev: true
 
-  /react-hook-form@7.45.1(react@18.2.0):
-    resolution: {integrity: sha512-6dWoFJwycbuFfw/iKMcl+RdAOAOHDiF11KWYhNDRN/OkUt+Di5qsZHwA0OwsVnu9y135gkHpTw9DJA+WzCeR9w==}
+  /react-hook-form@7.45.2(react@18.2.0):
+    resolution: {integrity: sha512-9s45OdTaKN+4NSTbXVqeDITd/nwIg++nxJGL8+OD5uf1DxvhsXQ641kaYHk5K28cpIOTYm71O/fYk7rFaygb3A==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18
@@ -6816,6 +6813,11 @@ packages:
   /type-fest@3.13.0:
     resolution: {integrity: sha512-Gur3yQGM9qiLNs0KPP7LPgeRbio2QTt4xXouobMCarR0/wyW3F+F/+OWwshg3NG0Adon7uQfSZBpB46NfhoF1A==}
     engines: {node: '>=14.16'}
+    dev: true
+
+  /type-fest@4.0.0:
+    resolution: {integrity: sha512-d/oYtUnPM9zar2fqqGLYPzgcY0qUlYK0evgNVti93xpzfjGkMgZHu9Lvgrkn0rqGXTgsFRxFamzjGoD9Uo+dgw==}
+    engines: {node: '>=16'}
     dev: true
 
   /typed-array-length@1.0.4:
