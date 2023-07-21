@@ -13,7 +13,12 @@
     "base",
     "crypto",
     "rfc4648",
-    "uint8array"
+    "uint8array",
+    "leb128",
+    "varint",
+    "ec-compression",
+    "base-x",
+    "isomorphic"
   ],
   "type": "module",
   "main": "src/index.js",
