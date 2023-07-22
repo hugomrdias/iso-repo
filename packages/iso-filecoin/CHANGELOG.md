@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.1.1...iso-filecoin-v1.2.0) (2023-07-22)
+
+
+### Features
+
+* add support for all address protocols ([57ea3ce](https://github.com/hugomrdias/iso-repo/commit/57ea3cefff22130d8a94633fe40e5c3441f2210e))
+
 ## [1.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.1.0...iso-filecoin-v1.1.1) (2023-07-21)
 
 
