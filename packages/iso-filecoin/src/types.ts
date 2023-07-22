@@ -15,6 +15,7 @@ export interface Address {
   network: Network
   networkPrefix: NetworkPrefix
   namespace?: number
+  id?: bigint
   toString: () => string
   toBytes: () => Uint8Array
   checksum: () => Uint8Array

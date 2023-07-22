@@ -34,6 +34,44 @@ const secp = [
   ],
 ]
 
+const actor = [
+  [
+    'f24vg6ut43yw2h2jqydgbg2xq7x6f4kub3bg6as6i',
+    '02e54dea4f9bc5b47d261819826d5e1fbf8bc5503b',
+  ],
+  [
+    'f25nml2cfbljvn4goqtclhifepvfnicv6g7mfmmvq',
+    '02eb58bd08a15a6ade19d0989674148fa95a8157c6',
+  ],
+  [
+    'f2nuqrg7vuysaue2pistjjnt3fadsdzvyuatqtfei',
+    '026d21137eb4c4814269e894d296cf6500e43cd714',
+  ],
+  [
+    'f24dd4ox4c2vpf5vk5wkadgyyn6qtuvgcpxxon64a',
+    '02e0c7c75f82d55e5ed55db28033630df4274a984f',
+  ],
+  [
+    'f2gfvuyh7v2sx3patm5k23wdzmhyhtmqctasbr23y',
+    '02316b4c1ff5d4afb7826ceab5bb0f2c3e0f364053',
+  ],
+]
+
+const bls = [
+  [
+    'f3vvmn62lofvhjd2ugzca6sof2j2ubwok6cj4xxbfzz4yuxfkgobpihhd2thlanmsh3w2ptld2gqkn2jvlss4a',
+    '03ad58df696e2d4e91ea86c881e938ba4ea81b395e12797b84b9cf314b9546705e839c7a99d606b247ddb4f9ac7a3414dd',
+  ],
+  [
+    'f3wmuu6crofhqmm3v4enos73okk2l366ck6yc4owxwbdtkmpk42ohkqxfitcpa57pjdcftql4tojda2poeruwa',
+    '03b3294f0a2e29e0c66ebc235d2fedca5697bf784af605c75af608e6a63d5cd38ea85ca8989e0efde9188b382f9372460d',
+  ],
+  [
+    'f3s2q2hzhkpiknjgmf4zq3ejab2rh62qbndueslmsdzervrhapxr7dftie4kpnpdiv2n6tvkr743ndhrsw6d3a',
+    '0396a1a3e4ea7a14d49985e661b22401d44fed402d1d0925b243c923589c0fbc7e32cd04e29ed78d15d37d3aaa3fe6da33',
+  ],
+]
+
 const delegated = [
   [
     'f410feot7hrogmplrcupubsdbbqarkdewmb4vkwc5qqq',
@@ -49,7 +87,90 @@ const delegated = [
   ],
 ]
 
+const id = [
+  ['f00', '0000'],
+  ['f0150', '009601'],
+  ['f01024', '008008'],
+  ['f01729', '00c10d'],
+  ['f018446744073709551615', '00ffffffffffffffffff01'],
+]
+
 describe('address', function () {
+  for (const [address, expected] of id) {
+    it(`id vectors ${address} fromString`, function () {
+      const a = fromString(address)
+      assert.ok(isAddress(a))
+      assert.equal(a.protocol, 0)
+      assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
+    })
+
+    it(`id vectors ${address} fromBytes`, function () {
+      const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
+
+      assert.strictEqual(a.toString(), address)
+    })
+
+    it(`id vectors ${address} from`, function () {
+      const a = from(base16.decode(expected.toUpperCase()), 'mainnet')
+      assert.strictEqual(a.toString(), address)
+      assert.ok(isAddress(a))
+
+      const b = from(address)
+      assert.equal(a.protocol, 0)
+      assert.strictEqual(base16.encode(b.toBytes()).toLowerCase(), expected)
+    })
+  }
+
+  for (const [address, expected] of bls) {
+    it(`bls vectors ${address} fromString`, function () {
+      const a = fromString(address)
+      assert.ok(isAddress(a))
+      assert.equal(a.protocol, 3)
+      assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
+    })
+
+    it(`bls vectors ${address} fromBytes`, function () {
+      const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
+
+      assert.strictEqual(a.toString(), address)
+    })
+
+    it(`bls vectors ${address} from`, function () {
+      const a = from(base16.decode(expected.toUpperCase()), 'mainnet')
+      assert.strictEqual(a.toString(), address)
+      assert.ok(isAddress(a))
+
+      const b = from(address)
+      assert.equal(a.protocol, 3)
+      assert.strictEqual(base16.encode(b.toBytes()).toLowerCase(), expected)
+    })
+  }
+
+  for (const [address, expected] of actor) {
+    it(`actor vectors ${address} fromString`, function () {
+      const a = fromString(address)
+      assert.ok(isAddress(a))
+      assert.equal(a.protocol, 2)
+      assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
+    })
+
+    it(`actor vectors ${address} fromBytes`, function () {
+      const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
+
+      assert.strictEqual(a.toString(), address)
+    })
+
+    it(`actor vectors ${address} from`, function () {
+      const a = from(base16.decode(expected.toUpperCase()), 'mainnet')
+      assert.strictEqual(a.toString(), address)
+      assert.ok(isAddress(a))
+
+      const b = from(address)
+      assert.equal(a.protocol, 2)
+      assert.strictEqual(base16.encode(b.toBytes()).toLowerCase(), expected)
+    })
+  }
+
   for (const [address, expected] of secp) {
     it(`sepc256k1 vectors ${address} fromString`, function () {
       const a = fromString(address)

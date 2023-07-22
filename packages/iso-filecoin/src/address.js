@@ -1,14 +1,11 @@
-import { NETWORKS, checkNetworkPrefix, getNetwork } from './utils.js'
-import { base32, base16 } from 'iso-base/rfc4648'
-import { concat, equals, isBufferSource, u8 } from 'iso-base/utils'
 import { blake2b } from '@noble/hashes/blake2b'
 import * as leb128 from 'iso-base/leb128'
+import { base16, base32 } from 'iso-base/rfc4648'
+import { concat, equals, isBufferSource, u8 } from 'iso-base/utils'
+import { NETWORKS, checkNetworkPrefix, getNetwork } from './utils.js'
 
 /**
  * @typedef {import('./types.js').Address} IAddress
- */
-
-/**
  * @typedef { string | IAddress | BufferSource} Value
  */
 
@@ -122,6 +119,18 @@ export function fromString(address) {
       return AddressDelegated.fromString(address)
     }
 
+    case PROTOCOL_INDICATOR.ACTOR: {
+      return AddressActor.fromString(address)
+    }
+
+    case PROTOCOL_INDICATOR.BLS: {
+      return AddressBLS.fromString(address)
+    }
+
+    case PROTOCOL_INDICATOR.ID: {
+      return AddressId.fromString(address)
+    }
+
     default: {
       throw new Error(`Invalid protocol indicator: ${type}`)
     }
@@ -145,6 +154,15 @@ export function fromBytes(bytes, network) {
     case PROTOCOL_INDICATOR.DELEGATED: {
       return AddressDelegated.fromBytes(bytes, network)
     }
+    case PROTOCOL_INDICATOR.BLS: {
+      return AddressBLS.fromBytes(bytes, network)
+    }
+    case PROTOCOL_INDICATOR.ACTOR: {
+      return AddressActor.fromBytes(bytes, network)
+    }
+    case PROTOCOL_INDICATOR.ID: {
+      return AddressId.fromBytes(bytes, network)
+    }
 
     default: {
       throw new Error(`Invalid protocol indicator: ${type}`)
@@ -164,6 +182,10 @@ export function fromPublicKey(bytes, network, type) {
   switch (type) {
     case 'SECP256K1': {
       return AddressSecp256k1.fromPublicKey(bytes, network)
+    }
+
+    case 'BLS': {
+      return AddressBLS.fromPublicKey(bytes, network)
     }
 
     default: {
@@ -212,7 +234,72 @@ class Address {
 }
 
 /**
- * Secp256k1 address
+ * ID Address f0..
+ *
+ * Protocol 0 addresses are simple IDs. All actors have a numeric ID even if they don’t have public keys. The payload of an ID address is base10 encoded. IDs are not hashed and do not have a checksum.
+ *
+ * @see https://spec.filecoin.io/appendix/address/#section-appendix.address.protocol-0-ids
+ *
+ * @implements {IAddress}
+ */
+export class AddressId extends Address {
+  /**
+   *
+   * @param {Uint8Array} payload
+   * @param {import("./types.js").Network} network
+   */
+  constructor(payload, network) {
+    super(payload, network)
+    this.protocol = PROTOCOL_INDICATOR.ID
+    this.id = leb128.unsigned.decode(payload)[0]
+  }
+
+  /**
+   * Create address from string
+   *
+   * @param {string} address
+   */
+  static fromString(address) {
+    const networkPrefix = address[0]
+    const protocolIndicator = address[1]
+
+    if (!checkNetworkPrefix(networkPrefix)) {
+      throw new Error(`Invalid network: ${networkPrefix}`)
+    }
+
+    if (Number.parseInt(protocolIndicator) !== PROTOCOL_INDICATOR.ID) {
+      throw new Error(`Invalid protocol indicator: ${protocolIndicator}`)
+    }
+
+    const newAddress = new AddressId(
+      leb128.unsigned.encode(address.slice(2)),
+      getNetwork(networkPrefix)
+    )
+
+    return newAddress
+  }
+
+  /**
+   * Create address from bytes
+   *
+   * @param {Uint8Array} bytes
+   * @param {import('./types.js').Network} network
+   * @returns
+   */
+  static fromBytes(bytes, network) {
+    if (bytes[0] !== PROTOCOL_INDICATOR.ID) {
+      throw new Error(`Invalid protocol indicator: ${bytes[0]}`)
+    }
+    return new AddressId(bytes.subarray(1), network)
+  }
+
+  toString() {
+    return `${this.networkPrefix}${this.protocol}${this.id}`
+  }
+}
+
+/**
+ * Secp256k1 address f1..
  *
  * @see https://spec.filecoin.io/appendix/address/#section-appendix.address.protocol-1-libsecpk1-elliptic-curve-public-keys
  *
@@ -296,7 +383,158 @@ export class AddressSecp256k1 extends Address {
 }
 
 /**
- * Delegated address
+ * Actor Address f2..
+ *
+ * Protocol 2 addresses representing an Actor. The payload field contains the SHA256 hash of meaningful data produced as a result of creating the actor.
+ *
+ * @see https://spec.filecoin.io/appendix/address/#section-appendix.address.protocol-2-actor
+ *
+ * @implements {IAddress}
+ */
+export class AddressActor extends Address {
+  /**
+   *
+   * @param {Uint8Array} payload
+   * @param {import("./types.js").Network} network
+   */
+  constructor(payload, network) {
+    super(payload, network)
+    this.protocol = PROTOCOL_INDICATOR.ACTOR
+    if (payload.length !== 20) {
+      throw new Error(`Invalid payload length: ${payload.length} should be 20.`)
+    }
+  }
+
+  /**
+   * Create address from string
+   *
+   * @param {string} address
+   */
+  static fromString(address) {
+    const networkPrefix = address[0]
+    const protocolIndicator = address[1]
+
+    if (!checkNetworkPrefix(networkPrefix)) {
+      throw new Error(`Invalid network: ${networkPrefix}`)
+    }
+
+    if (Number.parseInt(protocolIndicator) !== PROTOCOL_INDICATOR.ACTOR) {
+      throw new Error(`Invalid protocol indicator: ${protocolIndicator}`)
+    }
+
+    const data = base32.decode(address.slice(2).toUpperCase())
+    const payload = data.subarray(0, -4)
+    const checksum = data.subarray(-4)
+    const newAddress = new AddressActor(payload, getNetwork(networkPrefix))
+
+    if (validateChecksum(newAddress.checksum(), checksum)) {
+      return newAddress
+    } else {
+      throw new Error(`Invalid checksum`)
+    }
+  }
+
+  /**
+   * Create address from bytes
+   *
+   * @param {Uint8Array} bytes
+   * @param {import('./types.js').Network} network
+   * @returns
+   */
+  static fromBytes(bytes, network) {
+    if (bytes[0] !== PROTOCOL_INDICATOR.ACTOR) {
+      throw new Error(`Invalid protocol indicator: ${bytes[0]}`)
+    }
+    return new AddressActor(bytes.subarray(1), network)
+  }
+}
+
+/**
+ * BLS Address f3..
+ *
+ * Protocol 3 addresses represent BLS public encryption keys. The payload field contains the BLS public key.
+ *
+ * @see https://spec.filecoin.io/appendix/address/#section-appendix.address.protocol-3-bls
+ *
+ * @implements {IAddress}
+ */
+export class AddressBLS extends Address {
+  /**
+   *
+   * @param {Uint8Array} payload
+   * @param {import("./types.js").Network} network
+   */
+  constructor(payload, network) {
+    super(payload, network)
+    this.protocol = PROTOCOL_INDICATOR.BLS
+    if (payload.length !== 48) {
+      throw new Error(`Invalid payload length: ${payload.length} should be 48.`)
+    }
+  }
+
+  /**
+   * Create address from string
+   *
+   * @param {string} address
+   */
+  static fromString(address) {
+    const networkPrefix = address[0]
+    const protocolIndicator = address[1]
+
+    if (!checkNetworkPrefix(networkPrefix)) {
+      throw new Error(`Invalid network: ${networkPrefix}`)
+    }
+
+    if (Number.parseInt(protocolIndicator) !== PROTOCOL_INDICATOR.BLS) {
+      throw new Error(
+        `Invalid protocol indicator: ${protocolIndicator} expected ${PROTOCOL_INDICATOR.BLS}`
+      )
+    }
+
+    const data = base32.decode(address.slice(2).toUpperCase())
+    const payload = data.subarray(0, -4)
+    const checksum = data.subarray(-4)
+    const newAddress = new AddressBLS(payload, getNetwork(networkPrefix))
+
+    if (validateChecksum(newAddress.checksum(), checksum)) {
+      return newAddress
+    } else {
+      throw new Error(`Invalid checksum`)
+    }
+  }
+
+  /**
+   * Create address from bytes
+   *
+   * @param {Uint8Array} bytes
+   * @param {import('./types.js').Network} network
+   * @returns
+   */
+  static fromBytes(bytes, network) {
+    if (bytes[0] !== PROTOCOL_INDICATOR.BLS) {
+      throw new Error(`Invalid protocol indicator: ${bytes[0]}`)
+    }
+    return new AddressBLS(bytes.subarray(1), network)
+  }
+
+  /**
+   *
+   * @param {Uint8Array} publicKey
+   * @param {import('./types.js').Network} network
+   * @returns
+   */
+  static fromPublicKey(publicKey, network) {
+    if (publicKey.length !== 48) {
+      throw new Error(
+        `Invalid public key length: ${publicKey.length} should be 48.`
+      )
+    }
+    return new AddressBLS(publicKey, network)
+  }
+}
+
+/**
+ * Delegated address f4..
  *
  * @see https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0048.md
  *

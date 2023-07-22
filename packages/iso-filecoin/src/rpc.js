@@ -196,7 +196,9 @@ export class RPC {
     const prefix = getNetworkPrefix(this.network)
 
     if (!address.startsWith(prefix)) {
-      throw new TypeError(`Address does not belong to ${this.network}`)
+      throw new TypeError(
+        `Address ${address} does not belong to ${this.network}`
+      )
     }
 
     return address
