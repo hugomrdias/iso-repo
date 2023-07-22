@@ -109,7 +109,7 @@
     "@scure/base": "^1.1.1",
     "@types/assert": "^1.5.6",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^20.4.2",
+    "@types/node": "^20.4.3",
     "assert": "^2.0.0",
     "hd-scripts": "^7.0.0",
     "micro-bmark": "^0.3.1",
