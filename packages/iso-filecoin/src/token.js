@@ -206,6 +206,10 @@ export class Token {
     return this.div(WHOLE_MUL)
   }
 
+  toBigInt() {
+    return BigInt(this.val.toString())
+  }
+
   toBytes() {
     if (this.val.isZero()) {
       return new Uint8Array(0)

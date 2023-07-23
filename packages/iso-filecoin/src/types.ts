@@ -18,6 +18,7 @@ export interface Address {
   id?: bigint
   toString: () => string
   toBytes: () => Uint8Array
+  toContractDestination: () => `0x${string}`
   checksum: () => Uint8Array
 }
 

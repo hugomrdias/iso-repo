@@ -56,6 +56,7 @@ export function isEthAddress(address) {
  *
  * @param {string} address
  * @param {import('./types.js').Network} network
+ * @returns {IAddress}
  */
 export function fromEthAddress(address, network) {
   return new AddressDelegated(
@@ -66,8 +67,23 @@ export function fromEthAddress(address, network) {
 }
 
 /**
+ * Ethereum address from address
+ *
+ * @param {IAddress} address
+ */
+export function toEthAddress(address) {
+  if (address.protocol !== PROTOCOL_INDICATOR.DELEGATED) {
+    throw new Error(
+      `Invalid protocol indicator: ${address.protocol}. Only Delegated Adresses are supported.`
+    )
+  }
+  return `0x${base16.encode(address.payload).toLowerCase()}`
+}
+
+/**
  * @param {Value} value - Value to convert to address
  * @param {import('./types.js').Network} [network] - Network
+ * @returns {IAddress}
  */
 export function from(value, network = 'mainnet') {
   if (isBufferSource(value)) {
@@ -85,20 +101,6 @@ export function from(value, network = 'mainnet') {
   }
 
   throw new Error(`Invalid value: ${value}`)
-}
-
-/**
- * Ethereum address from address
- *
- * @param {IAddress} address
- */
-export function toEthAddress(address) {
-  if (address.protocol !== PROTOCOL_INDICATOR.DELEGATED) {
-    throw new Error(
-      `Invalid protocol indicator: ${address.protocol}. Only Delegated Adresses are supported.`
-    )
-  }
-  return `0x${base16.encode(address.payload).toLowerCase()}`
 }
 
 /**
@@ -224,6 +226,10 @@ class Address {
 
   toBytes() {
     return concat([base16.decode(`0${this.protocol}`), this.payload])
+  }
+
+  toContractDestination() {
+    return /** @type {`0x${string}`} */ (`0x${base16.encode(this.toBytes())}`)
   }
 
   checksum() {
