@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.2.0...iso-filecoin-v1.3.0) (2023-07-23)
+
+
+### Features
+
+* add toBigInt and toContractDestination ([88251b7](https://github.com/hugomrdias/iso-repo/commit/88251b70d32f5c35caadfc67f475fc43973ba306))
+
 ## [1.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.1.1...iso-filecoin-v1.2.0) (2023-07-22)
 
 
