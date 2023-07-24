@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.3.0...iso-filecoin-v2.0.0) (2023-07-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* change token toFormat signature
+
+### Features
+
+* change token toFormat signature ([07f50b7](https://github.com/hugomrdias/iso-repo/commit/07f50b7d51530c7368b5206c960edfc36024e34f))
+
 ## [1.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.2.0...iso-filecoin-v1.3.0) (2023-07-23)
 
 
