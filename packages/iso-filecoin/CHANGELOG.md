@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v2.0.0...iso-filecoin-v2.0.1) (2023-07-24)
+
+
+### Bug Fixes
+
+* improve toFormat defaults ([d75c232](https://github.com/hugomrdias/iso-repo/commit/d75c232cfb7a77d06ba46ec14430436ffc20d732))
+
 ## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v1.3.0...iso-filecoin-v2.0.0) (2023-07-24)
 
 
