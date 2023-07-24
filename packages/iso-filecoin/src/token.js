@@ -159,6 +159,8 @@ export class Token {
   }
 
   /**
+   * Serialize the number to a string using the given base.
+   *
    * @param {number | undefined} [base]
    */
   toString(base = 10) {
@@ -166,19 +168,25 @@ export class Token {
   }
 
   /**
-   * @param {number} [decimalPlaces]
-   * @param {BigNumber.RoundingMode} [roundingMode]
-   * @param {BigNumber.Format} [format]
+   * Format the number using the given options.
+   *
+   * @param {import('./types.js').FormatOptions} [options]
+   * @see https://mikemcl.github.io/bignumber.js/#toFor
    */
-  toFormat(
-    decimalPlaces = 2,
-    roundingMode = BigNumber.ROUND_HALF_DOWN,
-    format
-  ) {
-    return this.val.toFormat(decimalPlaces, roundingMode, format)
+  toFormat(options = {}) {
+    const { decimalPlaces, roundingMode, ...rest } = options
+    return this.val.toFormat(
+      decimalPlaces || 18,
+      roundingMode || BigNumber.ROUND_HALF_DOWN,
+      rest
+    )
   }
 
   toAttoFIL() {
+    this.toFormat({
+      decimalPlaces: 2,
+      roundingMode: 1,
+    })
     return this
   }
 

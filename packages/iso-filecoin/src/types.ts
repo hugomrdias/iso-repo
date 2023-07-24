@@ -1,3 +1,4 @@
+import type BigNumber from 'bignumber.js'
 import type { PROTOCOL_INDICATOR } from './address.js'
 import type { Schemas as MessageSchemas } from './message.js'
 import type {
@@ -130,3 +131,17 @@ export type MpoolPushResponse =
       error: undefined
     }
   | RpcError
+
+// Token types
+export type FormatOptions = BigNumber.Format & {
+  /**
+   * @default 18
+   * @see https://mikemcl.github.io/bignumber.js/#decimal-places
+   */
+  decimalPlaces?: number
+  /**
+   * @default BigNumber.ROUND_HALF_DOWN
+   * @see https://mikemcl.github.io/bignumber.js/#constructor-properties
+   */
+  roundingMode?: BigNumber.RoundingMode
+}
