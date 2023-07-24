@@ -174,12 +174,23 @@ export class Token {
    * @see https://mikemcl.github.io/bignumber.js/#toFor
    */
   toFormat(options = {}) {
-    const { decimalPlaces, roundingMode, ...rest } = options
-    return this.val.toFormat(
-      decimalPlaces || 18,
-      roundingMode || BigNumber.ROUND_HALF_DOWN,
-      rest
-    )
+    options = {
+      prefix: '',
+      decimalSeparator: '.',
+      groupSeparator: ',',
+      groupSize: 3,
+      secondaryGroupSize: 0,
+      fractionGroupSeparator: ' ',
+      fractionGroupSize: 0,
+      suffix: '',
+      ...options,
+    }
+    const {
+      decimalPlaces = 18,
+      roundingMode = BigNumber.ROUND_HALF_DOWN,
+      ...rest
+    } = options
+    return this.val.toFormat(decimalPlaces, roundingMode, rest)
   }
 
   toAttoFIL() {

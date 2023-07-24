@@ -124,4 +124,26 @@ describe('token', function () {
       assert.strictEqual(s, serialized)
     })
   }
+
+  it('should format', function () {
+    assert.strictEqual(
+      Token.fromAttoFIL(1).toFIL().toString(),
+      '0.000000000000000001'
+    )
+
+    assert.strictEqual(
+      Token.fromFIL(100).toFormat({
+        decimalPlaces: 0,
+        groupSize: 0,
+      }),
+      Token.fromFIL(100).toString()
+    )
+
+    assert.strictEqual(
+      Token.fromAttoFIL(1).toFIL().toFormat({
+        suffix: ' FIL',
+      }),
+      '0.000000000000000001 FIL'
+    )
+  })
 })
