@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v2.0.1...iso-filecoin-v2.0.2) (2023-07-25)
+
+
+### Bug Fixes
+
+* add npm provenance ([ea8a4f3](https://github.com/hugomrdias/iso-repo/commit/ea8a4f3125d0775e92ed03f804344be2be66f05c))
+
 ## [2.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v2.0.0...iso-filecoin-v2.0.1) (2023-07-24)
 
 
