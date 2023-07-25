@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/hugomrdias/iso-repo/compare/iso-base-v1.1.1...iso-base-v1.1.2) (2023-07-25)
+
+
+### Bug Fixes
+
+* add npm provenance ([ea8a4f3](https://github.com/hugomrdias/iso-repo/commit/ea8a4f3125d0775e92ed03f804344be2be66f05c))
+
 ## [1.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v1.1.0...iso-base-v1.1.1) (2023-07-21)
 
 
