@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.2.0...iso-passkeys-v0.2.1) (2023-07-25)
+
+
+### Bug Fixes
+
+* add npm provenance ([ea8a4f3](https://github.com/hugomrdias/iso-repo/commit/ea8a4f3125d0775e92ed03f804344be2be66f05c))
+
 ## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.1.6...iso-passkeys-v0.2.0) (2023-06-29)
 
 
