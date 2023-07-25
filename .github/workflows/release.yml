@@ -31,6 +31,9 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-did') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-signatures')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2.2.4
