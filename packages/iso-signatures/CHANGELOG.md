@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.8...iso-signatures-v0.1.9) (2023-07-25)
+
+
+### Bug Fixes
+
+* add npm provenance ([ea8a4f3](https://github.com/hugomrdias/iso-repo/commit/ea8a4f3125d0775e92ed03f804344be2be66f05c))
+
 ## [0.1.8](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.7...iso-signatures-v0.1.8) (2023-07-11)
 
 
