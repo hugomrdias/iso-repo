@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v2.0.2...iso-filecoin-v2.1.0) (2023-07-31)
+
+
+### Features
+
+* add `fromContractDestination` for address ([#66](https://github.com/hugomrdias/iso-repo/issues/66)) ([d1e6c38](https://github.com/hugomrdias/iso-repo/commit/d1e6c38de792316f24ffd877fd5be557b11d90d8))
+
 ## [2.0.2](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v2.0.1...iso-filecoin-v2.0.2) (2023-07-25)
 
 
