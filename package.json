@@ -23,7 +23,7 @@
     "prettier": "3.0.0",
     "simple-git-hooks": "^2.8.1",
     "typedoc": "^0.24.8",
-    "typedoc-plugin-missing-exports": "^2.0.0",
+    "typedoc-plugin-missing-exports": "^2.0.1",
     "typescript": "5.1.6"
   },
   "simple-git-hooks": {
