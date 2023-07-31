@@ -197,6 +197,19 @@ export function fromPublicKey(bytes, network, type) {
 }
 
 /**
+ * Create an `Address` instance from a 0x-prefixed hex string address returned by `Address.toContractDestination()`.
+ *
+ * @param {`0x${string}`} address - The 0x-prefixed hex string address returned by `Address.toContractDestination()`.
+ * @param {import("./types.js").Network} network - The network the address is on.
+ */
+export function fromContractDestination(address, network) {
+  if (!address.startsWith('0x')) {
+    throw new Error(`Expected 0x prefixed hex, instead got: '${address}'`)
+  }
+  return fromBytes(base16.decode(address.slice(2)), network)
+}
+
+/**
  * Secp256k1 address
  *
  * @implements {IAddress}
