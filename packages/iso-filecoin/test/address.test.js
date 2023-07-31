@@ -8,6 +8,7 @@ import {
   toEthAddress,
   isAddress,
   from,
+  fromContractDestination,
 } from '../src/address.js'
 import { base16, base64pad } from 'iso-base/rfc4648'
 
@@ -265,5 +266,27 @@ describe('address', function () {
     const f1 = fromString('f1wbxhu3ypkuo6eyp6hjx6davuelxaxrvwb2kuwva')
 
     assert.throws(() => toEthAddress(f1))
+  })
+
+  it('should convert from f1 address to contract destination and back', function () {
+    const f1 = fromString('f1wbxhu3ypkuo6eyp6hjx6davuelxaxrvwb2kuwva')
+    const contractDestination = f1.toContractDestination()
+    const f1FromContractDestination = fromContractDestination(
+      contractDestination,
+      'mainnet'
+    )
+
+    assert.strictEqual(f1.toString(), f1FromContractDestination.toString())
+  })
+
+  it('should convert from f1 address to contract destination and back on testnet', function () {
+    const t1 = fromString('t1wbxhu3ypkuo6eyp6hjx6davuelxaxrvwb2kuwva')
+    const contractDestination = t1.toContractDestination()
+    const t1FromContractDestination = fromContractDestination(
+      contractDestination,
+      'testnet'
+    )
+
+    assert.strictEqual(t1.toString(), t1FromContractDestination.toString())
   })
 })
