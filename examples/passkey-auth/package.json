@@ -25,7 +25,7 @@
     "p-debounce": "^4.0.0",
     "preact": "^10.16.0",
     "preact-router": "^4.1.2",
-    "react-hook-form": "^7.45.2",
+    "react-hook-form": "^7.45.4",
     "vite-plugin-wasm": "^3.2.2",
     "water.css": "^2.1.1"
   },
