@@ -17,7 +17,7 @@
     "@oddjs/odd": "^0.37.2",
     "@peculiar/asn1-ecc": "^2.3.6",
     "@peculiar/asn1-schema": "^2.3.6",
-    "@preact/signals": "^1.1.5",
+    "@preact/signals": "^1.2.1",
     "cbor-x": "^1.5.3",
     "idb-keyval": "^6.2.1",
     "iso-base": "workspace:^",
