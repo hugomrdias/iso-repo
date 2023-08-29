@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v1.1.2...iso-base-v2.0.0) (2023-08-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* add react-native export to crypto and change from import to default in the export map
+
+### Features
+
+* add react-native export to crypto and change from import to default in the export map ([7f78739](https://github.com/hugomrdias/iso-repo/commit/7f78739ac4a2a3df9d800c4f7bc79932d66809ce))
+
 ## [1.1.2](https://github.com/hugomrdias/iso-repo/compare/iso-base-v1.1.1...iso-base-v1.1.2) (2023-07-25)
 
 
