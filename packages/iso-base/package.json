@@ -30,40 +30,41 @@
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
-      "import": "./src/index.js"
+      "default": "./src/index.js"
     },
     "./utils": {
       "types": "./dist/src/utils.d.ts",
-      "import": "./src/utils.js"
+      "default": "./src/utils.js"
     },
     "./utf8": {
       "types": "./dist/src/utf8.d.ts",
-      "import": "./src/utf8.js"
+      "default": "./src/utf8.js"
     },
     "./crypto": {
       "types": "./dist/src/crypto.d.ts",
-      "browser": "./src/crypto-browser.js",
-      "import": "./src/crypto.js"
+      "node": "./src/crypto.js",
+      "react-native": "./src/crypto-browser.js",
+      "default": "./src/crypto-browser.js"
     },
     "./rfc4648": {
       "types": "./dist/src/rfc4648.d.ts",
-      "import": "./src/rfc4648.js"
+      "default": "./src/rfc4648.js"
     },
     "./base-x": {
       "types": "./dist/src/base-x.d.ts",
-      "import": "./src/base-x.js"
+      "default": "./src/base-x.js"
     },
     "./varint": {
       "types": "./dist/src/varint.d.ts",
-      "import": "./src/varint.js"
+      "default": "./src/varint.js"
     },
     "./ec-compression": {
       "types": "./dist/src/ec-compression.d.ts",
-      "import": "./src/ec-compression.js"
+      "default": "./src/ec-compression.js"
     },
     "./leb128": {
       "types": "./dist/src/leb128.d.ts",
-      "import": "./src/leb128.js"
+      "default": "./src/leb128.js"
     }
   },
   "typesVersions": {
