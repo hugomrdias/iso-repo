@@ -27,8 +27,8 @@
       "import": "./src/key.js"
     },
     "./core": {
-      "types": "./dist/src/key.d.ts",
-      "import": "./src/key.js"
+      "types": "./dist/src/core.d.ts",
+      "import": "./src/core.js"
     }
   },
   "typesVersions": {
