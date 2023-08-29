@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.3.1...iso-did-v1.3.2) (2023-08-29)
+
+
+### Bug Fixes
+
+* ./core export in package.json ([#78](https://github.com/hugomrdias/iso-repo/issues/78)) ([95b4d46](https://github.com/hugomrdias/iso-repo/commit/95b4d46df88b649a448ae927714bbb10b1022a89))
+
 ## [1.3.1](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.3.0...iso-did-v1.3.1) (2023-07-25)
 
 
