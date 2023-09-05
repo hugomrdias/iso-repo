@@ -7,14 +7,14 @@
 /**
  * Combines an array of AbortSignals into a single signal that is aborted when any signal is
  *
- * @param {Iterable<AbortSignal>} signals
+ * @param {Iterable<AbortSignal | undefined>} signals
  * @returns {AbortSignal}
  */
 export function anySignal(signals) {
   const controller = new AbortController()
 
   for (const signal of signals) {
-    if ('aborted' in signal && 'reason' in signal) {
+    if (signal && 'aborted' in signal && 'reason' in signal) {
       if (signal.aborted) {
         controller.abort(signal.reason)
         return signal
