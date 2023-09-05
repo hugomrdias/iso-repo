@@ -1,6 +1,6 @@
 {
   "name": "iso-web",
-  "version": "0.0.1",
+  "version": "0.1.5",
   "description": "Isomorphic Web APIs",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
@@ -65,12 +65,10 @@
   },
   "devDependencies": {
     "@types/assert": "^1.5.6",
-    "@types/mocha": "^10.0.1",
     "@types/node": "^20.5.9",
     "assert": "^2.0.0",
     "delay": "^6.0.0",
     "hd-scripts": "^8.0.0",
-    "mocha": "^10.2.0",
     "playwright-test": "^12.2.0",
     "typescript": "5.2.2"
   },
