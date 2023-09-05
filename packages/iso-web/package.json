@@ -1,6 +1,6 @@
 {
   "name": "iso-web",
-  "version": "0.0.1",
+  "version": "0.1.5",
   "description": "Isomorphic Web APIs",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
