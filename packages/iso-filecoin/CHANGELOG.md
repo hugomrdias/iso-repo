@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v2.1.0...iso-filecoin-v3.0.0) (2023-09-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* change rpc methods signature to support fetch options
+
+### Features
+
+* change rpc methods signature to support fetch options ([e1908f9](https://github.com/hugomrdias/iso-repo/commit/e1908f9ea05e309c7f1d260ecc18584503155cb4))
+
+
+### Bug Fixes
+
+* increase `waitMsg` timeout to 60s ([553a5e1](https://github.com/hugomrdias/iso-repo/commit/553a5e1bc9f7c3a5916c54d453feea6f67ffd414))
+* update deps ([1e0e7ef](https://github.com/hugomrdias/iso-repo/commit/1e0e7ef49e0d48719672129d8aff5c4ddd225ad8))
+
 ## [2.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v2.0.2...iso-filecoin-v2.1.0) (2023-07-31)
 
 

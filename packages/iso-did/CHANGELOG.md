@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.3.2...iso-did-v1.3.3) (2023-09-05)
+
+
+### Bug Fixes
+
+* update deps ([1e0e7ef](https://github.com/hugomrdias/iso-repo/commit/1e0e7ef49e0d48719672129d8aff5c4ddd225ad8))
+
 ## [1.3.2](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.3.1...iso-did-v1.3.2) (2023-08-29)
 
 
