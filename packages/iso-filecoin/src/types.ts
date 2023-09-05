@@ -10,6 +10,10 @@ import type { z } from 'zod'
 export type ProtocolIndicator = typeof PROTOCOL_INDICATOR
 export type ProtocolIndicatorCode = ProtocolIndicator[keyof ProtocolIndicator]
 
+export interface CID {
+  '/': string
+}
+
 export interface Address {
   protocol: ProtocolIndicatorCode
   payload: Uint8Array
@@ -80,57 +84,92 @@ export interface Options {
   fetch?: typeof globalThis.fetch
 }
 
+export interface RpcOptions {
+  method: `Filecoin.${string}`
+  params?: unknown[]
+}
+
+export interface FetchOptions {
+  signal?: AbortSignal
+  keepalive?: boolean
+  timeout?: number
+}
+
+export interface MsgReceipt {
+  ExitCode: number
+  Return: string | null
+  GasUsed: number
+  EventsRoot: CID | null
+}
+export interface MsgLookup {
+  Height: number
+  Message: CID
+  Receipt: MsgReceipt
+  ReturnDec: unknown | null
+  TipSet: CID[]
+}
 /**
  * Lotus API responses
+ *
+ * @see https://filecoin-shipyard.github.io/js-lotus-client/api/api.html
  */
-export type VersionResponse =
-  | {
-      result: { Version: string; APIVersion: number; BlockDelay: number }
-      error: undefined
-    }
-  | RpcError
 
-export type StateNetworkNameResponse =
-  | {
-      result: Network
-      error: undefined
-    }
-  | RpcError
+export type LotusResponse<T> = { result: T; error: undefined } | RpcError
+export type VersionResponse = LotusResponse<{
+  Version: string
+  APIVersion: number
+  BlockDelay: number
+}>
+export type StateNetworkNameResponse = LotusResponse<Network>
+export type MpoolGetNonceResponse = LotusResponse<number>
+export type GasEstimateMessageGasResponse = LotusResponse<LotusMessage>
 
-export type MpoolGetNonceResponse =
-  | {
-      result: number
-      error: undefined
-    }
-  | RpcError
+/**
+ * Wallet balance in attoFIL
+ *
+ * @example '99999927137190925849'
+ */
+export type WalletBalanceResponse = LotusResponse<string>
+export type MpoolPushResponse = LotusResponse<CID>
+export type WaitMsgResponse = LotusResponse<MsgLookup>
 
-export type GasEstimateMessageGasResponse =
-  | {
-      result: LotusMessage
-      error: undefined
-    }
-  | RpcError
+// RPC methods params
 
-export type WalletBalanceResponse =
-  | {
-      /**
-       * Wallet balance in attoFIL
-       *
-       * @example '99999927137190925849'
-       */
-      result: string
-      error: undefined
-    }
-  | RpcError
+export interface GasEstimateParams {
+  /**
+   * Message to estimate gas for
+   *
+   * @see https://lotus.filecoin.io/reference/lotus/gas/#gasestimatemessagegas
+   */
+  msg: PartialMessageObj
+  /**
+   * Max fee to pay for gas (attoFIL/gas units)
+   *
+   * @default '0'
+   */
+  maxFee?: string
+}
 
-export type MpoolPushResponse =
-  | {
-      result: {
-        ['/']: string
-      }
-      error: undefined
-    }
-  | RpcError
+export interface PushMessageParams {
+  msg: MessageObj
+  signature: SignatureObj
+}
+
+export interface waitMsgParams {
+  cid: CID
+  /**
+   * Confidence depth to wait for
+   *
+   * @default 2
+   */
+  confidence?: number
+  /**
+   * How chain epochs to look back to find the message
+   *
+   * @default 100
+   */
+  lookback?: number
+}
 
 // Token types
 export type FormatOptions = BigNumber.Format & {

@@ -67,7 +67,7 @@ describe('lotus rpc', function () {
       value: '100000000000000000',
     })
 
-    const estimate = await rpc.gasEstimate(msg)
+    const estimate = await rpc.gasEstimate({ msg })
     if (estimate.error) {
       return assert.fail(estimate.error.message)
     }
@@ -90,7 +90,7 @@ describe('lotus rpc', function () {
       value: '100000000000000000',
     })
 
-    const estimate = await rpc.gasEstimate(msg)
+    const estimate = await rpc.gasEstimate({ msg })
     if (estimate.error) {
       return assert.fail(estimate.error.message)
     }
@@ -116,7 +116,7 @@ describe('lotus rpc', function () {
       value: '100000000000000000',
     })
 
-    const estimate = await rpc.gasEstimate(msg)
+    const estimate = await rpc.gasEstimate({ msg })
     if (estimate.error) {
       return assert.fail(estimate.error.message)
     }
@@ -182,9 +182,12 @@ describe('lotus rpc', function () {
       value: '1',
     }).prepare(rpc)
 
-    const balance = await rpc.pushMessage(message, {
-      type: 'SECP256K1',
-      data: Wallet.signMessage(account.privateKey, 'SECP256K1', message),
+    const balance = await rpc.pushMessage({
+      msg: message,
+      signature: {
+        type: 'SECP256K1',
+        data: Wallet.signMessage(account.privateKey, 'SECP256K1', message),
+      },
     })
     if (balance.error) {
       return assert.fail(balance.error.message)
@@ -210,14 +213,85 @@ describe('lotus rpc', function () {
       value: '1',
     }).prepare(rpc)
 
-    const balance = await rpc.pushMessage(message, {
-      type: 'SECP256K1',
-      data: Wallet.signMessage(account.privateKey, 'SECP256K1', message),
+    const balance = await rpc.pushMessage({
+      msg: message,
+      signature: {
+        type: 'SECP256K1',
+        data: Wallet.signMessage(account.privateKey, 'SECP256K1', message),
+      },
     })
     if (balance.error) {
       return assert.fail(balance.error.message)
     }
 
     assert.ok(typeof balance.result['/'] === 'string')
+  })
+})
+
+describe('lotus rpc aborts', function () {
+  this.retries(3)
+  this.timeout(10_000)
+  it(`timeout`, async function () {
+    const rpc = new RPC({ api: API }, { timeout: 100 })
+
+    const version = await rpc.version()
+
+    assert.ok(version.error)
+
+    assert.ok(version.error.message.includes('FETCH_ERROR'))
+  })
+
+  it(`timeout on method`, async function () {
+    const rpc = new RPC({ api: API }, { timeout: 100 })
+
+    const version = await rpc.version({ timeout: 10 })
+
+    assert.ok(version.error)
+    assert.ok(version.error.message.includes('FETCH_ERROR'))
+  })
+
+  it(`timeout default`, async function () {
+    const rpc = new RPC({ api: API })
+
+    const version = await rpc.version()
+
+    assert.ok(version.result)
+  })
+
+  it(`timeout hit the 5s default`, async function () {
+    const rpc = new RPC({ api: API })
+
+    const msg = await rpc.waitMsg({
+      cid: {
+        '/': 'bafy2bzaceblgnc2umq2u7bzhq2dw3ck6qwksa33hyajltn4wiwtsldhmeuioo',
+      },
+      lookback: 1,
+    })
+
+    assert.ok(msg.error)
+    assert.ok(msg.error.message.includes('FETCH_ERROR'))
+  })
+
+  it(`aborted`, async function () {
+    const rpc = new RPC({ api: API }, { signal: AbortSignal.abort() })
+
+    const version = await rpc.version()
+
+    assert.ok(version.error)
+
+    assert.ok(version.error.message.includes('FETCH_ERROR'))
+  })
+
+  it(`abort`, async function () {
+    const controller = new AbortController()
+    const rpc = new RPC({ api: API })
+
+    const version = rpc.version({ signal: controller.signal })
+    controller.abort()
+
+    const rsp = await version
+    assert.ok(rsp.error)
+
+    assert.ok(rsp.error.message.includes('FETCH_ERROR'))
   })
 })

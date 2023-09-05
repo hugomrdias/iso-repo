@@ -8,6 +8,9 @@
   "references": [
     {
       "path": "../iso-base"
+    },
+    {
+      "path": "../iso-web"
     }
   ],
   "include": ["src", "scripts", "test", "package.json"],

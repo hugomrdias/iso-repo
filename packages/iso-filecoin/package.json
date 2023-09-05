@@ -99,6 +99,7 @@
     "@scure/bip39": "^1.2.1",
     "bignumber.js": "^9.1.1",
     "iso-base": "workspace:^",
+    "iso-web": "workspace:^",
     "zod": "^3.21.4"
   },
   "devDependencies": {
@@ -108,7 +109,7 @@
     "assert": "^2.0.0",
     "hd-scripts": "^7.0.0",
     "mocha": "^10.2.0",
-    "playwright-test": "^12.1.1",
+    "playwright-test": "^12.2.0",
     "typescript": "5.1.6"
   },
   "publishConfig": {

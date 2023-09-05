@@ -110,7 +110,7 @@ export class Message {
       (this.gasLimit === 0 && this.gasFeeCap === '0') ||
       this.gasPremium === '0'
     ) {
-      const gas = await rpc.gasEstimate(this)
+      const gas = await rpc.gasEstimate({ msg: this })
 
       if (gas.error) {
         throw new Error(gas.error.message)
