@@ -1,6 +1,7 @@
 import { Message } from './message.js'
 import { Signature } from './signature.js'
 import { getNetworkPrefix } from './utils.js'
+import { anySignal } from 'iso-web/signals'
 
 export class RPC {
   /**
@@ -143,6 +144,8 @@ export class RPC {
   /**
    * StateWaitMsg looks back in the chain for a message. If not found, it blocks until the message arrives on chain, and gets to the indicated confidence depth.
    *
+   * Timeout is increased to 60s instead of the default 5s.
+   *
    * @see https://lotus.filecoin.io/reference/lotus/state/#statewaitmsg
    * @param {import('./types.js').waitMsgParams} params
    * @param {import('./types.js').FetchOptions} [fetchOptions]
@@ -159,7 +162,7 @@ export class RPC {
             false,
           ],
         },
-        fetchOptions
+        { timeout: 60_000, ...fetchOptions }
       )
     )
   }
@@ -188,7 +191,10 @@ export class RPC {
           params: rpcOptions.params,
           id: 1,
         }),
-        signal: opts.signal ?? AbortSignal.timeout(opts.timeout ?? 5000),
+        signal: anySignal([
+          opts.signal,
+          AbortSignal.timeout(opts.timeout ?? 5000),
+        ]),
       })
 
       if (res.ok) {
