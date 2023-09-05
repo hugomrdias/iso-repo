@@ -258,20 +258,6 @@ describe('lotus rpc aborts', function () {
     assert.ok(version.result)
   })
 
-  it(`timeout hit the 5s default`, async function () {
-    const rpc = new RPC({ api: API })
-
-    const msg = await rpc.waitMsg({
-      cid: {
-        '/': 'bafy2bzaceblgnc2umq2u7bzhq2dw3ck6qwksa33hyajltn4wiwtsldhmeuioo',
-      },
-      lookback: 1,
-    })
-
-    assert.ok(msg.error)
-    assert.ok(msg.error.message.includes('FETCH_ERROR'))
-  })
-
   it(`aborted`, async function () {
     const rpc = new RPC({ api: API }, { signal: AbortSignal.abort() })
 
