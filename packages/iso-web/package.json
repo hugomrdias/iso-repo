@@ -1,0 +1,104 @@
+{
+  "name": "iso-web",
+  "version": "0.0.1",
+  "description": "Isomorphic Web APIs",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-web"
+  },
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-web",
+  "bugs": {
+    "url": "https://github.com/hugomrdias/iso-repo/issues"
+  },
+  "keywords": [
+    "web apis",
+    "crypto",
+    "webcrypto",
+    "abortcontroller",
+    "abortsignal"
+  ],
+  "type": "module",
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "browser": {
+    "crypto": false,
+    "./src/crypto.js": "./src/crypto-browser.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./crypto": {
+      "types": "./dist/src/crypto.d.ts",
+      "node": "./src/crypto.js",
+      "react-native": "./src/crypto-browser.js",
+      "default": "./src/crypto-browser.js"
+    },
+    "./signals": {
+      "types": "./dist/src/signals.d.ts",
+      "default": "./src/signals.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "crypto": [
+        "dist/src/crypto"
+      ],
+      "signals": [
+        "dist/src/signals"
+      ]
+    }
+  },
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
+  "scripts": {
+    "lint": "tsc --build && eslint '**/*.{js,ts}' && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
+    "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+  },
+  "devDependencies": {
+    "@types/assert": "^1.5.6",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.4.3",
+    "assert": "^2.0.0",
+    "delay": "^6.0.0",
+    "hd-scripts": "^7.0.0",
+    "mocha": "^10.2.0",
+    "playwright-test": "^12.2.0",
+    "typescript": "5.1.6"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "eslintConfig": {
+    "extends": [
+      "../../node_modules/hd-scripts/eslint/index.js"
+    ],
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "env": {
+      "mocha": true
+    },
+    "ignorePatterns": [
+      "dist"
+    ]
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*",
+      "hd-scripts",
+      "assert"
+    ]
+  }
+}

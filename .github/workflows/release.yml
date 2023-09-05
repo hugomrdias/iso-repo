@@ -29,7 +29,8 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-filecoin') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-passkeys') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-did') ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-signatures')
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-signatures') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-web')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -56,5 +57,6 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-filecoin') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-passkeys') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-did') ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-signatures')
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-signatures') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-web')
     uses: './.github/workflows/reusable-docs.yml'

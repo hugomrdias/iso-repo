@@ -40,7 +40,8 @@
       "packages/iso-filecoin",
       "packages/iso-passkeys",
       "packages/iso-did",
-      "packages/iso-signatures"
+      "packages/iso-signatures",
+      "packages/iso-web"
     ],
     "excludeExternals": true,
     "darkHighlightTheme": "github-dark",
