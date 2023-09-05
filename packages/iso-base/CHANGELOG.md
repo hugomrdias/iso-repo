@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v2.0.0...iso-base-v2.0.1) (2023-09-05)
+
+
+### Bug Fixes
+
+* update deps ([1e0e7ef](https://github.com/hugomrdias/iso-repo/commit/1e0e7ef49e0d48719672129d8aff5c4ddd225ad8))
+
 ## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v1.1.2...iso-base-v2.0.0) (2023-08-29)
 
 
