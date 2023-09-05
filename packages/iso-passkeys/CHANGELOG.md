@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.2.1...iso-passkeys-v0.2.2) (2023-09-05)
+
+
+### Bug Fixes
+
+* update deps ([1e0e7ef](https://github.com/hugomrdias/iso-repo/commit/1e0e7ef49e0d48719672129d8aff5c4ddd225ad8))
+
 ## [0.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.2.0...iso-passkeys-v0.2.1) (2023-07-25)
 
 
