@@ -100,7 +100,7 @@
     "bignumber.js": "^9.1.1",
     "iso-base": "workspace:^",
     "iso-web": "workspace:^",
-    "zod": "^3.21.4"
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@types/assert": "^1.5.6",
