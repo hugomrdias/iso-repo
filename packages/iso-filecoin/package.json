@@ -109,7 +109,7 @@
     "assert": "^2.0.0",
     "hd-scripts": "^8.0.0",
     "mocha": "^10.2.0",
-    "playwright-test": "^12.2.0",
+    "playwright-test": "^12.3.0",
     "typescript": "5.2.2"
   },
   "publishConfig": {

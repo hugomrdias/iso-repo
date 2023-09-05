@@ -67,8 +67,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.2.0
-        version: 12.2.0
+        specifier: ^12.3.0
+        version: 12.3.0
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -104,8 +104,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.2.0
-        version: 12.2.0
+        specifier: ^12.3.0
+        version: 12.3.0
       type-fest:
         specifier: ^4.3.1
         version: 4.3.1
@@ -162,8 +162,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.2.0
-        version: 12.2.0
+        specifier: ^12.3.0
+        version: 12.3.0
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -208,8 +208,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.2.0
-        version: 12.2.0
+        specifier: ^12.3.0
+        version: 12.3.0
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -245,8 +245,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.2.0
-        version: 12.2.0
+        specifier: ^12.3.0
+        version: 12.3.0
       type-fest:
         specifier: ^4.3.1
         version: 4.3.1
@@ -272,8 +272,8 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
       playwright-test:
-        specifier: ^12.2.0
-        version: 12.2.0
+        specifier: ^12.3.0
+        version: 12.3.0
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -3824,8 +3824,8 @@ packages:
     hasBin: true
     dev: true
 
-  /playwright-test@12.2.0:
-    resolution: {integrity: sha512-r2myEWFItONCVTwj91Bz29NMUgKZOwlZpQ9KuaLAluC+kXmSJfLwkSJoyk+riWLigOWyuntEqeAjjnx7t6t1iw==}
+  /playwright-test@12.3.0:
+    resolution: {integrity: sha512-5H0AzuVS37GQ7JbniCwDCJ9zAjsUNwfD46nrzS9JvyAQqTQgBfXpxdevUHOrm+w4ILoqnyMnjsDQR1chdxTvsw==}
     engines: {node: '>=16.0.0'}
     hasBin: true
     dependencies:
@@ -3847,6 +3847,7 @@ packages:
       merge-options: 3.0.4
       nanoid: 4.0.2
       ora: 7.0.1
+      p-timeout: 6.1.2
       p-wait-for: 5.0.2
       path-browserify: 1.0.1
       playwright-core: 1.37.1
