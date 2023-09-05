@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.10](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.9...iso-signatures-v0.1.10) (2023-09-05)
+
+
+### Bug Fixes
+
+* update deps ([1e0e7ef](https://github.com/hugomrdias/iso-repo/commit/1e0e7ef49e0d48719672129d8aff5c4ddd225ad8))
+
 ## [0.1.9](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.8...iso-signatures-v0.1.9) (2023-07-25)
 
 
