@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -52,8 +48,8 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1
       '@types/node':
-        specifier: ^20.4.3
-        version: 20.4.3
+        specifier: ^20.5.9
+        version: 20.5.9
       assert:
         specifier: ^2.0.0
         version: 2.0.0
@@ -92,8 +88,8 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1
       '@types/node':
-        specifier: ^20.4.3
-        version: 20.4.3
+        specifier: ^20.5.9
+        version: 20.5.9
       assert:
         specifier: ^2.0.0
         version: 2.0.0
@@ -150,8 +146,8 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1
       '@types/node':
-        specifier: ^20.4.3
-        version: 20.4.3
+        specifier: ^20.5.9
+        version: 20.5.9
       assert:
         specifier: ^2.0.0
         version: 2.0.0
@@ -196,8 +192,8 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1
       '@types/node':
-        specifier: ^20.4.3
-        version: 20.4.3
+        specifier: ^20.5.9
+        version: 20.5.9
       assert:
         specifier: ^2.0.0
         version: 2.0.0
@@ -233,8 +229,8 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1
       '@types/node':
-        specifier: ^20.4.3
-        version: 20.4.3
+        specifier: ^20.5.9
+        version: 20.5.9
       assert:
         specifier: ^2.0.0
         version: 2.0.0
@@ -263,8 +259,8 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1
       '@types/node':
-        specifier: ^20.4.3
-        version: 20.4.3
+        specifier: ^20.5.9
+        version: 20.5.9
       assert:
         specifier: ^2.0.0
         version: 2.0.0
@@ -928,8 +924,8 @@ packages:
     resolution: {integrity: sha512-/fvYntiO1GeICvqbQ3doGDIP97vWmvFt83GKguJ6prmQM2iXZfFcq6YE8KteFyRtX2/h5Hf91BYvPodJKFYv5Q==}
     dev: true
 
-  /@types/node@20.4.3:
-    resolution: {integrity: sha512-Yu3+r4Mn/iY6Mf0aihncZQ1qOjOUrCiodbHHY1hds5O+7BbKp9t+Li7zLO13zO8j9L2C6euz8xsYQP0rjGvVXw==}
+  /@types/node@20.5.9:
+    resolution: {integrity: sha512-PcGNd//40kHAS3sTlzKB9C9XL4K0sTup8nbG5lC14kzEteTNuAFh9u5nA0o5TWnSG2r/JNPRXFVcHJIIeRlmqQ==}
     dev: true
 
   /@types/normalize-package-data@2.4.1:
@@ -4798,3 +4794,7 @@ packages:
   /zod@3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
