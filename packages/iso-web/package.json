@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@types/assert": "^1.5.6",
-    "@types/node": "^20.5.9",
+    "@types/node": "^20.6.0",
     "assert": "^2.0.0",
     "delay": "^6.0.0",
     "hd-scripts": "^8.0.0",
