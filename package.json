@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "workspaces": [
-    "packages/*",
-    "examples/*"
+    "packages/*"
   ],
   "scripts": {
     "format": "prettier --write '**/*.{js,ts,yml,json}' --ignore-path .gitignore",
@@ -17,8 +16,8 @@
     "docs": "typedoc --out docs --plugin typedoc-plugin-missing-exports"
   },
   "devDependencies": {
-    "depcheck": "^1.4.5",
-    "hd-scripts": "^8.0.0",
+    "depcheck": "^1.4.6",
+    "hd-scripts": "^8.1.1",
     "lint-staged": "^14.0.1",
     "prettier": "3.0.3",
     "simple-git-hooks": "^2.9.0",

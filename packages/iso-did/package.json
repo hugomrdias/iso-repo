@@ -29,6 +29,9 @@
     "./core": {
       "types": "./dist/src/core.d.ts",
       "import": "./src/core.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts"
     }
   },
   "typesVersions": {
@@ -66,11 +69,10 @@
   "devDependencies": {
     "@types/assert": "^1.5.6",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^20.5.9",
-    "assert": "^2.0.0",
-    "hd-scripts": "^8.0.0",
+    "@types/node": "^20.6.0",
+    "assert": "^2.1.0",
     "mocha": "^10.2.0",
-    "playwright-test": "^12.3.0",
+    "playwright-test": "^12.3.1",
     "type-fest": "^4.3.1",
     "typescript": "5.2.2"
   },
