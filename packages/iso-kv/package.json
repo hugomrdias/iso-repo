@@ -1,6 +1,6 @@
 {
   "name": "iso-kv",
-  "version": "0.0.1",
+  "version": "0.1.5",
   "description": "Isomorphic key-value storage with support for multiple backends",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
