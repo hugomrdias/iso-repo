@@ -145,7 +145,8 @@
       "@types/*",
       "hd-scripts",
       "assert",
-      "type-fest"
+      "type-fest",
+      "mocha"
     ]
   }
 }
