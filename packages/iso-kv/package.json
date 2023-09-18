@@ -1,0 +1,103 @@
+{
+  "name": "iso-kv",
+  "version": "0.0.1",
+  "description": "Isomorphic key-value storage with support for multiple backends",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-kv"
+  },
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-kv",
+  "bugs": {
+    "url": "https://github.com/hugomrdias/iso-repo/issues"
+  },
+  "keywords": [
+    "kv",
+    "key-value",
+    "storage",
+    "isomorphic"
+  ],
+  "type": "module",
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./idb": {
+      "types": "./dist/src/idb.d.ts",
+      "default": "./src/idb.js"
+    },
+    "./localstorage": {
+      "types": "./dist/src/localstorage.d.ts",
+      "default": "./src/localstorage.js"
+    },
+    "./kysely": {
+      "types": "./dist/src/kysely.d.ts",
+      "default": "./src/kysely.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "idb": [
+        "dist/src/idb"
+      ],
+      "localstorage": [
+        "dist/src/localstorage"
+      ],
+      "kysely": [
+        "dist/src/kysely"
+      ]
+    }
+  },
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
+  "scripts": {
+    "lint": "tsc --build && eslint '**/*.{js,ts}' && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
+    "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.5",
+    "@types/node": "^20.6.1",
+    "better-sqlite3": "^8.6.0",
+    "conf": "^11.0.2",
+    "delay": "^6.0.0",
+    "playwright-test": "^12.3.3",
+    "tempy": "^3.1.0",
+    "typescript": "5.2.2"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "eslintConfig": {
+    "extends": [
+      "../../node_modules/hd-scripts/eslint/index.js"
+    ],
+    "env": {
+      "mocha": true
+    },
+    "ignorePatterns": [
+      "dist"
+    ]
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*"
+    ]
+  },
+  "dependencies": {
+    "idb-keyval": "^6.2.1",
+    "kysely": "^0.26.3",
+    "zod": "^3.22.2"
+  }
+}

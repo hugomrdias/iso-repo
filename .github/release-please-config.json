@@ -6,6 +6,7 @@
     "packages/iso-signatures": {},
     "packages/iso-filecoin": {},
     "packages/iso-passkeys": {},
-    "packages/iso-web": {}
+    "packages/iso-web": {},
+    "packages/iso-kv": {}
   }
 }

@@ -8,7 +8,8 @@
       "packages/iso-passkeys",
       "packages/iso-did",
       "packages/iso-signatures",
-      "packages/iso-web"
+      "packages/iso-web",
+      "packages/iso-kv"
     ],
     "excludeExternals": true,
     "darkHighlightTheme": "github-dark",
