@@ -73,9 +73,6 @@
     "extends": [
       "../../node_modules/hd-scripts/eslint/index.js"
     ],
-    "parserOptions": {
-      "project": "./tsconfig.json"
-    },
     "env": {
       "mocha": true
     },
