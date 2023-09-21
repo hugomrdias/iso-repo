@@ -50,6 +50,9 @@
     "./utils": {
       "types": "./dist/src/utils.d.ts",
       "import": "./src/utils.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts"
     }
   },
   "typesVersions": {
