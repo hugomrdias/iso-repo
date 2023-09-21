@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v3.0.0...iso-filecoin-v3.0.1) (2023-09-21)
+
+
+### Bug Fixes
+
+* export types ([dfaa4db](https://github.com/hugomrdias/iso-repo/commit/dfaa4dbbb64182c0b6b3b773f3191fc44afd1691))
+
 ## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-filecoin-v2.1.0...iso-filecoin-v3.0.0) (2023-09-05)
 
 
