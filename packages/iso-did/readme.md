@@ -27,18 +27,18 @@ const did = DID.fromString(
 ```js
 import { DIDKey } from 'iso-did/key'
 
-const did = DIDKey.fromString(
+const did1 = DIDKey.fromString(
   'did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp'
 )
 
-// did.key = Uint8Array([1, 2, 3, 4])
-// did.code = 0xed
-// did.type = 'ED25519'
+// did1.key = Uint8Array([1, 2, 3, 4])
+// did1.code = 0xed
+// did1.type = 'ED25519'
 
-const did = DIDKey.fromPublicKey('ED25519', publicKeyBytes)
+const did2 = DIDKey.fromPublicKey('ED25519', publicKeyBytes)
 
-// did.id = z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp
-// did.did = did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp
+// did2.id = z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp
+// did2.did = did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp
 ```
 
 ## Docs

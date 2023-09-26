@@ -1,4 +1,3 @@
-/* eslint-disable object-shorthand */
 /**
  * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
  * @typedef {import('../types').KvKey} KvKey

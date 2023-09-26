@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
 import { DIDKey } from 'iso-did/key'

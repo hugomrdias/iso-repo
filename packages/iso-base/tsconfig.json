@@ -1,9 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "lib": ["ESNext", "DOM"],
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "outDir": "dist"
   },
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],

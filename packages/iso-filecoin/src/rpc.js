@@ -1,7 +1,7 @@
+import { anySignal } from 'iso-web/signals'
 import { Message } from './message.js'
 import { Signature } from './signature.js'
 import { getNetworkPrefix } from './utils.js'
-import { anySignal } from 'iso-web/signals'
 
 export class RPC {
   /**

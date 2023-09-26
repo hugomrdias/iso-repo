@@ -12,7 +12,7 @@ const INT = Math.pow(2, 31)
 /**
  * @param {number} num
  * @param {Uint8Array} out
- * @param {number} [offset=0]
+ * @param {number} offset
  */
 function encode(num, out, offset = 0) {
   out = out || []
@@ -40,7 +40,7 @@ const REST$1 = 0x7f
 
 /**
  * @param {Uint8Array} buf
- * @param {number} [offset=0]
+ * @param {number} [offset]
  * @returns {[code: number, size: number]}
  */
 function decode(buf, offset = 0) {

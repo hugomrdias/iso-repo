@@ -1,11 +1,8 @@
 import type BigNumber from 'bignumber.js'
-import type { PROTOCOL_INDICATOR } from './address.js'
-import type { Schemas as MessageSchemas } from './message.js'
-import type {
-  Schemas as SignatureSchemas,
-  SIGNATURE_TYPE,
-} from './signature.js'
 import type { z } from 'zod'
+import type { PROTOCOL_INDICATOR } from './address'
+import type { Schemas as MessageSchemas } from './message'
+import type { SIGNATURE_TYPE, Schemas as SignatureSchemas } from './signature'
 
 export type ProtocolIndicator = typeof PROTOCOL_INDICATOR
 export type ProtocolIndicatorCode = ProtocolIndicator[keyof ProtocolIndicator]

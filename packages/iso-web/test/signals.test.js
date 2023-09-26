@@ -1,6 +1,6 @@
 import { assert, test } from 'playwright-test/taps'
-import { anySignal } from '../src/signals.js'
 import delay from 'delay'
+import { anySignal } from '../src/signals.js'
 
 test('should abort from any signal', async () => {
   const controllers = Array.from({ length: 5 }).map(() => new AbortController())

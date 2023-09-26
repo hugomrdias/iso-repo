@@ -1,6 +1,6 @@
 import assert from 'assert'
-import * as RS256 from '../src/verifiers/rsa.js'
 import { base64url } from 'iso-base/rfc4648'
+import * as RS256 from '../src/verifiers/rsa.js'
 import { RSASigner } from '../src/signers/rsa.js'
 import { encodeInt, encodeSequence } from '../src/asn1.js'
 

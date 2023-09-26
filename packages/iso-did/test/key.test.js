@@ -1,6 +1,6 @@
 import assert from 'assert'
-import { DIDKey } from '../src/key.js'
 import { base64pad } from 'iso-base/rfc4648'
+import { DIDKey } from '../src/key.js'
 
 /**
  * @typedef {import('../src/types').KeyType} PublicKeyType

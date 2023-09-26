@@ -7,8 +7,8 @@
 /**
  * Combines an array of AbortSignals into a single signal that is aborted when any signal is
  *
- * @param {Iterable<AbortSignal | undefined>} signals
- * @returns {AbortSignal}
+ * @param {Iterable<AbortSignal | undefined>} signals - The signals to combine
+ * @returns {AbortSignal} - The combined signal
  */
 export function anySignal(signals) {
   const controller = new AbortController()

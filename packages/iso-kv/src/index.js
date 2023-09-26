@@ -1,5 +1,3 @@
-/* eslint-disable object-shorthand */
-/* eslint-disable no-continue */
 /**
  * @typedef {import('./types').KvStorageAdapter} KvStorageAdapter
  * @typedef {import('./types').Kv} Kv
@@ -160,23 +158,23 @@ export class KV {
   }
 
   /**
-   * @template [Value = unknown]
+   * @template [Value=unknown]
    * @returns {AsyncIterableIterator<{key: KvKey, value: Value}>}
    */
   async *[Symbol.asyncIterator]() {
     for await (const { key, value: data } of this.store) {
-      const value = this.#maybeExpire(key, data)
-      if (value) {
+      const _value = this.#maybeExpire(key, data)
+      if (_value) {
         yield {
           key,
-          value: /** @type {Value} */ (value),
+          value: /** @type {Value} */ (_value),
         }
       }
     }
   }
 
   /**
-   * @template [Value = unknown]
+   * @template [Value=unknown]
    * @param {import('./types').KvListSelector} selector
    * @param {import('./types').KvListOptions} [options]
    * @returns {import('./types').KvListIterator<import('./types').KvEntry<Value>>}

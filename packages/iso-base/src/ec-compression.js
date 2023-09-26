@@ -135,7 +135,6 @@ export function decompress(comp, curve = 'P-256') {
   yPadded.set(y, offset)
 
   // concat coords & prepend compressed prefix
-  // eslint-disable-next-line unicorn/prefer-spread
   const publicKey = concat([[0x04], x, yPadded])
   return publicKey
 }

@@ -1,6 +1,6 @@
 import assert from 'assert'
-import { Token } from '../src/token.js'
 import { base16 } from 'iso-base/rfc4648'
+import { Token } from '../src/token.js'
 
 describe('token', function () {
   it('zero', function () {

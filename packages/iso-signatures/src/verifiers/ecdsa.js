@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
 import { decompress, isCompressed } from 'iso-base/ec-compression'
 import { createEcdsaParams } from '../utils.js'

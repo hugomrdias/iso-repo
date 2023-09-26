@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
 
 /** @type {import('../types.js').Verify} */

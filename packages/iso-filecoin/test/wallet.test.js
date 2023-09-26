@@ -1,6 +1,6 @@
 import assert from 'assert'
+import { base16, base64pad } from 'iso-base/rfc4648'
 import * as Wallet from '../src/wallet.js'
-import { base64pad, base16 } from 'iso-base/rfc4648'
 import { Message } from '../src/message.js'
 
 const mnemonic =

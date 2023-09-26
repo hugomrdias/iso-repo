@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/numeric-separators-style */
 import { verifyAsync } from '@noble/ed25519'
 
 /** @type {import('../types').Verify} */

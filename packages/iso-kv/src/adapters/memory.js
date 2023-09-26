@@ -1,5 +1,3 @@
-/* eslint-disable no-continue */
-/* eslint-disable object-shorthand */
 /**
  * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
  * @typedef {import('../types').KvKey} KvKey
@@ -31,7 +29,7 @@ export class MemoryStorageAdapter {
   }
 
   /**
-   * @template [Value = unknown]
+   * @template [Value=unknown]
    * @param {KvKey} key
    */
   get(key) {
@@ -60,13 +58,13 @@ export class MemoryStorageAdapter {
     for (const [key, value] of data) {
       yield {
         key: key.split(':'),
-        value: value,
+        value,
       }
     }
   }
 
   /**
-   * @template [Value = unknown]
+   * @template [Value=unknown]
    * @param {import('../types').KvListSelector} selector
    * @param {import('../types').KvListOptions} [options]
    * @returns {Iterator<import('../types').KvEntry>}

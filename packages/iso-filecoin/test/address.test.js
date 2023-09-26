@@ -1,16 +1,16 @@
 import assert from 'assert'
-import {
-  fromBytes,
-  fromString,
-  fromPublicKey,
-  isEthAddress,
-  fromEthAddress,
-  toEthAddress,
-  isAddress,
-  from,
-  fromContractDestination,
-} from '../src/address.js'
 import { base16, base64pad } from 'iso-base/rfc4648'
+import {
+  from,
+  fromBytes,
+  fromContractDestination,
+  fromEthAddress,
+  fromPublicKey,
+  fromString,
+  isAddress,
+  isEthAddress,
+  toEthAddress,
+} from '../src/address.js'
 
 const secp = [
   [

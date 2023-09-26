@@ -1,5 +1,5 @@
 import type { DIDKey } from 'iso-did/key'
-import type { SignatureAlgorithm, KeyType } from 'iso-did/types'
+import type { KeyType, SignatureAlgorithm } from 'iso-did/types'
 
 export interface ISigner<Export extends CryptoKeyPair | string> {
   /**

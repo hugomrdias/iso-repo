@@ -1,5 +1,4 @@
-/* eslint-disable unicorn/no-abusive-eslint-disable */
-/* eslint-disable */
+/* eslint-disable no-console */
 // @ts-nocheck
 import bench from 'micro-bmark'
 
@@ -54,7 +53,7 @@ const buffers = {
 
 const main = () =>
   bench.run(async () => {
-    for (let [k, libs] of Object.entries(codecs)) {
+    for (const [k, libs] of Object.entries(codecs)) {
       console.log(`==== ${k} ====`)
       for (const [size, [samples, buf]] of Object.entries(buffers)) {
         // encode

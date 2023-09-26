@@ -1,9 +1,9 @@
 import { suite } from 'playwright-test/taps'
-import { KV } from '../src/index.js'
-import { baseTests } from './base.js'
 import { SqliteDialect } from 'kysely'
 import SQLite from 'better-sqlite3'
+import { KV } from '../src/index.js'
 import { SqlStorageAdapter } from '../src/adapters/sql.js'
+import { baseTests } from './base.js'
 
 const kv = new KV({
   store: new SqlStorageAdapter({

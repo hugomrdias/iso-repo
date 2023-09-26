@@ -1,7 +1,5 @@
-/* eslint-disable no-continue */
-import { set, get, del, clear, entries, createStore } from 'idb-keyval'
+import { clear, createStore, del, entries, get, set } from 'idb-keyval'
 
-/* eslint-disable object-shorthand */
 /**
  * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
  * @typedef {import('../types').KvKey} KvKey
@@ -38,7 +36,7 @@ export class IDBStorageAdapter {
   }
 
   /**
-   * @template [Value = unknown]
+   * @template [Value=unknown]
    * @param {KvKey} key
    */
   get(key) {
@@ -74,7 +72,7 @@ export class IDBStorageAdapter {
   }
 
   /**
-   * @template [Value = unknown]
+   * @template [Value=unknown]
    * @param {import('../types').KvListSelector} selector
    * @param {import('../types').KvListOptions} [options]
    * @returns {AsyncIterator<import('../types').KvEntry>}

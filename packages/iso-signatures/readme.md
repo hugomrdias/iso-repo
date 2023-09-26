@@ -13,6 +13,7 @@ pnpm install iso-signatures
 ```js
 import { EdDSASigner } from 'iso-signatures/signers/eddsa'
 import * as EdDSA from 'iso-signatures/verifiers/eddsa'
+import { Resolver } from 'iso-signatures/verifiers/resolver'
 
 const message = new TextEncoder().encode('hello world')
 const resolver = new Resolver({
@@ -32,6 +33,7 @@ import { EdDSASigner } from 'iso-signatures/signers/eddsa'
 import * as EdDSA from 'iso-signatures/verifiers/eddsa'
 import * as ECDSA from 'iso-signatures/verifiers/ecdsa'
 import * as RSA from 'iso-signatures/verifiers/rsa'
+import { Resolver } from 'iso-signatures/verifiers/resolver'
 
 const message = new TextEncoder().encode('hello world')
 const resolver = new Resolver(

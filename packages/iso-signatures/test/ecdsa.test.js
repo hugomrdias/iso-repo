@@ -1,8 +1,8 @@
 import assert from 'assert'
-import * as ECDSA from '../src/verifiers/ecdsa.js'
 import { base64url } from 'iso-base/rfc4648'
-import { ECDSASigner } from '../src/signers/ecdsa.js'
 import { concat } from 'iso-base/utils'
+import * as ECDSA from '../src/verifiers/ecdsa.js'
+import { ECDSASigner } from '../src/signers/ecdsa.js'
 
 const fixtures = {
   // https://github.com/w3c-ccg/did-method-key/blob/main/test-vectors/nist-curves.json

@@ -1,6 +1,5 @@
-/* eslint-disable complexity */
 import * as EC from 'iso-base/ec-compression'
-import { u8, equals, concat } from 'iso-base/utils'
+import { concat, equals, u8 } from 'iso-base/utils'
 import { tag, varint } from 'iso-base/varint'
 import { base58btc } from 'multiformats/bases/base58'
 import { CODE_KEY_TYPE, KEY_TYPE_CODE, keyTypeToAlg } from './common.js'

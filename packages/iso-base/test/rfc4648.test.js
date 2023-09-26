@@ -1,6 +1,7 @@
 import assert from 'assert'
 import * as BASES from '../src/rfc4648.js'
 import { utf8 } from '../src/utf8.js'
+
 const VECTORS = [
   ['base16', '', ''],
   ['base16', utf8.encode(Uint8Array.from([0x01])), '01'],

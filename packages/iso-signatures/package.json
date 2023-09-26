@@ -1,14 +1,15 @@
 {
   "name": "iso-signatures",
+  "type": "module",
   "version": "0.1.10",
   "description": "Signatures tooling.",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-signatures",
   "repository": {
     "url": "hugomrdias/iso-repo",
     "directory": "packages/iso-signatures"
   },
-  "homepage": "https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-signatures",
   "keywords": [
     "elliptic",
     "curve",
@@ -25,9 +26,6 @@
     "rsa",
     "signatures"
   ],
-  "type": "module",
-  "main": "src/index.js",
-  "types": "dist/src/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -78,6 +76,8 @@
       "import": "./src/spki.js"
     }
   },
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
   "typesVersions": {
     "*": {
       ".": [
@@ -103,7 +103,7 @@
     "dist/src/**/*.d.ts.map"
   ],
   "scripts": {
-    "lint": "tsc --build && eslint '**/*.{js,ts}' && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
+    "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
     "test:node": "pw-test 'test/**/!(*.browser).test.js' --mode node",
     "test:browser": "pw-test 'test/**/!(*.node).test.js'"
@@ -114,12 +114,12 @@
     "iso-did": "workspace:^"
   },
   "devDependencies": {
-    "@types/assert": "^1.5.6",
+    "@types/assert": "^1.5.7",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^20.6.2",
+    "@types/node": "^20.7.0",
     "assert": "^2.1.0",
     "mocha": "^10.2.0",
-    "playwright-test": "^12.3.4",
+    "playwright-test": "^12.3.5",
     "type-fest": "^4.3.1",
     "typescript": "5.2.2"
   },

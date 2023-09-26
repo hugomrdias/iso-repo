@@ -1,14 +1,15 @@
 {
   "name": "iso-web",
+  "type": "module",
   "version": "0.1.5",
   "description": "Isomorphic Web APIs",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-web",
   "repository": {
     "url": "hugomrdias/iso-repo",
     "directory": "packages/iso-web"
   },
-  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-web",
   "bugs": {
     "url": "https://github.com/hugomrdias/iso-repo/issues"
   },
@@ -19,13 +20,6 @@
     "abortcontroller",
     "abortsignal"
   ],
-  "type": "module",
-  "main": "src/index.js",
-  "types": "dist/src/index.d.ts",
-  "browser": {
-    "crypto": false,
-    "./src/crypto.js": "./src/crypto-browser.js"
-  },
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -41,6 +35,12 @@
       "types": "./dist/src/signals.d.ts",
       "default": "./src/signals.js"
     }
+  },
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "browser": {
+    "crypto": false,
+    "./src/crypto.js": "./src/crypto-browser.js"
   },
   "typesVersions": {
     "*": {
@@ -58,15 +58,15 @@
     "dist/src/*.d.ts.map"
   ],
   "scripts": {
-    "lint": "tsc --build && eslint '**/*.{js,ts}' && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
+    "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
     "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "devDependencies": {
-    "@types/node": "^20.6.2",
+    "@types/node": "^20.7.0",
     "delay": "^6.0.0",
-    "playwright-test": "^12.3.4",
+    "playwright-test": "^12.3.5",
     "typescript": "5.2.2"
   },
   "publishConfig": {

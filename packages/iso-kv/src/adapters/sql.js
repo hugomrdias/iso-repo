@@ -1,7 +1,5 @@
-/* eslint-disable no-continue */
 import { Kysely } from 'kysely'
 
-/* eslint-disable object-shorthand */
 /**
  * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
  * @typedef {import('../types').KvKey} KvKey
@@ -116,7 +114,7 @@ export class SqlStorageAdapter {
   }
 
   /**
-   * @template [Value = unknown]
+   * @template [Value=unknown]
    * @param {KvKey} key
    */
   async get(key) {
@@ -185,7 +183,7 @@ export class SqlStorageAdapter {
   }
 
   /**
-   * @template [Value = unknown]
+   * @template [Value=unknown]
    * @param {import('../types').KvListSelector} selector
    * @param {import('../types').KvListOptions} [options]
    * @returns {AsyncIterator<import('../types').KvEntry>}

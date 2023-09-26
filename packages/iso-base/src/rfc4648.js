@@ -3,18 +3,20 @@
  *
  * @module
  */
-
 /* eslint-disable unicorn/prefer-math-trunc */
-/* eslint-disable unicorn/no-for-loop */
+
 /** @typedef {import('./types').Codec} Codec */
 
 import { utf8 } from './utf8.js'
 import { isBufferSource, u8 } from './utils.js'
+
 /**
- * @param {string} string
- * @param {string} alphabet
- * @param {number} bitsPerChar
- * @returns {Uint8Array}
+ * Decode
+ *
+ * @param {string} string - Encoded string
+ * @param {string} alphabet - Alphabet
+ * @param {number} bitsPerChar - Bits per character
+ * @returns {Uint8Array} - Decoded data
  */
 const decode = (string, alphabet, bitsPerChar) => {
   // Build the character lookup table:
@@ -64,11 +66,13 @@ const decode = (string, alphabet, bitsPerChar) => {
 }
 
 /**
- * @param {Uint8Array} data
- * @param {string} alphabet
- * @param {number} bitsPerChar
- * @param {boolean} pad
- * @returns {string}
+ * Encode
+ *
+ * @param {Uint8Array} data - Data to encode
+ * @param {string} alphabet - Alphabet
+ * @param {number} bitsPerChar - Bits per character
+ * @param {boolean} pad - Pad
+ * @returns {string} - Encoded string
  */
 const encode = (data, alphabet, bitsPerChar, pad) => {
   const mask = (1 << bitsPerChar) - 1
@@ -76,9 +80,9 @@ const encode = (data, alphabet, bitsPerChar, pad) => {
 
   let bits = 0 // Number of bits currently in the buffer
   let buffer = 0 // Bits waiting to be written out, MSB first
-  for (let i = 0; i < data.length; ++i) {
+  for (const datum of data) {
     // Slurp data into the buffer:
-    buffer = (buffer << 8) | data[i]
+    buffer = (buffer << 8) | datum
     bits += 8
 
     // Write out as much as we can:
@@ -124,10 +128,10 @@ const bases = {
 /**
  * RFC4648 Factory
  *
- * @param {string} base
- * @param {boolean} [padding]
- * @param {((str: string) => string)} [normalize]
- * @returns {Codec}
+ * @param {string} base - Base
+ * @param {boolean} [padding] - Padding
+ * @param {((str: string) => string)} [normalize] - Normalize
+ * @returns {Codec} - Codec
  */
 export function rfc4648(base, padding = false, normalize) {
   const [bits, alphabet] = bases[base]

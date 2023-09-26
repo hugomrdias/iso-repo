@@ -1,8 +1,8 @@
 import { suite } from 'playwright-test/taps'
-import { KV } from '../src/index.js'
-import { baseTests } from './base.js'
 import { temporaryDirectory } from 'tempy'
+import { KV } from '../src/index.js'
 import { FileStorageAdapter } from '../src/adapters/file.js'
+import { baseTests } from './base.js'
 
 const kv = new KV({
   store: new FileStorageAdapter({

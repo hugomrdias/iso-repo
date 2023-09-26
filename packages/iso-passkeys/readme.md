@@ -11,7 +11,7 @@ pnpm install iso-passkeys
 ## Usage
 
 ```js
-import { supports, credentialsCreate, credentialsGet } from 'iso-passkeys'
+import { credentialsCreate, credentialsGet, supports } from 'iso-passkeys'
 
 const credential = await credentialsCreate({
   publicKey: {
@@ -38,8 +38,8 @@ const credential = await credentialsCreate({
       },
       prf: {
         eval: {
-          first: new Uint8Array(new Array(32).fill(1)).buffer,
-          second: new Uint8Array(new Array(32).fill(1)).buffer,
+          first: new Uint8Array(Array.from({ length: 32 }).fill(1)).buffer,
+          second: new Uint8Array(Array.from({ length: 32 }).fill(1)).buffer,
         },
       },
     },
@@ -49,7 +49,7 @@ const credential = await credentialsCreate({
 const assertion = await credentialsGet({
   mediation: 'conditional',
   publicKey: {
-    challenge: base64url.encode(new Uint8Array([1, 2, 3, 4])),,
+    challenge: base64url.encode(new Uint8Array([1, 2, 3, 4])),
     allowCredentials: [],
     userVerification: 'required',
     rpId: 'example.com',

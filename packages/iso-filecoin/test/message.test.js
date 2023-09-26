@@ -38,7 +38,6 @@ describe('message validation', function () {
       gasFeeCap: '0',
       gasPremium: '0',
       method: 0,
-      // eslint-disable-next-line unicorn/no-null
       params: '',
     })
   })
