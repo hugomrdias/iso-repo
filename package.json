@@ -5,6 +5,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "packageManager": "pnpm@8.5.1",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "format": "prettier --write '**/*.{js,ts,yml,json}' --ignore-path .gitignore",
     "format:check": "prettier --check '**/*.{js,ts,yml,json}' --ignore-path .gitignore",
@@ -17,7 +21,7 @@
   },
   "devDependencies": {
     "depcheck": "^1.4.6",
-    "hd-scripts": "^9.0.3",
+    "hd-scripts": "^9.0.4",
     "lint-staged": "^14.0.1",
     "prettier": "3.0.3",
     "simple-git-hooks": "^2.9.0",
@@ -30,11 +34,15 @@
   },
   "lint-staged": {
     "*.{js,ts,yml,json}": "prettier --write",
-    "*.{js}": "eslint --fix"
+    "*": "eslint --fix"
   },
-  "prettier": "hd-scripts/prettier.config.js",
-  "engines": {
-    "node": ">=18"
+  "eslintConfig": {
+    "extends": [
+      "./node_modules/hd-scripts/eslint/index.js"
+    ],
+    "ignorePatterns": [
+      "docs"
+    ]
   },
-  "packageManager": "pnpm@8.5.1"
+  "prettier": "hd-scripts/prettier.config.js"
 }

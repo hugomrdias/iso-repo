@@ -8,13 +8,13 @@ on:
       - main
     paths:
       - 'packages/iso-kv/**'
-      - '.github/workflows/iso-kv.yml'
-      - 'pnpm-lock.yaml'
+      - .github/workflows/iso-kv.yml
+      - pnpm-lock.yaml
   pull_request:
     paths:
       - 'packages/iso-kv/**'
-      - '.github/workflows/iso-kv.yml'
-      - 'pnpm-lock.yaml'
+      - .github/workflows/iso-kv.yml
+      - pnpm-lock.yaml
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'pnpm'
+          cache: pnpm
       - run: pnpm install
       - run: pnpm run build
       - run: pnpm -r --filter iso-kv run lint

@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'
-          cache: 'pnpm'
+          cache: pnpm
       - run: pnpm install
       - run: pnpm run lint
       - run: pnpm -r publish --access=public
@@ -61,4 +61,4 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-signatures') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-web') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv')
-    uses: './.github/workflows/reusable-docs.yml'
+    uses: ./.github/workflows/reusable-docs.yml
