@@ -1,12 +1,10 @@
 import { suite } from 'playwright-test/taps'
 import { KV } from '../src/index.js'
-import { baseTests, baseSchema } from './base.js'
-import * as local from '../src/localstorage.js'
+import { baseTests } from './base.js'
+import { WebStorageAdapter } from '../src/adapters/web-storage.js'
 
-/** @type {KV<typeof baseSchema>} */
 const kv = new KV({
-  schema: baseSchema,
-  ...local,
+  store: new WebStorageAdapter(localStorage),
 })
 
-baseTests(kv, suite('Local Storage'))
+baseTests(kv, suite('Web Storage'))

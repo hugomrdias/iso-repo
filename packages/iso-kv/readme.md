@@ -7,12 +7,9 @@
 - Fully typed
 - TTL (time to live) for keys
 - Multiple backend adapters (localstorage, indexeddb, memory, sql, json file, etc)
-- Validation of keys and values using zod
 - On change hooks
-- Custom codecs for values
 - Easy to implement new adapters
 - SQL adapter uses [kysely](https://kysely.dev/)
-- Works directly with [conf](https://github.com/sindresorhus/conf)
 
 ## Install
 
@@ -22,8 +19,8 @@ pnpm install iso-kv
 
 ## Todo
 
-- [] namespacing
-- [] codecs for json with buffer, dates etc
+- [ ] codecs for json with buffer, dates etc
+- [ ] more docs
 
 ## Docs
 

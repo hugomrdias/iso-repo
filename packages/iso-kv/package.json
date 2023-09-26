@@ -26,29 +26,15 @@
       "types": "./dist/src/index.d.ts",
       "default": "./src/index.js"
     },
-    "./idb": {
-      "types": "./dist/src/idb.d.ts",
-      "default": "./src/idb.js"
-    },
-    "./localstorage": {
-      "types": "./dist/src/localstorage.d.ts",
-      "default": "./src/localstorage.js"
-    },
-    "./kysely": {
-      "types": "./dist/src/kysely.d.ts",
-      "default": "./src/kysely.js"
+    "./adapters/*": {
+      "types": "./dist/src/adapters/*",
+      "default": "./src/adapters/*"
     }
   },
   "typesVersions": {
     "*": {
-      "idb": [
-        "dist/src/idb"
-      ],
-      "localstorage": [
-        "dist/src/localstorage"
-      ],
-      "kysely": [
-        "dist/src/kysely"
+      "adapters/*": [
+        "dist/src/adapters/*"
       ]
     }
   },
@@ -97,7 +83,6 @@
   },
   "dependencies": {
     "idb-keyval": "^6.2.1",
-    "kysely": "^0.26.3",
-    "zod": "^3.22.2"
+    "kysely": "^0.26.3"
   }
 }

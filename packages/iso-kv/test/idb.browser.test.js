@@ -1,12 +1,9 @@
 import { suite } from 'playwright-test/taps'
 import { KV } from '../src/index.js'
-import { baseTests, baseSchema } from './base.js'
-
-import * as idb from '../src/idb.js'
-/** @type {KV<typeof baseSchema>} */
+import { baseTests } from './base.js'
+import { IDBStorageAdapter } from '../src/adapters/idb.js'
 const kv = new KV({
-  schema: baseSchema,
-  ...idb,
+  store: new IDBStorageAdapter(),
 })
 
 baseTests(kv, suite('IDB'))

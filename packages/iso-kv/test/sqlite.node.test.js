@@ -1,16 +1,12 @@
 import { suite } from 'playwright-test/taps'
-import { KV, serialize, deserialize } from '../src/index.js'
-import { baseTests, baseSchema } from './base.js'
+import { KV } from '../src/index.js'
+import { baseTests } from './base.js'
 import { SqliteDialect } from 'kysely'
 import SQLite from 'better-sqlite3'
-import * as SQL from '../src/kysely.js'
+import { SqlStorageAdapter } from '../src/adapters/sql.js'
 
-/** @type {KV<typeof baseSchema>} */
 const kv = new KV({
-  schema: baseSchema,
-  serialize,
-  deserialize,
-  store: new SQL.SqlStore({
+  store: new SqlStorageAdapter({
     name: 'kv',
     dialect: new SqliteDialect({
       database: new SQLite(':memory:', {

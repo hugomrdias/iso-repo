@@ -1,16 +1,13 @@
 import { suite } from 'playwright-test/taps'
 import { KV } from '../src/index.js'
-import { baseTests, baseSchema } from './base.js'
+import { baseTests } from './base.js'
 import { temporaryDirectory } from 'tempy'
-import Conf from 'conf'
+import { FileStorageAdapter } from '../src/adapters/file.js'
 
-/** @type {KV<typeof baseSchema>} */
 const kv = new KV({
-  schema: baseSchema,
-  // @ts-ignore
-  store: new Conf({
+  store: new FileStorageAdapter({
     cwd: temporaryDirectory(),
   }),
 })
 
-baseTests(kv, suite('Conf'))
+baseTests(kv, suite('File'))
