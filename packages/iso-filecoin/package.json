@@ -107,7 +107,7 @@
   },
   "devDependencies": {
     "@types/assert": "^1.5.7",
-    "@types/mocha": "^10.0.1",
+    "@types/mocha": "^10.0.2",
     "@types/node": "^20.7.0",
     "assert": "^2.1.0",
     "mocha": "^10.2.0",
