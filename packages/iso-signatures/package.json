@@ -119,7 +119,7 @@
     "@types/node": "^20.7.1",
     "assert": "^2.1.0",
     "mocha": "^10.2.0",
-    "playwright-test": "^12.3.6",
+    "playwright-test": "^12.3.8",
     "type-fest": "^4.3.2",
     "typescript": "5.2.2"
   },
