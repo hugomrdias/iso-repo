@@ -52,8 +52,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.7.1
-        version: 20.7.1
+        specifier: ^20.8.2
+        version: 20.8.2
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -64,8 +64,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.3.6
-        version: 12.3.6
+        specifier: ^12.3.8
+        version: 12.3.8
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -79,8 +79,8 @@ importers:
         specifier: workspace:^
         version: link:../iso-base
       multiformats:
-        specifier: ^12.1.1
-        version: 12.1.1
+        specifier: ^12.1.2
+        version: 12.1.2
     devDependencies:
       '@types/assert':
         specifier: ^1.5.7
@@ -89,8 +89,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.7.1
-        version: 20.7.1
+        specifier: ^20.8.2
+        version: 20.8.2
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -98,11 +98,11 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.3.6
-        version: 12.3.6
+        specifier: ^12.3.8
+        version: 12.3.8
       type-fest:
-        specifier: ^4.3.2
-        version: 4.3.2
+        specifier: ^4.3.3
+        version: 4.3.3
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -110,8 +110,8 @@ importers:
   packages/iso-filecoin:
     dependencies:
       '@ipld/dag-cbor':
-        specifier: ^9.0.5
-        version: 9.0.5
+        specifier: ^9.0.6
+        version: 9.0.6
       '@noble/curves':
         specifier: ^1.2.0
         version: 1.2.0
@@ -144,8 +144,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.7.1
-        version: 20.7.1
+        specifier: ^20.8.2
+        version: 20.8.2
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -153,8 +153,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.3.6
-        version: 12.3.6
+        specifier: ^12.3.8
+        version: 12.3.8
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -172,11 +172,11 @@ importers:
         specifier: ^7.6.5
         version: 7.6.5
       '@types/node':
-        specifier: ^20.7.1
-        version: 20.7.1
+        specifier: ^20.8.2
+        version: 20.8.2
       better-sqlite3:
-        specifier: ^8.6.0
-        version: 8.6.0
+        specifier: ^8.7.0
+        version: 8.7.0
       conf:
         specifier: ^11.0.2
         version: 11.0.2
@@ -184,8 +184,8 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0
       playwright-test:
-        specifier: ^12.3.6
-        version: 12.3.6
+        specifier: ^12.3.8
+        version: 12.3.8
       tempy:
         specifier: ^3.1.0
         version: 3.1.0
@@ -221,8 +221,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.7.1
-        version: 20.7.1
+        specifier: ^20.8.2
+        version: 20.8.2
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -230,8 +230,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.3.6
-        version: 12.3.6
+        specifier: ^12.3.8
+        version: 12.3.8
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -255,8 +255,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.7.1
-        version: 20.7.1
+        specifier: ^20.8.2
+        version: 20.8.2
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -264,11 +264,11 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       playwright-test:
-        specifier: ^12.3.6
-        version: 12.3.6
+        specifier: ^12.3.8
+        version: 12.3.8
       type-fest:
-        specifier: ^4.3.2
-        version: 4.3.2
+        specifier: ^4.3.3
+        version: 4.3.3
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -283,20 +283,20 @@ importers:
         version: 6.1.0
     devDependencies:
       '@types/node':
-        specifier: ^20.7.1
-        version: 20.7.1
+        specifier: ^20.8.2
+        version: 20.8.2
       delay:
         specifier: ^6.0.0
         version: 6.0.0
       msw:
-        specifier: ^1.3.1
-        version: 1.3.1(typescript@5.2.2)
+        specifier: ^1.3.2
+        version: 1.3.2(typescript@5.2.2)
       playwright-test:
-        specifier: ^12.3.6
-        version: 12.3.6
+        specifier: ^12.3.8
+        version: 12.3.8
       type-fest:
-        specifier: ^4.3.2
-        version: 4.3.2
+        specifier: ^4.3.3
+        version: 4.3.3
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -750,12 +750,12 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
-  /@ipld/dag-cbor@9.0.5:
-    resolution: {integrity: sha512-TyqgtxEojc98rvxg4NGM+73JzQeM4+tK2VQes/in2mdyhO+1wbGuBijh1tvi9BErQ/dEblxs9v4vEQSX8mFCIw==}
+  /@ipld/dag-cbor@9.0.6:
+    resolution: {integrity: sha512-3kNab5xMppgWw6DVYx2BzmFq8t7I56AGWfp5kaU1fIPkwHVpBRglJJTYsGtbVluCi/s/q97HZM3bC+aDW4sxbQ==}
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dependencies:
-      cborg: 4.0.1
-      multiformats: 12.1.1
+      cborg: 4.0.3
+      multiformats: 12.1.2
     dev: false
 
   /@istanbuljs/schema@0.1.3:
@@ -926,7 +926,7 @@ packages:
   /@types/better-sqlite3@7.6.5:
     resolution: {integrity: sha512-H3ZUx89KiPhYa9nalUXVVStSUFHuzYxt4yoazufpTTYW9rVUCzhh02V8CH2C8nE4libnK0UgFq5DFIe0DOhqow==}
     dependencies:
-      '@types/node': 20.7.1
+      '@types/node': 20.8.2
     dev: true
 
   /@types/cookie@0.4.1:
@@ -973,8 +973,8 @@ packages:
     resolution: {integrity: sha512-xPSg0jm4mqgEkNhowKgZFBNtwoEwF6gJ4Dhww+GFpm3IgtNseHQZ5IqdNwnquZEoANxyDAKDRAdVo4Z72VvD/g==}
     dev: true
 
-  /@types/node@20.7.1:
-    resolution: {integrity: sha512-LT+OIXpp2kj4E2S/p91BMe+VgGX2+lfO+XTpfXhh+bCk2LkQtHZSub8ewFBMGP5ClysPjTDFa4sMI8Q3n4T0wg==}
+  /@types/node@20.8.2:
+    resolution: {integrity: sha512-Vvycsc9FQdwhxE3y3DzeIxuEJbWGDsnrxvMADzTDF/lcdR9/K+AQIeAghTQsHtotg/q0j3WEOYS/jQgSdWue3w==}
     dev: true
 
   /@types/normalize-package-data@2.4.2:
@@ -996,7 +996,7 @@ packages:
   /@types/set-cookie-parser@2.4.4:
     resolution: {integrity: sha512-xCfTC/eL/GmvMC24b42qJpYSTdCIBwWcfskDF80ztXtnU6pKXyvuZP2EConb2K9ps0s7gMhCa0P1foy7wiItMA==}
     dependencies:
-      '@types/node': 20.7.1
+      '@types/node': 20.8.2
     dev: true
 
   /@types/unist@2.0.8:
@@ -1556,8 +1556,8 @@ packages:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
     dev: true
 
-  /better-sqlite3@8.6.0:
-    resolution: {integrity: sha512-jwAudeiTMTSyby+/SfbHDebShbmC2MCH8mU2+DXi0WJfv13ypEJm47cd3kljmy/H130CazEvkf2Li//ewcMJ1g==}
+  /better-sqlite3@8.7.0:
+    resolution: {integrity: sha512-99jZU4le+f3G6aIl6PmmV0cxUIWqKieHxsiF7G34CVFiE+/UabpYqkU0NJIkY/96mQKikHeBjtR27vFfs5JpEw==}
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
@@ -1720,8 +1720,8 @@ packages:
       cbor-extract: 2.1.1
     dev: false
 
-  /cborg@4.0.1:
-    resolution: {integrity: sha512-jbQyS14n3d1W3QyK3WXLTzSrnJnpZphrr0PbxYpT2VXcTpzl6QQ5JeAMfRWvdqt/Vbsxp56OXe/RIYFl069LGQ==}
+  /cborg@4.0.3:
+    resolution: {integrity: sha512-poLvpK30KT5KI8gzDx3J/IuVCbsLqMT2fEbOrOuX0H7Hyj8yg5LezeWhRh9aLa5Z6MfPC5sriW3HVJF328M8LQ==}
     hasBin: true
     dev: false
 
@@ -4088,8 +4088,8 @@ packages:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
     dev: true
 
-  /msw@1.3.1(typescript@5.2.2):
-    resolution: {integrity: sha512-GhP5lHSTXNlZb9EaKgPRJ01YAnVXwzkvnTzRn4W8fxU2DXuJrRO+Nb6OHdYqB4fCkwSNpIJH9JkON5Y6rHqJMQ==}
+  /msw@1.3.2(typescript@5.2.2):
+    resolution: {integrity: sha512-wKLhFPR+NitYTkQl5047pia0reNGgf0P6a1eTnA5aNlripmiz0sabMvvHcicE8kQ3/gZcI0YiPFWmYfowfm3lA==}
     engines: {node: '>=14'}
     hasBin: true
     requiresBuild: true
@@ -4124,8 +4124,8 @@ packages:
       - supports-color
     dev: true
 
-  /multiformats@12.1.1:
-    resolution: {integrity: sha512-GBSToTmri2vJYs8wqcZQ8kB21dCaeTOzHTIAlr8J06C1eL6UbzqURXFZ5Fl0EYm9GAFz1IlYY8SxGOs9G9NJRg==}
+  /multiformats@12.1.2:
+    resolution: {integrity: sha512-6mRIsrZXyw5xNPO31IGBMmxgDXBSgCGDsBAtazkZ02ip4hMwZNrQvfxXZtytRoBSWuzSq5f9VmMnXj76fIz5FQ==}
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dev: false
 
@@ -4536,8 +4536,8 @@ packages:
     hasBin: true
     dev: true
 
-  /playwright-test@12.3.6:
-    resolution: {integrity: sha512-hTw3yERdO8Kd0vlyrXdr8p3n18d2dsyXNXNQwWfOXikPg3yixVRQInCdtku201m6DA7V62QEncNIgN8NNeA03Q==}
+  /playwright-test@12.3.8:
+    resolution: {integrity: sha512-nd8/R0fDM2MXkNfhVB+/Vw1ToIQ7QQJv8eVLbwqHp83p34peQacoytwRvSnkc2G2CtFxABP+9w3ljwYd+5TLmg==}
     engines: {node: '>=16.0.0'}
     hasBin: true
     dependencies:
@@ -5439,8 +5439,8 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  /type-fest@4.3.2:
-    resolution: {integrity: sha512-VpwuOgnTsQUUWi0id8Hl4/xiQ+OoaeJGe8dnFjzubJYe/lOc2/d1Qx/d3FqWR0FlpOG/cvukAXfB12A49Y4iiA==}
+  /type-fest@4.3.3:
+    resolution: {integrity: sha512-bxhiFii6BBv6UiSDq7uKTMyADT9unXEl3ydGefndVLxFeB44LRbT4K7OJGDYSyDrKnklCC1Pre68qT2wbUl2Aw==}
     engines: {node: '>=16'}
     dev: true
 
