@@ -55,11 +55,11 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.5",
-    "@types/node": "^20.7.0",
+    "@types/node": "^20.7.1",
     "better-sqlite3": "^8.6.0",
     "conf": "^11.0.2",
     "delay": "^6.0.0",
-    "playwright-test": "^12.3.5",
+    "playwright-test": "^12.3.6",
     "tempy": "^3.1.0",
     "typescript": "5.2.2"
   },

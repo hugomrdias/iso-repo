@@ -4,7 +4,7 @@
 export type Await<T> = Promise<T> | T
 
 export interface Options {
-  store: KvStorageAdapter
+  store?: KvStorageAdapter
 }
 
 /**

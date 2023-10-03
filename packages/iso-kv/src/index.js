@@ -4,6 +4,8 @@
  * @typedef {import('./types').KvKey} KvKey
  */
 
+import { MemoryStorageAdapter } from './adapters/memory.js'
+
 /**
  *
  * @param {unknown} value
@@ -30,10 +32,10 @@ function checkValue(value) {
 export class KV {
   #subs
   /**
-   * @param {import('./types').Options} options
+   * @param {import('./types').Options} [options]
    */
-  constructor(options) {
-    this.store = options.store
+  constructor(options = {}) {
+    this.store = options.store ?? new MemoryStorageAdapter()
     this.#subs = new Map()
   }
 
