@@ -217,7 +217,7 @@ export class RPC {
           json = JSON.parse(text)
         } catch {}
 
-        if (json.error) {
+        if (json && json.error) {
           return /** @type {import("./types.js").RpcError} */ ({
             error: {
               code: json.error.code,
