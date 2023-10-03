@@ -8,10 +8,10 @@ import { clear, createStore, del, entries, get, set } from 'idb-keyval'
 /**
  *
  * @param {unknown} key
- * @returns { KvKey}
+ * @returns {string}
  */
 function asKey(key) {
-  return /** @type {KvKey} */ (key)
+  return /** @type {string} */ (key)
 }
 
 /**
@@ -37,7 +37,7 @@ export class IDBStorageAdapter {
 
   /**
    * @template [Value=unknown]
-   * @param {KvKey} key
+   * @param {string} key
    */
   get(key) {
     return get(key, this.store)
@@ -59,7 +59,7 @@ export class IDBStorageAdapter {
   }
 
   /**
-   * @returns {AsyncIterableIterator<import('../types').KvEntry>}
+   * @returns {AsyncIterableIterator<{key: string, value: unknown}>}
    */
   async *[Symbol.asyncIterator]() {
     const data = await entries(this.store)
@@ -67,57 +67,6 @@ export class IDBStorageAdapter {
       yield {
         key: asKey(key),
         value,
-      }
-    }
-  }
-
-  /**
-   * @template [Value=unknown]
-   * @param {import('../types').KvListSelector} selector
-   * @param {import('../types').KvListOptions} [options]
-   * @returns {AsyncIterator<import('../types').KvEntry>}
-   */
-  async *list(selector, options = {}) {
-    const { limit, reverse } = options
-
-    let count = 0
-    const data = await entries(this.store)
-    if (reverse) {
-      data.reverse()
-    }
-
-    for (const [key, value] of data) {
-      if (
-        'start' in selector &&
-        asKey(key).join(':').localeCompare(selector.start.join(':')) < 0
-      ) {
-        continue
-      }
-
-      if (
-        'end' in selector &&
-        asKey(key).join(':').localeCompare(selector.end.join(':')) >= 0
-      ) {
-        continue
-      }
-
-      if (
-        'prefix' in selector &&
-        !asKey(key)
-          .join(':')
-          .startsWith(selector.prefix.join(':') + ':')
-      ) {
-        continue
-      }
-
-      yield {
-        key: asKey(key),
-        value,
-      }
-
-      count++
-      if (limit !== undefined && count >= limit) {
-        return
       }
     }
   }

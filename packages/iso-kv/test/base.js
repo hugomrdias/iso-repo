@@ -140,9 +140,9 @@ export function baseTests(kv, suite) {
   })
 
   test('should expires', async () => {
-    await kv.set(['foo'], 1, 10)
+    await kv.set(['foo'], 1, 1)
 
-    await delay(20)
+    await delay(2000)
 
     const value = await kv.get(['foo'])
 

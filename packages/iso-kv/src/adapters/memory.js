@@ -24,26 +24,26 @@ export class MemoryStorageAdapter {
    * @type {KvStorageAdapter['set']}
    */
   set(key, value) {
-    this.map.set(key.join(':'), value)
+    this.map.set(key, value)
     return this
   }
 
   /**
    * @template [Value=unknown]
-   * @param {KvKey} key
+   * @param {string} key
    */
   get(key) {
-    return /** @type {Value | undefined} */ (this.map.get(key.join(':')))
+    return /** @type {Value | undefined} */ (this.map.get(key))
   }
 
   /** @type {KvStorageAdapter['delete']} */
   delete(key) {
-    this.map.delete(key.join(':'))
+    this.map.delete(key)
   }
 
   /** @type {KvStorageAdapter['has']} */
   has(key) {
-    return this.map.has(key.join(':'))
+    return this.map.has(key)
   }
 
   clear() {
@@ -51,60 +51,14 @@ export class MemoryStorageAdapter {
   }
 
   /**
-   * @returns {AsyncIterableIterator<import('../types').KvEntry>}
+   * @returns {AsyncIterableIterator<{key: string, value: unknown}>}
    */
   async *[Symbol.asyncIterator]() {
     const data = [...this.map].sort(([k1], [k2]) => k1.localeCompare(k2))
     for (const [key, value] of data) {
       yield {
-        key: key.split(':'),
+        key,
         value,
-      }
-    }
-  }
-
-  /**
-   * @template [Value=unknown]
-   * @param {import('../types').KvListSelector} selector
-   * @param {import('../types').KvListOptions} [options]
-   * @returns {Iterator<import('../types').KvEntry>}
-   */
-  *list(selector, options = {}) {
-    const { limit, reverse } = options
-
-    let count = 0
-    const data = [...this.map].sort(([k1], [k2]) => k1.localeCompare(k2))
-    if (reverse) {
-      data.reverse()
-    }
-
-    for (const [key, value] of data) {
-      if (
-        'start' in selector &&
-        key.localeCompare(selector.start.join(':')) < 0
-      ) {
-        continue
-      }
-
-      if ('end' in selector && key.localeCompare(selector.end.join(':')) >= 0) {
-        continue
-      }
-
-      if (
-        'prefix' in selector &&
-        !key.startsWith(selector.prefix.join(':') + ':')
-      ) {
-        continue
-      }
-
-      yield {
-        key: key.split(':'),
-        value,
-      }
-
-      count++
-      if (limit !== undefined && count >= limit) {
-        return
       }
     }
   }

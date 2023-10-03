@@ -6,20 +6,6 @@ import { Kysely } from 'kysely'
  */
 
 /**
- * @param {KvKey} key
- */
-function encodeKey(key) {
-  return key.join(':')
-}
-
-/**
- * @param {string} key
- */
-function decodeKey(key) {
-  return key.split(':')
-}
-
-/**
  * @param {unknown} data
  */
 export function serialize(data) {
@@ -35,15 +21,6 @@ export function deserialize(data) {
   }
   // @ts-ignore
   return JSON.parse(data)
-}
-
-/**
- *
- * @param {unknown} key
- * @returns { KvKey}
- */
-function asKey(key) {
-  return /** @type {KvKey} */ (key)
 }
 
 /**
@@ -97,7 +74,7 @@ export class SqlStorageAdapter {
     await this.db
       .insertInto(this.name)
       .values({
-        key: encodeKey(key),
+        key,
         value: serialize(value),
       })
       .onConflict((oc) =>
@@ -115,7 +92,7 @@ export class SqlStorageAdapter {
 
   /**
    * @template [Value=unknown]
-   * @param {KvKey} key
+   * @param {string} key
    */
   async get(key) {
     if (!this.#isInitialized) {
@@ -125,7 +102,7 @@ export class SqlStorageAdapter {
     const row = await this.db
       .selectFrom(this.name)
       .selectAll()
-      .where('key', '=', encodeKey(key))
+      .where('key', '=', key)
       .executeTakeFirst()
 
     return deserialize(row?.value)
@@ -139,7 +116,7 @@ export class SqlStorageAdapter {
 
     await this.db
       .deleteFrom(this.name)
-      .where('key', '=', encodeKey(key))
+      .where('key', '=', key)
       .executeTakeFirst()
   }
 
@@ -163,7 +140,7 @@ export class SqlStorageAdapter {
   }
 
   /**
-   * @returns {AsyncIterableIterator<import('../types').KvEntry>}
+   * @returns {AsyncIterableIterator<{key: string, value: unknown}>}
    */
   async *[Symbol.asyncIterator]() {
     if (!this.#isInitialized) {
@@ -176,64 +153,8 @@ export class SqlStorageAdapter {
       .execute()
     for (const { key, value } of data) {
       yield {
-        key: decodeKey(key),
+        key,
         value: deserialize(value),
-      }
-    }
-  }
-
-  /**
-   * @template [Value=unknown]
-   * @param {import('../types').KvListSelector} selector
-   * @param {import('../types').KvListOptions} [options]
-   * @returns {AsyncIterator<import('../types').KvEntry>}
-   */
-  async *list(selector, options = {}) {
-    const { limit, reverse } = options
-
-    let count = 0
-    const data = []
-
-    for await (const kv of this) {
-      data.push(kv)
-    }
-
-    if (reverse) {
-      data.reverse()
-    }
-
-    for (const { key, value } of data) {
-      if (
-        'start' in selector &&
-        asKey(key).join(':').localeCompare(selector.start.join(':')) < 0
-      ) {
-        continue
-      }
-
-      if (
-        'end' in selector &&
-        asKey(key).join(':').localeCompare(selector.end.join(':')) >= 0
-      ) {
-        continue
-      }
-
-      if (
-        'prefix' in selector &&
-        !asKey(key)
-          .join(':')
-          .startsWith(selector.prefix.join(':') + ':')
-      ) {
-        continue
-      }
-
-      yield {
-        key: asKey(key),
-        value,
-      }
-
-      count++
-      if (limit !== undefined && count >= limit) {
-        return
       }
     }
   }

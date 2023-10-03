@@ -36,17 +36,19 @@ export interface KvListOptions {
 export type KvListIterator<T> = Iterator<T> | AsyncIterator<T>
 
 export interface KvStorageAdapter {
-  get: <T = unknown>(key: KvKey) => Await<T | undefined>
-  has: (key: KvKey) => Await<boolean>
-  set: <T = unknown>(key: KvKey, value: T) => Await<KvStorageAdapter>
-  delete: (key: KvKey) => Await<void>
+  get: <T = unknown>(key: string) => Await<T | undefined>
+  has: (key: string) => Await<boolean>
+  set: <T = unknown>(key: string, value: T) => Await<KvStorageAdapter>
+  delete: (key: string) => Await<void>
   clear: () => Await<void>
-  list: <T = unknown>(
-    selector: KvListSelector,
-    options?: KvListOptions
-  ) => KvListIterator<KvEntry<T>>
-  [Symbol.asyncIterator]: <T = unknown>() => AsyncIterableIterator<KvEntry<T>>
-  [Symbol.iterator]?: <T = unknown>() => IterableIterator<KvEntry<T>>
+  [Symbol.asyncIterator]: () => AsyncIterableIterator<{
+    key: string
+    value: unknown
+  }>
+  [Symbol.iterator]?: () => IterableIterator<{
+    key: string
+    value: unknown
+  }>
 }
 
 export interface Kv {

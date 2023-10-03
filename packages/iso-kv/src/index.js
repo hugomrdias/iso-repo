@@ -25,6 +25,25 @@ function checkValue(value) {
 }
 
 /**
+ * @param {KvKey} key
+ */
+function join(key) {
+  return key.join(':')
+}
+
+/**
+ * @param {string} key
+ */
+function split(key) {
+  return key.split(':')
+}
+
+/**
+ * UTC Unix timestamp in seconds
+ */
+export const now = () => Math.floor(Date.now() / 1000)
+
+/**
  * @class KV
  *
  * @implements {Kv}
@@ -52,7 +71,7 @@ export class KV {
       )
     }
 
-    const keyString = key.join(':')
+    const keyString = join(key)
 
     let handlers = this.#subs.get(keyString)
     let handler = callback
@@ -82,7 +101,7 @@ export class KV {
    * @param {T} [newValue]
    */
   async #handleChange(key, newValue) {
-    const handlers = this.#subs.get(key.join(':'))
+    const handlers = this.#subs.get(join(key))
     if (handlers) {
       for (const handler of handlers) {
         handler.call(this, newValue, await this.get(key))
@@ -97,7 +116,7 @@ export class KV {
    */
   async get(key) {
     const raw = await /** @type {typeof this.store.get<T>} */ (this.store.get)(
-      key
+      join(key)
     )
 
     return this.#maybeExpire(key, raw)
@@ -111,7 +130,7 @@ export class KV {
    */
   #maybeExpire(key, data) {
     if (data && checkValue(data)) {
-      if (typeof data.expires === 'number' && Date.now() > data.expires) {
+      if (typeof data.expires === 'number' && now() > data.expires) {
         this.delete(key)
       } else {
         return data.value
@@ -120,10 +139,12 @@ export class KV {
   }
 
   /**
+   * Set a value in the store
+   *
    * @template [T=unknown]
    * @param {KvKey} key
    * @param {T} value
-   * @param {number} [ttl]
+   * @param {number} [ttl] - Time to live in seconds
    */
   async set(key, value, ttl) {
     if (value === undefined) {
@@ -135,17 +156,17 @@ export class KV {
     }
 
     // eslint-disable-next-line unicorn/no-null
-    const expires = typeof ttl === 'number' ? Date.now() + ttl : null
+    const expires = typeof ttl === 'number' ? now() + ttl : null
 
     await this.#handleChange(key, value)
-    await this.store.set(key, { value, expires })
+    await this.store.set(join(key), { value, expires })
     return this
   }
 
   /** @type {Kv['delete']} */
   async delete(key) {
     await this.#handleChange(key)
-    return this.store.delete(key)
+    return this.store.delete(join(key))
   }
 
   /** @type {Kv['has']} */
@@ -155,7 +176,7 @@ export class KV {
 
   async clear() {
     for await (const { key } of this.store) {
-      await this.delete(key)
+      await this.delete(split(key))
     }
   }
 
@@ -164,7 +185,8 @@ export class KV {
    * @returns {AsyncIterableIterator<{key: KvKey, value: Value}>}
    */
   async *[Symbol.asyncIterator]() {
-    for await (const { key, value: data } of this.store) {
+    for await (const { key: _key, value: data } of this.store) {
+      const key = split(_key)
       const _value = this.#maybeExpire(key, data)
       if (_value) {
         yield {
@@ -187,7 +209,7 @@ export class KV {
     const data = []
 
     for await (const { key, value } of this) {
-      const keyString = key.join(':')
+      const keyString = join(key)
       if (
         'start' in selector &&
         keyString.localeCompare(selector.start.join(':')) < 0
