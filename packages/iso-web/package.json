@@ -31,6 +31,11 @@
       "react-native": "./src/crypto-browser.js",
       "default": "./src/crypto-browser.js"
     },
+    "./msw": {
+      "types": "./dist/src/msw/msw.d.ts",
+      "node": "./src/msw/msw.js",
+      "default": "./src/msw/msw-browser.js"
+    },
     "./signals": {
       "types": "./dist/src/signals.d.ts",
       "default": "./src/signals.js"
@@ -40,7 +45,9 @@
   "types": "dist/src/index.d.ts",
   "browser": {
     "crypto": false,
-    "./src/crypto.js": "./src/crypto-browser.js"
+    "./src/crypto.js": "./src/crypto-browser.js",
+    "msw/node": false,
+    "./src/msw/msw.js": "./src/msw/msw-browser.js"
   },
   "typesVersions": {
     "*": {
@@ -61,12 +68,19 @@
     "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
     "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
-    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+    "update-msw": "msw init test/mocks/ --save",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js' --assets test/mocks"
+  },
+  "dependencies": {
+    "iso-kv": "workspace:^",
+    "p-retry": "^6.1.0"
   },
   "devDependencies": {
-    "@types/node": "^20.7.0",
+    "@types/node": "^20.7.1",
     "delay": "^6.0.0",
-    "playwright-test": "^12.3.5",
+    "msw": "^1.3.1",
+    "playwright-test": "^12.3.6",
+    "type-fest": "^4.3.2",
     "typescript": "5.2.2"
   },
   "publishConfig": {
@@ -80,7 +94,8 @@
       "mocha": true
     },
     "ignorePatterns": [
-      "dist"
+      "dist",
+      "test/mocks/mockServiceWorker.js"
     ]
   },
   "depcheck": {
@@ -92,5 +107,8 @@
       "hd-scripts",
       "assert"
     ]
+  },
+  "msw": {
+    "workerDirectory": "test/mocks"
   }
 }

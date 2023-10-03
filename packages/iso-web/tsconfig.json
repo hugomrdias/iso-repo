@@ -4,8 +4,13 @@
     "emitDeclarationOnly": true,
     "outDir": "dist"
   },
+  "references": [
+    {
+      "path": "../iso-kv"
+    }
+  ],
   "include": ["src", "scripts", "test", "package.json"],
-  "exclude": ["node_modules", "dist", "out"],
+  "exclude": ["node_modules", "dist", "out", "test/mocks/mockServiceWorker.js"],
   "typedocOptions": {
     "entryPoints": ["src/signals.js", "src/crypto.js"],
     "includeVersion": true,
