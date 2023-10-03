@@ -131,7 +131,7 @@ export async function resolve(query, type, options = {}) {
     const out = {
       error: new Error(error),
     }
-    await cache.set([url], out, 3600)
+    await cache.set([url], out, 3600) // caches errors for 1 hour
     return out
   }
 

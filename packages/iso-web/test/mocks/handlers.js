@@ -39,7 +39,7 @@ export const handlers = [
             {
               name: 'google.com',
               type: 1,
-              TTL: 200,
+              TTL: 1,
               data: expireCount === 1 ? '142.250.184.174' : `${expireCount}`,
             },
           ],

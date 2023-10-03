@@ -38,7 +38,7 @@ test('should resolve from cache', async () => {
   }
 
   // second from cache
-  await cache.set([url], { result: [1] }, 100)
+  await cache.set([url], { result: [1] }, 1)
 
   const out1 = await resolve('google.com', 'A', {
     cache,
@@ -46,7 +46,7 @@ test('should resolve from cache', async () => {
   assert.deepEqual(out1, { result: [1] })
 
   // after ttl should resolve again
-  await delay(200)
+  await delay(2000)
 
   const out2 = await resolve('google.com', 'A', {
     cache,
@@ -62,7 +62,7 @@ test('should expire from cache', async () => {
   assert.deepEqual(out1, { result: ['142.250.184.174'] })
 
   // after ttl should resolve again
-  await delay(500)
+  await delay(2000)
 
   const out2 = await resolve('expires.com', 'A')
   assert.deepEqual(out2, { result: ['2'] })
