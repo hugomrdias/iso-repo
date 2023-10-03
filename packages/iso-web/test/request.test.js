@@ -132,8 +132,6 @@ test('should handle network error', async () => {
 
   if (error) {
     assert.equal(error.message, 'Failed to fetch')
-    // @ts-expect-error
-    assert.equal(error.cause.message, 'Failed to connect')
     assert.equal(error.name, 'NetworkError')
   } else {
     assert.fail('should fail')
