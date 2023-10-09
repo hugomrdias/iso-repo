@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -24,11 +20,11 @@ importers:
         specifier: ^2.9.0
         version: 2.9.0
       typedoc:
-        specifier: ^0.25.1
-        version: 0.25.1(typescript@5.2.2)
+        specifier: ^0.25.2
+        version: 0.25.2(typescript@5.2.2)
       typedoc-plugin-missing-exports:
         specifier: ^2.1.0
-        version: 2.1.0(typedoc@0.25.1)
+        version: 2.1.0(typedoc@0.25.2)
       typescript:
         specifier: 5.2.2
         version: 5.2.2
@@ -5482,16 +5478,16 @@ packages:
       is-typed-array: 1.1.12
     dev: true
 
-  /typedoc-plugin-missing-exports@2.1.0(typedoc@0.25.1):
+  /typedoc-plugin-missing-exports@2.1.0(typedoc@0.25.2):
     resolution: {integrity: sha512-+1DhqZCEu7Vu5APnrqpPwl31D+hXpt1fV0Le9ycCRL1eLVdatdl6KVt4SEVwPxnEpKwgOn2dNX6I9+0F1aO2aA==}
     peerDependencies:
       typedoc: 0.24.x || 0.25.x
     dependencies:
-      typedoc: 0.25.1(typescript@5.2.2)
+      typedoc: 0.25.2(typescript@5.2.2)
     dev: true
 
-  /typedoc@0.25.1(typescript@5.2.2):
-    resolution: {integrity: sha512-c2ye3YUtGIadxN2O6YwPEXgrZcvhlZ6HlhWZ8jQRNzwLPn2ylhdGqdR8HbyDRyALP8J6lmSANILCkkIdNPFxqA==}
+  /typedoc@0.25.2(typescript@5.2.2):
+    resolution: {integrity: sha512-286F7BeATBiWe/qC4PCOCKlSTwfnsLbC/4cZ68oGBbvAqb9vV33quEOXx7q176OXotD+JdEerdQ1OZGJ818lnA==}
     engines: {node: '>= 16'}
     hasBin: true
     peerDependencies:
@@ -5795,3 +5791,7 @@ packages:
   /zod@3.22.2:
     resolution: {integrity: sha512-wvWkphh5WQsJbVk1tbx1l1Ly4yg+XecD+Mq280uBGt9wa5BKSWf4Mhp6GmrkPixhMxmabYY7RbzlwVP32pbGCg==}
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
