@@ -48,8 +48,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.8.2
-        version: 20.8.2
+        specifier: ^20.8.4
+        version: 20.8.4
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -85,8 +85,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.8.2
-        version: 20.8.2
+        specifier: ^20.8.4
+        version: 20.8.4
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -140,8 +140,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.8.2
-        version: 20.8.2
+        specifier: ^20.8.4
+        version: 20.8.4
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -168,8 +168,8 @@ importers:
         specifier: ^7.6.5
         version: 7.6.5
       '@types/node':
-        specifier: ^20.8.2
-        version: 20.8.2
+        specifier: ^20.8.4
+        version: 20.8.4
       better-sqlite3:
         specifier: ^8.7.0
         version: 8.7.0
@@ -217,8 +217,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.8.2
-        version: 20.8.2
+        specifier: ^20.8.4
+        version: 20.8.4
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -251,8 +251,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       '@types/node':
-        specifier: ^20.8.2
-        version: 20.8.2
+        specifier: ^20.8.4
+        version: 20.8.4
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -279,8 +279,8 @@ importers:
         version: 6.1.0
     devDependencies:
       '@types/node':
-        specifier: ^20.8.2
-        version: 20.8.2
+        specifier: ^20.8.4
+        version: 20.8.4
       delay:
         specifier: ^6.0.0
         version: 6.0.0
@@ -922,7 +922,7 @@ packages:
   /@types/better-sqlite3@7.6.5:
     resolution: {integrity: sha512-H3ZUx89KiPhYa9nalUXVVStSUFHuzYxt4yoazufpTTYW9rVUCzhh02V8CH2C8nE4libnK0UgFq5DFIe0DOhqow==}
     dependencies:
-      '@types/node': 20.8.2
+      '@types/node': 20.8.4
     dev: true
 
   /@types/cookie@0.4.1:
@@ -969,8 +969,10 @@ packages:
     resolution: {integrity: sha512-xPSg0jm4mqgEkNhowKgZFBNtwoEwF6gJ4Dhww+GFpm3IgtNseHQZ5IqdNwnquZEoANxyDAKDRAdVo4Z72VvD/g==}
     dev: true
 
-  /@types/node@20.8.2:
-    resolution: {integrity: sha512-Vvycsc9FQdwhxE3y3DzeIxuEJbWGDsnrxvMADzTDF/lcdR9/K+AQIeAghTQsHtotg/q0j3WEOYS/jQgSdWue3w==}
+  /@types/node@20.8.4:
+    resolution: {integrity: sha512-ZVPnqU58giiCjSxjVUESDtdPk4QR5WQhhINbc9UBrKLU68MX5BF6kbQzTrkwbolyr0X8ChBpXfavr5mZFKZQ5A==}
+    dependencies:
+      undici-types: 5.25.3
     dev: true
 
   /@types/normalize-package-data@2.4.2:
@@ -992,7 +994,7 @@ packages:
   /@types/set-cookie-parser@2.4.4:
     resolution: {integrity: sha512-xCfTC/eL/GmvMC24b42qJpYSTdCIBwWcfskDF80ztXtnU6pKXyvuZP2EConb2K9ps0s7gMhCa0P1foy7wiItMA==}
     dependencies:
-      '@types/node': 20.8.2
+      '@types/node': 20.8.4
     dev: true
 
   /@types/unist@2.0.8:
@@ -5513,6 +5515,10 @@ packages:
       has-bigints: 1.0.2
       has-symbols: 1.0.3
       which-boxed-primitive: 1.0.2
+    dev: true
+
+  /undici-types@5.25.3:
+    resolution: {integrity: sha512-Ga1jfYwRn7+cP9v8auvEXN1rX3sWqlayd4HP7OKk4mZWylEmu3KzXDUGrQUN6Ol7qo1gPvB2e5gX6udnyEPgdA==}
     dev: true
 
   /unique-string@3.0.0:
