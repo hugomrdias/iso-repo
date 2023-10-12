@@ -1,6 +1,67 @@
 import { KV } from 'iso-kv'
 import { request } from '../http.js'
 
+const symbol = Symbol.for('doh-error')
+
+/**
+ * @typedef {import('../http.js').Errors | DohError} Errors
+ * @typedef {import('../http.js').Errors} RequestErrors
+ */
+
+export {
+  AbortError,
+  HttpError,
+  NetworkError,
+  RequestError,
+  RetryError,
+  TimeoutError,
+} from '../http.js'
+
+/**
+ * Check if a value is a DohError
+ *
+ * @param {unknown} value
+ * @returns {value is DohError}
+ */
+export function isDohError(value) {
+  return value instanceof Error && symbol in value
+}
+
+export class DohError extends Error {
+  /** @type {boolean} */
+  [symbol] = true
+
+  name = 'DohError'
+
+  /** @type {unknown} */
+  cause
+
+  /** @type {import('./types.js').DoHResponse} */
+  data
+
+  /**
+   *
+   * @param {string} message
+   * @param {ErrorOptions & {data: import('./types.js').DoHResponse}} options
+   */
+  constructor(message, options) {
+    super(message, options)
+
+    this.cause = options.cause
+    this.data = options.data
+  }
+
+  /**
+   * Check if a value is a DohError
+   *
+   * @param {unknown} value
+   * @returns {value is DohError}
+   */
+  static is(value) {
+    return isDohError(value) && value.name === 'DohError'
+  }
+}
+
 /**
  * DoH Status to Description
  *
@@ -85,12 +146,11 @@ const kv = new KV()
  * @param {string} query
  * @param {import("./types.js").RecordType} type
  * @param {import("./types.js").ResolveOptions} [options]
- * @returns {Promise<import("../types.js").MaybeResult<string[]>>}
+ * @returns {Promise<import("../types.js").MaybeResult<string[], Errors>>}
  */
 export async function resolve(query, type, options = {}) {
   const { cache = kv } = options
   const {
-    // server:  'https://dns.google/resolve',
     server = 'https://cloudflare-dns.com/dns-query',
     signal,
     retry,
@@ -98,13 +158,13 @@ export async function resolve(query, type, options = {}) {
   } = options
   const url = `${server}?name=${query}&type=${type}`
 
-  /** @type {import('../types.js').MaybeResult<string[]> | undefined} */
+  /** @type {import('../types.js').MaybeResult<string[], Errors> | undefined} */
   const cached = await cache.get([url])
   if (cached) {
     return cached
   }
 
-  /** @type {import('../types.js').MaybeResult<import('./types.js').DoHResponse>} */
+  /** @type {import('../types.js').MaybeResult<import('./types.js').DoHResponse, RequestErrors>} */
   const { error, result } = await request(new URL(url).toString(), {
     signal,
     headers: { accept: 'application/dns-json' },
@@ -115,7 +175,6 @@ export async function resolve(query, type, options = {}) {
   if (error) {
     return {
       error,
-      result: undefined,
     }
   }
 
@@ -129,7 +188,7 @@ export async function resolve(query, type, options = {}) {
       : desc
 
     const out = {
-      error: new Error(error),
+      error: new DohError(error, { data: result }),
     }
     await cache.set([url], out, 3600) // caches errors for 1 hour
     return out
@@ -151,5 +210,7 @@ export async function resolve(query, type, options = {}) {
     return out
   }
 
-  return { error: new TypeError('Unknown error'), result: undefined }
+  return {
+    error: new DohError('No answer or authority', { data: result }),
+  }
 }

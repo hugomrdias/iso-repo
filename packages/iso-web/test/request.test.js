@@ -104,7 +104,7 @@ test('should request 500 with text body', async () => {
   )
 
   if (HttpError.is(error)) {
-    assert.equal(error.message, 'Internal Server Error: hello')
+    assert.equal(error.message, 'Internal Server Error - hello')
     assert.equal(error.code, 500)
     assert.equal(error.data, undefined)
     assert.ok(error.response)
@@ -117,7 +117,10 @@ test('should request 500 with json body', async () => {
   const { error } = await request('https://local.dev/error-json?status=500')
 
   if (HttpError.is(error)) {
-    assert.equal(error.message, 'API Error')
+    assert.equal(
+      error.message,
+      'Internal Server Error - More details in "error.data"'
+    )
     assert.equal(error.code, 500)
     assert.deepEqual(error.data, { error: 'error' })
     assert.equal(error.cause, undefined)

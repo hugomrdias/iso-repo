@@ -4,6 +4,10 @@ import { anySignal } from './signals.js'
 const symbol = Symbol.for('request-error')
 
 /**
+ * @typedef {NetworkError | TimeoutError | AbortError | HttpError | RetryError} Errors
+ */
+
+/**
  * Check if a value is a RequestError
  *
  * @param {unknown} value
@@ -148,10 +152,10 @@ export class HttpError extends RequestError {
    */
   constructor(text, options) {
     let data
-    let msg = `${options.response.statusText}${text ? ': ' + text : ''}`
+    let msg = `${options.response.statusText}${text ? ' - ' + text : ''}`
     try {
       data = JSON.parse(text)
-      msg = 'API Error'
+      msg = `${options.response.statusText} - More details in "error.data"`
     } catch {}
 
     super(msg, options)
