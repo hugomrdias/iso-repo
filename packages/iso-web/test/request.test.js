@@ -38,7 +38,7 @@ const server = setup([
   rest.get('http://localhost:8999/', (req, res, ctx) => {
     return req.passthrough()
   }),
-  rest.get('https://google.com/', (req, res, ctx) => {
+  rest.get('https://cloudflare-dns.com/dns-query', (req, res, ctx) => {
     return req.passthrough()
   }),
 ])
@@ -142,12 +142,12 @@ test('should handle network error', async () => {
 })
 
 test('should timeout after 100ms', async () => {
-  const { error } = await request('https://google.com', {
-    timeout: 100,
+  const { error } = await request('https://cloudflare-dns.com/dns-query', {
+    timeout: 10,
   })
 
   if (error) {
-    assert.equal(error.message, 'Request timed out after 100ms')
+    assert.equal(error.message, 'Request timed out after 10ms')
     assert.ok(error.cause)
     assert.equal(error.name, 'TimeoutError')
   } else {
@@ -157,7 +157,7 @@ test('should timeout after 100ms', async () => {
 
 test('should abort manually', async () => {
   const controller = new AbortController()
-  const rsp = request('https://google.com', {
+  const rsp = request('https://cloudflare-dns.com/dns-query', {
     signal: controller.signal,
   })
 

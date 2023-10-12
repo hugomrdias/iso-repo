@@ -18,7 +18,9 @@
     "crypto",
     "webcrypto",
     "abortcontroller",
-    "abortsignal"
+    "abortsignal",
+    "doh",
+    "dnslink"
   ],
   "exports": {
     ".": {
@@ -39,6 +41,14 @@
     "./signals": {
       "types": "./dist/src/signals.d.ts",
       "default": "./src/signals.js"
+    },
+    "./doh": {
+      "types": "./dist/doh/index.d.ts",
+      "default": "./src/doh/index.js"
+    },
+    "./dnslink": {
+      "types": "./dist/doh/dnslink.d.ts",
+      "default": "./src/doh/dnslink.js"
     }
   },
   "main": "src/index.js",
@@ -56,6 +66,12 @@
       ],
       "signals": [
         "dist/src/signals"
+      ],
+      "doh": [
+        "dist/src/doh/index"
+      ],
+      "dnslink": [
+        "dist/src/doh/dnslink"
       ]
     }
   },

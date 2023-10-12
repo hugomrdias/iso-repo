@@ -14,11 +14,6 @@ export interface FetchOptions {
 
 /**
  * Generic result with error
- *
- * @example
- * if('error' in result) {
- *   console.error(result.error.message)
- * }
  */
 export type MaybeResult<ResultType = unknown, ErrorType = Error> =
   | {
@@ -39,10 +34,6 @@ export interface JSONError {
 /**
  * Fetch result with JSON error
  *
- * @example
- * if('error' in result) {
- *  console.error(result.error.message)
- * }
  */
 export type MaybeFetchResult<
   ResultType = unknown,
