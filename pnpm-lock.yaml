@@ -8,8 +8,8 @@ importers:
         specifier: ^1.4.6
         version: 1.4.6
       hd-scripts:
-        specifier: ^9.0.5
-        version: 9.0.5
+        specifier: ^9.0.6
+        version: 9.0.6
       lint-staged:
         specifier: ^14.0.1
         version: 14.0.1
@@ -359,11 +359,6 @@ packages:
     engines: {node: '>=6.9.0'}
     dev: true
 
-  /@babel/helper-validator-identifier@7.22.15:
-    resolution: {integrity: sha512-4E/F9IIEi8WR94324mbDUMo074YTheJmd7eZF5vITTeYchqAi6sYXRLHUVsmkdmY4QjfKTcB2jB7dVP3NaBElQ==}
-    engines: {node: '>=6.9.0'}
-    dev: true
-
   /@babel/helper-validator-identifier@7.22.20:
     resolution: {integrity: sha512-Y4OZ+ytlatR8AI+8KZfKuL5urKp7qey08ha31L8b3BwewJAoJamTzyvxPR/5D+KkdJCGPq/+8TukHBlY10FX9A==}
     engines: {node: '>=6.9.0'}
@@ -373,7 +368,7 @@ packages:
     resolution: {integrity: sha512-C/BaXcnnvBCmHTpz/VGZ8jgtE2aYlW4hxDhseJAWZb7gqGM/qtCK6iZUb0TyKFf7BOUsBH7Q7fkRsDRhg1XklQ==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/helper-validator-identifier': 7.22.15
+      '@babel/helper-validator-identifier': 7.22.20
       chalk: 2.4.2
       js-tokens: 4.0.0
     dev: true
@@ -426,7 +421,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/helper-string-parser': 7.22.5
-      '@babel/helper-validator-identifier': 7.22.15
+      '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
     dev: true
 
@@ -3191,8 +3186,8 @@ packages:
       function-bind: 1.1.1
     dev: true
 
-  /hd-scripts@9.0.5:
-    resolution: {integrity: sha512-MhNovCNlHL9gBGKLQQw42eMUWDFBUEpApxCAzls73/R68VGjbBC8LCiauYHB1fASA+yRencqLBOEfpL0HXi5Vg==}
+  /hd-scripts@9.0.6:
+    resolution: {integrity: sha512-qoVWaRSWOg8Rxq4T2YHjwZBPnZB8Zm7EiyQS9HxJewiLETWgs/QgejkbtuD1oGG8gahlgwo65pyh3QGECvOXYQ==}
     engines: {node: '>=14'}
     dependencies:
       '@typescript-eslint/eslint-plugin': 6.7.3(@typescript-eslint/parser@6.7.3)(eslint@8.50.0)(typescript@5.2.2)
