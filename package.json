@@ -22,7 +22,7 @@
   "devDependencies": {
     "depcheck": "^1.4.6",
     "hd-scripts": "^9.0.5",
-    "lint-staged": "^14.0.1",
+    "lint-staged": "^15.0.1",
     "prettier": "3.0.3",
     "simple-git-hooks": "^2.9.0",
     "typedoc": "^0.25.2",
