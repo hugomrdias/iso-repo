@@ -67,7 +67,7 @@
     "multiformats": "^12.1.2"
   },
   "devDependencies": {
-    "@types/assert": "^1.5.7",
+    "@types/assert": "^1.5.8",
     "@types/mocha": "^10.0.2",
     "@types/node": "^20.8.4",
     "assert": "^2.1.0",
