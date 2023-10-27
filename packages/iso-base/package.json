@@ -112,13 +112,13 @@
   },
   "devDependencies": {
     "@scure/base": "^1.1.3",
-    "@types/assert": "^1.5.7",
-    "@types/mocha": "^10.0.2",
-    "@types/node": "^20.8.4",
+    "@types/assert": "^1.5.8",
+    "@types/mocha": "^10.0.3",
+    "@types/node": "^20.8.7",
     "assert": "^2.1.0",
     "micro-bmark": "^0.3.1",
     "mocha": "^10.2.0",
-    "playwright-test": "^12.3.8",
+    "playwright-test": "^12.4.3",
     "typescript": "5.2.2"
   },
   "publishConfig": {

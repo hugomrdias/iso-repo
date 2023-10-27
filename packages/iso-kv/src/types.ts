@@ -7,11 +7,6 @@ export interface Options {
   store?: KvStorageAdapter
 }
 
-/**
- * New KV types
- */
-
-/** */
 export type KvKeyPart = number | string | Date | BufferSource
 export type KvKey = KvKeyPart[]
 export interface KVStoredValue<T = unknown> {
