@@ -12,6 +12,7 @@
       "packages/iso-kv"
     ],
     "excludeExternals": true,
+    "sourceLinkExternal": true,
     "darkHighlightTheme": "github-dark",
     "navigationLinks": {
       "Github": "https://github.com/hugomrdias/iso-repo"
