@@ -7,12 +7,7 @@
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
   "typedocOptions": {
-    "entryPoints": [
-      "src/index.js",
-      "src/idb.js",
-      "src/localstorage.js",
-      "src/kysely.js"
-    ],
+    "entryPoints": ["src/index.js", "src/adapters/*.js"],
     "includeVersion": true,
     "excludeExternals": true,
     "internalModule": "<internal>"

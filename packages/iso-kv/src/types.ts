@@ -46,7 +46,7 @@ export interface KvStorageAdapter {
   }>
 }
 
-export interface Kv {
+export interface IKV {
   onChange: <T = unknown>(
     key: KvKey,
     callback: (newValue?: T, oldValue?: T) => void,
@@ -61,7 +61,7 @@ export interface Kv {
    * @param value
    * @param ttl - Time-to-live (TTL) for the key. The TTL is specified in milliseconds, and the key will be deleted from the database at earliest after the specified number of milliseconds have elapsed.
    */
-  set: <T = unknown>(key: KvKey, value: T, ttl?: number) => Promise<Kv>
+  set: <T = unknown>(key: KvKey, value: T, ttl?: number) => Promise<IKV>
   delete: (key: KvKey) => Promise<void>
   clear: () => Promise<void>
   list: <T = unknown>(

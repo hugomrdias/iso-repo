@@ -2,7 +2,7 @@ import { assert } from 'playwright-test/taps'
 import delay from 'delay'
 
 /**
- * @param {import('../src/types.js').Kv} kv
+ * @param {import('../src/types.js').IKV} kv
  * @param {import('playwright-test/taps').Suite} suite
  */
 export function baseTests(kv, suite) {

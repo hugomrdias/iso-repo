@@ -1,6 +1,6 @@
 /**
  * @typedef {import('./types').KvStorageAdapter} KvStorageAdapter
- * @typedef {import('./types').Kv} Kv
+ * @typedef {import('./types').IKV} Kv
  * @typedef {import('./types').KvKey} KvKey
  */
 
@@ -41,7 +41,7 @@ function split(key) {
 /**
  * UTC Unix timestamp in seconds
  */
-export const now = () => Math.floor(Date.now() / 1000)
+const now = () => Math.floor(Date.now() / 1000)
 
 /**
  * @class KV
