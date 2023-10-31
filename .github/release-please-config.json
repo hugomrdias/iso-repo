@@ -8,6 +8,6 @@
     "packages/iso-passkeys": {},
     "packages/iso-web": {},
     "packages/iso-kv": {},
-    "packages/iso-ws": {}
+    "packages/iso-websocket": {}
   }
 }

@@ -1,6 +1,6 @@
-# iso-ws [![NPM Version](https://img.shields.io/npm/v/iso-ws.svg)](https://www.npmjs.com/package/iso-ws) [![License](https://img.shields.io/npm/l/iso-ws.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-ws](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-ws.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-ws.yml)
+# iso-websocket [![NPM Version](https://img.shields.io/npm/v/iso-websocket.svg)](https://www.npmjs.com/package/iso-websocket) [![License](https://img.shields.io/npm/l/iso-websocket.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-websocket](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-websocket.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-websocket.yml)
 
-`iso-ws` implements the [Websocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) interface and is compatible with the browser, node.js and any other engine that implements basic Web APIs.
+`iso-websocket` implements the [Websocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) interface and is compatible with the browser, node.js and any other engine that implements basic Web APIs.
 
 ## Features
 
@@ -16,13 +16,13 @@
 ## Install
 
 ```bash
-pnpm install iso-ws
+pnpm install iso-websocket
 ```
 
 ## Usage
 
 ```js
-import { WS } from 'iso-ws'
+import { WS } from 'iso-websocket'
 
 const ws = new WS('ws://localhost:8080')
 
@@ -37,7 +37,7 @@ ws.close()
 
 ## Docs
 
-Check <https://hugomrdias.github.io/iso-repo/modules/iso_ws.html>
+Check <https://hugomrdias.github.io/iso-repo/modules/iso_websocket.html>
 
 ## License
 
