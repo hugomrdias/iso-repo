@@ -1,0 +1,34 @@
+name: iso-ws
+env:
+  CI: true
+  FORCE_COLOR: 1
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/iso-ws/**'
+      - .github/workflows/iso-ws.yml
+      - pnpm-lock.yaml
+  pull_request:
+    paths:
+      - 'packages/iso-ws/**'
+      - .github/workflows/iso-ws.yml
+      - pnpm-lock.yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm run build
+      - run: pnpm -r --filter iso-ws run lint
+      - run: pnpm -r --filter iso-ws run test
+      - run: pnpm -r --filter iso-ws exec depcheck

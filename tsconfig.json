@@ -9,7 +9,8 @@
       "packages/iso-did",
       "packages/iso-signatures",
       "packages/iso-web",
-      "packages/iso-kv"
+      "packages/iso-kv",
+      "packages/iso-ws"
     ],
     "excludeExternals": true,
     "sourceLinkExternal": true,

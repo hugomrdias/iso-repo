@@ -2,6 +2,13 @@ name: Release
 env:
   CI: true
   FORCE_COLOR: 1
+
+permissions:
+  contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
 on:
   push:
     branches:
@@ -31,7 +38,8 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-did') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-signatures') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-web') ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv')
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ws')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -60,5 +68,6 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-did') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-signatures') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-web') ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv')
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ws')
     uses: ./.github/workflows/reusable-docs.yml

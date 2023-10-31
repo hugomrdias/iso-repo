@@ -1,0 +1,89 @@
+{
+  "name": "iso-ws",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Isomorphic, resilient and extensible Websocket.",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-ws",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-ws"
+  },
+  "bugs": {
+    "url": "https://github.com/hugomrdias/iso-repo/issues"
+  },
+  "keywords": [
+    "websocket",
+    "reconnect",
+    "retry",
+    "websocket-client"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
+  "scripts": {
+    "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
+    "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
+    "update-msw": "msw init test/mocks/ --save",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js' --assets test/mocks"
+  },
+  "dependencies": {
+    "debug": "^4.3.4",
+    "retry": "^0.13.1",
+    "typescript-event-target": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.10",
+    "@types/node": "^20.8.9",
+    "@types/retry": "^0.12.4",
+    "@types/ws": "^8.5.8",
+    "delay": "^6.0.0",
+    "p-defer": "^4.0.0",
+    "playwright-test": "^12.4.3",
+    "type-fest": "^4.6.0",
+    "typescript": "5.2.2",
+    "unws": "^0.2.4",
+    "ws": "^8.14.2"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "eslintConfig": {
+    "extends": [
+      "../../node_modules/hd-scripts/eslint/index.js"
+    ],
+    "env": {
+      "mocha": true
+    },
+    "ignorePatterns": [
+      "dist",
+      "test/mocks/mockServiceWorker.js"
+    ]
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*",
+      "hd-scripts",
+      "assert",
+      "type-fest"
+    ]
+  },
+  "msw": {
+    "workerDirectory": "test/mocks"
+  }
+}
