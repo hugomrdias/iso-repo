@@ -6,5 +6,5 @@
   "packages/iso-signatures": "0.1.10",
   "packages/iso-web": "0.1.5",
   "packages/iso-kv": "0.2.0",
-  "packages/iso-websocket": "0.0.1"
+  "packages/iso-websocket": "0.1.5"
 }
