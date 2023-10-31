@@ -10,7 +10,7 @@
       "packages/iso-signatures",
       "packages/iso-web",
       "packages/iso-kv",
-      "packages/iso-ws"
+      "packages/iso-websocket"
     ],
     "excludeExternals": true,
     "sourceLinkExternal": true,

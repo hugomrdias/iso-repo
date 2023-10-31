@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v0.1.5...iso-kv-v0.2.0) (2023-10-31)
+
+
+### Features
+
+* kv refactor ([3258a5e](https://github.com/hugomrdias/iso-repo/commit/3258a5eabb556e4cb5e8444622a74cf476df92fd))
+
+
+### Bug Fixes
+
+* default to memory store ([958feac](https://github.com/hugomrdias/iso-repo/commit/958feace70442180998b69903cacbd5862960081))
+* simplify types and use seconds for ttl ([bd71f70](https://github.com/hugomrdias/iso-repo/commit/bd71f70051c46727c0a86fdab83de73221618f26))
+* small types/docs tweaks ([53b7a41](https://github.com/hugomrdias/iso-repo/commit/53b7a41baf19a347fda9a537fc6715bd2026cc8f))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v0.0.1...iso-kv-v0.1.5) (2023-09-18)
 
 

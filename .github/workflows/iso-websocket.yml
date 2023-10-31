@@ -1,4 +1,4 @@
-name: iso-ws
+name: iso-websocket
 env:
   CI: true
   FORCE_COLOR: 1
@@ -8,12 +8,12 @@ on:
       - main
     paths:
       - 'packages/iso-ws/**'
-      - .github/workflows/iso-ws.yml
+      - .github/workflows/iso-websocket.yml
       - pnpm-lock.yaml
   pull_request:
     paths:
       - 'packages/iso-ws/**'
-      - .github/workflows/iso-ws.yml
+      - .github/workflows/iso-websocket.yml
       - pnpm-lock.yaml
 jobs:
   test:
@@ -29,6 +29,6 @@ jobs:
           cache: pnpm
       - run: pnpm install
       - run: pnpm run build
-      - run: pnpm -r --filter iso-ws run lint
-      - run: pnpm -r --filter iso-ws run test
-      - run: pnpm -r --filter iso-ws exec depcheck
+      - run: pnpm -r --filter iso-websocket run lint
+      - run: pnpm -r --filter iso-websocket run test
+      - run: pnpm -r --filter iso-websocket exec depcheck

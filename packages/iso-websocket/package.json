@@ -1,14 +1,14 @@
 {
-  "name": "iso-ws",
+  "name": "iso-websocket",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.5",
   "description": "Isomorphic, resilient and extensible Websocket.",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
-  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-ws",
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-websocket",
   "repository": {
     "url": "hugomrdias/iso-repo",
-    "directory": "packages/iso-ws"
+    "directory": "packages/iso-websocket"
   },
   "bugs": {
     "url": "https://github.com/hugomrdias/iso-repo/issues"
