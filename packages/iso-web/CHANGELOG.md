@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.1.5...iso-web-v0.2.0) (2023-10-31)
+
+
+### Features
+
+* doh and dnslink ([d6cd9a1](https://github.com/hugomrdias/iso-repo/commit/d6cd9a1fa3fe160114fdb8904f0b2d6655b751a0))
+* request, doh and msw ([3b779d3](https://github.com/hugomrdias/iso-repo/commit/3b779d3dd105f0bf6de6a5b454eea83078046f52))
+* websocket client ([d16b624](https://github.com/hugomrdias/iso-repo/commit/d16b624a5d1b560e2756816f9b298ed2ac067b59))
+
+
+### Bug Fixes
+
+* export and docs for http and doh ([831fc22](https://github.com/hugomrdias/iso-repo/commit/831fc227304474b784e34c75f83de40a7d7ed758))
+* export dnslink and doh ([f6fcf39](https://github.com/hugomrdias/iso-repo/commit/f6fcf3905dfd9b65c4b3b1983e0ac5d1230b161f))
+* use seconds for ttl ([76fcce5](https://github.com/hugomrdias/iso-repo/commit/76fcce5643bfa2f53c7cc0fa90770d7437f60b4d))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.0.1...iso-web-v0.1.5) (2023-09-05)
 
 
