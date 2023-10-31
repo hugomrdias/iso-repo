@@ -304,7 +304,7 @@ importers:
         specifier: 5.2.2
         version: 5.2.2
 
-  packages/iso-ws:
+  packages/iso-websocket:
     dependencies:
       debug:
         specifier: ^4.3.4
