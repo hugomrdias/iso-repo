@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -52,8 +48,8 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.9
+        specifier: ^20.8.10
+        version: 20.8.10
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -89,8 +85,8 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.9
+        specifier: ^20.8.10
+        version: 20.8.10
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -144,8 +140,8 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.9
+        specifier: ^20.8.10
+        version: 20.8.10
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -172,8 +168,8 @@ importers:
         specifier: ^7.6.6
         version: 7.6.6
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.9
+        specifier: ^20.8.10
+        version: 20.8.10
       better-sqlite3:
         specifier: ^9.0.0
         version: 9.0.0
@@ -221,8 +217,8 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.9
+        specifier: ^20.8.10
+        version: 20.8.10
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -255,8 +251,8 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.9
+        specifier: ^20.8.10
+        version: 20.8.10
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -286,8 +282,8 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.9
+        specifier: ^20.8.10
+        version: 20.8.10
       delay:
         specifier: ^6.0.0
         version: 6.0.0
@@ -320,8 +316,8 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10
       '@types/node':
-        specifier: ^20.8.9
-        version: 20.8.9
+        specifier: ^20.8.10
+        version: 20.8.10
       '@types/retry':
         specifier: ^0.12.4
         version: 0.12.4
@@ -962,7 +958,7 @@ packages:
   /@types/better-sqlite3@7.6.6:
     resolution: {integrity: sha512-nuFAptzt0hZYBvyLzKQCbuCCK+RN9PHH4ezar5EJLIg2qpVhwQ/uLvLO/K8A9O7N8DafawgFupiyXQSs0U48Ng==}
     dependencies:
-      '@types/node': 20.8.9
+      '@types/node': 20.8.10
     dev: true
 
   /@types/cookie@0.4.1:
@@ -1009,8 +1005,8 @@ packages:
     resolution: {integrity: sha512-AuHIyzR5Hea7ij0P9q7vx7xu4z0C28ucwjAZC0ja7JhINyCnOw8/DnvAPQQ9TfOlCtZAmCERKQX9+o1mgQhuOQ==}
     dev: true
 
-  /@types/node@20.8.9:
-    resolution: {integrity: sha512-UzykFsT3FhHb1h7yD4CA4YhBHq545JC0YnEz41xkipN88eKQtL6rSgocL5tbAP6Ola9Izm/Aw4Ora8He4x0BHg==}
+  /@types/node@20.8.10:
+    resolution: {integrity: sha512-TlgT8JntpcbmKUFzjhsyhGfP2fsiz1Mv56im6enJ905xG1DAYesxJaeSbGqQmAw8OWPdhyJGhGSQGKRNJ45u9w==}
     dependencies:
       undici-types: 5.26.5
     dev: true
@@ -1038,7 +1034,7 @@ packages:
   /@types/set-cookie-parser@2.4.4:
     resolution: {integrity: sha512-xCfTC/eL/GmvMC24b42qJpYSTdCIBwWcfskDF80ztXtnU6pKXyvuZP2EConb2K9ps0s7gMhCa0P1foy7wiItMA==}
     dependencies:
-      '@types/node': 20.8.9
+      '@types/node': 20.8.10
     dev: true
 
   /@types/unist@2.0.9:
@@ -1048,7 +1044,7 @@ packages:
   /@types/ws@8.5.8:
     resolution: {integrity: sha512-flUksGIQCnJd6sZ1l5dqCEG/ksaoAg/eUwiLAGTJQcfgvZJKF++Ta4bJA6A5aPSJmsr+xlseHn4KLgVlNnvPTg==}
     dependencies:
-      '@types/node': 20.8.9
+      '@types/node': 20.8.10
     dev: true
 
   /@types/yargs-parser@21.0.2:
@@ -5954,3 +5950,7 @@ packages:
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
