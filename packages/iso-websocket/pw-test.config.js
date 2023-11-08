@@ -46,6 +46,13 @@ const config = {
         socket.terminate()
       }
 
+      if (url.pathname.startsWith('/delayed-msg')) {
+        socket.send('first msg')
+        setTimeout(() => {
+          socket.send('second msg')
+        }, 1000)
+      }
+
       socket.on('message', (data) => {
         const msg = data.toString()
         if (url.pathname.startsWith('/echo')) {

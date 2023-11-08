@@ -9,7 +9,7 @@ import {
   RetryEvent,
 } from './events.js'
 
-const log = debug('iso-web:ws')
+const log = debug('iso-ws')
 
 /**
  * @typedef {import('./types.js').WebSocketEventMap} WebSocketEventMap
@@ -346,10 +346,12 @@ export class WS extends TypedEventTarget {
         timeout: this.options.timeout,
         // @ts-ignore
         cb: () => {
-          this.#removeListeners()
-          this.#maybeReconnect(
-            new ErrorEvent({ message: 'Connection timeout' })
-          )
+          if (this.#ws?.readyState !== WS.OPEN) {
+            this.#removeListeners()
+            this.#maybeReconnect(
+              new ErrorEvent({ message: 'Connection timeout' })
+            )
+          }
         },
       }
     )

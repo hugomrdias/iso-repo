@@ -424,3 +424,29 @@ test('should retry timeout ', async () => {
 
   await deferred.promise
 })
+
+test('should not retry timeout after connect opened', async () => {
+  const deferred = pDefer()
+  let count = 0
+  const ws = new WS(URL + '/delayed-msg', {
+    ws: WebSocket,
+    timeout: 100,
+    retry: {
+      retries: 1,
+    },
+  })
+
+  ws.addEventListener('error', (e) => {
+    count++
+  })
+
+  ws.addEventListener('message', (e) => {
+    if (e.data === 'second msg') {
+      deferred.resolve()
+    }
+  })
+
+  await deferred.promise
+  assert.equal(count, 0)
+  ws.close()
+})
