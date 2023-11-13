@@ -42,8 +42,8 @@ importers:
         specifier: ^1.1.3
         version: 1.1.3
       '@types/assert':
-        specifier: ^1.5.8
-        version: 1.5.8
+        specifier: ^1.5.9
+        version: 1.5.9
       '@types/mocha':
         specifier: ^10.0.3
         version: 10.0.3
@@ -79,8 +79,8 @@ importers:
         version: 12.1.3
     devDependencies:
       '@types/assert':
-        specifier: ^1.5.8
-        version: 1.5.8
+        specifier: ^1.5.9
+        version: 1.5.9
       '@types/mocha':
         specifier: ^10.0.3
         version: 10.0.3
@@ -134,8 +134,8 @@ importers:
         version: 3.22.4
     devDependencies:
       '@types/assert':
-        specifier: ^1.5.8
-        version: 1.5.8
+        specifier: ^1.5.9
+        version: 1.5.9
       '@types/mocha':
         specifier: ^10.0.3
         version: 10.0.3
@@ -211,8 +211,8 @@ importers:
         version: link:../iso-did
     devDependencies:
       '@types/assert':
-        specifier: ^1.5.8
-        version: 1.5.8
+        specifier: ^1.5.9
+        version: 1.5.9
       '@types/mocha':
         specifier: ^10.0.3
         version: 10.0.3
@@ -245,8 +245,8 @@ importers:
         version: link:../iso-did
     devDependencies:
       '@types/assert':
-        specifier: ^1.5.8
-        version: 1.5.8
+        specifier: ^1.5.9
+        version: 1.5.9
       '@types/mocha':
         specifier: ^10.0.3
         version: 10.0.3
@@ -951,8 +951,8 @@ packages:
       '@scure/base': 1.1.3
     dev: false
 
-  /@types/assert@1.5.8:
-    resolution: {integrity: sha512-tL1NSDf4CF5hiVTnLd4KSth6bmRO3+tw8cJzEAUaN6fYQ26DIixX0lRFmtrA0jhxUS8SL6PDWtphMz3maxapjA==}
+  /@types/assert@1.5.9:
+    resolution: {integrity: sha512-uQ+/hp0DbfrhnJFgiqHlsrLTGgr8HZGssV7vYN8XunlvyJkzArcyBy/9e5Rey2T7lpL7jVuoNI/8CWCDCwISgg==}
     dev: true
 
   /@types/better-sqlite3@7.6.6:
