@@ -120,7 +120,7 @@
     "assert": "^2.1.0",
     "mocha": "^10.2.0",
     "playwright-test": "^12.4.3",
-    "type-fest": "^4.6.0",
+    "type-fest": "^4.8.1",
     "typescript": "5.2.2"
   },
   "publishConfig": {
