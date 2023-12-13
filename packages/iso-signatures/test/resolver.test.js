@@ -1,11 +1,10 @@
 import assert from 'assert'
 import { EdDSASigner } from '../src/signers/eddsa.js'
-import { RSAOldSigner } from '../src/signers/rsa-old.js'
+import { RSASigner } from '../src/signers/rsa.js'
 import { Resolver } from '../src/verifiers/resolver.js'
 import * as EdDSA from '../src/verifiers/eddsa.js'
 import * as ECDSA from '../src/verifiers/ecdsa.js'
 import * as RSA from '../src/verifiers/rsa.js'
-import * as RSA_OLD from '../src/verifiers/rsa-old.js'
 
 describe('Verifier Resolver', function () {
   it(`should verify`, async function () {
@@ -99,10 +98,9 @@ describe('Verifier Resolver', function () {
     const resolver = new Resolver({
       ...ECDSA.verifier,
       ...EdDSA.verifier,
-      ...RSA_OLD.verifier,
       ...RSA.verifier,
     })
-    const signer = await RSAOldSigner.generate()
+    const signer = await RSASigner.generate()
     const signature = await signer.sign(message)
     const verified = await resolver.verify({
       signature,

@@ -6,7 +6,6 @@ export const KEY_TYPE_ALG = /** @type {const} */ ({
   'P-521': 'ES512',
   secp256k1: 'ES256K',
   RSA: 'RS256',
-  RSA_OLD: 'RS256_OLD',
 })
 
 export const ALG_KEY_TYPE = /** @type {const} */ ({
@@ -16,7 +15,6 @@ export const ALG_KEY_TYPE = /** @type {const} */ ({
   ES512: 'P-521',
   ES256K: 'secp256k1',
   RS256: 'RSA',
-  RS256_OLD: 'RSA_OLD',
 })
 
 /**
@@ -27,7 +25,6 @@ export const ALG_KEY_TYPE = /** @type {const} */ ({
 export const KEY_TYPE_CODE = /** @type {const} */ ({
   Ed25519: 0xed,
   RSA: 0x1205,
-  RSA_OLD: 11111,
   'P-256': 0x1200,
   'P-384': 0x1201,
   'P-521': 0x1202,
@@ -37,7 +34,6 @@ export const KEY_TYPE_CODE = /** @type {const} */ ({
 export const CODE_KEY_TYPE = /** @type {const} */ ({
   0xed: 'Ed25519',
   0x1205: 'RSA',
-  11111: 'RSA_OLD',
   0x1200: 'P-256',
   0x1201: 'P-384',
   0x1202: 'P-521',

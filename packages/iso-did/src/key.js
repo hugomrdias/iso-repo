@@ -1,5 +1,5 @@
 import * as EC from 'iso-base/ec-compression'
-import { concat, equals, u8 } from 'iso-base/utils'
+import { u8 } from 'iso-base/utils'
 import { tag, varint } from 'iso-base/varint'
 import { base58btc } from 'multiformats/bases/base58'
 import { CODE_KEY_TYPE, KEY_TYPE_CODE, keyTypeToAlg } from './common.js'
@@ -67,15 +67,6 @@ function validateRawPublicKeyLength(code, key) {
       }
       return key
     }
-
-    case KEY_TYPE_CODE.RSA_OLD: {
-      // if (key.length !== 270 && key.length !== 526) {
-      //   throw new RangeError(
-      //     `RSA public keys must be 270 bytes for 2048 bits or 526 bytes for 4096 bits.`
-      //   )
-      // }
-      return key
-    }
     default: {
       throw new RangeError(
         `Unsupported DID encoding, unknown multicode 0x${code.toString(16)}.`
@@ -112,21 +103,8 @@ export class DIDKey extends DIDCore {
 
     if (did.method === 'key') {
       const encodedKey = base58btc.decode(did.id)
-      let code
-      let size
-      let key
-
-      // fission old rsa key
-      if (
-        equals(encodedKey.subarray(0, 3), new Uint8Array([0x00, 0xf5, 0x02]))
-      ) {
-        code = KEY_TYPE_CODE.RSA_OLD
-        size = 3
-        key = validateRawPublicKeyLength(code, encodedKey.slice(size))
-      } else {
-        ;[code, size] = varint.decode(encodedKey)
-        key = validateRawPublicKeyLength(code, encodedKey.slice(size))
-      }
+      const [code, size] = varint.decode(encodedKey)
+      const key = validateRawPublicKeyLength(code, encodedKey.slice(size))
 
       return new DIDKey(
         did,
@@ -151,10 +129,7 @@ export class DIDKey extends DIDCore {
     }
 
     const keyBytes = validateRawPublicKeyLength(code, u8(key))
-    const id =
-      type === 'RSA_OLD'
-        ? base58btc.encode(concat([[0x00, 0xf5, 0x02], keyBytes]))
-        : base58btc.encode(tag(code, keyBytes))
+    const id = base58btc.encode(tag(code, keyBytes))
 
     return new DIDKey(
       {
