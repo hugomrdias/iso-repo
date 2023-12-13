@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.10...iso-signatures-v0.2.0) (2023-12-13)
+
+
+### Features
+
+* expose types and export with wildcard ([de94912](https://github.com/hugomrdias/iso-repo/commit/de94912ba013dcff10ce33d7a0fd58b5a2161937))
+* remove rsa old ([29ba18b](https://github.com/hugomrdias/iso-repo/commit/29ba18bdaca806c8c006697aa3e2b0572288c6e8))
+
 ## [0.1.10](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.9...iso-signatures-v0.1.10) (2023-09-05)
 
 
