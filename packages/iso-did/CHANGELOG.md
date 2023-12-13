@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.3.4...iso-did-v1.4.0) (2023-12-13)
+
+
+### Features
+
+* remove rsa old ([29ba18b](https://github.com/hugomrdias/iso-repo/commit/29ba18bdaca806c8c006697aa3e2b0572288c6e8))
+
 ## [1.3.4](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.3.3...iso-did-v1.3.4) (2023-12-13)
 
 

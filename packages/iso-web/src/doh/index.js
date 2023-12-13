@@ -184,8 +184,8 @@ export async function resolve(query, type, options = {}) {
     const error = Array.isArray(result.Comment)
       ? desc + ' - ' + result.Comment.join(' ').trim()
       : result.Comment
-      ? desc + ' - ' + result.Comment
-      : desc
+        ? desc + ' - ' + result.Comment
+        : desc
 
     const out = {
       error: new DohError(error, { data: result }),
