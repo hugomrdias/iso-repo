@@ -31,41 +31,16 @@
       "types": "./dist/src/index.d.ts",
       "import": "./src/index.js"
     },
-    "./signers/ecdsa": {
-      "types": "./dist/src/signers/ecdsa.d.ts",
-      "import": "./src/signers/ecdsa.js"
+    "./types": {
+      "types": "./dist/src/types.d.ts"
     },
-    "./signers/eddsa": {
-      "types": "./dist/src/signers/eddsa.d.ts",
-      "import": "./src/signers/eddsa.js"
+    "./signers/*": {
+      "types": "./dist/src/signers/*",
+      "default": "./src/signers/*"
     },
-    "./signers/rsa-old": {
-      "types": "./dist/src/signers/rsa-old.d.ts",
-      "import": "./src/signers/rsa-old.js"
-    },
-    "./signers/rsa": {
-      "types": "./dist/src/signers/rsa.d.ts",
-      "import": "./src/signers/rsa.js"
-    },
-    "./verifiers/ecdsa": {
-      "types": "./dist/src/verifiers/ecdsa.d.ts",
-      "import": "./src/verifiers/ecdsa.js"
-    },
-    "./verifiers/eddsa": {
-      "types": "./dist/src/verifiers/eddsa.d.ts",
-      "import": "./src/verifiers/eddsa.js"
-    },
-    "./verifiers/rsa-old": {
-      "types": "./dist/src/verifiers/rsa-old.d.ts",
-      "import": "./src/verifiers/rsa-old.js"
-    },
-    "./verifiers/rsa": {
-      "types": "./dist/src/verifiers/rsa.d.ts",
-      "import": "./src/verifiers/rsa.js"
-    },
-    "./verifiers/resolver": {
-      "types": "./dist/src/verifiers/resolver.d.ts",
-      "import": "./src/verifiers/resolver.js"
+    "./verifiers/*": {
+      "types": "./dist/src/verifiers/*",
+      "import": "./src/verifiers/*"
     },
     "./asn1": {
       "types": "./dist/src/asn1.d.ts",
@@ -82,6 +57,9 @@
     "*": {
       ".": [
         "dist/src/index"
+      ],
+      "types": [
+        "dist/src/types"
       ],
       "signers/*": [
         "dist/src/signers/*"
@@ -115,13 +93,13 @@
   },
   "devDependencies": {
     "@types/assert": "^1.5.10",
-    "@types/mocha": "^10.0.3",
-    "@types/node": "^20.8.10",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.4",
     "assert": "^2.1.0",
     "mocha": "^10.2.0",
-    "playwright-test": "^12.4.3",
+    "playwright-test": "^14.0.0",
     "type-fest": "^4.8.3",
-    "typescript": "5.2.2"
+    "typescript": "5.3.3"
   },
   "publishConfig": {
     "provenance": true
