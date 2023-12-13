@@ -2,7 +2,7 @@
   "name": "iso-did",
   "type": "module",
   "version": "1.3.3",
-  "description": "DID tooling.",
+  "description": "Isomorphic did core and did key tooling",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
   "homepage": "https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-did",
