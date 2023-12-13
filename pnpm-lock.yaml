@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -18,8 +14,8 @@ importers:
         specifier: ^15.2.0
         version: 15.2.0
       prettier:
-        specifier: 3.0.3
-        version: 3.0.3
+        specifier: 3.1.1
+        version: 3.1.1
       simple-git-hooks:
         specifier: ^2.9.0
         version: 2.9.0
@@ -3344,7 +3340,7 @@ packages:
       eslint-plugin-unicorn: 48.0.1(eslint@8.51.0)
       eslint-plugin-yml: 1.10.0(eslint@8.51.0)
       lint-staged: 14.0.1
-      prettier: 3.0.3
+      prettier: 3.1.1
       simple-git-hooks: 2.9.0
       typescript: 5.3.3
     transitivePeerDependencies:
@@ -4826,8 +4822,8 @@ packages:
     hasBin: true
     dev: true
 
-  /prettier@3.0.3:
-    resolution: {integrity: sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==}
+  /prettier@3.1.1:
+    resolution: {integrity: sha512-22UbSzg8luF4UuZtzgiUOfcGM8s4tjBv6dJRT7j275NXsy2jb4aJa4NNveul5x4eqlF1wuhuR2RElK71RvmVaw==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true
@@ -6054,3 +6050,7 @@ packages:
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
