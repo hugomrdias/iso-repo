@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.4](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.3.3...iso-did-v1.3.4) (2023-12-13)
+
+
+### Bug Fixes
+
+* expose types ([f66b567](https://github.com/hugomrdias/iso-repo/commit/f66b5670f621cc1b6f3a4a33e8231ecce92189a2))
+
 ## [1.3.3](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.3.2...iso-did-v1.3.3) (2023-09-05)
 
 
