@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.2.0...iso-web-v0.3.0) (2023-12-15)
+
+
+### Features
+
+* updare msw to 2.0 ([fa934ae](https://github.com/hugomrdias/iso-repo/commit/fa934ae9d4d1f81dc74f15ada04dbe3621b38be4))
+
 ## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.1.5...iso-web-v0.2.0) (2023-10-31)
 
 
