@@ -1,5 +1,5 @@
 import { assert, suite } from 'playwright-test/taps'
-import { rest } from 'msw'
+import { http } from 'msw'
 import { DohError, NetworkError, resolve } from '../src/doh/dnslink.js'
 import { setup } from '../src/msw/msw.js'
 
@@ -28,131 +28,100 @@ function mockRecord(values, status = 0) {
 }
 
 export const handlers = [
-  rest.get('https://cloudflare-dns.com/dns-query', (req, res, ctx) => {
-    const params = Object.fromEntries(req.url.searchParams)
-
+  http.get('https://cloudflare-dns.com/dns-query', ({ request }) => {
+    const params = Object.fromEntries(new URL(request.url).searchParams)
     if (params.name === '_dnslink.docs.ipfs.tech') {
-      return res(
-        ctx.status(200),
-        ctx.json(
-          mockRecord([
-            '_dnslink.ipfs-docs.on.fleek.co.',
-            'dnslink=/ipfs/Qdocsipfstech',
-          ])
-        )
+      return Response.json(
+        mockRecord([
+          '_dnslink.ipfs-docs.on.fleek.co.',
+          'dnslink=/ipfs/Qdocsipfstech',
+        ])
       )
     }
-
     if (params.name === '_dnslink.ipfs.io') {
-      return res(
-        ctx.status(200),
-        ctx.json(mockRecord(['"dnslink=/ipns/ipns/path/here"']))
-      )
+      return Response.json(mockRecord(['"dnslink=/ipns/ipns/path/here"']))
     }
-
     if (
       params.name === '_dnslink.maindomainerror.io' &&
       params.type === 'TXT'
     ) {
-      return res.networkError('Failed to connect')
+      return Response.error()
     }
-
     if (params.name === 'maindomainerror.io') {
-      return res(
-        ctx.status(200),
-        ctx.json(mockRecord(['"dnslink=/ipns/ipns/path/here"']))
-      )
+      return Response.json(mockRecord(['"dnslink=/ipns/ipns/path/here"']))
     }
-
     if (params.name === '_dnslink.empty.io') {
-      return res(ctx.status(200), ctx.json(mockRecord([])))
+      return Response.json(mockRecord([]))
     }
-
     if (params.name === 'empty.io') {
-      return res(
-        ctx.status(200),
-        ctx.json(mockRecord(['"dnslink=/ipns/ipns/path/here"']))
-      )
+      return Response.json(mockRecord(['"dnslink=/ipns/ipns/path/here"']))
     }
-
     if (
       params.name === '_dnslink.no-records.io' ||
       params.name === 'no-records.io'
     ) {
-      return res(ctx.status(200), ctx.json(mockRecord([])))
+      return Response.json(mockRecord([]))
     }
     if (
       params.name === '_dnslink.no-slash.io' ||
       params.name === 'no-slash.io'
     ) {
-      return res(
-        ctx.status(200),
-        ctx.json(mockRecord(['"dnslink="', 'dnslink= /ipfs/ dddd']))
-      )
+      return Response.json(mockRecord(['"dnslink="', 'dnslink= /ipfs/ dddd']))
     }
-
     if (params.name === '_dnslink.invalid.io' || params.name === 'invalid.io') {
-      return res(
-        ctx.status(200),
-        ctx.json(
-          mockRecord([
-            'dnslink=/\u0019',
-            'dnslink=/\u007F',
-            'dnslink=/フゲ/UVWX',
-            'dnslink=/YZ12/ホガ',
-            'dnslink=/',
-            'dnslink=/ipfs/',
-            'dnslink=/testnamespace',
-            'dnslink=/testnamespace/',
-            'dnslink=/testnamespace%',
-            'dnslink= //\u0019',
-            'dnslink=//\u0019',
-            'dnslink=//',
-            'dnslink=/testnamespace/',
-            'dnslink=/testnamespace/Z123 ',
-            'dnslink=/testnamespace/QRST',
-            'dnslink=/testnamespace/ UVWX',
-            'dnslink=/testnamespace/lowercase',
-          ])
-        )
+      return Response.json(
+        mockRecord([
+          'dnslink=/\u0019',
+          'dnslink=/\u007F',
+          'dnslink=/フゲ/UVWX',
+          'dnslink=/YZ12/ホガ',
+          'dnslink=/',
+          'dnslink=/ipfs/',
+          'dnslink=/testnamespace',
+          'dnslink=/testnamespace/',
+          'dnslink=/testnamespace%',
+          'dnslink= //\u0019',
+          'dnslink=//\u0019',
+          'dnslink=//',
+          'dnslink=/testnamespace/',
+          'dnslink=/testnamespace/Z123 ',
+          'dnslink=/testnamespace/QRST',
+          'dnslink=/testnamespace/ UVWX',
+          'dnslink=/testnamespace/lowercase',
+        ])
       )
     }
-
     if (params.name === '_dnslink.valid.io' || params.name === 'valid.io') {
-      return res(
-        ctx.status(200),
-        ctx.json(
-          mockRecord([
-            'dnslink=/ns_1/4567',
-            'dnslink=/ns_1/890A',
-            'dnslink=/ns_3/AABC',
-            'dnslink=/ns_2/AADE',
-            'dnslink=/testnamespace/ ',
-            'dnslink=/ /AAFG',
-            'dnslink=/testnamespace / AAHI ',
-            'dnslink=/ testnamespace/AAJK/LM',
-            'dnslink=/testnamespace/AANO/PQ?RS=TU',
-            'dnslink=/testnamespace/AAVW/ XY/ ?Z1=23 ',
-            'dnslink=/%E3%81%B5%E3%81%92/AA45',
-            'dnslink=/testnamespace/%E3%83%9B%E3%82%AC',
-            'dnslink=/testnamespace%/AA67%',
-            'dnslink=/dnslink/AA89',
-          ])
-        )
+      return Response.json(
+        mockRecord([
+          'dnslink=/ns_1/4567',
+          'dnslink=/ns_1/890A',
+          'dnslink=/ns_3/AABC',
+          'dnslink=/ns_2/AADE',
+          'dnslink=/testnamespace/ ',
+          'dnslink=/ /AAFG',
+          'dnslink=/testnamespace / AAHI ',
+          'dnslink=/ testnamespace/AAJK/LM',
+          'dnslink=/testnamespace/AANO/PQ?RS=TU',
+          'dnslink=/testnamespace/AAVW/ XY/ ?Z1=23 ',
+          'dnslink=/%E3%81%B5%E3%81%92/AA45',
+          'dnslink=/testnamespace/%E3%83%9B%E3%82%AC',
+          'dnslink=/testnamespace%/AA67%',
+          'dnslink=/dnslink/AA89',
+        ])
       )
     }
     if (
       params.name === '_dnslink.doh-error.io' ||
       params.name === 'doh-error.io'
     ) {
-      return res(ctx.status(200), ctx.json(mockRecord([], 2)))
+      return Response.json(mockRecord([], 2))
     }
-
     if (
       params.name === '_dnslink.fetch-error.io' ||
       params.name === 'fetch-error.io'
     ) {
-      return res.networkError('Failed to connect')
+      return Response.error()
     }
   }),
 ]

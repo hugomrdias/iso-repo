@@ -1,49 +1,27 @@
 import { assert, suite } from 'playwright-test/taps'
-import { rest } from 'msw'
+import { HttpResponse, delay, http } from 'msw'
 import { HttpError, request } from '../src/http.js'
 import { setup } from '../src/msw/msw.js'
 
 const test = suite('request')
 const server = setup([
-  rest.get('https://local.dev', (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json({ hello: 'world' }))
+  http.get('https://local.dev/error', ({ request }) => {
+    const params = Object.fromEntries(new URL(request.url).searchParams)
+    // @ts-ignore
+    return HttpResponse.text(params.text, { status: Number(params.status) })
   }),
-  rest.get('https://local.dev/error', (req, res, ctx) => {
-    const params = Object.fromEntries(req.url.searchParams)
-    return res(ctx.status(Number(params.status)), ctx.text(params.text))
-  }),
-  rest.get('https://local.dev/error-json', (req, res, ctx) => {
-    const params = Object.fromEntries(req.url.searchParams)
-    return res(ctx.status(Number(params.status)), ctx.json({ error: 'error' }))
-  }),
-  rest.get('https://local.dev/network-error', (req, res, ctx) => {
-    return res.networkError('Failed to connect')
-  }),
-
-  rest.post('https://local.dev/post', async (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(await req.json()))
-  }),
-
-  rest.get('https://local.dev/redirect', async (req, res, ctx) => {
-    return res(
-      ctx.status(301),
-      ctx.set('Location', 'https://local.dev/redirected')
-    )
-  }),
-
-  rest.get('https://local.dev/redirected', async (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json({ hello: 'world' }))
-  }),
-
-  rest.get('http://localhost:8999/', (req, res, ctx) => {
-    return req.passthrough()
-  }),
-  rest.get('https://cloudflare-dns.com/dns-query', (req, res, ctx) => {
-    return req.passthrough()
+  http.get('https://local.dev/timeout', async () => {
+    await delay(100)
+    return Response.error()
   }),
 ])
+
 test.before(async () => {
   server.start({ quiet: true })
+})
+
+test.beforeEach(() => {
+  server.resetHandlers()
 })
 
 test.after(() => {
@@ -51,6 +29,11 @@ test.after(() => {
 })
 
 test('should request 200', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return Response.json({ hello: 'world' }, { status: 200 })
+    })
+  )
   const { error, result } = await request('https://local.dev')
 
   if (error) {
@@ -61,6 +44,12 @@ test('should request 200', async () => {
 })
 
 test('should post json', async () => {
+  server.use(
+    http.post('https://local.dev/post', async ({ request }) => {
+      // @ts-ignore
+      return Response.json(await request.json(), { status: 200 })
+    })
+  )
   const { error, result } = await request('https://local.dev/post', {
     method: 'POST',
     body: JSON.stringify({ hello: 'world' }),
@@ -114,6 +103,16 @@ test('should request 500 with text body', async () => {
 })
 
 test('should request 500 with json body', async () => {
+  server.use(
+    http.get('https://local.dev/error-json', ({ request }) => {
+      const params = Object.fromEntries(new URL(request.url).searchParams)
+      // @ts-ignore
+      return HttpResponse.json(
+        { error: 'error' },
+        { status: Number(params.status) }
+      )
+    })
+  )
   const { error } = await request('https://local.dev/error-json?status=500')
 
   if (HttpError.is(error)) {
@@ -131,6 +130,11 @@ test('should request 500 with json body', async () => {
 })
 
 test('should handle network error', async () => {
+  server.use(
+    http.get('https://local.dev/network-error', () => {
+      return Response.error()
+    })
+  )
   const { error } = await request('https://local.dev/network-error')
 
   if (error) {
@@ -142,7 +146,7 @@ test('should handle network error', async () => {
 })
 
 test('should timeout after 100ms', async () => {
-  const { error } = await request('https://cloudflare-dns.com/dns-query', {
+  const { error } = await request('https://local.dev/timeout', {
     timeout: 10,
   })
 
@@ -157,7 +161,7 @@ test('should timeout after 100ms', async () => {
 
 test('should abort manually', async () => {
   const controller = new AbortController()
-  const rsp = request('https://cloudflare-dns.com/dns-query', {
+  const rsp = request('https://local.dev/timeout', {
     signal: controller.signal,
   })
 
@@ -175,7 +179,12 @@ test('should abort manually', async () => {
 test(
   'should retry failed network error',
   async () => {
-    const { error } = await request('http://localhost:8999', {
+    server.use(
+      http.get('https://local.dev/network-error', () => {
+        return Response.error()
+      })
+    )
+    const { error } = await request('https://local.dev/network-error', {
       retry: { retries: 1 },
     })
 
