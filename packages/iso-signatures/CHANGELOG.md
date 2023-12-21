@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.2.0...iso-signatures-v0.3.0) (2023-12-21)
+
+
+### Features
+
+* update to new did types ([0db02d7](https://github.com/hugomrdias/iso-repo/commit/0db02d73e76e7c11cf6e60187482b2396e7ee244))
+
 ## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.1.10...iso-signatures-v0.2.0) (2023-12-13)
 
 
