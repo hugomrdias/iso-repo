@@ -53,6 +53,9 @@
     "./dnslink": {
       "types": "./dist/doh/dnslink.d.ts",
       "default": "./src/doh/dnslink.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts"
     }
   },
   "main": "src/index.js",
@@ -79,6 +82,9 @@
       ],
       "dnslink": [
         "dist/src/doh/dnslink"
+      ],
+      "types": [
+        "dist/src/types"
       ]
     }
   },
