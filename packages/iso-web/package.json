@@ -1,7 +1,7 @@
 {
   "name": "iso-web",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Isomorphic Web APIs",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",

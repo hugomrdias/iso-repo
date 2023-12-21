@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.3.0...iso-web-v0.3.1) (2023-12-21)
+
+
+### Bug Fixes
+
+* export types ([93aa0a4](https://github.com/hugomrdias/iso-repo/commit/93aa0a409493bb01fc15b981a19822b416785dc6))
+
 ## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.2.0...iso-web-v0.3.0) (2023-12-15)
 
 
