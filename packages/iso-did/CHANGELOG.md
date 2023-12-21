@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.4.0...iso-did-v1.5.0) (2023-12-21)
+
+
+### Features
+
+* verifiable did, document, resolver ([cce2203](https://github.com/hugomrdias/iso-repo/commit/cce220371903a93c366216cced7b215a0f0127ad))
+
 ## [1.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.3.4...iso-did-v1.4.0) (2023-12-13)
 
 
