@@ -4,6 +4,7 @@ import * as RS256 from '../src/verifiers/rsa.js'
 import { RSASigner } from '../src/signers/rsa.js'
 import { encodeInt, encodeSequence } from '../src/asn1.js'
 
+/** @type {{rsa: Array<{did: string, jwk : import('iso-did/types').RSAJWKPrivate}>}} */
 const fixtures = {
   // https://github.com/w3c-ccg/did-method-key/blob/main/test-vectors/nist-curves.json
   rsa: [
@@ -83,7 +84,7 @@ describe('Verifier RS256', function () {
       const verified = await RS256.verify({
         signature,
         message,
-        ...signer.did,
+        ...signer,
       })
       assert.ok(verified)
     })

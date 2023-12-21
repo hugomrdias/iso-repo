@@ -32,7 +32,7 @@ describe('Verifier Resolver', function () {
     const verified = await resolver.verify({
       signature,
       message,
-      ...signer.did,
+      ...signer,
     })
     assert.ok(verified)
   })
