@@ -18,7 +18,7 @@ export const ALG_KEY_TYPE = /** @type {const} */ ({
 })
 
 /**
- * @typedef {keyof ALG_KEY_TYPE} Alg
+ * @typedef {keyof ALG_KEY_TYPE} SignatureAlgorithm
  * @typedef {keyof KEY_TYPE_ALG} KeyType
  */
 
@@ -52,7 +52,7 @@ export const CODE_KEY_TYPE = /** @type {const} */ ({
  */
 export function keyTypeToAlg(type) {
   // @ts-ignore
-  const alg = /** @type {Alg} */ (KEY_TYPE_ALG[type])
+  const alg = /** @type {SignatureAlgorithm} */ (KEY_TYPE_ALG[type])
 
   if (!alg) {
     throw new TypeError(`Unsupported key type ${type}`)
@@ -63,7 +63,7 @@ export function keyTypeToAlg(type) {
 /**
  * Signature algorithm name to key type.
  *
- * @param {Alg} alg
+ * @param {SignatureAlgorithm} alg
  * @throws {TypeError} if the algorithm is not supported.
  */
 export function algToKeyType(alg) {

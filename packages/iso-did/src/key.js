@@ -5,6 +5,9 @@ import { base58btc } from 'multiformats/bases/base58'
 import { CODE_KEY_TYPE, KEY_TYPE_CODE, keyTypeToAlg } from './common.js'
 import { DIDCore } from './core.js'
 
+// eslint-disable-next-line no-unused-vars
+import * as T from './types.js'
+
 export * from './common.js'
 
 const DID_KEY_PREFIX = `did:key:`
@@ -15,7 +18,7 @@ const DID_KEY_PREFIX = `did:key:`
  * @param {number} code
  * @param {Uint8Array} key
  */
-function validateRawPublicKeyLength(code, key) {
+export function validateRawPublicKeyLength(code, key) {
   switch (code) {
     case KEY_TYPE_CODE.secp256k1: {
       if (key.length !== 33) {
@@ -77,12 +80,14 @@ function validateRawPublicKeyLength(code, key) {
 
 /**
  * did:key Method
+ *
+ * @implements {T.VerifiableDID}
  */
 export class DIDKey extends DIDCore {
   /**
    *
-   * @param {import('./types').DID} did
-   * @param {import('./types').KeyType} type
+   * @param {T.DIDURLObject} did
+   * @param {T.KeyType} type
    * @param {Uint8Array} key
    */
   constructor(did, type, key) {
@@ -91,6 +96,7 @@ export class DIDKey extends DIDCore {
     this.publicKey = key
     this.code = KEY_TYPE_CODE[type]
     this.alg = keyTypeToAlg(type)
+    this.url = did
   }
 
   /**
@@ -108,7 +114,7 @@ export class DIDKey extends DIDCore {
 
       return new DIDKey(
         did,
-        CODE_KEY_TYPE[/** @type {import('./types').PublicKeyCode} */ (code)],
+        CODE_KEY_TYPE[/** @type {T.PublicKeyCode} */ (code)],
         key
       )
     } else {
@@ -119,7 +125,7 @@ export class DIDKey extends DIDCore {
   /**
    * Create a DIDKey from a public key bytes
    *
-   * @param {import('./types').KeyType} type
+   * @param {T.KeyType} type
    * @param {BufferSource} key
    */
   static fromPublicKey(type, key) {
@@ -142,4 +148,48 @@ export class DIDKey extends DIDCore {
       keyBytes
     )
   }
+
+  /**
+   *
+   * @returns {T.DIDDocument}
+   */
+  get document() {
+    const id = `${this.did}#${this.id}`
+    return {
+      '@context': [
+        'https://www.w3.org/ns/did/v1',
+        'https://w3id.org/security/multikey/v1',
+      ],
+      id: this.did,
+      verificationMethod: [
+        {
+          id,
+          type: 'MultiKey',
+          controller: this.did,
+          publicKeyMultibase: this.id,
+        },
+      ],
+      authentication: [id],
+      assertionMethod: [id],
+      capabilityDelegation: [id],
+      capabilityInvocation: [id],
+    }
+  }
+}
+
+/** @type {import('did-resolver').DIDResolver} */
+async function didKeyResolver(did, parsedDid) {
+  const didKey = DIDKey.fromString(did)
+  return {
+    didDocumentMetadata: {},
+    didResolutionMetadata: {
+      contentType: 'application/did+ld+json',
+    },
+    didDocument: didKey.document,
+  }
+}
+
+/** @type {import('did-resolver').ResolverRegistry} */
+export const resolver = {
+  key: didKeyResolver,
 }

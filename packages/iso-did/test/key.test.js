@@ -65,7 +65,7 @@ const VECTORS = {
   ],
 }
 
-describe('did', function () {
+describe('did:key', function () {
   for (const [
     type,
     fixtures,
