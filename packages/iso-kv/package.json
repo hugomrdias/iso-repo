@@ -45,7 +45,7 @@
   ],
   "scripts": {
     "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
-    "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
+    "test": "pnpm run test:node && pnpm run test:browser",
     "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
@@ -60,6 +60,7 @@
     "conf": "^12.0.0",
     "delay": "^6.0.0",
     "playwright-test": "^14.0.0",
+    "quick-lru": "^7.0.0",
     "tempy": "^3.1.0",
     "typescript": "5.3.3"
   },

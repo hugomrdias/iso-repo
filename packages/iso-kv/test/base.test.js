@@ -8,5 +8,3 @@ const kv = new KV({
 })
 
 baseTests(kv, suite('Memory'))
-
-// const test = suite('Misc')
