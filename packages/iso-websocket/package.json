@@ -55,7 +55,7 @@
     "type-fest": "^4.8.3",
     "typescript": "5.3.3",
     "unws": "^0.2.4",
-    "ws": "^8.15.1"
+    "ws": "^8.16.0"
   },
   "publishConfig": {
     "provenance": true
