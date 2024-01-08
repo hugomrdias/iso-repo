@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -24,11 +20,11 @@ importers:
         specifier: ^2.9.0
         version: 2.9.0
       typedoc:
-        specifier: ^0.25.4
-        version: 0.25.4(typescript@5.3.3)
+        specifier: ^0.25.7
+        version: 0.25.7(typescript@5.3.3)
       typedoc-plugin-missing-exports:
         specifier: ^2.1.0
-        version: 2.1.0(typedoc@0.25.4)
+        version: 2.1.0(typedoc@0.25.7)
       typescript:
         specifier: 5.3.3
         version: 5.3.3
@@ -5156,8 +5152,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /shiki@0.14.6:
-    resolution: {integrity: sha512-R4koBBlQP33cC8cpzX0hAoOURBHJILp4Aaduh2eYi+Vj8ZBqtK/5SWNEHBS3qwUMu8dqOtI/ftno3ESfNeVW9g==}
+  /shiki@0.14.7:
+    resolution: {integrity: sha512-dNPAPrxSc87ua2sKJ3H5dQ/6ZaY8RNnaAqK+t0eG7p0Soi2ydiqbGOTaZCqaYvA/uZYfS1LJnemt3Q+mSfcPCg==}
     dependencies:
       ansi-sequence-parser: 1.1.1
       jsonc-parser: 3.2.0
@@ -5691,16 +5687,16 @@ packages:
       is-typed-array: 1.1.12
     dev: true
 
-  /typedoc-plugin-missing-exports@2.1.0(typedoc@0.25.4):
+  /typedoc-plugin-missing-exports@2.1.0(typedoc@0.25.7):
     resolution: {integrity: sha512-+1DhqZCEu7Vu5APnrqpPwl31D+hXpt1fV0Le9ycCRL1eLVdatdl6KVt4SEVwPxnEpKwgOn2dNX6I9+0F1aO2aA==}
     peerDependencies:
       typedoc: 0.24.x || 0.25.x
     dependencies:
-      typedoc: 0.25.4(typescript@5.3.3)
+      typedoc: 0.25.7(typescript@5.3.3)
     dev: true
 
-  /typedoc@0.25.4(typescript@5.3.3):
-    resolution: {integrity: sha512-Du9ImmpBCw54bX275yJrxPVnjdIyJO/84co0/L9mwe0R3G4FSR6rQ09AlXVRvZEGMUg09+z/usc8mgygQ1aidA==}
+  /typedoc@0.25.7(typescript@5.3.3):
+    resolution: {integrity: sha512-m6A6JjQRg39p2ZVRIN3NKXgrN8vzlHhOS+r9ymUYtcUP/TIQPvWSq7YgE5ZjASfv5Vd5BW5xrir6Gm2XNNcOow==}
     engines: {node: '>= 16'}
     hasBin: true
     peerDependencies:
@@ -5709,7 +5705,7 @@ packages:
       lunr: 2.3.9
       marked: 4.3.0
       minimatch: 9.0.3
-      shiki: 0.14.6
+      shiki: 0.14.7
       typescript: 5.3.3
     dev: true
 
@@ -6034,3 +6030,7 @@ packages:
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
