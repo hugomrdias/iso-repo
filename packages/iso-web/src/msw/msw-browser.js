@@ -1,7 +1,7 @@
-import { setupWorker } from 'msw'
+import { setupWorker } from 'msw/browser'
 
 /**
- * @param {import('msw').RestHandler[]} handlers
+ * @param {import('msw').RequestHandler[]} handlers
  */
 export function setup(handlers) {
   const server = setupWorker(...handlers)

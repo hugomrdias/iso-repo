@@ -1,13 +1,13 @@
 import { setupServer } from 'msw/node'
 
 /**
- * @param {import('msw').RestHandler[]} handlers
+ * @param {import('msw').RequestHandler[]} handlers
  */
 export function setup(handlers) {
   const server = setupServer(...handlers)
   return {
     /**
-     * @param {import('msw').StartOptions} options
+     * @param {import('msw/browser').StartOptions} options
      */
     start(options) {
       server.listen()
@@ -15,6 +15,14 @@ export function setup(handlers) {
     stop() {
       server.close()
     },
-    ...server,
+    resetHandlers() {
+      server.resetHandlers()
+    },
+    /**
+     * @param {import('msw').RequestHandler[]} handlers
+     */
+    use(...handlers) {
+      server.use(...handlers)
+    },
   }
 }

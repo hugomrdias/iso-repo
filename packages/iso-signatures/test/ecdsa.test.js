@@ -4,6 +4,13 @@ import { concat } from 'iso-base/utils'
 import * as ECDSA from '../src/verifiers/ecdsa.js'
 import { ECDSASigner } from '../src/signers/ecdsa.js'
 
+/**
+ * @type {{
+ * 'p256': Array<{did: string, jwk : import('iso-did/types').ECJWKPrivate}>
+ * 'p384': Array<{did: string, jwk : import('iso-did/types').ECJWKPrivate}>
+ * 'p521': Array<{did: string, jwk : import('iso-did/types').ECJWKPrivate}>
+ * }}
+ */
 const fixtures = {
   // https://github.com/w3c-ccg/did-method-key/blob/main/test-vectors/nist-curves.json
   p256: [
@@ -86,7 +93,10 @@ describe('Verifier ES256', function () {
         base64url.decode(jwk.y),
       ])
 
-      assert.deepStrictEqual(signer.publicKey, pub)
+      assert.deepStrictEqual(
+        signer.publicKey.subarray(1),
+        base64url.decode(jwk.x)
+      )
 
       assert.strictEqual(signer.did.toString(), did)
 
@@ -106,7 +116,7 @@ describe('Verifier ES256', function () {
       const verified = await ECDSA.verify('ES256', {
         signature,
         message,
-        ...signer.did,
+        ...signer,
       })
       assert.ok(verified)
     })
@@ -137,7 +147,10 @@ describe('Verifier ES384', function () {
         base64url.decode(jwk.y),
       ])
 
-      assert.deepStrictEqual(signer.publicKey, pub)
+      assert.deepStrictEqual(
+        signer.publicKey.subarray(1),
+        base64url.decode(jwk.x)
+      )
 
       assert.strictEqual(signer.did.toString(), did)
 
@@ -157,7 +170,7 @@ describe('Verifier ES384', function () {
       const verified = await ECDSA.verify('ES384', {
         signature,
         message,
-        ...signer.did,
+        ...signer,
       })
       assert.ok(verified)
     })
@@ -188,7 +201,10 @@ describe('Verifier ES521', function () {
         base64url.decode(jwk.y),
       ])
 
-      assert.deepStrictEqual(signer.publicKey, pub)
+      assert.deepStrictEqual(
+        signer.publicKey.subarray(1),
+        base64url.decode(jwk.x)
+      )
 
       assert.strictEqual(signer.did.toString(), did)
 
@@ -208,7 +224,7 @@ describe('Verifier ES521', function () {
       const verified = await ECDSA.verify('ES512', {
         signature,
         message,
-        ...signer.did,
+        ...signer,
       })
       assert.ok(verified)
     })

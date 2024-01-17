@@ -1,4 +1,5 @@
 import { Kysely } from 'kysely'
+import { parse, stringify } from '../json.js'
 
 /**
  * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
@@ -9,7 +10,7 @@ import { Kysely } from 'kysely'
  * @param {unknown} data
  */
 export function serialize(data) {
-  return JSON.stringify(data)
+  return stringify(data)
 }
 
 /**
@@ -20,7 +21,7 @@ export function deserialize(data) {
     return
   }
   // @ts-ignore
-  return JSON.parse(data)
+  return parse(data)
 }
 
 /**
@@ -151,6 +152,7 @@ export class SqlStorageAdapter {
       .orderBy('key')
       .selectAll()
       .execute()
+
     for (const { key, value } of data) {
       yield {
         key,

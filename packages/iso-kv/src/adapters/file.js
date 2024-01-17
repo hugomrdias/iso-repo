@@ -1,4 +1,5 @@
 import Conf from 'conf'
+import { parse, stringify } from '../json.js'
 
 /**
  * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
@@ -13,7 +14,12 @@ export class FileStorageAdapter {
    * @param {import('conf').Options<Map<string, unknown>>} [config]
    */
   constructor(config = {}) {
-    this.conf = new Conf(config)
+    this.conf = new Conf({
+      ...config,
+      serialize: (value) => stringify(value),
+      deserialize: (value) => parse(value),
+      accessPropertiesByDotNotation: false,
+    })
   }
 
   /**

@@ -1,9 +1,12 @@
 import * as EC from 'iso-base/ec-compression'
-import { concat, equals, u8 } from 'iso-base/utils'
+import { u8 } from 'iso-base/utils'
 import { tag, varint } from 'iso-base/varint'
 import { base58btc } from 'multiformats/bases/base58'
 import { CODE_KEY_TYPE, KEY_TYPE_CODE, keyTypeToAlg } from './common.js'
 import { DIDCore } from './core.js'
+
+// eslint-disable-next-line no-unused-vars
+import * as T from './types.js'
 
 export * from './common.js'
 
@@ -15,7 +18,7 @@ const DID_KEY_PREFIX = `did:key:`
  * @param {number} code
  * @param {Uint8Array} key
  */
-function validateRawPublicKeyLength(code, key) {
+export function validateRawPublicKeyLength(code, key) {
   switch (code) {
     case KEY_TYPE_CODE.secp256k1: {
       if (key.length !== 33) {
@@ -67,15 +70,6 @@ function validateRawPublicKeyLength(code, key) {
       }
       return key
     }
-
-    case KEY_TYPE_CODE.RSA_OLD: {
-      // if (key.length !== 270 && key.length !== 526) {
-      //   throw new RangeError(
-      //     `RSA public keys must be 270 bytes for 2048 bits or 526 bytes for 4096 bits.`
-      //   )
-      // }
-      return key
-    }
     default: {
       throw new RangeError(
         `Unsupported DID encoding, unknown multicode 0x${code.toString(16)}.`
@@ -86,12 +80,14 @@ function validateRawPublicKeyLength(code, key) {
 
 /**
  * did:key Method
+ *
+ * @implements {T.VerifiableDID}
  */
 export class DIDKey extends DIDCore {
   /**
    *
-   * @param {import('./types').DID} did
-   * @param {import('./types').KeyType} type
+   * @param {T.DIDURLObject} did
+   * @param {T.KeyType} type
    * @param {Uint8Array} key
    */
   constructor(did, type, key) {
@@ -100,6 +96,7 @@ export class DIDKey extends DIDCore {
     this.publicKey = key
     this.code = KEY_TYPE_CODE[type]
     this.alg = keyTypeToAlg(type)
+    this.url = did
   }
 
   /**
@@ -112,25 +109,12 @@ export class DIDKey extends DIDCore {
 
     if (did.method === 'key') {
       const encodedKey = base58btc.decode(did.id)
-      let code
-      let size
-      let key
-
-      // fission old rsa key
-      if (
-        equals(encodedKey.subarray(0, 3), new Uint8Array([0x00, 0xf5, 0x02]))
-      ) {
-        code = KEY_TYPE_CODE.RSA_OLD
-        size = 3
-        key = validateRawPublicKeyLength(code, encodedKey.slice(size))
-      } else {
-        ;[code, size] = varint.decode(encodedKey)
-        key = validateRawPublicKeyLength(code, encodedKey.slice(size))
-      }
+      const [code, size] = varint.decode(encodedKey)
+      const key = validateRawPublicKeyLength(code, encodedKey.slice(size))
 
       return new DIDKey(
         did,
-        CODE_KEY_TYPE[/** @type {import('./types').PublicKeyCode} */ (code)],
+        CODE_KEY_TYPE[/** @type {T.PublicKeyCode} */ (code)],
         key
       )
     } else {
@@ -141,7 +125,7 @@ export class DIDKey extends DIDCore {
   /**
    * Create a DIDKey from a public key bytes
    *
-   * @param {import('./types').KeyType} type
+   * @param {T.KeyType} type
    * @param {BufferSource} key
    */
   static fromPublicKey(type, key) {
@@ -151,10 +135,7 @@ export class DIDKey extends DIDCore {
     }
 
     const keyBytes = validateRawPublicKeyLength(code, u8(key))
-    const id =
-      type === 'RSA_OLD'
-        ? base58btc.encode(concat([[0x00, 0xf5, 0x02], keyBytes]))
-        : base58btc.encode(tag(code, keyBytes))
+    const id = base58btc.encode(tag(code, keyBytes))
 
     return new DIDKey(
       {
@@ -167,4 +148,48 @@ export class DIDKey extends DIDCore {
       keyBytes
     )
   }
+
+  /**
+   *
+   * @returns {T.DIDDocument}
+   */
+  get document() {
+    const id = `${this.did}#${this.id}`
+    return {
+      '@context': [
+        'https://www.w3.org/ns/did/v1',
+        'https://w3id.org/security/multikey/v1',
+      ],
+      id: this.did,
+      verificationMethod: [
+        {
+          id,
+          type: 'MultiKey',
+          controller: this.did,
+          publicKeyMultibase: this.id,
+        },
+      ],
+      authentication: [id],
+      assertionMethod: [id],
+      capabilityDelegation: [id],
+      capabilityInvocation: [id],
+    }
+  }
+}
+
+/** @type {import('did-resolver').DIDResolver} */
+async function didKeyResolver(did, parsedDid) {
+  const didKey = DIDKey.fromString(did)
+  return {
+    didDocumentMetadata: {},
+    didResolutionMetadata: {
+      contentType: 'application/did+ld+json',
+    },
+    didDocument: didKey.document,
+  }
+}
+
+/** @type {import('did-resolver').ResolverRegistry} */
+export const resolver = {
+  key: didKeyResolver,
 }

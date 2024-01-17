@@ -3,10 +3,24 @@ import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
 import { DIDKey } from 'iso-did/key'
 import { spki } from '../spki.js'
+import { didKeyOrVerifiableDID } from '../utils.js'
 
 /**
  * @typedef {import('../types.js').ISigner<CryptoKeyPair>} ISigner
  */
+
+/**
+ *
+ * @param {import('iso-did/types').VerifiableDID} did
+ */
+function checkDid(did) {
+  if (did.type !== RSASigner.type) {
+    throw new TypeError(`Unsupported key type ${did.type}`)
+  }
+  if (did.alg !== RSASigner.alg) {
+    throw new TypeError(`Unsupported algorithm ${did.alg}`)
+  }
+}
 
 /**
  * RSA signer
@@ -23,17 +37,22 @@ export class RSASigner {
   // multicodec code for RSA private key
   static code = 0x1305
 
+  /** @type {CryptoKeyPair} */
+  #keypair
+
   /**
-   * @param {Uint8Array} publicKey
+   * @param {import('iso-did/types').VerifiableDID} did
    * @param {CryptoKeyPair} keypair
    */
-  constructor(publicKey, keypair) {
-    this.keypair = keypair
-    this.publicKey = publicKey
-    this.alg = RSASigner.alg
-    this.type = RSASigner.type
-    this.code = RSASigner.code
-    this.did = DIDKey.fromPublicKey(RSASigner.type, this.publicKey)
+  constructor(did, keypair) {
+    checkDid(did)
+    this.did = did.did
+    this.url = did.url
+    this.type = did.type
+    this.publicKey = did.publicKey
+    this.alg = did.alg
+    this.document = did.document
+    this.#keypair = keypair
   }
 
   /**
@@ -56,16 +75,19 @@ export class RSASigner {
       'spki',
       cryptoKeyPair.publicKey
     )
-
-    return new RSASigner(spki.decode(u8(publicKey)), cryptoKeyPair)
+    return new RSASigner(
+      DIDKey.fromPublicKey('RSA', spki.decode(u8(publicKey))),
+      cryptoKeyPair
+    )
   }
 
   /**
    * Import a signer from a JWK
    *
-   * @param {import('../types.js').PrivateKeyRSAJwk} jwk
+   * @param {import('iso-did/types').RSAJWKPrivate} jwk
+   * @param {import('iso-did/types').VerifiableDID} [did]
    */
-  static async importJwk(jwk) {
+  static async importJwk(jwk, did) {
     const privateKey = await webcrypto.subtle.importKey(
       'jwk',
       jwk,
@@ -88,8 +110,9 @@ export class RSASigner {
     )
 
     const publicKey = await webcrypto.subtle.exportKey('spki', publicKeyJWK)
+    const decodedPublicKey = spki.decode(u8(publicKey))
 
-    return new RSASigner(spki.decode(u8(publicKey)), {
+    return new RSASigner(didKeyOrVerifiableDID('RSA', decodedPublicKey, did), {
       privateKey,
       publicKey: publicKeyJWK,
     })
@@ -99,14 +122,20 @@ export class RSASigner {
    * Import a signer from a keypair
    *
    * @param {CryptoKeyPair} keypair
+   * @param {import('iso-did/types').VerifiableDID} [did]
    */
-  static async import(keypair) {
+  static async import(keypair, did) {
     const publicKey = await webcrypto.subtle.exportKey(
       'spki',
       keypair.publicKey
     )
 
-    return new RSASigner(spki.decode(u8(publicKey)), keypair)
+    const decodedPublicKey = spki.decode(u8(publicKey))
+
+    return new RSASigner(
+      didKeyOrVerifiableDID('RSA', decodedPublicKey, did),
+      keypair
+    )
   }
 
   /**
@@ -117,7 +146,7 @@ export class RSASigner {
   async sign(message) {
     const buf = await webcrypto.subtle.sign(
       { name: 'RSASSA-PKCS1-v1_5', saltLength: 128 },
-      this.keypair.privateKey,
+      this.#keypair.privateKey,
       message
     )
 
@@ -128,6 +157,10 @@ export class RSASigner {
    * Export the signer as a crypto key pair
    */
   export() {
-    return this.keypair
+    return this.#keypair
+  }
+
+  toString() {
+    return this.url.didUrl
   }
 }

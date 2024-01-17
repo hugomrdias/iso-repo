@@ -1,7 +1,7 @@
 {
   "name": "iso-web",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Isomorphic Web APIs",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
@@ -53,6 +53,9 @@
     "./dnslink": {
       "types": "./dist/doh/dnslink.d.ts",
       "default": "./src/doh/dnslink.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts"
     }
   },
   "main": "src/index.js",
@@ -79,6 +82,9 @@
       ],
       "dnslink": [
         "dist/src/doh/dnslink"
+      ],
+      "types": [
+        "dist/src/types"
       ]
     }
   },
@@ -96,16 +102,16 @@
   },
   "dependencies": {
     "iso-kv": "workspace:^",
-    "p-retry": "^6.1.0"
+    "p-retry": "^6.2.0"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.10",
-    "@types/node": "^20.8.10",
+    "@types/debug": "^4.1.12",
+    "@types/node": "^20.10.5",
     "delay": "^6.0.0",
-    "msw": "^1.3.2",
-    "playwright-test": "^12.4.3",
-    "type-fest": "^4.6.0",
-    "typescript": "5.2.2"
+    "msw": "^2.0.11",
+    "playwright-test": "^14.0.0",
+    "type-fest": "^4.8.3",
+    "typescript": "5.3.3"
   },
   "publishConfig": {
     "provenance": true

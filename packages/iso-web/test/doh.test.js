@@ -1,20 +1,18 @@
 import { assert, suite } from 'playwright-test/taps'
 import { KV } from 'iso-kv'
 import delay from 'delay'
-import { rest } from 'msw'
+import { http } from 'msw'
 import { DohError, resolve } from '../src/doh/index.js'
 import { setup } from '../src/msw/msw.js'
 import { HttpError } from '../src/http.js'
 
 let expireCount = 0
 export const handlers = [
-  rest.get('https://cloudflare-dns.com/dns-query', (req, res, ctx) => {
-    const params = Object.fromEntries(req.url.searchParams)
-
+  http.get('https://cloudflare-dns.com/dns-query', ({ request }) => {
+    const params = Object.fromEntries(new URL(request.url).searchParams)
     if (params.name === 'google.com' && params.type === 'A') {
-      return res(
-        ctx.status(200),
-        ctx.json({
+      return Response.json(
+        {
           Status: 0,
           TC: false,
           RD: true,
@@ -25,15 +23,14 @@ export const handlers = [
           Answer: [
             { name: 'google.com', type: 1, TTL: 100, data: '142.250.184.174' },
           ],
-        })
+        },
+        { status: 200 }
       )
     }
-
     if (params.name === 'expires.com' && params.type === 'A') {
       expireCount++
-      return res(
-        ctx.status(200),
-        ctx.json({
+      return Response.json(
+        {
           Status: 0,
           TC: false,
           RD: true,
@@ -49,37 +46,35 @@ export const handlers = [
               data: expireCount === 1 ? '142.250.184.174' : `${expireCount}`,
             },
           ],
-        })
+        },
+        { status: 200 }
       )
     }
-
     if (params.name === 'error.com' && params.type === 'A') {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          Status: 2,
-          TC: false,
-          RD: true,
-          RA: true,
-          AD: false,
-          CD: false,
-          Question: [{ name: 'error.com', type: 1 }],
-          Comment: 'Invalid domain name',
-        })
-      )
+      return Response.json({
+        Status: 2,
+        TC: false,
+        RD: true,
+        RA: true,
+        AD: false,
+        CD: false,
+        Question: [{ name: 'error.com', type: 1 }],
+        Comment: 'Invalid domain name',
+      })
     }
-
     if (params.name === 'example..com') {
-      return res(
-        ctx.status(400),
-        ctx.json({
+      return Response.json(
+        {
           error: 'Invalid query name `example..com`.',
-        })
+        },
+        { status: 400, statusText: 'Bad Request' }
       )
     }
-
     if (params.name === 'exampleελ.com') {
-      return res(ctx.status(400), ctx.text('malformed'))
+      return new Response('malformed', {
+        status: 400,
+        statusText: 'Bad Request',
+      })
     }
   }),
 ]

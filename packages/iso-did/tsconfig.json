@@ -7,12 +7,15 @@
   "references": [
     {
       "path": "../iso-base"
+    },
+    {
+      "path": "../iso-web"
     }
   ],
   "include": ["src", "scripts", "test", "package.json"],
-  "exclude": ["node_modules", "dist", "out"],
+  "exclude": ["node_modules", "dist", "out", "test/mocks/mockServiceWorker.js"],
   "typedocOptions": {
-    "entryPoints": ["src/index.js", "src/core.js", "src/key.js"],
+    "entryPoints": ["src/index.js", "src/core.js", "src/key.js", "src/web.js"],
     "includeVersion": true,
     "excludeExternals": true,
     "internalModule": "<internal>"

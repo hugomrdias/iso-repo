@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null */
 import { assert } from 'playwright-test/taps'
 import delay from 'delay'
 
@@ -6,7 +7,12 @@ import delay from 'delay'
  * @param {import('playwright-test/taps').Suite} suite
  */
 export function baseTests(kv, suite) {
-  const { test } = suite
+  const { test, beforeEach } = suite
+
+  beforeEach(async () => {
+    await kv.clear()
+  })
+
   test('should set/get', async () => {
     await kv.set(['foo'], 1)
 
@@ -157,5 +163,58 @@ export function baseTests(kv, suite) {
     const value = await kv.get(['should not expires with 0'])
 
     assert.equal(value, 1)
+  })
+
+  test('should support data types', async () => {
+    let v
+    await kv.set(['undefined'], undefined)
+    assert.equal(undefined, await kv.get(['undefined']))
+
+    await kv.set(['null'], null)
+    assert.equal(null, await kv.get(['null']))
+
+    await kv.set(['string'], 'string')
+    assert.equal('string', await kv.get(['string']))
+
+    await kv.set(['number'], 1)
+    assert.equal(1, await kv.get(['number']))
+
+    await kv.set(['bigint'], BigInt(1))
+    assert.equal(BigInt(1), await kv.get(['bigint']))
+
+    v = /^[\s\w!,?àáâãçèéêíïñóôõöú-]+$/
+    await kv.set(['regex'], v)
+    assert.deepEqual(v, await kv.get(['regex']))
+
+    v = new Set(['a', 1, new Set(['c', 'd'])])
+    await kv.set(['set'], v)
+    assert.deepEqual(v, await kv.get(['set']))
+  })
+
+  test('should order', async () => {
+    await kv.set([new Date('2000-01-01T11:00:00.000Z')], 2)
+    await kv.set([new Date('2000-01-01T10:00:00.000Z')], 3)
+    await kv.set([new Date('2000-01-01T09:00:00.000Z')], 1)
+    await kv.set([2], 4)
+    await kv.set([1], 1)
+    // await kv.set(['users', Date.now(), crypto.randomUUID()], 1)
+    // await kv.set(['users', Date.now(), crypto.randomUUID()], 1)
+    // await kv.set(['users', Date.now(), crypto.randomUUID()], 1)
+
+    const expected = [
+      ['1'],
+      ['2'],
+      ['2000-01-01T09:00:00.000Z'],
+      ['2000-01-01T10:00:00.000Z'],
+      ['2000-01-01T11:00:00.000Z'],
+    ]
+
+    const actual = []
+
+    for await (const { key } of kv) {
+      actual.push(key)
+    }
+
+    assert.deepEqual(actual, expected)
   })
 }

@@ -28,7 +28,7 @@ export interface KvListOptions {
   reverse?: boolean
 }
 
-export type KvListIterator<T> = Iterator<T> | AsyncIterator<T>
+export type KvListIterator<T> = IterableIterator<T> | AsyncIterableIterator<T>
 
 export interface KvStorageAdapter {
   get: <T = unknown>(key: string) => Await<T | undefined>

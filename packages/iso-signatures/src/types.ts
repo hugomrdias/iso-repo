@@ -1,26 +1,13 @@
-import type { DIDKey } from 'iso-did/key'
-import type { KeyType, SignatureAlgorithm } from 'iso-did/types'
+import type { SignatureAlgorithm, VerifiableDID } from 'iso-did/types'
 
-export interface ISigner<Export extends CryptoKeyPair | string> {
-  /**
-   * JWT signing algorithm
-   */
-  alg: SignatureAlgorithm
-  /**
-   * Keypair type
-   */
-  type: KeyType
-  /**
-   * Multicodec identifier for the private key
-   */
-  code?: number
-
-  did: DIDKey
-  /**
-   * Sign a message
-   */
+export interface Sign {
   sign: (message: Uint8Array) => Promise<Uint8Array>
+}
 
+export interface ISigner<Export extends CryptoKeyPair | string>
+  extends VerifiableDID,
+    Sign {
+  code?: number
   export: () => Export
 }
 
@@ -49,27 +36,3 @@ export interface IResolver {
 export interface ResolverOptions {
   cache?: Cache | boolean | undefined
 }
-
-export interface PublicKeyJwk {
-  kty: string
-  crv: string
-  x: string
-  y: string
-}
-
-export interface PublicKeyRSAJwk {
-  kty: string
-  n: string
-  e: string
-}
-
-export interface PrivateKeyRSAJwk extends PublicKeyRSAJwk {
-  d: string
-  p: string
-  q: string
-  dp: string
-  dq: string
-  qi: string
-}
-
-export type PrivateKeyJwk = PublicKeyJwk & { d: string }

@@ -1,18 +1,18 @@
 import { parse } from 'did-resolver'
 
 /**
- * @typedef {import('./types').DID} DID
+ * @typedef {import('./types').DIDURLObject} DIDURLObject
  */
 
 /**
  * DID Core
  *
- * @implements {DID}
+ * @implements {DIDURLObject}
  */
 export class DIDCore {
   /**
    *
-   * @param {DID} parsed
+   * @param {DIDURLObject} parsed
    */
   constructor(parsed) {
     this.did = parsed.did
@@ -22,7 +22,6 @@ export class DIDCore {
     this.path = parsed.path
     this.fragment = parsed.fragment
     this.query = parsed.query
-    this.params = parsed.params
   }
 
   /**
@@ -31,7 +30,7 @@ export class DIDCore {
    * @param {string} did
    */
   static fromString(did) {
-    const parsedDid = parse(did)
+    const parsedDid = /** @type {DIDURLObject} */ (parse(did))
     if (parsedDid) {
       return new DIDCore(parsedDid)
     } else {

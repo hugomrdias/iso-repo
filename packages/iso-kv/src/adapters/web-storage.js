@@ -3,13 +3,14 @@
  * @typedef {import('../types').KvKey} KvKey
  */
 
+import { parse, stringify } from '../json.js'
 import { MemoryStorageAdapter } from './memory.js'
 
 /**
  * @param {unknown} data
  */
 export function serialize(data) {
-  return JSON.stringify(data)
+  return stringify(data)
 }
 
 /**
@@ -17,7 +18,7 @@ export function serialize(data) {
  */
 export function deserialize(data) {
   // @ts-ignore
-  return JSON.parse(data)
+  return parse(data)
 }
 
 /**

@@ -1,7 +1,7 @@
 import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
-import { DIDKey, keyTypeToAlg } from 'iso-did/key'
-import { createEcdsaParams } from '../utils.js'
+import { DIDKey, algToKeyType, keyTypeToAlg } from 'iso-did/key'
+import { createEcdsaParams, didKeyOrVerifiableDID } from '../utils.js'
 
 /**
  * @typedef {import('../types.js').ISigner<CryptoKeyPair>} ISigner
@@ -12,7 +12,7 @@ import { createEcdsaParams } from '../utils.js'
  * @param {string} alg
  */
 function asECDSAAlg(alg) {
-  if (alg.startsWith('ES')) {
+  if (['ES256', 'ES384', 'ES512'].includes(alg)) {
     return /** @type {ECDSAAlg} */ (alg)
   }
   throw new TypeError(`Unsupported algorithm ${alg}`)
@@ -24,18 +24,24 @@ function asECDSAAlg(alg) {
  * @implements {ISigner}
  */
 export class ECDSASigner {
+  /** @type {ReturnType<createEcdsaParams>} */
+  #params
+
+  /** @type {CryptoKeyPair} */
+  #keypair
   /**
-   * @param {ECDSAAlg} alg
-   * @param {Uint8Array} publicKey
+   * @param {import('iso-did/types').VerifiableDID} did
    * @param {CryptoKeyPair} keypair
    */
-  constructor(alg, publicKey, keypair) {
-    this.params = createEcdsaParams(alg)
-    this.keypair = keypair
-    this.publicKey = publicKey
-    this.alg = alg
-    this.type = this.params.namedCurve
-    this.did = DIDKey.fromPublicKey(this.type, this.publicKey)
+  constructor(did, keypair) {
+    this.did = did.did
+    this.url = did.url
+    this.type = did.type
+    this.publicKey = did.publicKey
+    this.alg = asECDSAAlg(did.alg)
+    this.document = did.document
+    this.#params = createEcdsaParams(this.alg)
+    this.#keypair = keypair
   }
 
   /**
@@ -55,17 +61,22 @@ export class ECDSASigner {
       cryptoKeyPair.publicKey
     )
 
-    return new ECDSASigner(alg, u8(publicKey), cryptoKeyPair)
+    return new ECDSASigner(
+      DIDKey.fromPublicKey(algToKeyType(alg), u8(publicKey)),
+      cryptoKeyPair
+    )
   }
 
   /**
    * Import a signer from a JWK
    *
-   * @param {import('../types.js').PrivateKeyJwk} jwk
+   * @param {import('iso-did/types').ECJWKPrivate} jwk
+   * @param {import('iso-did/types').VerifiableDID} [did]
    */
-  static async importJwk(jwk) {
+  static async importJwk(jwk, did) {
     const alg = asECDSAAlg(keyTypeToAlg(jwk.crv))
     const params = createEcdsaParams(alg)
+    const type = jwk.crv
     const privateKey = await webcrypto.subtle.importKey(
       'jwk',
       jwk,
@@ -83,7 +94,7 @@ export class ECDSASigner {
 
     const publicKey = await webcrypto.subtle.exportKey('raw', publicKeyJWK)
 
-    return new ECDSASigner(alg, u8(publicKey), {
+    return new ECDSASigner(didKeyOrVerifiableDID(type, publicKey, did), {
       privateKey,
       publicKey: publicKeyJWK,
     })
@@ -93,8 +104,9 @@ export class ECDSASigner {
    * Import a signer from a CryptoKeyPair
    *
    * @param {CryptoKeyPair} key
+   * @param {import('iso-did/types').VerifiableDID} [did]
    */
-  static async import(key) {
+  static async import(key, did) {
     const publicKey = await webcrypto.subtle.exportKey('raw', key.publicKey)
 
     /** @type { ECDSAAlg } */
@@ -117,7 +129,11 @@ export class ECDSASigner {
         throw new Error('Unsupported key type')
       }
     }
-    return new ECDSASigner(alg, u8(publicKey), key)
+
+    return new ECDSASigner(
+      didKeyOrVerifiableDID(algToKeyType(alg), publicKey, did),
+      key
+    )
   }
 
   /**
@@ -127,8 +143,8 @@ export class ECDSASigner {
    */
   async sign(message) {
     const buf = await webcrypto.subtle.sign(
-      this.params,
-      this.keypair.privateKey,
+      this.#params,
+      this.#keypair.privateKey,
       message
     )
 
@@ -141,6 +157,10 @@ export class ECDSASigner {
    * @returns {CryptoKeyPair}
    */
   export() {
-    return this.keypair
+    return this.#keypair
+  }
+
+  toString() {
+    return this.url.didUrl
   }
 }

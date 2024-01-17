@@ -28,14 +28,18 @@ function checkValue(value) {
  * @param {KvKey} key
  */
 function join(key) {
-  return key.join(':')
+  return key
+    .map((v) => {
+      return v instanceof Date ? v.toISOString() : v.toString()
+    })
+    .join(' ')
 }
 
 /**
  * @param {string} key
  */
 function split(key) {
-  return key.split(':')
+  return key.split(' ')
 }
 
 /**
@@ -231,7 +235,11 @@ export class KV {
         continue
       }
 
-      data.push({ key, value })
+      if (reverse) {
+        data.push({ key, value })
+      } else {
+        yield /** @type {import('./types').KvEntry} */ ({ key, value })
+      }
 
       count++
       if (limit !== undefined && count >= limit) {
@@ -241,10 +249,9 @@ export class KV {
 
     if (reverse) {
       data.reverse()
-    }
-
-    for (const item of data) {
-      yield /** @type {import('./types').KvEntry} */ (item)
+      for (const item of data) {
+        yield /** @type {import('./types').KvEntry} */ (item)
+      }
     }
   }
 }
