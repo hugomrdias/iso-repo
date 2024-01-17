@@ -106,11 +106,11 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^20.10.5",
+    "@types/node": "^20.11.5",
     "delay": "^6.0.0",
-    "msw": "^2.0.11",
+    "msw": "^2.1.2",
     "playwright-test": "^14.0.0",
-    "type-fest": "^4.8.3",
+    "type-fest": "^4.9.0",
     "typescript": "5.3.3"
   },
   "publishConfig": {

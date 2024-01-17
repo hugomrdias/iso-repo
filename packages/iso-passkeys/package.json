@@ -53,14 +53,14 @@
     "@noble/ed25519": "^2.0.0",
     "@peculiar/asn1-ecc": "^2.3.8",
     "@peculiar/asn1-schema": "^2.3.8",
-    "cbor-x": "^1.5.6",
+    "cbor-x": "^1.5.8",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^"
   },
   "devDependencies": {
     "@types/assert": "^1.5.10",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.10.5",
+    "@types/node": "^20.11.5",
     "assert": "^2.1.0",
     "mocha": "^10.2.0",
     "playwright-test": "^14.0.0",
