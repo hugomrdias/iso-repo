@@ -2,12 +2,12 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "outDir": "dist"
+    "outDir": "dist",
   },
   "references": [
     {
-      "path": "../iso-kv"
-    }
+      "path": "../iso-kv",
+    },
   ],
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out", "test/mocks/mockServiceWorker.js"],
@@ -18,10 +18,10 @@
       "src/http.js",
       "src/env.js",
       "src/doh/index.js",
-      "src/doh/dnslink.js"
+      "src/doh/dnslink.js",
     ],
     "includeVersion": true,
     "excludeExternals": true,
-    "internalModule": "<internal>"
-  }
+    "internalModule": "<internal>",
+  },
 }

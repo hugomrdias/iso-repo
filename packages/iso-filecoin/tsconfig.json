@@ -2,15 +2,15 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "outDir": "dist"
+    "outDir": "dist",
   },
   "references": [
     {
-      "path": "../iso-base"
+      "path": "../iso-base",
     },
     {
-      "path": "../iso-web"
-    }
+      "path": "../iso-web",
+    },
   ],
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
@@ -22,10 +22,10 @@
       "src/message.js",
       "src/rpc.js",
       "src/signature.js",
-      "src/utils.js"
+      "src/utils.js",
     ],
     "includeVersion": true,
     "excludeExternals": true,
-    "internalModule": "<internal>"
-  }
+    "internalModule": "<internal>",
+  },
 }
