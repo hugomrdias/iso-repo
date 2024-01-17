@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.3.2...iso-web-v0.3.3) (2024-01-17)
+
+
+### Bug Fixes
+
+* more docs ([f92b7e2](https://github.com/hugomrdias/iso-repo/commit/f92b7e26fac5e2594b6ce32797c2a33a0d66f024))
+
 ## [0.3.2](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.3.1...iso-web-v0.3.2) (2024-01-17)
 
 
