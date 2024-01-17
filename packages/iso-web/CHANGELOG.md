@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.3.1...iso-web-v0.3.2) (2024-01-17)
+
+
+### Bug Fixes
+
+* export doh and msw ([37f843e](https://github.com/hugomrdias/iso-repo/commit/37f843ec6750af4609044af4790bce7861b11bae))
+
 ## [0.3.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.3.0...iso-web-v0.3.1) (2023-12-21)
 
 
