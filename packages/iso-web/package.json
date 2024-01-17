@@ -80,6 +80,9 @@
       "doh": [
         "dist/src/doh/index"
       ],
+      "msw": [
+        "dist/src/msw/msw"
+      ],
       "dnslink": [
         "dist/src/doh/dnslink"
       ],
@@ -91,7 +94,11 @@
   "files": [
     "src",
     "dist/src/*.d.ts",
-    "dist/src/*.d.ts.map"
+    "dist/src/*.d.ts.map",
+    "dist/src/doh/*.d.ts",
+    "dist/src/doh/*.d.ts.map",
+    "dist/src/msw/*.d.ts",
+    "dist/src/msw/*.d.ts.map"
   ],
   "scripts": {
     "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
