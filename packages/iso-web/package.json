@@ -103,8 +103,8 @@
   "scripts": {
     "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
-    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
     "update-msw": "msw init test/mocks/ --save",
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
     "test:browser": "playwright-test 'test/**/!(*.node).test.js' --assets test/mocks"
   },
   "dependencies": {
