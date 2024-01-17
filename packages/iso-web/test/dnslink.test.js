@@ -129,7 +129,7 @@ export const handlers = [
 const test = suite('dnslink')
 const server = setup(handlers)
 test.before(async () => {
-  server.start({ quiet: true })
+  await server.start({ quiet: true })
 })
 
 test.after(() => {

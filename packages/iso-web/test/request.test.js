@@ -7,7 +7,6 @@ const test = suite('request')
 const server = setup([
   http.get('https://local.dev/error', ({ request }) => {
     const params = Object.fromEntries(new URL(request.url).searchParams)
-    // @ts-ignore
     return HttpResponse.text(params.text, { status: Number(params.status) })
   }),
   http.get('https://local.dev/timeout', async () => {
@@ -17,7 +16,7 @@ const server = setup([
 ])
 
 test.before(async () => {
-  server.start({ quiet: true })
+  await server.start({ quiet: true })
 })
 
 test.beforeEach(() => {
@@ -31,7 +30,7 @@ test.after(() => {
 test('should request 200', async () => {
   server.use(
     http.get('https://local.dev', () => {
-      return Response.json({ hello: 'world' }, { status: 200 })
+      return HttpResponse.json({ hello: 'world' }, { status: 200 })
     })
   )
   const { error, result } = await request('https://local.dev')

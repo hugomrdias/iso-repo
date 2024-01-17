@@ -9,7 +9,7 @@ export function setup(handlers) {
     /**
      * @param {import('msw/browser').StartOptions} options
      */
-    start(options) {
+    async start(options) {
       server.listen()
     },
     stop() {
