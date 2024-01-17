@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "idb-keyval": "^6.2.1",
-    "kysely": "^0.26.3"
+    "kysely": "^0.27.2"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.8",
