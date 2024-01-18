@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v0.2.0...iso-kv-v1.0.0) (2024-01-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* adapter types, docs for list
+
+### Features
+
+* adapter types, docs for list ([509941b](https://github.com/hugomrdias/iso-repo/commit/509941bfd7e8d9da865d1cd3ebaf9c57ab5fc441))
+* better json codec and avoid reverse if not needed ([849c23f](https://github.com/hugomrdias/iso-repo/commit/849c23fdf0ce154b37193a9d2a0fe4df79aa062b))
+
 ## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v0.1.5...iso-kv-v0.2.0) (2023-10-31)
 
 
