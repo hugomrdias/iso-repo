@@ -2,7 +2,7 @@ import { Kysely } from 'kysely'
 import { parse, stringify } from '../json.js'
 
 /**
- * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
+ * @typedef {import('../types').KvStorageAdapterAsync} KvStorageAdapter
  * @typedef {import('../types').KvKey} KvKey
  */
 
@@ -92,7 +92,6 @@ export class SqlStorageAdapter {
   }
 
   /**
-   * @template [Value=unknown]
    * @param {string} key
    */
   async get(key) {
@@ -141,7 +140,8 @@ export class SqlStorageAdapter {
   }
 
   /**
-   * @returns {AsyncIterableIterator<{key: string, value: unknown}>}
+   * @template [Value=unknown]
+   * @returns {AsyncIterableIterator<[string, Value]>}
    */
   async *[Symbol.asyncIterator]() {
     if (!this.#isInitialized) {
@@ -154,10 +154,7 @@ export class SqlStorageAdapter {
       .execute()
 
     for (const { key, value } of data) {
-      yield {
-        key,
-        value: deserialize(value),
-      }
+      yield [key, deserialize(value)]
     }
   }
 }

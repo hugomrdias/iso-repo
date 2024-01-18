@@ -1,7 +1,7 @@
 import { clear, createStore, del, entries, get, set } from 'idb-keyval'
 
 /**
- * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
+ * @typedef {import('../types').KvStorageAdapterAsync} KvStorageAdapter
  * @typedef {import('../types').KvKey} KvKey
  */
 
@@ -36,8 +36,7 @@ export class IDBStorageAdapter {
   }
 
   /**
-   * @template [Value=unknown]
-   * @param {string} key
+   * @type {KvStorageAdapter['get']}
    */
   get(key) {
     return get(key, this.store)
@@ -59,15 +58,12 @@ export class IDBStorageAdapter {
   }
 
   /**
-   * @returns {AsyncIterableIterator<{key: string, value: unknown}>}
+   * @returns {AsyncIterableIterator<[string, unknown]>}
    */
   async *[Symbol.asyncIterator]() {
     const data = await entries(this.store)
     for (const [key, value] of data) {
-      yield {
-        key: asKey(key),
-        value,
-      }
+      yield [asKey(key), value]
     }
   }
 }

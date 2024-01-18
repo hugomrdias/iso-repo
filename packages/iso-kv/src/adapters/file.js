@@ -2,7 +2,7 @@ import Conf from 'conf'
 import { parse, stringify } from '../json.js'
 
 /**
- * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
+ * @typedef {import('../types').KvStorageAdapterSync} KvStorageAdapter
  */
 
 /**
@@ -31,11 +31,10 @@ export class FileStorageAdapter {
   }
 
   /**
-   * @template [Value=unknown]
-   * @param {string} key
+   * @type {KvStorageAdapter['get']}
    */
   get(key) {
-    return /** @type {Value | undefined} */ (this.conf.get(key))
+    return /** @type {unknown} */ (this.conf.get(key))
   }
 
   /** @type {KvStorageAdapter['delete']} */
@@ -54,18 +53,15 @@ export class FileStorageAdapter {
   }
 
   /**
-   * @returns {AsyncIterableIterator<{key: string, value: unknown}>}
+   * @returns {IterableIterator<[string, unknown]>}
    */
-  async *[Symbol.asyncIterator]() {
+  *[Symbol.iterator]() {
     const data = [...new Map(Object.entries(this.conf.store))].sort(
       ([k1], [k2]) => k1.localeCompare(k2)
     )
 
     for (const [key, value] of data) {
-      yield {
-        key,
-        value,
-      }
+      yield [key, value]
     }
   }
 }

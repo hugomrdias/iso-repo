@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
+ * @typedef {import('../types').KvStorageAdapterSync} KvStorageAdapter
  * @typedef {import('../types').KvKey} KvKey
  */
 
@@ -8,7 +8,7 @@
  * @implements {KvStorageAdapter}
  */
 export class MemoryStorageAdapter {
-  /** @type {Map<string,unknown>} */
+  /** @type {Map<string,any>} */
   map
 
   /**
@@ -16,7 +16,7 @@ export class MemoryStorageAdapter {
    * @param {Map<string,unknown>} [map]
    */
   constructor(map) {
-    /** @type {Map<string,unknown>} */
+    /** @type {Map<string,any>} */
     this.map = map ?? new Map()
   }
 
@@ -51,15 +51,12 @@ export class MemoryStorageAdapter {
   }
 
   /**
-   * @returns {AsyncIterableIterator<{key: string, value: unknown}>}
+   * @returns {IterableIterator<[string, unknown]>}
    */
-  async *[Symbol.asyncIterator]() {
+  *[Symbol.iterator]() {
     const data = [...this.map].sort(([k1], [k2]) => k1.localeCompare(k2))
     for (const [key, value] of data) {
-      yield {
-        key,
-        value,
-      }
+      yield [key, value]
     }
   }
 }

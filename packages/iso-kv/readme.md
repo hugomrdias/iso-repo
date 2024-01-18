@@ -19,11 +19,6 @@
 pnpm install iso-kv
 ```
 
-## Todo
-
-- [ ] codecs for json with buffer, dates etc
-- [ ] more docs
-
 ## Docs
 
 Check <https://hugomrdias.github.io/iso-repo/modules/iso_kv.html>

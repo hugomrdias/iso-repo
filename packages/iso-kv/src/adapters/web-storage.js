@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../types').KvStorageAdapter} KvStorageAdapter
+ * @typedef {import('../types').KvStorageAdapterSync} KvStorageAdapter
  * @typedef {import('../types').KvKey} KvKey
  */
 
