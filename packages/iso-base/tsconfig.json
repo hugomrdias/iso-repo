@@ -7,6 +7,7 @@
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
   "typedocOptions": {
+    "entryPointStrategy": "resolve",
     "entryPoints": [
       "src/rfc4648.js",
       "src/crypto.js",

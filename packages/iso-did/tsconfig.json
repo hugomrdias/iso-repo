@@ -15,6 +15,7 @@
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out", "test/mocks/mockServiceWorker.js"],
   "typedocOptions": {
+    "entryPointStrategy": "resolve",
     "entryPoints": ["src/index.js", "src/core.js", "src/key.js", "src/web.js"],
     "includeVersion": true,
     "excludeExternals": true,

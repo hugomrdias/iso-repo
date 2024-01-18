@@ -7,6 +7,7 @@
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
   "typedocOptions": {
+    "entryPointStrategy": "resolve",
     "entryPoints": ["src/index.js", "src/adapters/*.js"],
     "includeVersion": true,
     "excludeExternals": true,
