@@ -98,7 +98,7 @@
     "assert": "^2.1.0",
     "mocha": "^10.2.0",
     "playwright-test": "^14.0.0",
-    "type-fest": "^4.9.0",
+    "type-fest": "^4.10.0",
     "typescript": "5.3.3"
   },
   "publishConfig": {
