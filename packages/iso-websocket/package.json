@@ -52,7 +52,7 @@
     "delay": "^6.0.0",
     "p-defer": "^4.0.0",
     "playwright-test": "^14.0.0",
-    "type-fest": "^4.9.0",
+    "type-fest": "^4.10.1",
     "typescript": "5.3.3",
     "unws": "^0.2.4",
     "ws": "^8.16.0"
