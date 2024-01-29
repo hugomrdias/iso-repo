@@ -115,7 +115,7 @@
     "@types/debug": "^4.1.12",
     "@types/node": "^20.11.5",
     "delay": "^6.0.0",
-    "msw": "^2.1.2",
+    "msw": "^2.1.5",
     "playwright-test": "^14.0.0",
     "type-fest": "^4.9.0",
     "typescript": "5.3.3"
