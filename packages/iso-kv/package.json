@@ -54,7 +54,7 @@
     "kysely": "^0.27.2"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.8",
+    "@types/better-sqlite3": "^7.6.9",
     "@types/node": "^20.11.5",
     "better-sqlite3": "^9.3.0",
     "conf": "^12.0.0",
