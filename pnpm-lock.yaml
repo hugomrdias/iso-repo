@@ -287,6 +287,9 @@ importers:
 
   packages/iso-web:
     dependencies:
+      delay:
+        specifier: ^6.0.0
+        version: 6.0.0
       iso-kv:
         specifier: workspace:^
         version: link:../iso-kv
@@ -300,9 +303,6 @@ importers:
       '@types/node':
         specifier: ^20.11.10
         version: 20.11.10
-      delay:
-        specifier: ^6.0.0
-        version: 6.0.0
       msw:
         specifier: ^2.1.5
         version: 2.1.5(typescript@5.3.3)
@@ -2117,7 +2117,6 @@ packages:
   /delay@6.0.0:
     resolution: {integrity: sha512-2NJozoOHQ4NuZuVIr5CWd0iiLVIRSDepakaovIN+9eIDHEhdCAEvSy2cuf1DCrPPQLvHmbqTHODlhHg8UCy4zw==}
     engines: {node: '>=16'}
-    dev: true
 
   /depcheck@1.4.7:
     resolution: {integrity: sha512-1lklS/bV5chOxwNKA/2XUUk/hPORp8zihZsXflr8x0kLwmcZ9Y9BsS6Hs3ssvA+2wUVbG0U2Ciqvm1SokNjPkA==}
