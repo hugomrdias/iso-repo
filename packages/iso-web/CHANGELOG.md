@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.0...iso-web-v1.0.1) (2024-01-30)
+
+
+### Bug Fixes
+
+* add delay to deps ([08292c2](https://github.com/hugomrdias/iso-repo/commit/08292c2867af32cc8afc40cf19ed2fa9a42a88c3))
+
 ## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.3.3...iso-web-v1.0.0) (2024-01-30)
 
 
