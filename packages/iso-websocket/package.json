@@ -46,13 +46,13 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^20.11.5",
+    "@types/node": "^20.11.10",
     "@types/retry": "^0.12.5",
     "@types/ws": "^8.5.10",
     "delay": "^6.0.0",
     "p-defer": "^4.0.0",
     "playwright-test": "^14.0.0",
-    "type-fest": "^4.9.0",
+    "type-fest": "^4.10.2",
     "typescript": "5.3.3",
     "unws": "^0.2.4",
     "ws": "^8.16.0"
