@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.3.3...iso-web-v1.0.0) (2024-01-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* request returns response directly, has http verb method and json method
+
+### Features
+
+* request returns response directly, has http verb method and json method ([a2d97eb](https://github.com/hugomrdias/iso-repo/commit/a2d97ebc6b35d40e3aaf716c2ff48bb1b5738b51))
+
 ## [0.3.3](https://github.com/hugomrdias/iso-repo/compare/iso-web-v0.3.2...iso-web-v0.3.3) (2024-01-17)
 
 
