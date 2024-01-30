@@ -1,10 +1,12 @@
 import { KV } from 'iso-kv'
-import { request } from '../http.js'
+
+// eslint-disable-next-line no-unused-vars
+import { JsonError, request } from '../http.js'
 
 const symbol = Symbol.for('doh-error')
 
 /**
- * @typedef {import('../http.js').Errors | DohError} Errors
+ * @typedef {import('../http.js').Errors | DohError | JsonError} Errors
  * @typedef {import('../http.js').Errors} RequestErrors
  */
 
@@ -15,6 +17,7 @@ export {
   RequestError,
   RetryError,
   TimeoutError,
+  JsonError,
 } from '../http.js'
 
 /**
@@ -164,8 +167,7 @@ export async function resolve(query, type, options = {}) {
     return cached
   }
 
-  /** @type {import('../types.js').MaybeResult<import('./types.js').DoHResponse, RequestErrors>} */
-  const { error, result } = await request(new URL(url).toString(), {
+  const { error, result: rawResult } = await request.json(new URL(url), {
     signal,
     headers: { accept: 'application/dns-json' },
     retry,
@@ -177,6 +179,9 @@ export async function resolve(query, type, options = {}) {
       error,
     }
   }
+
+  /** @type {import('./types.js').DoHResponse} */
+  const result = await rawResult
 
   if (result.Status !== 0) {
     const desc = statusToDescription(result.Status)

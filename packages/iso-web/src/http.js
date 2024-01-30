@@ -1,4 +1,5 @@
 import pRetry from 'p-retry'
+import delay from 'delay'
 import { anySignal } from './signals.js'
 
 const symbol = Symbol.for('request-error')
@@ -45,6 +46,33 @@ export class RequestError extends Error {
    */
   static is(value) {
     return isRequestError(value) && value.name === 'RequestError'
+  }
+}
+
+export class JsonError extends RequestError {
+  name = 'JsonError'
+
+  /** @type {import('type-fest').JsonValue} */
+  cause
+
+  /**
+   *
+   * @param {{ cause: import('type-fest').JsonValue }} options
+   */
+  constructor(options) {
+    super(`Failed with a JSON error, see cause.`, options)
+
+    this.cause = options.cause
+  }
+
+  /**
+   * Check if a value is a JsonError
+   *
+   * @param {unknown} value
+   * @returns {value is JsonError}
+   */
+  static is(value) {
+    return isRequestError(value) && value.name === 'JsonError'
   }
 }
 
@@ -139,30 +167,28 @@ export class HttpError extends RequestError {
   /** @type {number} */
   code = 0
 
-  /** @type {import('type-fest').JsonValue | undefined} */
-  data
-
-  /** @type {Response | undefined} */
+  /** @type {Response} */
   response
+
+  /** @type {Request} */
+  request
+
+  /** @type {import('./types.js').RequestOptions} */
+  options
 
   /**
    *
-   * @param {string} text - This should be `response.text()`
-   * @param {ErrorOptions & {response: Response}} options
+   * @param {ErrorOptions & {response: Response, request: Request, options: import('./types.js').RequestOptions}} options
    */
-  constructor(text, options) {
-    let data
-    let msg = `${options.response.statusText}${text ? ' - ' + text : ''}`
-    try {
-      data = JSON.parse(text)
-      msg = `${options.response.statusText} - More details in "error.data"`
-    } catch {}
+  constructor(options) {
+    const msg = `HttpError: ${options.response.status} - ${options.response.statusText}`
 
     super(msg, options)
 
-    this.data = data
     this.code = options.response?.status ?? 0
     this.response = options.response
+    this.request = options.request
+    this.options = options.options
   }
 
   /**
@@ -179,88 +205,85 @@ export class HttpError extends RequestError {
 /**
  * Request timeout
  *
- * @template T
- * @param {RequestInfo} resource
- * @param {import("./types.js").FetchOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<T, HttpError | AbortError | TimeoutError | NetworkError | RetryError>>}
- */
-async function _request(resource, options = {}) {
-  const { signal, timeout, fetch = globalThis.fetch.bind(globalThis) } = options
-
-  // validate resource type
-  if (
-    typeof resource !== 'string' &&
-    !(resource instanceof URL || resource instanceof Request)
-  ) {
-    throw new TypeError('`resource` must be a string, URL, or Request')
-  }
-
-  const url = new URL(resource.toString())
-  const timeoutSignal = AbortSignal.timeout(timeout ?? 5000)
-  const combinedSignals = anySignal([signal, timeoutSignal])
-
-  try {
-    const response = await fetch(url.toString(), {
-      ...options,
-      signal: combinedSignals,
-    })
-
-    if (response.ok) {
-      const data = await response.json()
-      return { result: /** @type {T} */ (data) }
-    } else {
-      const text = await response.text()
-      return {
-        error: new HttpError(text, {
-          response,
-        }),
-      }
-    }
-  } catch (error) {
-    const err = /** @type {Error} */ (error)
-
-    if (timeoutSignal.aborted) {
-      return { error: new TimeoutError(timeout ?? 5000, { cause: err }) }
-    }
-
-    if (signal?.aborted) {
-      return { error: new AbortError(signal, { cause: err }) }
-    }
-
-    return {
-      error: new NetworkError(err.message, { cause: err.cause }),
-    }
-  }
-}
-
-/**
- * Request with retry and timeout
- *
- * @template T
- * @param {RequestInfo} resource
- * @param {import("./types.js").FetchOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<T, HttpError | AbortError | TimeoutError | NetworkError | RetryError>>}
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
  */
 export async function request(resource, options = {}) {
-  const { signal, retry } = options
+  const {
+    signal,
+    timeout = 5000,
+    retry,
+    fetch = globalThis.fetch.bind(globalThis),
+    json,
+    headers,
+  } = options
+
+  // validate resource type
+  if (typeof resource !== 'string' && !(resource instanceof URL)) {
+    throw new TypeError('`resource` must be a string or URL object')
+  }
+
+  const timeoutSignal = AbortSignal.timeout(timeout)
+  const combinedSignals = anySignal([signal, timeoutSignal])
+
+  const _headers = new Headers(headers)
+  if (json !== undefined) {
+    _headers.set(
+      'content-type',
+      _headers.get('content-type') ?? 'application/json'
+    )
+    options.body = JSON.stringify(json)
+  }
+  const request = new Request(resource, {
+    ...options,
+    headers: _headers,
+    signal: combinedSignals,
+  })
 
   try {
     const response = await (retry
       ? pRetry(
           async () => {
-            const { error, result } = await _request(resource, options)
-            if (error) {
-              throw error
-            }
-            return result
-          },
-          { ...retry, signal }
-        )
-      : _request(resource, options))
+            const rsp = await fetch(resource)
+            if (!rsp.ok) {
+              // Delay if needed using Retry-After header
+              const delayValue = calculateRetryAfter(rsp)
+              if (delayValue > 0) {
+                await delay(delayValue, { signal: combinedSignals })
+              }
 
-    return response
+              throw new HttpError({
+                response: rsp,
+                request,
+                options,
+              })
+            }
+            return rsp
+          },
+          { ...retry, signal: combinedSignals }
+        )
+      : fetch(request))
+
+    return response.ok
+      ? { result: response }
+      : {
+          error: new HttpError({
+            response,
+            request,
+            options,
+          }),
+        }
   } catch (error) {
     const err = /** @type {Error} */ (error)
+
+    if (timeoutSignal.aborted) {
+      return { error: new TimeoutError(timeout, { cause: err }) }
+    }
+
+    if (signal?.aborted) {
+      return { error: new AbortError(signal, { cause: err }) }
+    }
 
     if ('attemptNumber' in err) {
       return {
@@ -272,4 +295,249 @@ export async function request(resource, options = {}) {
       error: new NetworkError(err.message, { cause: err.cause }),
     }
   }
+}
+
+/**
+ *
+ * @param {Response} response
+ */
+function calculateRetryAfter(response) {
+  const retryAfter = response.headers.get('Retry-After')
+
+  if (retryAfter === null) {
+    return 0
+  }
+
+  let after = Number(retryAfter)
+  if (Number.isNaN(after)) {
+    after = Date.parse(retryAfter) - Date.now()
+  } else {
+    after *= 1000
+  }
+
+  return after
+}
+
+/**
+ * Request GET
+ *
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ */
+request.get = function get(resource, options = {}) {
+  return request(resource, { ...options, method: 'GET' })
+}
+
+/**
+ * Request POST
+ *
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ */
+request.post = function post(resource, options = {}) {
+  return request(resource, { ...options, method: 'POST' })
+}
+
+/**
+ * Request PUT
+ *
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ */
+request.put = function put(resource, options = {}) {
+  return request(resource, { ...options, method: 'PUT' })
+}
+
+/**
+ * Request DELETE
+ *
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ */
+request.delete = function del(resource, options = {}) {
+  return request(resource, { ...options, method: 'DELETE' })
+}
+
+/**
+ * Request PATCH
+ *
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ */
+request.patch = function patch(resource, options = {}) {
+  return request(resource, { ...options, method: 'PATCH' })
+}
+
+/**
+ * Request HEAD
+ *
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ */
+request.head = function head(resource, options = {}) {
+  return request(resource, { ...options, method: 'HEAD' })
+}
+
+/**
+ * Request OPTIONS
+ *
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ */
+request.options = function options(resource, options = {}) {
+  return request(resource, { ...options, method: 'OPTIONS' })
+}
+
+/**
+ * Request TRACE
+ *
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ */
+request.trace = function trace(resource, options = {}) {
+  return request(resource, { ...options, method: 'TRACE' })
+}
+
+/**
+ * Request Json GET
+ *
+ * @template T
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").JSONRequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
+ */
+request.json = async function json(resource, options = {}) {
+  const { error, result } = await request(resource, {
+    ...options,
+    // eslint-disable-next-line unicorn/no-null
+    body: null,
+    json: options.body,
+  })
+
+  if (error) {
+    if (
+      HttpError.is(error) &&
+      error.response.headers.get('content-type')?.includes('application/json')
+    ) {
+      return {
+        error: new JsonError({ cause: await error.response.json() }),
+      }
+    }
+    return { error }
+  }
+
+  if (
+    result.ok &&
+    result.headers.get('content-type')?.includes('application/json')
+  ) {
+    return { result: /** @type {T} */ (await result.json()) }
+  }
+
+  return {
+    error: new RequestError('Response is not JSON', { cause: result }),
+  }
+}
+
+/**
+ * Request Json GET
+ *
+ * @template T
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").JSONRequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
+ */
+request.json.get = function get(resource, options = {}) {
+  return request.json(resource, { ...options, method: 'GET' })
+}
+
+/**
+ * Request Json POST
+ *
+ * @template T
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").JSONRequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
+ */
+request.json.post = function post(resource, options = {}) {
+  return request.json(resource, { ...options, method: 'POST' })
+}
+
+/**
+ * Request Json PUT
+ *
+ * @template T
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").JSONRequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
+ */
+request.json.put = function put(resource, options = {}) {
+  return request.json(resource, { ...options, method: 'PUT' })
+}
+
+/**
+ * Request Json DELETE
+ *
+ * @template T
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").JSONRequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
+ */
+request.json.delete = function del(resource, options = {}) {
+  return request.json(resource, { ...options, method: 'DELETE' })
+}
+
+/**
+ * Request Json PATCH
+ *
+ * @template T
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").JSONRequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
+ */
+request.json.patch = function patch(resource, options = {}) {
+  return request.json(resource, { ...options, method: 'PATCH' })
+}
+
+/**
+ * Request Json HEAD
+ *
+ * @template T
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").JSONRequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
+ */
+request.json.head = function head(resource, options = {}) {
+  return request.json(resource, { ...options, method: 'HEAD' })
+}
+
+/**
+ * Request Json OPTIONS
+ *
+ * @template T
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").JSONRequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
+ */
+request.json.options = function options(resource, options = {}) {
+  return request.json(resource, { ...options, method: 'OPTIONS' })
+}
+
+/**
+ * Request Json TRACE
+ *
+ * @template T
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").JSONRequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
+ */
+request.json.trace = function trace(resource, options = {}) {
+  return request.json(resource, { ...options, method: 'TRACE' })
 }

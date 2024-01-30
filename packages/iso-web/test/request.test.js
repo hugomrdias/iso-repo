@@ -1,11 +1,15 @@
 import { assert, suite } from 'playwright-test/taps'
 import { HttpResponse, delay, http } from 'msw'
-import { HttpError, request } from '../src/http.js'
+import { HttpError, JsonError, request } from '../src/http.js'
 import { setup } from '../src/msw/msw.js'
 
 const test = suite('request')
 const server = setup([
   http.get('https://local.dev/error', ({ request }) => {
+    const params = Object.fromEntries(new URL(request.url).searchParams)
+    return HttpResponse.text(params.text, { status: Number(params.status) })
+  }),
+  http.post('https://local.dev/error', ({ request }) => {
     const params = Object.fromEntries(new URL(request.url).searchParams)
     return HttpResponse.text(params.text, { status: Number(params.status) })
   }),
@@ -38,7 +42,22 @@ test('should request 200', async () => {
   if (error) {
     assert.fail(error.message)
   } else {
-    assert.deepEqual(result, { hello: 'world' })
+    assert.deepEqual(await result.json(), { hello: 'world' })
+  }
+})
+
+test('should request 200 with URL object ', async () => {
+  server.use(
+    http.get('https://local.dev/url', () => {
+      return HttpResponse.json({ hello: 'world' }, { status: 200 })
+    })
+  )
+  const { error, result } = await request(new URL('/url', 'https://local.dev'))
+
+  if (error) {
+    assert.fail(error.message)
+  } else {
+    assert.deepEqual(await result.json(), { hello: 'world' })
   }
 })
 
@@ -57,7 +76,7 @@ test('should post json', async () => {
   if (error) {
     assert.fail(error.message)
   } else {
-    assert.deepEqual(result, { hello: 'world' })
+    assert.deepEqual(await result.json(), { hello: 'world' })
   }
 })
 
@@ -65,9 +84,8 @@ test('should request 500', async () => {
   const { error } = await request('https://local.dev/error?status=500')
 
   if (HttpError.is(error)) {
-    assert.equal(error.message, 'Internal Server Error')
+    assert.equal(error.message, 'HttpError: 500 - Internal Server Error')
     assert.equal(error.code, 500)
-    assert.equal(error.data, undefined)
   } else {
     assert.fail('should fail')
   }
@@ -77,24 +95,8 @@ test('should request 501', async () => {
   const { error } = await request('https://local.dev/error?status=501')
 
   if (HttpError.is(error)) {
-    assert.equal(error.message, 'Not Implemented')
+    assert.equal(error.message, 'HttpError: 501 - Not Implemented')
     assert.equal(error.code, 501)
-    assert.equal(error.data, undefined)
-    assert.ok(error.response)
-  } else {
-    assert.fail('should fail')
-  }
-})
-
-test('should request 500 with text body', async () => {
-  const { error } = await request(
-    'https://local.dev/error?status=500&text=hello'
-  )
-
-  if (HttpError.is(error)) {
-    assert.equal(error.message, 'Internal Server Error - hello')
-    assert.equal(error.code, 500)
-    assert.equal(error.data, undefined)
     assert.ok(error.response)
   } else {
     assert.fail('should fail')
@@ -115,14 +117,14 @@ test('should request 500 with json body', async () => {
   const { error } = await request('https://local.dev/error-json?status=500')
 
   if (HttpError.is(error)) {
-    assert.equal(
-      error.message,
-      'Internal Server Error - More details in "error.data"'
-    )
+    assert.equal(error.message, 'HttpError: 500 - Internal Server Error')
     assert.equal(error.code, 500)
-    assert.deepEqual(error.data, { error: 'error' })
     assert.equal(error.cause, undefined)
     assert.ok(error.response)
+
+    const errorData = await error.response.json()
+
+    assert.deepEqual(errorData, { error: 'error' })
   } else {
     assert.fail('should fail')
   }
@@ -184,7 +186,9 @@ test(
       })
     )
     const { error } = await request('https://local.dev/network-error', {
-      retry: { retries: 1 },
+      retry: {
+        retries: 1,
+      },
     })
 
     if (error) {
@@ -215,3 +219,142 @@ test(
   },
   { timeout: 10_000 }
 )
+
+test(
+  'should timeout with retries',
+  async () => {
+    server.use(
+      http.get('https://local.dev/network-error', () => {
+        return Response.error()
+      })
+    )
+    const { error } = await request('https://local.dev/network-error', {
+      timeout: 100,
+      retry: {
+        retries: 5,
+      },
+    })
+
+    if (error) {
+      assert.equal(error.message, 'Request timed out after 100ms')
+      assert.ok(error.cause)
+      assert.equal(error.name, 'TimeoutError')
+    } else {
+      assert.fail('should fail')
+    }
+  },
+  { timeout: 10_000 }
+)
+
+test('should abort manually with retries', async () => {
+  const controller = new AbortController()
+  const rsp = request('https://local.dev/timeout', {
+    retry: {
+      retries: 5,
+    },
+    signal: controller.signal,
+  })
+
+  controller.abort('reason')
+  const { error } = await rsp
+  if (error) {
+    assert.equal(error.message, 'Request aborted: reason')
+    assert.ok(error.cause)
+    assert.equal(error.name, 'AbortError')
+  } else {
+    assert.fail('should fail')
+  }
+})
+
+test(
+  'should delay with retry after header',
+  async () => {
+    server.use(
+      http.get('https://local.dev/retry-after', ({ request }) => {
+        return HttpResponse.json(
+          { error: 'error' },
+          { status: 429, headers: { 'retry-after': '5' } }
+        )
+      })
+    )
+    const { error } = await request('https://local.dev/retry-after', {
+      retry: {
+        factor: 0,
+        retries: 5,
+      },
+    })
+
+    if (error) {
+      assert.equal(error.message, 'Request timed out after 5000ms')
+      assert.ok(error.cause)
+      assert.equal(error.name, 'TimeoutError')
+    } else {
+      assert.fail('should fail')
+    }
+  },
+  { timeout: 10_000 }
+)
+
+test('should set content-type json', async () => {
+  const { error } = await request('https://local.dev/error?status=500', {
+    method: 'POST',
+    json: { hello: 'world' },
+  })
+
+  if (HttpError.is(error)) {
+    assert.equal(error.message, 'HttpError: 500 - Internal Server Error')
+    assert.equal(error.code, 500)
+    assert.equal(error.request.headers.get('content-type'), 'application/json')
+  } else {
+    assert.fail('should fail')
+  }
+})
+
+test('should be able to overide with custom json content-type ', async () => {
+  const { error } = await request('https://local.dev/error?status=500', {
+    method: 'POST',
+    json: { hello: 'world' },
+    headers: {
+      'Content-Type': 'application/custom+json',
+    },
+  })
+
+  if (HttpError.is(error)) {
+    assert.equal(error.message, 'HttpError: 500 - Internal Server Error')
+    assert.equal(error.code, 500)
+    assert.equal(
+      error.request.headers.get('content-type'),
+      'application/custom+json'
+    )
+  } else {
+    assert.fail('should fail')
+  }
+})
+
+test('should request json', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return HttpResponse.json({ hello: 'world' }, { status: 200 })
+    })
+  )
+  const { error, result } = await request.json('https://local.dev')
+
+  if (error) {
+    assert.fail(error.message)
+  } else {
+    assert.deepEqual(result, { hello: 'world' })
+  }
+})
+
+test('should request json and error', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return HttpResponse.json({ hello: 'world' }, { status: 500 })
+    })
+  )
+
+  const { error } = await request.json('https://local.dev')
+
+  assert.ok(JsonError.is(error))
+  assert.deepEqual(error.cause, { hello: 'world' })
+})

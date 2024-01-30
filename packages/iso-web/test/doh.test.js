@@ -2,9 +2,8 @@ import { assert, suite } from 'playwright-test/taps'
 import { KV } from 'iso-kv'
 import delay from 'delay'
 import { http } from 'msw'
-import { DohError, resolve } from '../src/doh/index.js'
+import { DohError, HttpError, JsonError, resolve } from '../src/doh/index.js'
 import { setup } from '../src/msw/msw.js'
-import { HttpError } from '../src/http.js'
 
 let expireCount = 0
 export const handlers = [
@@ -161,14 +160,11 @@ test('should fail with 400 for invalid domain', async () => {
   const { error } = await resolve('example..com', 'A')
 
   if (error) {
-    assert.deepEqual(
-      error.message,
-      'Bad Request - More details in "error.data"'
-    )
-    assert.ok(HttpError.is(error))
-    assert.deepEqual(error.data, {
+    assert.ok(JsonError.is(error))
+    assert.deepEqual(error.cause, {
       error: 'Invalid query name `example..com`.',
     })
+    assert.deepEqual(error.message, 'Failed with a JSON error, see cause.')
   } else {
     assert.fail('should fail')
   }
@@ -177,8 +173,9 @@ test('should fail with 400 for invalid domain', async () => {
 test('should fail with non-ascii chars', async () => {
   const { error } = await resolve('exampleελ.com', 'A')
   if (error) {
-    assert.deepEqual(error.message, 'Bad Request - malformed')
     assert.ok(HttpError.is(error))
+    assert.deepEqual(await error.response.text(), 'malformed')
+    assert.deepEqual(error.message, 'HttpError: 400 - Bad Request')
   } else {
     assert.fail('should fail')
   }

@@ -1,9 +1,25 @@
 import type { Options } from 'p-retry'
+import type { Jsonifiable } from 'type-fest'
 
-export interface FetchOptions {
+export type RequestInput = URL | string
+
+export interface RequestOptions {
   fetch?: typeof globalThis.fetch
   redirect?: RequestRedirect
   body?: BodyInit | null
+  method?: string
+  headers?: HeadersInit
+  signal?: AbortSignal
+  keepalive?: boolean
+  timeout?: number
+  retry?: Options
+  json?: Jsonifiable
+}
+
+export interface JSONRequestOptions {
+  fetch?: typeof globalThis.fetch
+  redirect?: RequestRedirect
+  body?: Jsonifiable | null
   method?: string
   headers?: HeadersInit
   signal?: AbortSignal
@@ -24,18 +40,3 @@ export type MaybeResult<ResultType = unknown, ErrorType = Error> =
       result: ResultType
       error?: undefined
     }
-
-export interface JSONError {
-  name: string
-  code?: number
-  message: string
-}
-
-/**
- * Fetch result with JSON error
- *
- */
-export type MaybeFetchResult<
-  ResultType = unknown,
-  ErrorType extends JSONError = JSONError,
-> = MaybeResult<ResultType, ErrorType>
