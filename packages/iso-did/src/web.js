@@ -20,9 +20,9 @@ export async function didWebResolver(did, parsedDid) {
 
   url = url + '/did.json'
 
-  const resolve = await /** @type {typeof request<T.DIDDocument>} */ (request)(
-    url
-  )
+  const resolve = await /** @type {typeof request.json<T.DIDDocument>} */ (
+    request.json
+  )(url)
 
   if (resolve.error) {
     return {
