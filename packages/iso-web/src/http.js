@@ -425,7 +425,7 @@ request.json = async function json(resource, options = {}) {
   if (error) {
     if (
       HttpError.is(error) &&
-      error.response.headers.get('content-type')?.includes('application/json')
+      error.response.headers.get('content-type')?.includes('json')
     ) {
       return {
         error: new JsonError({ cause: await error.response.json() }),
@@ -434,10 +434,7 @@ request.json = async function json(resource, options = {}) {
     return { error }
   }
 
-  if (
-    result.ok &&
-    result.headers.get('content-type')?.includes('application/json')
-  ) {
+  if (result.ok && result.headers.get('content-type')?.includes('json')) {
     return { result: /** @type {T} */ (await result.json()) }
   }
 
