@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.1...iso-web-v1.0.2) (2024-01-31)
+
+
+### Bug Fixes
+
+* fix doh exports ([db92f55](https://github.com/hugomrdias/iso-repo/commit/db92f55ac4d3f387f641d6a72eb63f74755fa6dc))
+* relax http json parsing ([cfd33df](https://github.com/hugomrdias/iso-repo/commit/cfd33df20a50a9c5d3f922a64b2d65074fe7155c))
+
 ## [1.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.0...iso-web-v1.0.1) (2024-01-30)
 
 
