@@ -47,11 +47,11 @@
       "default": "./src/http.js"
     },
     "./doh": {
-      "types": "./dist/doh/index.d.ts",
+      "types": "./dist/src/doh/index.d.ts",
       "default": "./src/doh/index.js"
     },
     "./dnslink": {
-      "types": "./dist/doh/dnslink.d.ts",
+      "types": "./dist/src/doh/dnslink.d.ts",
       "default": "./src/doh/dnslink.js"
     },
     "./types": {
