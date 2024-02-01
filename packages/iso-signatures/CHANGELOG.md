@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.3.0...iso-signatures-v0.3.1) (2024-02-01)
+
+
+### Bug Fixes
+
+* add didKey prop from VerifiableDID ([6b1a166](https://github.com/hugomrdias/iso-repo/commit/6b1a1666759ffcdd4b64977d1ac8a0d5ba8d0d6d))
+
 ## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.2.0...iso-signatures-v0.3.0) (2023-12-21)
 
 
