@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.5.0...iso-did-v1.6.0) (2024-02-01)
+
+
+### Features
+
+* add support for did:fission ([476b756](https://github.com/hugomrdias/iso-repo/commit/476b7567299663a6fddf1897d44bc784d8e80f70))
+
+
+### Bug Fixes
+
+* didKey should be a did string to avoid cyclic deps ([79df745](https://github.com/hugomrdias/iso-repo/commit/79df74557fb3bf73200a3cd5ceb1460f2b52d0bd))
+
 ## [1.5.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.4.0...iso-did-v1.5.0) (2023-12-21)
 
 
