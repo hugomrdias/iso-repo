@@ -108,10 +108,10 @@
   "devDependencies": {
     "@types/assert": "^1.5.10",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.11.10",
+    "@types/node": "^20.11.15",
     "assert": "^2.1.0",
     "mocha": "^10.2.0",
-    "playwright-test": "^14.0.0",
+    "playwright-test": "^14.1.0",
     "typescript": "5.3.3"
   },
   "publishConfig": {
