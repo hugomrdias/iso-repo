@@ -42,6 +42,7 @@ export class ECDSASigner {
     this.document = did.document
     this.#params = createEcdsaParams(this.alg)
     this.#keypair = keypair
+    this.didKey = DIDKey.fromPublicKey(this.type, this.publicKey).url.did
   }
 
   /**

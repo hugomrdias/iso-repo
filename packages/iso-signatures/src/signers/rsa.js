@@ -53,6 +53,7 @@ export class RSASigner {
     this.alg = did.alg
     this.document = did.document
     this.#keypair = keypair
+    this.didKey = DIDKey.fromPublicKey(this.type, this.publicKey).url.did
   }
 
   /**

@@ -56,6 +56,7 @@ export class EdDSASigner {
     this.alg = did.alg
     this.document = did.document
     this.#privateKey = privateKey
+    this.didKey = DIDKey.fromPublicKey(this.type, this.publicKey).url.did
   }
 
   /**
