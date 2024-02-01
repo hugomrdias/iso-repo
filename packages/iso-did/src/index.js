@@ -116,7 +116,7 @@ export class DID {
     this.type = opts.type
     this.document = opts.document
     this.url = opts.url
-    this.didKey = DidKey.DIDKey.fromPublicKey(opts.type, opts.publicKey)
+    this.didKey = DidKey.DIDKey.fromPublicKey(opts.type, opts.publicKey).url.did
   }
 
   /**

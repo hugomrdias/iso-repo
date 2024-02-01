@@ -7,7 +7,6 @@ import type {
 } from 'did-resolver'
 import type { KeyType, SignatureAlgorithm } from './common'
 import type { JWK } from './jwk-types'
-import type { DIDKey } from './key'
 
 export type { KeyType, PublicKeyCode, SignatureAlgorithm } from './common'
 
@@ -91,7 +90,7 @@ export interface VerifiableDID {
    */
   type: KeyType
   publicKey: Uint8Array
-  didKey: DIDKey
+  didKey: DID
   /**
    * JWT signing algorithm
    */
