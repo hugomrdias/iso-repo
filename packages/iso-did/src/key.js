@@ -97,6 +97,7 @@ export class DIDKey extends DIDCore {
     this.code = KEY_TYPE_CODE[type]
     this.alg = keyTypeToAlg(type)
     this.url = did
+    this.didKey = this
   }
 
   /**

@@ -8,7 +8,7 @@ const server = setup([])
 
 describe('did web ', function () {
   before(async () => {
-    server.start({ quiet: true })
+    await server.start({ quiet: true })
   })
 
   beforeEach(() => {

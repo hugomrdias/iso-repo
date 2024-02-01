@@ -107,7 +107,7 @@ export function derefDocument(didObject, document) {
 export class DID {
   /**
    *
-   * @param {T.VerifiableDID} opts
+   * @param {Omit<T.VerifiableDID, 'didKey'>} opts
    */
   constructor(opts) {
     this.did = opts.did
@@ -116,6 +116,7 @@ export class DID {
     this.type = opts.type
     this.document = opts.document
     this.url = opts.url
+    this.didKey = DidKey.DIDKey.fromPublicKey(opts.type, opts.publicKey)
   }
 
   /**
