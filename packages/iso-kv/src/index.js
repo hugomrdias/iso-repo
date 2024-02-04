@@ -1,10 +1,10 @@
 /**
- * @typedef {import('./types').KvStorageAdapter} KvStorageAdapter
- * @typedef {import('./types').IKV} Kv
+ * @typedef {import('./types').Driver} Driver
+ * @typedef {import('./types').IKV} IKV
  * @typedef {import('./types').KvKey} KvKey
  */
 
-import { MemoryStorageAdapter } from './adapters/memory.js'
+import { MemoryDriver } from './drivers/memory.js'
 
 const SEPARATOR = ' '
 
@@ -52,15 +52,18 @@ const now = () => Math.floor(Date.now() / 1000)
 /**
  * @class KV
  *
- * @implements {Kv}
+ * @implements {IKV}
  */
 export class KV {
+  /** @type {Driver} */
+  #driver
+
   #subs
   /**
    * @param {import('./types').Options} [options]
    */
   constructor(options = {}) {
-    this.store = options.store ?? new MemoryStorageAdapter()
+    this.#driver = options.driver ?? new MemoryDriver()
     this.#subs = new Map()
   }
 
@@ -121,7 +124,7 @@ export class KV {
    * @returns {Promise<T | undefined>}
    */
   async get(key) {
-    const raw = await this.store.get(join(key))
+    const raw = await this.#driver.get(join(key))
 
     return this.#maybeExpire(key, raw)
   }
@@ -163,23 +166,23 @@ export class KV {
     const expires = typeof ttl === 'number' ? now() + ttl : null
 
     await this.#handleChange(key, value)
-    await this.store.set(join(key), { value, expires })
+    await this.#driver.set(join(key), { value, expires })
     return this
   }
 
-  /** @type {Kv['delete']} */
+  /** @type {IKV['delete']} */
   async delete(key) {
     await this.#handleChange(key)
-    return this.store.delete(join(key))
+    return this.#driver.delete(join(key))
   }
 
-  /** @type {Kv['has']} */
+  /** @type {IKV['has']} */
   async has(key) {
     return (await this.get(key)) !== undefined
   }
 
   async clear() {
-    for await (const [key] of this.store) {
+    for await (const [key] of this.#driver) {
       await this.delete(split(key))
     }
   }
@@ -189,7 +192,7 @@ export class KV {
    * @returns {AsyncIterableIterator<{key: KvKey, value: Value}>}
    */
   async *[Symbol.asyncIterator]() {
-    for await (const [_key, data] of this.store) {
+    for await (const [_key, data] of this.#driver) {
       const key = split(_key)
       const _value = this.#maybeExpire(key, data)
       if (_value) {

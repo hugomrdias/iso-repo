@@ -2,11 +2,11 @@ import { suite } from 'playwright-test/taps'
 import { SqliteDialect } from 'kysely'
 import SQLite from 'better-sqlite3'
 import { KV } from '../src/index.js'
-import { SqlStorageAdapter } from '../src/adapters/sql.js'
+import { SqlDriver } from '../src/drivers/sql.js'
 import { baseTests } from './base.js'
 
 const kv = new KV({
-  store: new SqlStorageAdapter({
+  driver: new SqlDriver({
     name: 'kv',
     dialect: new SqliteDialect({
       database: new SQLite(':memory:', {

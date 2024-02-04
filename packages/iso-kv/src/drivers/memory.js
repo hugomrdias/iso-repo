@@ -1,13 +1,13 @@
 /**
- * @typedef {import('../types').KvStorageAdapterSync} KvStorageAdapter
+ * @typedef {import('../types').DriverSync} DriverSync
  * @typedef {import('../types').KvKey} KvKey
  */
 
 /**
  * @class
- * @implements {KvStorageAdapter}
+ * @implements {DriverSync}
  */
-export class MemoryStorageAdapter {
+export class MemoryDriver {
   /** @type {Map<string,any>} */
   map
 
@@ -21,7 +21,7 @@ export class MemoryStorageAdapter {
   }
 
   /**
-   * @type {KvStorageAdapter['set']}
+   * @type {DriverSync['set']}
    */
   set(key, value) {
     this.map.set(key, value)
@@ -36,12 +36,12 @@ export class MemoryStorageAdapter {
     return /** @type {Value | undefined} */ (this.map.get(key))
   }
 
-  /** @type {KvStorageAdapter['delete']} */
+  /** @type {DriverSync['delete']} */
   delete(key) {
     this.map.delete(key)
   }
 
-  /** @type {KvStorageAdapter['has']} */
+  /** @type {DriverSync['has']} */
   has(key) {
     return this.map.has(key)
   }

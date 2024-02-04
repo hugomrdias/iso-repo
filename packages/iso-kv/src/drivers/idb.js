@@ -1,7 +1,7 @@
 import { clear, createStore, del, entries, get, set } from 'idb-keyval'
 
 /**
- * @typedef {import('../types').KvStorageAdapterAsync} KvStorageAdapter
+ * @typedef {import('../types').DriverAsync} DriverAsync
  * @typedef {import('../types').KvKey} KvKey
  */
 
@@ -16,9 +16,9 @@ function asKey(key) {
 
 /**
  * @class
- * @implements {KvStorageAdapter}
+ * @implements {DriverAsync}
  */
-export class IDBStorageAdapter {
+export class IdbDriver {
   /**
    * @param {{name?: string}} [config]
    */
@@ -28,7 +28,7 @@ export class IDBStorageAdapter {
   }
 
   /**
-   * @type {KvStorageAdapter['set']}
+   * @type {DriverAsync['set']}
    */
   async set(key, value) {
     await set(key, value, this.store)
@@ -36,18 +36,18 @@ export class IDBStorageAdapter {
   }
 
   /**
-   * @type {KvStorageAdapter['get']}
+   * @type {DriverAsync['get']}
    */
   get(key) {
     return get(key, this.store)
   }
 
-  /** @type {KvStorageAdapter['delete']} */
+  /** @type {DriverAsync['delete']} */
   delete(key) {
     return del(key, this.store)
   }
 
-  /** @type {KvStorageAdapter['has']} */
+  /** @type {DriverAsync['has']} */
   async has(key) {
     const value = await get(key, this.store)
     return value !== undefined

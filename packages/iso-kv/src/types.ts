@@ -3,8 +3,28 @@
  */
 export type Await<T> = Promise<T> | T
 
+export type Driver = DriverSync | DriverAsync
+
+export interface DriverSync {
+  get: (key: string) => unknown
+  has: (key: string) => boolean
+  set: (key: string, value: unknown) => DriverSync
+  delete: (key: string) => void
+  clear: () => void
+  [Symbol.iterator]: () => IterableIterator<[string, unknown]>
+}
+
+export interface DriverAsync {
+  get: (key: string) => Promise<unknown>
+  has: (key: string) => Promise<boolean>
+  set: (key: string, value: unknown) => Promise<DriverAsync>
+  delete: (key: string) => Promise<void>
+  clear: () => Promise<void>
+  [Symbol.asyncIterator]: () => AsyncIterableIterator<[string, unknown]>
+}
+
 export interface Options {
-  store?: KvStorageAdapterSync | KvStorageAdapterAsync
+  driver?: Driver
 }
 
 export type KvKeyPart = number | string | Date | BufferSource
@@ -43,36 +63,6 @@ The default value is false.
 }
 
 export type KvListIterator<T> = IterableIterator<T> | AsyncIterableIterator<T>
-
-// export interface KvStorageAdapter {
-//   get: <T = unknown>(key: string) => Await<T>
-//   has: (key: string) => Await<boolean>
-//   set: <T = unknown>(key: string, value: T) => Await<KvStorageAdapter>
-//   delete: (key: string) => Await<void>
-//   clear: () => Await<void>
-//   [Symbol.asyncIterator]?: <T = unknown>() => AsyncIterableIterator<[string, T]>
-//   [Symbol.iterator]: <T = unknown>() => IterableIterator<[string, T]>
-// }
-
-export type KvStorageAdapter = KvStorageAdapterSync | KvStorageAdapterAsync
-
-export interface KvStorageAdapterSync {
-  get: (key: string) => unknown
-  has: (key: string) => boolean
-  set: (key: string, value: unknown) => KvStorageAdapterSync
-  delete: (key: string) => void
-  clear: () => void
-  [Symbol.iterator]: () => IterableIterator<[string, unknown]>
-}
-
-export interface KvStorageAdapterAsync {
-  get: (key: string) => Promise<unknown>
-  has: (key: string) => Promise<boolean>
-  set: (key: string, value: unknown) => Promise<KvStorageAdapterAsync>
-  delete: (key: string) => Promise<void>
-  clear: () => Promise<void>
-  [Symbol.asyncIterator]: () => AsyncIterableIterator<[string, unknown]>
-}
 
 export interface IKV {
   onChange: <T = unknown>(

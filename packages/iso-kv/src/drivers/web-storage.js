@@ -1,10 +1,10 @@
 /**
- * @typedef {import('../types').KvStorageAdapterSync} KvStorageAdapter
- * @typedef {import('../types').KvKey} KvKey
+ * @typedef {import('../types.js').DriverSync} DriverSync
+ * @typedef {import('../types.js').KvKey} KvKey
  */
 
 import { parse, stringify } from '../json.js'
-import { MemoryStorageAdapter } from './memory.js'
+import { MemoryDriver } from './memory.js'
 
 /**
  * @param {unknown} data
@@ -23,9 +23,9 @@ export function deserialize(data) {
 
 /**
  * @class
- * @implements {KvStorageAdapter}
+ * @implements {DriverSync}
  */
-export class WebStorageAdapter extends MemoryStorageAdapter {
+export class WebStorageDriver extends MemoryDriver {
   /**
    *
    * @param {Storage} storage
@@ -44,7 +44,7 @@ export class WebStorageAdapter extends MemoryStorageAdapter {
   }
 
   /**
-   * @type {KvStorageAdapter['set']}
+   * @type {DriverSync['set']}
    */
   set(key, value) {
     super.set(key, value)
@@ -53,7 +53,7 @@ export class WebStorageAdapter extends MemoryStorageAdapter {
     return this
   }
 
-  /** @type {KvStorageAdapter['delete']} */
+  /** @type {DriverSync['delete']} */
   delete(key) {
     super.delete(key)
     const obj = Object.fromEntries(this.map)

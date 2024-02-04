@@ -2,8 +2,8 @@ import { Kysely } from 'kysely'
 import { parse, stringify } from '../json.js'
 
 /**
- * @typedef {import('../types').KvStorageAdapterAsync} KvStorageAdapter
- * @typedef {import('../types').KvKey} KvKey
+ * @typedef {import('../types.js').DriverAsync} DriverAsync
+ * @typedef {import('../types.js').KvKey} KvKey
  */
 
 /**
@@ -26,9 +26,9 @@ export function deserialize(data) {
 
 /**
  * @class
- * @implements {KvStorageAdapter}
+ * @implements {DriverAsync}
  */
-export class SqlStorageAdapter {
+export class SqlDriver {
   /** @type {import('kysely').CompiledQuery<unknown>} */
   #tableQuery
 
@@ -65,7 +65,7 @@ export class SqlStorageAdapter {
   }
 
   /**
-   * @type {KvStorageAdapter['set']}
+   * @type {DriverAsync['set']}
    */
   async set(key, value) {
     if (!this.#isInitialized) {
@@ -108,7 +108,7 @@ export class SqlStorageAdapter {
     return deserialize(row?.value)
   }
 
-  /** @type {KvStorageAdapter['delete']} */
+  /** @type {DriverAsync['delete']} */
   async delete(key) {
     if (!this.#isInitialized) {
       await this.#init()
@@ -120,7 +120,7 @@ export class SqlStorageAdapter {
       .executeTakeFirst()
   }
 
-  /** @type {KvStorageAdapter['has']} */
+  /** @type {DriverAsync['has']} */
   async has(key) {
     if (!this.#isInitialized) {
       await this.#init()

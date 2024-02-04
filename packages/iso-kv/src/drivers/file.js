@@ -2,14 +2,14 @@ import Conf from 'conf'
 import { parse, stringify } from '../json.js'
 
 /**
- * @typedef {import('../types').KvStorageAdapterSync} KvStorageAdapter
+ * @typedef {import('../types.js').DriverSync} DriverSync
  */
 
 /**
  * @class
- * @implements {KvStorageAdapter}
+ * @implements {DriverSync}
  */
-export class FileStorageAdapter {
+export class FileDriver {
   /**
    * @param {import('conf').Options<Map<string, unknown>>} [config]
    */
@@ -23,7 +23,7 @@ export class FileStorageAdapter {
   }
 
   /**
-   * @type {KvStorageAdapter['set']}
+   * @type {DriverSync['set']}
    */
   set(key, value) {
     this.conf.set(key, value)
@@ -31,19 +31,19 @@ export class FileStorageAdapter {
   }
 
   /**
-   * @type {KvStorageAdapter['get']}
+   * @type {DriverSync['get']}
    */
   get(key) {
     return /** @type {unknown} */ (this.conf.get(key))
   }
 
-  /** @type {KvStorageAdapter['delete']} */
+  /** @type {DriverSync['delete']} */
   delete(key) {
     // @ts-ignore
     return this.conf.delete(key)
   }
 
-  /** @type {KvStorageAdapter['has']} */
+  /** @type {DriverSync['has']} */
   async has(key) {
     return this.conf.has(key)
   }

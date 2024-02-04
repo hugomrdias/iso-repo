@@ -1,11 +1,11 @@
 import { suite } from 'playwright-test/taps'
 import { temporaryDirectory } from 'tempy'
 import { KV } from '../src/index.js'
-import { FileStorageAdapter } from '../src/adapters/file.js'
+import { FileDriver } from '../src/drivers/file.js'
 import { baseTests } from './base.js'
 
 const kv = new KV({
-  store: new FileStorageAdapter({
+  driver: new FileDriver({
     cwd: temporaryDirectory(),
   }),
 })
