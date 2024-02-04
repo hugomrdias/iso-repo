@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v1.0.0...iso-kv-v2.0.0) (2024-02-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* change adapters to drivers and exported them
+
+### Features
+
+* change adapters to drivers and exported them ([15c1791](https://github.com/hugomrdias/iso-repo/commit/15c17919ef0b9351a53a71f5d5ef7bcc2ea54051))
+
 ## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v0.2.0...iso-kv-v1.0.0) (2024-01-18)
 
 
