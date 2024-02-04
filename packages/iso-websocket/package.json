@@ -42,7 +42,9 @@
   "dependencies": {
     "debug": "^4.3.4",
     "retry": "^0.13.1",
-    "typescript-event-target": "^1.1.0"
+    "typescript-event-target": "^1.1.0",
+    "unws": "^0.2.4",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
@@ -53,9 +55,7 @@
     "p-defer": "^4.0.0",
     "playwright-test": "^14.1.0",
     "type-fest": "^4.10.2",
-    "typescript": "5.3.3",
-    "unws": "^0.2.4",
-    "ws": "^8.16.0"
+    "typescript": "5.3.3"
   },
   "publishConfig": {
     "provenance": true

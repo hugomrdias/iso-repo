@@ -1,5 +1,6 @@
 import { TypedEventTarget } from 'typescript-event-target'
 import debug from 'debug'
+import { WebSocket } from 'unws'
 import * as retry from 'retry'
 import {
   CloseEvent,
@@ -54,7 +55,7 @@ export class WS extends TypedEventTarget {
   constructor(url, options = {}) {
     super()
 
-    if (!options.ws && typeof WebSocket === 'undefined') {
+    if (!options.ws && WebSocket === undefined) {
       throw new TypeError('No WebSocket implementation found.')
     }
 
@@ -200,7 +201,16 @@ export class WS extends TypedEventTarget {
   }
 
   #getUrl() {
-    return typeof this.#url === 'function' ? this.#url() : this.#url
+    const url = new URL(
+      typeof this.#url === 'function' ? this.#url() : this.#url
+    )
+    if (url.protocol === 'http:') {
+      url.protocol = 'ws:'
+    }
+    if (url.protocol === 'https:') {
+      url.protocol = 'wss:'
+    }
+    return url.toString()
   }
 
   #addListeners() {

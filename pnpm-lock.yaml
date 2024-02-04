@@ -327,6 +327,12 @@ importers:
       typescript-event-target:
         specifier: ^1.1.0
         version: 1.1.0
+      unws:
+        specifier: ^0.2.4
+        version: 0.2.4(ws@8.16.0)
+      ws:
+        specifier: ^8.16.0
+        version: 8.16.0
     devDependencies:
       '@types/debug':
         specifier: ^4.1.12
@@ -355,12 +361,6 @@ importers:
       typescript:
         specifier: 5.3.3
         version: 5.3.3
-      unws:
-        specifier: ^0.2.4
-        version: 0.2.4(ws@8.16.0)
-      ws:
-        specifier: ^8.16.0
-        version: 8.16.0
 
 packages:
 
@@ -5771,7 +5771,7 @@ packages:
       ws: '*'
     dependencies:
       ws: 8.16.0
-    dev: true
+    dev: false
 
   /uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
@@ -5945,7 +5945,7 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
-    dev: true
+    dev: false
 
   /y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
