@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.2...iso-web-v1.0.3) (2024-02-04)
+
+
+### Bug Fixes
+
+* updated iso-kv types ([6689622](https://github.com/hugomrdias/iso-repo/commit/66896222f01c81c2d7eebc973c307deba53272a4))
+
 ## [1.0.2](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.1...iso-web-v1.0.2) (2024-01-31)
 
 
