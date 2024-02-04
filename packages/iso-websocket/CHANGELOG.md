@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.1.6...iso-websocket-v0.2.0) (2024-02-04)
+
+
+### Features
+
+* swap protocol to ws and include unws ([6907858](https://github.com/hugomrdias/iso-repo/commit/6907858a9b0de7fe45921ea07c0d9401f6776e74))
+
 ## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.1.5...iso-websocket-v0.1.6) (2023-11-08)
 
 
