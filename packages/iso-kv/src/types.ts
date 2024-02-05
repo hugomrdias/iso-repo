@@ -68,11 +68,11 @@ export interface SetOptions {
   /**
    * Time-to-live (TTL) for the key. The TTL is specified in seconds, and the key will be deleted from the database at earliest after the specified number of seconds have elapsed.
    */
-  ttl?: number
+  ttl?: number | null
   /**
    * Expiration time for the key. The expiration time is specified as a Unix timestamp in seconds since UNIX epoch, and the key will be deleted from the database at the specified time.
    */
-  expiration?: number
+  expiration?: number | null
 }
 
 export interface IKV {
