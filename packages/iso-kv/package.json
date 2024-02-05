@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.9",
-    "@types/node": "^20.11.15",
+    "@types/node": "^20.11.16",
     "better-sqlite3": "^9.3.0",
     "conf": "^12.0.0",
     "delay": "^6.0.0",
