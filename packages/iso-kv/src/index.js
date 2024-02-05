@@ -45,7 +45,7 @@ function split(key) {
 }
 
 /**
- * UTC Unix timestamp in seconds
+ * Unix timestamp in seconds
  */
 const now = () => Math.floor(Date.now() / 1000)
 
@@ -151,19 +151,17 @@ export class KV {
    * @template [T=unknown]
    * @param {KvKey} key
    * @param {T} value
-   * @param {number} [ttl] - Time to live in seconds
+   * @param {import('./types').SetOptions} [options]
    */
-  async set(key, value, ttl) {
+  async set(key, value, options = {}) {
     if (value === undefined) {
       return this
     }
 
-    if (ttl === 0) {
-      ttl = undefined
-    }
+    const { ttl, expiration } = options
 
     // eslint-disable-next-line unicorn/no-null
-    const expires = typeof ttl === 'number' ? now() + ttl : null
+    const expires = expiration ?? (typeof ttl === 'number' ? now() + ttl : null)
 
     await this.#handleChange(key, value)
     await this.#driver.set(join(key), { value, expires })

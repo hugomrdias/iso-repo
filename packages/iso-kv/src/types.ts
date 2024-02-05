@@ -64,6 +64,17 @@ The default value is false.
 
 export type KvListIterator<T> = IterableIterator<T> | AsyncIterableIterator<T>
 
+export interface SetOptions {
+  /**
+   * Time-to-live (TTL) for the key. The TTL is specified in seconds, and the key will be deleted from the database at earliest after the specified number of seconds have elapsed.
+   */
+  ttl?: number
+  /**
+   * Expiration time for the key. The expiration time is specified as a Unix timestamp in seconds since UNIX epoch, and the key will be deleted from the database at the specified time.
+   */
+  expiration?: number
+}
+
 export interface IKV {
   onChange: <T = unknown>(
     key: KvKey,
@@ -77,9 +88,9 @@ export interface IKV {
    *
    * @param key
    * @param value
-   * @param ttl - Time-to-live (TTL) for the key. The TTL is specified in milliseconds, and the key will be deleted from the database at earliest after the specified number of milliseconds have elapsed.
+   * @param options - {@link SetOptions}
    */
-  set: <T = unknown>(key: KvKey, value: T, ttl?: number) => Promise<IKV>
+  set: <T = unknown>(key: KvKey, value: T, options?: SetOptions) => Promise<IKV>
   delete: (key: KvKey) => Promise<void>
   clear: () => Promise<void>
   list: <T = unknown>(

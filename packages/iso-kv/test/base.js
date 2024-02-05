@@ -146,23 +146,13 @@ export function baseTests(kv, suite) {
   })
 
   test('should expires', async () => {
-    await kv.set(['foo'], 1, 1)
+    await kv.set(['foo'], 1, { ttl: 1 })
 
     await delay(2000)
 
     const value = await kv.get(['foo'])
 
     assert.equal(value, undefined)
-  })
-
-  test('should not expires with 0', async () => {
-    await kv.set(['should not expires with 0'], 1, 0)
-
-    await delay(100)
-
-    const value = await kv.get(['should not expires with 0'])
-
-    assert.equal(value, 1)
   })
 
   test('should support data types', async () => {
