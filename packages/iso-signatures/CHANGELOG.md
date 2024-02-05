@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.3.1...iso-signatures-v0.3.2) (2024-02-05)
+
+
+### Bug Fixes
+
+* simplify signer didKey ([6452696](https://github.com/hugomrdias/iso-repo/commit/6452696bbdc8ffbb3484b94b7c62d95421e9eb4e))
+
 ## [0.3.1](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.3.0...iso-signatures-v0.3.1) (2024-02-01)
 
 
