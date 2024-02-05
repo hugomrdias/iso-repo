@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v2.0.0...iso-kv-v3.0.0) (2024-02-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* kv set has expiration and ttl in seconds now
+
+### Features
+
+* kv set has expiration and ttl in seconds now ([9fef51a](https://github.com/hugomrdias/iso-repo/commit/9fef51ad54f3496f70673dc27314b04fe4ce1060))
+
 ## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v1.0.0...iso-kv-v2.0.0) (2024-02-04)
 
 
