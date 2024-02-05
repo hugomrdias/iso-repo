@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.0.0...iso-kv-v3.0.1) (2024-02-05)
+
+
+### Bug Fixes
+
+* allow null for expiration ([c5193f3](https://github.com/hugomrdias/iso-repo/commit/c5193f32ecb76e89951c9a49fd4c1622bec2d62c))
+
 ## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v2.0.0...iso-kv-v3.0.0) (2024-02-05)
 
 
