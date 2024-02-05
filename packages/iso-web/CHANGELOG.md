@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.3...iso-web-v1.0.4) (2024-02-05)
+
+
+### Bug Fixes
+
+* update doh to new iso-kv ttl in seconds ([6023226](https://github.com/hugomrdias/iso-repo/commit/6023226bfe6d27a299defe65b3e87c99831436f0))
+
 ## [1.0.3](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.2...iso-web-v1.0.3) (2024-02-04)
 
 
