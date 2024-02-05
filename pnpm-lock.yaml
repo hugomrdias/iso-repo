@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -104,8 +100,8 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0
       msw:
-        specifier: ^2.1.5
-        version: 2.1.5(typescript@5.3.3)
+        specifier: ^2.1.6
+        version: 2.1.6(typescript@5.3.3)
       playwright-test:
         specifier: ^14.1.0
         version: 14.1.0
@@ -304,8 +300,8 @@ importers:
         specifier: ^20.11.15
         version: 20.11.15
       msw:
-        specifier: ^2.1.5
-        version: 2.1.5(typescript@5.3.3)
+        specifier: ^2.1.6
+        version: 2.1.6(typescript@5.3.3)
       playwright-test:
         specifier: ^14.1.0
         version: 14.1.0
@@ -4276,8 +4272,8 @@ packages:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
     dev: true
 
-  /msw@2.1.5(typescript@5.3.3):
-    resolution: {integrity: sha512-r39AZk4taMmUEYwtzDAgFy38feqJy1yaKykvo0QE8q7H7c28yH/WIlOmE7oatjkC3dMgpTYfND8MaxeywgU+Yg==}
+  /msw@2.1.6(typescript@5.3.3):
+    resolution: {integrity: sha512-62NX1pdMa1C17U/6+SQjQFxwHx0bcWHzZoDN2mK97FvEttTkX9CyJqx3OcYYBpNykDx+segweaO4yxapjifj4g==}
     engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
@@ -6039,3 +6035,7 @@ packages:
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
