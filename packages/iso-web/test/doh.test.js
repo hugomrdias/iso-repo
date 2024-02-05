@@ -111,7 +111,7 @@ test('should resolve from cache', async () => {
   }
 
   // second from cache
-  await cache.set([url], { result: [1] }, 1)
+  await cache.set([url], { result: [1] }, { ttl: 1 })
 
   const out1 = await resolve('google.com', 'A', {
     cache,

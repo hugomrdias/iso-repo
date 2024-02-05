@@ -195,7 +195,7 @@ export async function resolve(query, type, options = {}) {
     const out = {
       error: new DohError(error, { data: result }),
     }
-    await cache.set([url], out, 3600) // caches errors for 1 hour
+    await cache.set([url], out, { ttl: 3600 }) // caches errors for 1 hour
     return out
   }
 
@@ -203,7 +203,7 @@ export async function resolve(query, type, options = {}) {
     const data = result.Answer.map((a) => a.data.replaceAll(/["']+/g, ''))
     const ttl = Math.min(...result.Answer.map((a) => a.TTL))
     const out = { result: data }
-    await cache.set([url], out, ttl)
+    await cache.set([url], out, { ttl })
     return out
   }
 
@@ -211,7 +211,7 @@ export async function resolve(query, type, options = {}) {
     const data = result.Authority.map((a) => a.data)
     const ttl = Math.min(...result.Authority.map((a) => a.TTL))
     const out = { result: data }
-    await cache.set([url], out, ttl)
+    await cache.set([url], out, { ttl })
     return out
   }
 
