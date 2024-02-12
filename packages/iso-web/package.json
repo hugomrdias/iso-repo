@@ -115,7 +115,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.12",
     "@types/node": "^20.11.15",
-    "msw": "^2.1.5",
+    "msw": "^2.2.0",
     "playwright-test": "^14.1.0",
     "type-fest": "^4.10.2",
     "typescript": "5.3.3"
