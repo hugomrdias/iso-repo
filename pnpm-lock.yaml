@@ -180,8 +180,8 @@ importers:
         specifier: ^20.11.19
         version: 20.11.19
       better-sqlite3:
-        specifier: ^9.3.0
-        version: 9.3.0
+        specifier: ^9.4.3
+        version: 9.4.3
       conf:
         specifier: ^12.0.0
         version: 12.0.0
@@ -1621,8 +1621,8 @@ packages:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
     dev: true
 
-  /better-sqlite3@9.3.0:
-    resolution: {integrity: sha512-ww73jVpQhRRdS9uMr761ixlkl4bWoXi8hMQlBGhoN6vPNlUHpIsNmw4pKN6kjknlt/wopdvXHvLk1W75BI+n0Q==}
+  /better-sqlite3@9.4.3:
+    resolution: {integrity: sha512-ud0bTmD9O3uWJGuXDltyj3R47Nz0OHX8iqPOT5PMspGqlu/qQFn+5S2eFBUCrySpavTjFXbi4EgrfVvPAHlImw==}
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
