@@ -25,7 +25,7 @@
     "lint-staged": "^15.2.1",
     "prettier": "3.2.4",
     "simple-git-hooks": "^2.9.0",
-    "typedoc": "^0.25.7",
+    "typedoc": "^0.25.9",
     "typedoc-plugin-missing-exports": "^2.2.0",
     "typescript": "5.3.3"
   },
