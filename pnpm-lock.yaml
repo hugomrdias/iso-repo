@@ -14,8 +14,8 @@ importers:
         specifier: ^15.2.1
         version: 15.2.1
       prettier:
-        specifier: 3.2.4
-        version: 3.2.4
+        specifier: 3.2.5
+        version: 3.2.5
       simple-git-hooks:
         specifier: ^2.10.0
         version: 2.10.0
@@ -3342,7 +3342,7 @@ packages:
       eslint-plugin-unicorn: 48.0.1(eslint@8.56.0)
       eslint-plugin-yml: 1.12.2(eslint@8.56.0)
       lint-staged: 14.0.1
-      prettier: 3.2.4
+      prettier: 3.2.5
       simple-git-hooks: 2.10.0
       typescript: 5.3.3
     transitivePeerDependencies:
@@ -4804,8 +4804,8 @@ packages:
     hasBin: true
     dev: true
 
-  /prettier@3.2.4:
-    resolution: {integrity: sha512-FWu1oLHKCrtpO1ypU6J0SbK2d9Ckwysq6bHj/uaCP26DxrPpppCLQRGVuqAxSTvhF00AcvDRyYrLNW7ocBhFFQ==}
+  /prettier@3.2.5:
+    resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true
