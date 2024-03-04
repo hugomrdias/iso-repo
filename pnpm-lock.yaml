@@ -48,8 +48,8 @@ importers:
         specifier: ^10.0.6
         version: 10.0.6
       '@types/node':
-        specifier: ^20.11.19
-        version: 20.11.19
+        specifier: ^20.11.24
+        version: 20.11.24
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -91,8 +91,8 @@ importers:
         specifier: ^10.0.6
         version: 10.0.6
       '@types/node':
-        specifier: ^20.11.19
-        version: 20.11.19
+        specifier: ^20.11.24
+        version: 20.11.24
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -149,8 +149,8 @@ importers:
         specifier: ^10.0.6
         version: 10.0.6
       '@types/node':
-        specifier: ^20.11.19
-        version: 20.11.19
+        specifier: ^20.11.24
+        version: 20.11.24
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -177,8 +177,8 @@ importers:
         specifier: ^7.6.9
         version: 7.6.9
       '@types/node':
-        specifier: ^20.11.19
-        version: 20.11.19
+        specifier: ^20.11.24
+        version: 20.11.24
       better-sqlite3:
         specifier: ^9.4.3
         version: 9.4.3
@@ -229,8 +229,8 @@ importers:
         specifier: ^10.0.6
         version: 10.0.6
       '@types/node':
-        specifier: ^20.11.19
-        version: 20.11.19
+        specifier: ^20.11.24
+        version: 20.11.24
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -263,8 +263,8 @@ importers:
         specifier: ^10.0.6
         version: 10.0.6
       '@types/node':
-        specifier: ^20.11.19
-        version: 20.11.19
+        specifier: ^20.11.24
+        version: 20.11.24
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -297,8 +297,8 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12
       '@types/node':
-        specifier: ^20.11.19
-        version: 20.11.19
+        specifier: ^20.11.24
+        version: 20.11.24
       msw:
         specifier: ^2.1.5
         version: 2.1.5(typescript@5.3.3)
@@ -334,8 +334,8 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12
       '@types/node':
-        specifier: ^20.11.19
-        version: 20.11.19
+        specifier: ^20.11.24
+        version: 20.11.24
       '@types/retry':
         specifier: ^0.12.5
         version: 0.12.5
@@ -999,7 +999,7 @@ packages:
   /@types/better-sqlite3@7.6.9:
     resolution: {integrity: sha512-FvktcujPDj9XKMJQWFcl2vVl7OdRIqsSRX9b0acWwTmwLK9CF2eqo/FRcmMLNpugKoX/avA6pb7TorDLmpgTnQ==}
     dependencies:
-      '@types/node': 20.11.19
+      '@types/node': 20.11.24
     dev: true
 
   /@types/cookie@0.6.0:
@@ -1042,8 +1042,8 @@ packages:
     resolution: {integrity: sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==}
     dev: true
 
-  /@types/node@20.11.19:
-    resolution: {integrity: sha512-7xMnVEcZFu0DikYjWOlRq7NTPETrm7teqUT2WkQjrTIkEgUyyGdWsj/Zg8bEJt5TNklzbPD1X3fqfsHw3SpapQ==}
+  /@types/node@20.11.24:
+    resolution: {integrity: sha512-Kza43ewS3xoLgCEpQrsT+xRo/EJej1y0kVYGiLFE1NEODXGzTfwiC6tXTLMQskn1X4/Rjlh0MQUvx9W+L9long==}
     dependencies:
       undici-types: 5.26.5
     dev: true
@@ -1079,7 +1079,7 @@ packages:
   /@types/ws@8.5.10:
     resolution: {integrity: sha512-vmQSUcfalpIq0R9q7uTo2lXs6eGIpt9wtnLdMv9LVpIjCA/+ufZRozlVoVelIYixx1ugCBKDhn89vnsEGOCx9A==}
     dependencies:
-      '@types/node': 20.11.19
+      '@types/node': 20.11.24
     dev: true
 
   /@types/yargs-parser@21.0.3:
