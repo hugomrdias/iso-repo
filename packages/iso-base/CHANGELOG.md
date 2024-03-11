@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v2.0.1...iso-base-v3.0.0) (2024-03-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* change base32hex to lower case
+
+### Features
+
+* change base32hex to lower case ([3364836](https://github.com/hugomrdias/iso-repo/commit/3364836a49ed2b3c993bdb2b882f1a6efe8542e0))
+
 ## [2.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v2.0.0...iso-base-v2.0.1) (2023-09-05)
 
 
