@@ -114,7 +114,7 @@ const bases = {
   hex: [4, '0123456789abcdef'],
   base16: [4, '0123456789ABCDEF'],
   base32: [5, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'],
-  base32hex: [5, '0123456789ABCDEFGHIJKLMNOPQRSTUV'],
+  base32hex: [5, '0123456789abcdefghijklmnopqrstuv'],
   base64: [
     6,
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
