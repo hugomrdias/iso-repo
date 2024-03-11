@@ -10,13 +10,13 @@
       "packages/iso-signatures",
       "packages/iso-web",
       "packages/iso-kv",
-      "packages/iso-websocket",
+      "packages/iso-websocket"
     ],
     "excludeExternals": true,
     "sourceLinkExternal": true,
     "darkHighlightTheme": "github-dark",
     "navigationLinks": {
-      "Github": "https://github.com/hugomrdias/iso-repo",
-    },
-  },
+      "Github": "https://github.com/hugomrdias/iso-repo"
+    }
+  }
 }

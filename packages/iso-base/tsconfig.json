@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "outDir": "dist",
+    "outDir": "dist"
   },
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
@@ -15,10 +15,10 @@
       "src/utils.js",
       "src/base-x.js",
       "src/varint.js",
-      "src/ec-compression.js",
+      "src/ec-compression.js"
     ],
     "includeVersion": true,
     "excludeExternals": true,
-    "internalModule": "<internal>",
-  },
+    "internalModule": "<internal>"
+  }
 }

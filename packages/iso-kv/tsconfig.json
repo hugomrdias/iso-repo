@@ -2,15 +2,15 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "outDir": "dist",
+    "outDir": "dist"
   },
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
   "typedocOptions": {
     "entryPointStrategy": "resolve",
-    "entryPoints": ["src/index.js", "src/adapters/*.js"],
+    "entryPoints": ["src/index.js", "src/drivers/*.js"],
     "includeVersion": true,
     "excludeExternals": true,
-    "internalModule": "<internal>",
-  },
+    "internalModule": "<internal>"
+  }
 }

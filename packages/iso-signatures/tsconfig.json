@@ -2,15 +2,15 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "outDir": "dist",
+    "outDir": "dist"
   },
   "references": [
     {
-      "path": "../iso-base",
+      "path": "../iso-base"
     },
     {
-      "path": "../iso-did",
-    },
+      "path": "../iso-did"
+    }
   ],
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
@@ -20,10 +20,10 @@
       "src/signers/*.js",
       "src/verifiers/*.js",
       "src/asn1.js",
-      "src/spki.js",
+      "src/spki.js"
     ],
     "includeVersion": true,
     "excludeExternals": true,
-    "internalModule": "<internal>",
-  },
+    "internalModule": "<internal>"
+  }
 }
