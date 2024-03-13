@@ -80,30 +80,37 @@ export function encode(value, buf, offset = 0) {
   }
 
   switch (size) {
+    // @ts-ignore
     case 8: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
+    // @ts-ignore
     case 7: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
+    // @ts-ignore
     case 6: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
+    // @ts-ignore
     case 5: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
+    // @ts-ignore
     case 4: {
       buf[offset++] = (value & 0xff) | MSB
       value >>>= 7
     }
+    // @ts-ignore
     case 3: {
       buf[offset++] = (value & 0xff) | MSB
       value >>>= 7
     }
+    // @ts-ignore
     case 2: {
       buf[offset++] = (value & 0xff) | MSB
       value >>>= 7
