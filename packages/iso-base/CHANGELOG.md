@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v3.0.0...iso-base-v4.0.0) (2024-03-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* varint overhaul and removed globalthis.Buffer from utf8 codec
+
+### Features
+
+* varint overhaul and removed globalthis.Buffer from utf8 codec ([a3b47c4](https://github.com/hugomrdias/iso-repo/commit/a3b47c4a8e7890ffd1f7ffbb689ba1a8b80ac9c8))
+
 ## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v2.0.1...iso-base-v3.0.0) (2024-03-11)
 
 
