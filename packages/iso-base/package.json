@@ -111,7 +111,7 @@
     "bigint-mod-arith": "^3.3.1"
   },
   "devDependencies": {
-    "@scure/base": "^1.1.5",
+    "@scure/base": "^1.1.6",
     "@types/assert": "^1.5.10",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.30",
