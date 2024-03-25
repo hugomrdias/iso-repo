@@ -146,10 +146,12 @@ const kv = new KV()
  * @see https://developers.google.com/speed/public-dns/docs/doh/json
  * @see https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/
  *
+ * @template {string[]} [T=string[]]
+ *
  * @param {string} query
  * @param {import("./types.js").RecordType} type
  * @param {import("./types.js").ResolveOptions} [options]
- * @returns {Promise<import("../types.js").MaybeResult<string[], Errors>>}
+ * @returns {Promise<import("../types.js").MaybeResult<T, Errors>>}
  */
 export async function resolve(query, type, options = {}) {
   const { cache = kv } = options
@@ -161,7 +163,7 @@ export async function resolve(query, type, options = {}) {
   } = options
   const url = `${server}?name=${query}&type=${type}`
 
-  /** @type {import('../types.js').MaybeResult<string[], Errors> | undefined} */
+  /** @type {import('../types.js').MaybeResult<T, Errors> | undefined} */
   const cached = await cache.get([url])
   if (cached) {
     return cached
@@ -200,7 +202,9 @@ export async function resolve(query, type, options = {}) {
   }
 
   if (result.Answer) {
-    const data = result.Answer.map((a) => a.data.replaceAll(/["']+/g, ''))
+    const data = /** @type {T} */ (
+      result.Answer.map((a) => a.data.replaceAll(/["']+/g, ''))
+    )
     const ttl = Math.min(...result.Answer.map((a) => a.TTL))
     const out = { result: data }
     await cache.set([url], out, { ttl })
@@ -208,7 +212,7 @@ export async function resolve(query, type, options = {}) {
   }
 
   if (result.Authority) {
-    const data = result.Authority.map((a) => a.data)
+    const data = /** @type {T} */ (result.Authority.map((a) => a.data))
     const ttl = Math.min(...result.Authority.map((a) => a.TTL))
     const out = { result: data }
     await cache.set([url], out, { ttl })
