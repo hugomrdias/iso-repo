@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.0.1...iso-kv-v3.0.2) (2024-03-25)
+
+
+### Bug Fixes
+
+* move conf to deps ([d939f7d](https://github.com/hugomrdias/iso-repo/commit/d939f7db0f920d02f1830066d1d6249188b7ac5e))
+
 ## [3.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.0.0...iso-kv-v3.0.1) (2024-02-05)
 
 
