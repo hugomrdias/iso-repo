@@ -100,8 +100,8 @@ importers:
         specifier: ^10.3.0
         version: 10.3.0
       msw:
-        specifier: ^2.2.3
-        version: 2.2.3(typescript@5.3.3)
+        specifier: ^2.2.10
+        version: 2.2.10(typescript@5.3.3)
       playwright-test:
         specifier: ^14.1.1
         version: 14.1.1
@@ -300,8 +300,8 @@ importers:
         specifier: ^20.11.30
         version: 20.11.30
       msw:
-        specifier: ^2.2.3
-        version: 2.2.3(typescript@5.3.3)
+        specifier: ^2.2.10
+        version: 2.2.10(typescript@5.3.3)
       playwright-test:
         specifier: ^14.1.1
         version: 14.1.1
@@ -4256,8 +4256,8 @@ packages:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
     dev: true
 
-  /msw@2.2.3(typescript@5.3.3):
-    resolution: {integrity: sha512-84CoNCkcJ/EvY8Tv0tD/6HKVd4S5HyGowHjM5W12K8Wgryp4fikqS7IaTOceyQgP5dNedxo2icTLDXo7dkpxCg==}
+  /msw@2.2.10(typescript@5.3.3):
+    resolution: {integrity: sha512-OQhHBocUsI8j+czCTRouGCGYE8pk6hq8HQ0HFg9mYQg7KCzqVpUSbMikmRbRXGoid28FFvYqjbxB3/UWw50VZQ==}
     engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
