@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.4...iso-web-v1.0.5) (2024-03-25)
+
+
+### Bug Fixes
+
+* support generic result from doh resolve ([0a0ebaa](https://github.com/hugomrdias/iso-repo/commit/0a0ebaaa15637c3daec7c2dec9b789c4ccd17f15))
+
 ## [1.0.4](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.3...iso-web-v1.0.4) (2024-02-05)
 
 
