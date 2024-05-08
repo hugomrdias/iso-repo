@@ -1,4 +1,4 @@
-# @hugomrdias/configs [![NPM Version](https://img.shields.io/npm/v/@hugomrdias/configs.svg)](https://www.npmjs.com/package/@hugomrdias/configs) [![License](https://img.shields.io/npm/l/@hugomrdias/configs.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![@hugomrdias/configs](https://github.com/hugomrdias/iso-repo/actions/workflows/@hugomrdias/configs.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/@hugomrdias/configs.yml)
+# @hugomrdias/configs [![NPM Version](https://img.shields.io/npm/v/%40hugomrdias/configs.svg)](https://www.npmjs.com/package/@hugomrdias/configs) [![License](https://img.shields.io/npm/l/%40hugomrdias/configs.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license)
 
 > JS tooling config
 

@@ -27,7 +27,7 @@
     "typescript": "5.4.5"
   },
   "publishConfig": {
-    "provenance": true
+    "provenance": false
   },
   "depcheck": {
     "specials": [
