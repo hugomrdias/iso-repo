@@ -9,6 +9,6 @@
     "packages/iso-web": {},
     "packages/iso-kv": {},
     "packages/iso-websocket": {},
-    "packages/iso-config": {}
+    "packages/configs": {}
   }
 }
