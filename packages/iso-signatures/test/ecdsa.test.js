@@ -1,8 +1,8 @@
 import assert from 'assert'
 import { base64url } from 'iso-base/rfc4648'
 import { concat } from 'iso-base/utils'
-import * as ECDSA from '../src/verifiers/ecdsa.js'
 import { ECDSASigner } from '../src/signers/ecdsa.js'
+import * as ECDSA from '../src/verifiers/ecdsa.js'
 
 /**
  * @type {{
@@ -81,9 +81,9 @@ const fixtures = {
   ],
 }
 
-describe('Verifier ES256', function () {
+describe('Verifier ES256', () => {
   for (const { did, jwk } of fixtures.p256) {
-    it(`should verify ${jwk.d}`, async function () {
+    it(`should verify ${jwk.d}`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await ECDSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -108,7 +108,7 @@ describe('Verifier ES256', function () {
       assert.ok(verified)
     })
 
-    it(`should verify ${jwk.d} from did compressed EC`, async function () {
+    it(`should verify ${jwk.d} from did compressed EC`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await ECDSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -121,7 +121,7 @@ describe('Verifier ES256', function () {
       assert.ok(verified)
     })
 
-    it(`should verify ${jwk.d} from signer directly`, async function () {
+    it(`should verify ${jwk.d} from signer directly`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await ECDSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -135,9 +135,9 @@ describe('Verifier ES256', function () {
   }
 })
 
-describe('Verifier ES384', function () {
+describe('Verifier ES384', () => {
   for (const { did, jwk } of fixtures.p384) {
-    it(`should verify ${jwk.d}`, async function () {
+    it(`should verify ${jwk.d}`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await ECDSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -162,7 +162,7 @@ describe('Verifier ES384', function () {
       assert.ok(verified)
     })
 
-    it(`should verify ${jwk.d} from did compressed EC`, async function () {
+    it(`should verify ${jwk.d} from did compressed EC`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await ECDSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -175,7 +175,7 @@ describe('Verifier ES384', function () {
       assert.ok(verified)
     })
 
-    it(`should verify ${jwk.d} from signer directly`, async function () {
+    it(`should verify ${jwk.d} from signer directly`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await ECDSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -189,9 +189,9 @@ describe('Verifier ES384', function () {
   }
 })
 
-describe('Verifier ES521', function () {
+describe('Verifier ES521', () => {
   for (const { did, jwk } of fixtures.p521) {
-    it(`should verify ${jwk.d}`, async function () {
+    it(`should verify ${jwk.d}`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await ECDSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -216,7 +216,7 @@ describe('Verifier ES521', function () {
       assert.ok(verified)
     })
 
-    it(`should verify ${jwk.d} from did compressed EC`, async function () {
+    it(`should verify ${jwk.d} from did compressed EC`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await ECDSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -229,7 +229,7 @@ describe('Verifier ES521', function () {
       assert.ok(verified)
     })
 
-    it(`should verify ${jwk.d} from signer directly`, async function () {
+    it(`should verify ${jwk.d} from signer directly`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await ECDSASigner.importJwk(jwk)
       const signature = await signer.sign(message)

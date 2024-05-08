@@ -1,6 +1,6 @@
-import { z } from 'zod'
 import { encode } from '@ipld/dag-cbor'
 import { base64 } from 'iso-base/rfc4648'
+import { z } from 'zod'
 
 import * as Address from './address.js'
 import { Token } from './token.js'

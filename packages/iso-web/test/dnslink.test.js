@@ -1,5 +1,5 @@
-import { assert, suite } from 'playwright-test/taps'
 import { http } from 'msw'
+import { assert, suite } from 'playwright-test/taps'
 import { DohError, NetworkError, resolve } from '../src/doh/dnslink.js'
 import { setup } from '../src/msw/msw.js'
 
@@ -27,7 +27,7 @@ function mockRecord(values, status = 0) {
   }
 }
 
-export const handlers = [
+const handlers = [
   http.get('https://cloudflare-dns.com/dns-query', ({ request }) => {
     const params = Object.fromEntries(new URL(request.url).searchParams)
     if (params.name === '_dnslink.docs.ipfs.tech') {

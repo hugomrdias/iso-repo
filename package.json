@@ -2,16 +2,13 @@
   "name": "iso-repo",
   "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "packageManager": "pnpm@8.5.1",
+  "workspaces": ["packages/*"],
+  "packageManager": "pnpm@9.1.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
-    "format": "prettier --write '**/*.{js,ts,yml,json}' --ignore-path .gitignore",
-    "format:check": "prettier --check '**/*.{js,ts,yml,json}' --ignore-path .gitignore",
+    "format": "biome check --apply --no-errors-on-unmatched --files-ignore-unknown=true .",
     "clean": "rm -rf docs node_modules pnpm-lock.yaml packages/*/{pnpm-lock.yaml,coverage,.nyc_output,dist,node_modules,.next}",
     "lint": "pnpm -r --if-present run lint",
     "test": "pnpm -r --if-present run test",
@@ -22,28 +19,19 @@
   },
   "devDependencies": {
     "depcheck": "^1.4.7",
-    "hd-scripts": "^9.1.0",
+    "iso-config": "workspace:^",
     "lint-staged": "^15.2.2",
     "prettier": "3.2.5",
     "simple-git-hooks": "^2.11.0",
     "typedoc": "^0.25.12",
     "typedoc-plugin-missing-exports": "^2.2.0",
-    "typescript": "5.3.3"
+    "typescript": "5.4.5",
+    "@biomejs/biome": "1.7.3"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
   },
   "lint-staged": {
-    "*.{js,ts,yml,json}": "prettier --write",
-    "*": "eslint --fix"
-  },
-  "eslintConfig": {
-    "extends": [
-      "./node_modules/hd-scripts/eslint/index.js"
-    ],
-    "ignorePatterns": [
-      "docs"
-    ]
-  },
-  "prettier": "hd-scripts/prettier.config.js"
+    "*": "biome check --no-errors-on-unmatched --files-ignore-unknown=true"
+  }
 }

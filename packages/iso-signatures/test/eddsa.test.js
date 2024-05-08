@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { base64url } from 'iso-base/rfc4648'
-import * as EdDSA from '../src/verifiers/eddsa.js'
 import { EdDSASigner } from '../src/signers/eddsa.js'
+import * as EdDSA from '../src/verifiers/eddsa.js'
 
 const fixtures = {
   ed25519: [
@@ -23,9 +23,9 @@ const fixtures = {
   ],
 }
 
-describe('Verifier EdDSA', function () {
+describe('Verifier EdDSA', () => {
   for (const { pub, priv } of fixtures.ed25519) {
-    it(`should verify ${base64url.encode(priv)}`, async function () {
+    it(`should verify ${base64url.encode(priv)}`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await EdDSASigner.generate(priv)
 

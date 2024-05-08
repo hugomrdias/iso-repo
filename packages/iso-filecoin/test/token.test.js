@@ -2,8 +2,8 @@ import assert from 'assert'
 import { base16 } from 'iso-base/rfc4648'
 import { Token } from '../src/token.js'
 
-describe('token', function () {
-  it('zero', function () {
+describe('token', () => {
+  it('zero', () => {
     assert.strictEqual(new Token(0).toAttoFIL().toString(), '0')
     assert.strictEqual(new Token(0).toFemtoFIL().toString(), '0')
     assert.strictEqual(new Token(0).toPicoFIL().toString(), '0')
@@ -13,7 +13,7 @@ describe('token', function () {
     assert.strictEqual(new Token(0).toFIL().toString(), '0')
   })
 
-  it('positive', function () {
+  it('positive', () => {
     assert.strictEqual(
       Token.fromFIL(1).toAttoFIL().toString(),
       '1000000000000000000'
@@ -29,7 +29,7 @@ describe('token', function () {
     assert.strictEqual(Token.fromFIL(1).toFIL().toString(), '1')
   })
 
-  it('negative', function () {
+  it('negative', () => {
     assert.strictEqual(
       Token.fromFIL(-1).toAttoFIL().toString(),
       '-1000000000000000000'
@@ -48,7 +48,7 @@ describe('token', function () {
     assert.strictEqual(Token.fromFIL(-1).toFIL().toString(), '-1')
   })
 
-  it('float', function () {
+  it('float', () => {
     assert.strictEqual(
       Token.fromFIL(0.001).toAttoFIL().toString(),
       '1000000000000000'
@@ -67,7 +67,7 @@ describe('token', function () {
     assert.strictEqual(Token.fromFIL(0.001).toFIL().toString(), '0.001')
   })
 
-  it('precision bigint', function () {
+  it('precision bigint', () => {
     assert.strictEqual(
       Token.fromAttoFIL(11_231_000_001_100_000_000_011n).toAttoFIL().toString(),
       '11231000001100000000011'
@@ -118,14 +118,14 @@ describe('token', function () {
   ]
 
   for (const [atto, serialized] of vectors) {
-    it(`serialize ${atto}`, function () {
+    it(`serialize ${atto}`, () => {
       const s = base16.encode(Token.fromAttoFIL(atto).toBytes()).toLowerCase()
 
       assert.strictEqual(s, serialized)
     })
   }
 
-  it('should format', function () {
+  it('should format', () => {
     assert.strictEqual(
       Token.fromAttoFIL(1).toFIL().toString(),
       '0.000000000000000001'

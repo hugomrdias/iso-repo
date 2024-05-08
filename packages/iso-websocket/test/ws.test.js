@@ -1,8 +1,8 @@
+import delay from 'delay'
+import pDefer from 'p-defer'
+import * as Client from 'playwright-test/client'
 /* eslint-disable unicorn/prefer-add-event-listener */
 import { assert, suite } from 'playwright-test/taps'
-import * as Client from 'playwright-test/client'
-import pDefer from 'p-defer'
-import delay from 'delay'
 import { WebSocket } from 'unws'
 import { WS } from '../src/index.js'
 
@@ -12,7 +12,7 @@ const URL = 'ws://localhost:8080'
 
 test('should queue and send', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '/echo', { ws: WebSocket })
+  const ws = new WS(`${URL}/echo`, { ws: WebSocket })
   ws.addEventListener('message', (e) => {
     if (e.data === 'test') {
       deferred.resolve()
@@ -29,7 +29,7 @@ test('should queue and send', async () => {
 
 test('should handle close', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '?exitCode=1002&exitReason=testing', {
+  const ws = new WS(`${URL}?exitCode=1002&exitReason=testing`, {
     ws: WebSocket,
   })
 
@@ -47,7 +47,7 @@ test('should handle close', async () => {
 
 test('should unclean close', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '/terminate', {
+  const ws = new WS(`${URL}/terminate`, {
     ws: WebSocket,
   })
 
@@ -65,7 +65,7 @@ test('should unclean close', async () => {
 
 test('should retry', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '?exitCode=1002&exitReason=testing', {
+  const ws = new WS(`${URL}?exitCode=1002&exitReason=testing`, {
     retry: {
       retries: 1,
     },
@@ -86,21 +86,21 @@ test('should retry', async () => {
 
 test('should not retry on code 1000', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '?exitCode=1000', {
+  const ws = new WS(`${URL}?exitCode=1000`, {
     retry: {
       retries: 1,
     },
     ws: WebSocket,
   })
 
-  ws.addEventListener('error', (e) => {
+  ws.addEventListener('error', () => {
     deferred.reject(new Error('Should not error'))
   })
   ws.addEventListener('retry', () => {
     deferred.reject(new Error('Should not retry'))
   })
 
-  ws.addEventListener('close', (e) => {
+  ws.addEventListener('close', () => {
     deferred.resolve()
   })
 
@@ -110,12 +110,12 @@ test('should not retry on code 1000', async () => {
 
 test('should force stop retries', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '?exitCode=1002', {
+  const ws = new WS(`${URL}?exitCode=1002`, {
     ws: WebSocket,
   })
 
   let retries = 0
-  ws.addEventListener('close', (e) => {
+  ws.addEventListener('close', () => {
     if (retries === 1) {
       deferred.resolve()
     } else {
@@ -134,7 +134,7 @@ test('should force stop retries', async () => {
 
 test('should stop > message > stop and reset retry count', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '/echo', {
+  const ws = new WS(`${URL}/echo`, {
     ws: WebSocket,
     retry: {
       retries: 1,
@@ -182,13 +182,13 @@ test('should error and fix itself by changing urls', async () => {
    *
    */
   function getUrl() {
-    return errorHappened ? URL + '/echo' : 'ws://localhost:5900'
+    return errorHappened ? `${URL}/echo` : 'ws://localhost:5900'
   }
   const ws = new WS(getUrl, {
     ws: WebSocket,
   })
 
-  ws.addEventListener('error', (e) => {
+  ws.addEventListener('error', () => {
     errorHappened = true
   })
 
@@ -209,7 +209,7 @@ test('should error and fix itself by changing urls', async () => {
 test('should not auto open, queue msg and send when opened', async () => {
   const deferred = pDefer()
 
-  const ws = new WS(URL + '/echo', { automaticOpen: false, ws: WebSocket })
+  const ws = new WS(`${URL}/echo`, { automaticOpen: false, ws: WebSocket })
 
   ws.addEventListener('message', (e) => {
     if (e.data === 'test') {
@@ -231,7 +231,7 @@ test(
     const deferred = pDefer()
     await Client.context.setOffline(true)
 
-    const ws = new WS(URL + '/echo', { ws: WebSocket })
+    const ws = new WS(`${URL}/echo`, { ws: WebSocket })
 
     ws.addEventListener('message', (e) => {
       if (e.data === 'test') {
@@ -257,7 +257,7 @@ test(
   async () => {
     const deferred = pDefer()
 
-    const ws = new WS(URL + '/echo', { ws: WebSocket })
+    const ws = new WS(`${URL}/echo`, { ws: WebSocket })
     let openCount = 0
 
     ws.addEventListener('open', () => {
@@ -292,7 +292,7 @@ test(
 test(
   'should not reconnect when explicitly closed',
   async () => {
-    const ws = new WS(URL + '/echo', { ws: WebSocket })
+    const ws = new WS(`${URL}/echo`, { ws: WebSocket })
     let openCount = 0
     let closeCount = 0
 
@@ -326,7 +326,7 @@ test(
 )
 
 test('should not reconnect if already open', async () => {
-  const ws = new WS(URL + '/echo', { ws: WebSocket, retry: {} })
+  const ws = new WS(`${URL}/echo`, { ws: WebSocket, retry: {} })
   let openCount = 0
 
   ws.addEventListener('open', () => {
@@ -348,7 +348,7 @@ test('should error on "onerror" hook', async () => {
   const ws = new WS('ws://localhost:8003', {
     ws: WebSocket,
   })
-  ws.onerror = (e) => {
+  ws.onerror = () => {
     deferred.resolve()
   }
   ws.open()
@@ -362,7 +362,7 @@ test('should open on "onopen" hook', async () => {
   const ws = new WS(URL, {
     ws: WebSocket,
   })
-  ws.addEventListener('open', (e) => {
+  ws.addEventListener('open', () => {
     deferred.resolve()
   })
   ws.open()
@@ -373,7 +373,7 @@ test('should open on "onopen" hook', async () => {
 
 test('should message on "onmessage" hook ', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '/echo', { ws: WebSocket })
+  const ws = new WS(`${URL}/echo`, { ws: WebSocket })
   ws.onmessage = (e) => {
     if (e.data === 'test') {
       deferred.resolve()
@@ -390,7 +390,7 @@ test('should message on "onmessage" hook ', async () => {
 
 test('should close on "onclose" hook', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '?exitCode=1002&exitReason=testing', {
+  const ws = new WS(`${URL}?exitCode=1002&exitReason=testing`, {
     ws: WebSocket,
   })
 
@@ -408,7 +408,7 @@ test('should close on "onclose" hook', async () => {
 
 test('should retry timeout ', async () => {
   const deferred = pDefer()
-  const ws = new WS(URL + '/timeout', {
+  const ws = new WS(`${URL}/timeout`, {
     ws: WebSocket,
     timeout: 100,
     retry: {
@@ -428,7 +428,7 @@ test('should retry timeout ', async () => {
 test('should not retry timeout after connect opened', async () => {
   const deferred = pDefer()
   let count = 0
-  const ws = new WS(URL + '/delayed-msg', {
+  const ws = new WS(`${URL}/delayed-msg`, {
     ws: WebSocket,
     timeout: 100,
     retry: {
@@ -436,7 +436,7 @@ test('should not retry timeout after connect opened', async () => {
     },
   })
 
-  ws.addEventListener('error', (e) => {
+  ws.addEventListener('error', () => {
     count++
   })
 

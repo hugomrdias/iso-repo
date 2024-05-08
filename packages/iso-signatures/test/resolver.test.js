@@ -1,13 +1,13 @@
 import assert from 'assert'
 import { EdDSASigner } from '../src/signers/eddsa.js'
 import { RSASigner } from '../src/signers/rsa.js'
-import { Resolver } from '../src/verifiers/resolver.js'
-import * as EdDSA from '../src/verifiers/eddsa.js'
 import * as ECDSA from '../src/verifiers/ecdsa.js'
+import * as EdDSA from '../src/verifiers/eddsa.js'
+import { Resolver } from '../src/verifiers/resolver.js'
 import * as RSA from '../src/verifiers/rsa.js'
 
-describe('Verifier Resolver', function () {
-  it(`should verify`, async function () {
+describe('Verifier Resolver', () => {
+  it('should verify', async () => {
     const message = new TextEncoder().encode('hello world')
     const resolver = new Resolver({
       ...EdDSA.verifier,
@@ -22,7 +22,7 @@ describe('Verifier Resolver', function () {
     assert.ok(verified)
   })
 
-  it(`should verify from did`, async function () {
+  it('should verify from did', async () => {
     const message = new TextEncoder().encode('hello world')
     const resolver = new Resolver({
       ...EdDSA.verifier,
@@ -37,7 +37,7 @@ describe('Verifier Resolver', function () {
     assert.ok(verified)
   })
 
-  it(`should verify with cache`, async function () {
+  it('should verify with cache', async () => {
     const message = new TextEncoder().encode('hello world')
     const resolver = new Resolver(
       {
@@ -55,7 +55,7 @@ describe('Verifier Resolver', function () {
     assert.ok(verified)
   })
 
-  it(`should verify with multiple verifiers`, async function () {
+  it('should verify with multiple verifiers', async () => {
     const message = new TextEncoder().encode('hello world')
     const resolver = new Resolver(
       {
@@ -74,7 +74,7 @@ describe('Verifier Resolver', function () {
     assert.ok(verified)
   })
 
-  it(`should throw when no verifiers`, async function () {
+  it('should throw when no verifiers', async () => {
     const message = new TextEncoder().encode('hello world')
     const resolver = new Resolver({})
     const signer = await EdDSASigner.generate()
@@ -93,7 +93,7 @@ describe('Verifier Resolver', function () {
     )
   })
 
-  it(`should verify rsa old`, async function () {
+  it('should verify rsa old', async () => {
     const message = new TextEncoder().encode('hello world')
     const resolver = new Resolver({
       ...ECDSA.verifier,

@@ -204,37 +204,35 @@ export class RPC {
           return /** @type {import("./types.js").RpcError} */ ({
             error: {
               code: json.error.code,
-              message: 'RPC_ERROR: ' + json.error.message,
+              message: `RPC_ERROR: ${json.error.message}`,
             },
           })
-        } else {
-          return /** @type {R} */ ({ result: json.result })
         }
-      } else {
-        const text = await res.text()
-        let json
-        try {
-          json = JSON.parse(text)
-        } catch {}
+        return /** @type {R} */ ({ result: json.result })
+      }
+      const text = await res.text()
+      let json
+      try {
+        json = JSON.parse(text)
+      } catch {
+        // ignore error
+      }
 
-        if (json && json.error) {
-          return /** @type {import("./types.js").RpcError} */ ({
-            error: {
-              code: json.error.code,
-              message: 'RPC_ERROR: ' + json.error.message,
-            },
-          })
-        }
-        if (!json || !json.error) {
-          return /** @type {import("./types.js").RpcError} */ ({
-            error: {
-              code: res.status,
-              message: `HTTP_ERROR: ${res.statusText} ${
-                text ? `- ${text}` : ``
-              }`,
-            },
-          })
-        }
+      if (json?.error) {
+        return /** @type {import("./types.js").RpcError} */ ({
+          error: {
+            code: json.error.code,
+            message: `RPC_ERROR: ${json.error.message}`,
+          },
+        })
+      }
+      if (!json || !json.error) {
+        return /** @type {import("./types.js").RpcError} */ ({
+          error: {
+            code: res.status,
+            message: `HTTP_ERROR: ${res.statusText} ${text ? `- ${text}` : ''}`,
+          },
+        })
       }
     } catch (error) {
       const err = /** @type {Error} */ (error)
@@ -249,7 +247,7 @@ export class RPC {
     return /** @type {import("./types.js").RpcError} */ ({
       error: {
         code: 0,
-        message: `ERROR: unknown error`,
+        message: 'ERROR: unknown error',
       },
     })
   }

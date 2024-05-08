@@ -51,40 +51,40 @@ const VECTORS = [
   ['base64url', '÷ïÿ🥰÷ïÿ😎🥶🤯', 'w7fDr8O_8J-lsMO3w6_Dv_CfmI7wn6W28J-krw'],
 ]
 
-describe('decode', function () {
+describe('decode', () => {
   for (const [base, input, output] of VECTORS) {
     // @ts-ignore
     const codec = /** @type {import('../src/types.js').Codec} */ (BASES[base])
-    it(`${base}: ${input}`, function () {
+    it(`${base}: ${input}`, () => {
       assert.deepStrictEqual(codec.decode(output), utf8.decode(input))
     })
   }
 })
 
-describe('encode', function () {
+describe('encode', () => {
   for (const [base, input, output] of VECTORS) {
     // @ts-ignore
     const codec = /** @type {import('../src/types.js').Codec} */ (BASES[base])
 
-    it(`${base}: ${input}`, function () {
+    it(`${base}: ${input}`, () => {
       assert.deepStrictEqual(codec.encode(input), output)
     })
   }
 })
 
-describe('encode/decode', function () {
+describe('encode/decode', () => {
   for (const [base, input] of VECTORS) {
     // @ts-ignore
     const codec = /** @type {import('../src/types.js').Codec} */ (BASES[base])
 
-    it(`${base}: ${input}`, function () {
+    it(`${base}: ${input}`, () => {
       const bytes = utf8.decode(input)
       assert.deepStrictEqual(codec.decode(codec.encode(input)), bytes)
     })
   }
 })
 
-describe('others', function () {
+describe('others', () => {
   it('hex matches node', function () {
     if (!globalThis.Buffer) {
       this.skip()
@@ -115,7 +115,7 @@ describe('others', function () {
     )
   })
 
-  it('base64url with pad ', function () {
+  it('base64url with pad ', () => {
     const vector = ['foob', 'Zm9vYg==']
 
     assert.deepStrictEqual(BASES.base64url.encode(vector[0], true), vector[1])

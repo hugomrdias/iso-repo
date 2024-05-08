@@ -30,7 +30,9 @@ const curveToPointLength = {
  * @param {Curve} curve
  */
 export function getConstantsForCurve(curve) {
-  let prime, b, pIdent
+  let prime
+  let b
+  let pIdent
   const two = BigInt(2)
 
   switch (curve) {

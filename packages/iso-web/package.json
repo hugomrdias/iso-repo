@@ -68,27 +68,13 @@
   },
   "typesVersions": {
     "*": {
-      "crypto": [
-        "dist/src/crypto"
-      ],
-      "signals": [
-        "dist/src/signals"
-      ],
-      "http": [
-        "dist/src/http"
-      ],
-      "doh": [
-        "dist/src/doh/index"
-      ],
-      "msw": [
-        "dist/src/msw/msw"
-      ],
-      "dnslink": [
-        "dist/src/doh/dnslink"
-      ],
-      "types": [
-        "dist/src/types"
-      ]
+      "crypto": ["dist/src/crypto"],
+      "signals": ["dist/src/signals"],
+      "http": ["dist/src/http"],
+      "doh": ["dist/src/doh/index"],
+      "msw": ["dist/src/msw/msw"],
+      "dnslink": ["dist/src/doh/dnslink"],
+      "types": ["dist/src/types"]
     }
   },
   "files": [
@@ -101,7 +87,7 @@
     "dist/src/msw/*.d.ts.map"
   ],
   "scripts": {
-    "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
     "update-msw": "msw init test/mocks/ --save",
     "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
@@ -118,33 +104,14 @@
     "msw": "^2.2.3",
     "playwright-test": "^14.1.1",
     "type-fest": "^4.12.0",
-    "typescript": "5.3.3"
+    "typescript": "5.4.5"
   },
   "publishConfig": {
     "provenance": true
   },
-  "eslintConfig": {
-    "extends": [
-      "../../node_modules/hd-scripts/eslint/index.js"
-    ],
-    "env": {
-      "mocha": true
-    },
-    "ignorePatterns": [
-      "dist",
-      "test/mocks/mockServiceWorker.js"
-    ]
-  },
   "depcheck": {
-    "specials": [
-      "bin"
-    ],
-    "ignores": [
-      "@types/*",
-      "hd-scripts",
-      "assert",
-      "type-fest"
-    ]
+    "specials": ["bin"],
+    "ignores": ["@types/*", "assert", "type-fest"]
   },
   "msw": {
     "workerDirectory": "test/mocks"

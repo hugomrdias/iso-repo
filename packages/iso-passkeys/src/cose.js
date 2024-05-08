@@ -1,7 +1,7 @@
-import { utf8 } from 'iso-base/utf8'
-import { DIDKey } from 'iso-did/key'
 import { webcrypto } from 'iso-base/crypto'
+import { utf8 } from 'iso-base/utf8'
 import { concat } from 'iso-base/utils'
+import { DIDKey } from 'iso-did/key'
 
 /**
  * COSE Keys
@@ -73,17 +73,20 @@ export function mapCoseAlgToWebCryptoAlg(alg) {
   // @ts-ignore
   if ([COSEALG_MAP.RS1].includes(alg)) {
     return 'SHA-1'
-  } else if (
+  }
+  if (
     // @ts-ignore
     [COSEALG_MAP.ES256, COSEALG_MAP.PS256, COSEALG_MAP.RS256].includes(alg)
   ) {
     return 'SHA-256'
-  } else if (
+  }
+  if (
     // @ts-ignore
     [COSEALG_MAP.ES384, COSEALG_MAP.PS384, COSEALG_MAP.RS384].includes(alg)
   ) {
     return 'SHA-384'
-  } else if (
+  }
+  if (
     [
       COSEALG_MAP.ES512,
       COSEALG_MAP.PS512,

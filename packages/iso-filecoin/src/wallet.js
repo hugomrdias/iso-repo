@@ -1,12 +1,12 @@
 import { secp256k1 as secp } from '@noble/curves/secp256k1'
+import { blake2b } from '@noble/hashes/blake2b'
 import { HDKey } from '@scure/bip32'
 import * as bip39 from '@scure/bip39'
 import { wordlist } from '@scure/bip39/wordlists/english'
-import { blake2b } from '@noble/hashes/blake2b'
 import { concat } from 'iso-base/utils'
-import { getNetworkFromPath } from './utils.js'
 import { fromPublicKey } from './address.js'
 import { Message } from './message.js'
+import { getNetworkFromPath } from './utils.js'
 
 /**
  *

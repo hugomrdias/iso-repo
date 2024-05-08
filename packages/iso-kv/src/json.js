@@ -3,25 +3,32 @@
 /**
  * Json replacer with URL, Map, Set, BitInt, RegExp and Uint8Array type support.
  *
- * @param {string} k
+ * @param {string} _k
  * @param {any} v
  */
-export const replacer = (k, v) => {
+export const replacer = (_k, v) => {
   if (v instanceof URL) {
     return { $url: v.toString() }
-  } else if (v instanceof Map) {
+  }
+  if (v instanceof Map) {
     return { $map: [...v.entries()] }
-  } else if (v instanceof Uint8Array) {
+  }
+  if (v instanceof Uint8Array) {
     return { $bytes: [...v.values()] }
-  } else if (v instanceof ArrayBuffer) {
+  }
+  if (v instanceof ArrayBuffer) {
     return { $bytes: [...new Uint8Array(v).values()] }
-  } else if (v?.type === 'Buffer' && Array.isArray(v.data)) {
+  }
+  if (v?.type === 'Buffer' && Array.isArray(v.data)) {
     return { $bytes: v.data }
-  } else if (typeof v === 'bigint') {
+  }
+  if (typeof v === 'bigint') {
     return { $bigint: v.toString() }
-  } else if (v instanceof Set) {
+  }
+  if (v instanceof Set) {
     return { $set: [...v.values()] }
-  } else if (v instanceof RegExp) {
+  }
+  if (v instanceof RegExp) {
     return { $regex: [v.source, v.flags] }
   }
   return v
@@ -31,10 +38,10 @@ export const replacer = (k, v) => {
 /**
  * Json reviver with URL, Map, Set, BitInt, RegExp and Uint8Array type support.
  *
- * @param {string} k - key
+ * @param {string} _k - key
  * @param {any} v - value
  */
-export const reviver = (k, v) => {
+export const reviver = (_k, v) => {
   if (!v) return v
   if (v.$url) return new URL(v.$url)
   if (v.$map) return new Map(v.$map)

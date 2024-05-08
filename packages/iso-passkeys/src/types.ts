@@ -220,7 +220,7 @@ export interface AuthenticationPublicKeyCredential extends PublicKeyCredential {
  *
  * @see https://w3c.github.io/webappsec-credential-management/#framework-credential-management
  */
-export interface PublicKeyCredentialsContainer {
+export interface PublicKeyCredentialsContainer extends CredentialsContainer {
   create: (
     options?: CredentialCreationOptions
   ) => Promise<RegistrationPublicKeyCredential | null>
@@ -228,7 +228,7 @@ export interface PublicKeyCredentialsContainer {
     options?: CredentialRequestOptions
   ) => Promise<AuthenticationPublicKeyCredential | null>
   preventSilentAccess: () => Promise<void>
-  store: (credential: Credential) => Promise<PublicKeyCredential>
+  store: (credential: Credential) => Promise<void>
 }
 
 /**

@@ -1,6 +1,6 @@
+import delay from 'delay'
 /* eslint-disable unicorn/no-null */
 import { assert } from 'playwright-test/taps'
-import delay from 'delay'
 
 /**
  * @param {import('../src/types.js').IKV} kv
@@ -95,7 +95,7 @@ export function baseTests(kv, suite) {
 
   test('should subscribe event', async () => {
     const p = new Promise((resolve) => {
-      kv.onChange(['name'], (newValue, oldValue) => {
+      kv.onChange(['name'], (newValue) => {
         resolve(newValue)
       })
     })
@@ -111,7 +111,7 @@ export function baseTests(kv, suite) {
     const p = new Promise((resolve) => {
       kv.onChange(
         ['name'],
-        (newValue, oldValue) => {
+        (newValue) => {
           count++
           resolve(newValue)
         },

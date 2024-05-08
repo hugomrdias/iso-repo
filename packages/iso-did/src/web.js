@@ -15,10 +15,10 @@ export async function didWebResolver(did, parsedDid) {
   let url = `https://${path}`
 
   if (parsedDid.id.split(':').length === 1) {
-    url = url + '/.well-known'
+    url = `${url}/.well-known`
   }
 
-  url = url + '/did.json'
+  url = `${url}/did.json`
 
   const resolve = await /** @type {typeof request.json<T.DIDDocument>} */ (
     request.json

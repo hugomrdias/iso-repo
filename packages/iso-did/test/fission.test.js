@@ -6,7 +6,7 @@ import { DID, parse } from '../src/index.js'
 
 const server = setup([])
 
-describe('did fission ', function () {
+describe('did fission ', () => {
   before(async () => {
     await server.start({ quiet: true })
   })
@@ -19,7 +19,7 @@ describe('did fission ', function () {
     server.stop()
   })
 
-  it(`should fail with not found`, async function () {
+  it('should fail with not found', async () => {
     const host = 'http://example.com:4400'
     const didString = format(host)
     server.use(
@@ -36,12 +36,12 @@ describe('did fission ', function () {
     assert.strictEqual(out.didResolutionMetadata.error, 'notFound')
   })
 
-  it(`should resolve real `, async function () {
+  it('should resolve real ', async () => {
     const host = 'http://localhost:4400'
     const didString = format(host)
 
     server.use(
-      http.get(host + '/dns-query', () => {
+      http.get(`${host}/dns-query`, () => {
         return Response.json(
           {
             Status: 0,

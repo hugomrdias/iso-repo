@@ -28,7 +28,7 @@ const bases = {
 export function baseX(base) {
   const alphabet = bases[base]
   return {
-    encode(input, pad) {
+    encode(input, _pad) {
       if (typeof input === 'string') {
         input = utf8.decode(input)
       }

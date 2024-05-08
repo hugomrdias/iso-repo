@@ -1,18 +1,18 @@
 import { Resolver } from 'did-resolver'
-import { varint } from 'iso-base/varint'
-import { concat } from 'iso-base/utils'
 import { base64url } from 'iso-base/rfc4648'
+import { concat } from 'iso-base/utils'
+import { varint } from 'iso-base/varint'
 import { base58btc } from 'multiformats/bases/base58'
-import * as DidKey from './key.js'
 import { DIDCore } from './core.js'
+import * as DidKey from './key.js'
 
-// eslint-disable-next-line no-unused-vars
-import * as T from './types.js'
 import {
   CODE_KEY_TYPE,
   keyTypeToAlg,
   validateRawPublicKeyLength,
 } from './key.js'
+// eslint-disable-next-line no-unused-vars
+import * as T from './types.js'
 
 /**
  * Resolve a DID to a DID Document

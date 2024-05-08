@@ -10,7 +10,7 @@ import * as T from './types.js'
 
 export * from './common.js'
 
-const DID_KEY_PREFIX = `did:key:`
+const DID_KEY_PREFIX = 'did:key:'
 
 /**
  * Validate raw public key length
@@ -22,13 +22,13 @@ export function validateRawPublicKeyLength(code, key) {
   switch (code) {
     case KEY_TYPE_CODE.secp256k1: {
       if (key.length !== 33) {
-        throw new RangeError(`Secp256k1 public keys must be 33 bytes.`)
+        throw new RangeError('Secp256k1 public keys must be 33 bytes.')
       }
       return key
     }
     case KEY_TYPE_CODE.Ed25519: {
       if (key.length !== 32) {
-        throw new RangeError(`ed25519 public keys must be 32 bytes.`)
+        throw new RangeError('ed25519 public keys must be 32 bytes.')
       }
       return key
     }
@@ -38,7 +38,7 @@ export function validateRawPublicKeyLength(code, key) {
       }
 
       if (EC.isCompressed(key) && key.length !== 33) {
-        throw new RangeError(`p256 public keys must be 33 bytes.`)
+        throw new RangeError('p256 public keys must be 33 bytes.')
       }
 
       return key
@@ -48,7 +48,7 @@ export function validateRawPublicKeyLength(code, key) {
         key = EC.compress(key)
       }
       if (EC.isCompressed(key) && key.length !== 49) {
-        throw new RangeError(`p384 public keys must be 49 bytes.`)
+        throw new RangeError('p384 public keys must be 49 bytes.')
       }
       return key
     }
@@ -57,7 +57,7 @@ export function validateRawPublicKeyLength(code, key) {
         key = EC.compress(key)
       }
       if (EC.isCompressed(key) && key.length !== 67) {
-        throw new RangeError(`p521 public keys must be 67 bytes.`)
+        throw new RangeError('p521 public keys must be 67 bytes.')
       }
       return key
     }
@@ -65,7 +65,7 @@ export function validateRawPublicKeyLength(code, key) {
     case KEY_TYPE_CODE.RSA: {
       if (key.length !== 270 && key.length !== 526) {
         throw new RangeError(
-          `RSA public keys must be 270 bytes for 2048 bits or 526 bytes for 4096 bits.`
+          'RSA public keys must be 270 bytes for 2048 bits or 526 bytes for 4096 bits.'
         )
       }
       return key
@@ -118,9 +118,8 @@ export class DIDKey extends DIDCore {
         CODE_KEY_TYPE[/** @type {T.PublicKeyCode} */ (code)],
         key
       )
-    } else {
-      throw new TypeError(`Invalid DID "${did}", method must be 'key'`)
     }
+    throw new TypeError(`Invalid DID "${did}", method must be 'key'`)
   }
 
   /**
@@ -179,7 +178,7 @@ export class DIDKey extends DIDCore {
 }
 
 /** @type {import('did-resolver').DIDResolver} */
-async function didKeyResolver(did, parsedDid) {
+async function didKeyResolver(did, _parsedDid) {
   const didKey = DIDKey.fromString(did)
   return {
     didDocumentMetadata: {},

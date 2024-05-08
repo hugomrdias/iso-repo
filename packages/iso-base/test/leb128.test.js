@@ -25,36 +25,36 @@ const VECTORS = [
   ],
 ]
 
-describe('lib128', function () {
+describe('lib128', () => {
   for (const [bytes, num, size] of VECTORS) {
-    it(`${bytes} bytes`, function () {
+    it(`${bytes} bytes`, () => {
       assert.deepStrictEqual(leb128.unsigned.decode(bytes)[0], BigInt(num))
     })
 
-    it(`${bytes} size `, function () {
+    it(`${bytes} size `, () => {
       assert.deepStrictEqual(leb128.unsigned.encodingLength(bytes), size)
     })
 
-    it(`${bytes} num `, function () {
+    it(`${bytes} num `, () => {
       assert.deepStrictEqual(leb128.unsigned.encode(num), bytes)
     })
   }
 
-  it('offset 1', function () {
+  it('offset 1', () => {
     const bytes = Uint8Array.from([4, 226, 154, 1])
 
     assert.deepStrictEqual(leb128.unsigned.decode(bytes, 1)[0], 19_810n)
     assert.deepStrictEqual(leb128.unsigned.encodingLength(bytes, 1), 3)
   })
 
-  it('offset 0', function () {
+  it('offset 0', () => {
     const bytes = Uint8Array.from([226, 154, 1])
 
     assert.deepStrictEqual(leb128.unsigned.decode(bytes, 0)[0], 19_810n)
     assert.deepStrictEqual(leb128.unsigned.encodingLength(bytes, 0), 3)
   })
 
-  it('offset 2', function () {
+  it('offset 2', () => {
     const bytes = Uint8Array.from([10, 4, 226, 154, 1])
 
     assert.deepStrictEqual(leb128.unsigned.decode(bytes, 2)[0], 19_810n)

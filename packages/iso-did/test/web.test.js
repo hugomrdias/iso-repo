@@ -1,12 +1,12 @@
 import assert from 'assert'
 import { setup } from 'iso-web/msw'
 import { http } from 'msw'
-import { didWebResolver } from '../src/web.js'
 import { parse } from '../src/index.js'
+import { didWebResolver } from '../src/web.js'
 
 const server = setup([])
 
-describe('did web ', function () {
+describe('did web ', () => {
   before(async () => {
     await server.start({ quiet: true })
   })
@@ -19,7 +19,7 @@ describe('did web ', function () {
     server.stop()
   })
 
-  it(`should fail with not found`, async function () {
+  it('should fail with not found', async () => {
     server.use(
       http.get('https://example.com/.well-known/did.json', () => {
         return Response.error()
@@ -36,7 +36,7 @@ describe('did web ', function () {
     assert.strictEqual(out.didResolutionMetadata.error, 'notFound')
   })
 
-  it(`should resolve real `, async function () {
+  it('should resolve real ', async () => {
     const document = {
       '@context': [
         'https://w3.org/ns/did/v1',

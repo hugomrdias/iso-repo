@@ -189,9 +189,9 @@ export async function resolve(query, type, options = {}) {
     const desc = statusToDescription(result.Status)
     // eslint-disable-next-line no-nested-ternary
     const error = Array.isArray(result.Comment)
-      ? desc + ' - ' + result.Comment.join(' ').trim()
+      ? `${desc} - ${result.Comment.join(' ').trim()}`
       : result.Comment
-        ? desc + ' - ' + result.Comment
+        ? `${desc} - ${result.Comment}`
         : desc
 
     const out = {

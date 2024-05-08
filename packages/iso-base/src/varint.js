@@ -10,13 +10,13 @@ const MSB = 0x80
 /** Rest of the bits in a byte */
 const REST = 0x7f
 
-const N1 = Math.pow(2, 7)
-const N2 = Math.pow(2, 14)
-const N3 = Math.pow(2, 21)
-const N4 = Math.pow(2, 28)
-const N5 = Math.pow(2, 35)
-const N6 = Math.pow(2, 42)
-const N7 = Math.pow(2, 49)
+const N1 = 2 ** 7
+const N2 = 2 ** 14
+const N3 = 2 ** 21
+const N4 = 2 ** 28
+const N5 = 2 ** 35
+const N6 = 2 ** 42
+const N7 = 2 ** 49
 // const N8 = Math.pow(2, 56)
 // const N9 = Math.pow(2, 63)
 
@@ -81,36 +81,43 @@ export function encode(value, buf, offset = 0) {
 
   switch (size) {
     // @ts-ignore
+    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 8: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
     // @ts-ignore
+    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 7: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
     // @ts-ignore
+    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 6: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
     // @ts-ignore
+    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 5: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
     // @ts-ignore
+    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 4: {
       buf[offset++] = (value & 0xff) | MSB
       value >>>= 7
     }
     // @ts-ignore
+    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 3: {
       buf[offset++] = (value & 0xff) | MSB
       value >>>= 7
     }
     // @ts-ignore
+    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 2: {
       buf[offset++] = (value & 0xff) | MSB
       value >>>= 7
@@ -223,11 +230,10 @@ export function untag(code, taggedBytes) {
       taggedBytes.byteOffset + size,
       taggedBytes.byteLength - size
     )
-  } else {
-    throw new Error(
-      `Expected multiformat with codec 0x${code.toString(
-        16
-      )} tag instead got 0x${tag.toString(16)}`
-    )
   }
+  throw new Error(
+    `Expected multiformat with codec 0x${code.toString(
+      16
+    )} tag instead got 0x${tag.toString(16)}`
+  )
 }

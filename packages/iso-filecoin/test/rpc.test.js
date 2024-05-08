@@ -1,15 +1,15 @@
 import assert from 'assert'
-import { RPC } from '../src/rpc.js'
-import { Message } from '../src/message.js'
-import * as Wallet from '../src/wallet.js'
 import { Address } from '../src/index.js'
+import { Message } from '../src/message.js'
+import { RPC } from '../src/rpc.js'
+import * as Wallet from '../src/wallet.js'
 
 const API = 'https://api.calibration.node.glif.io'
 
 describe('lotus rpc', function () {
   this.retries(3)
   this.timeout(10_000)
-  it(`version`, async function () {
+  it('version', async () => {
     const rpc = new RPC({ api: API })
 
     const version = await rpc.version()
@@ -22,7 +22,7 @@ describe('lotus rpc', function () {
     assert(version.result.BlockDelay)
   })
 
-  it(`networkName`, async function () {
+  it('networkName', async () => {
     const rpc = new RPC({ api: API })
 
     const version = await rpc.networkName()
@@ -33,7 +33,7 @@ describe('lotus rpc', function () {
     assert.equal(version.result, 'calibrationnet')
   })
 
-  it(`nonce`, async function () {
+  it('nonce', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
 
     const version = await rpc.nonce('t1pc2apytmdas3sn5ylwhfa32jfpx7ez7ykieelna')
@@ -44,7 +44,7 @@ describe('lotus rpc', function () {
     assert.ok(Number.isInteger(version.result))
   })
 
-  it(`nonce fail with wrong network`, async function () {
+  it('nonce fail with wrong network', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
 
     await assert.rejects(() =>
@@ -52,7 +52,7 @@ describe('lotus rpc', function () {
     )
   })
 
-  it(`gas estimate`, async function () {
+  it('gas estimate', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
 
     const nonce = await rpc.nonce('t1pc2apytmdas3sn5ylwhfa32jfpx7ez7ykieelna')
@@ -75,7 +75,7 @@ describe('lotus rpc', function () {
     assert.equal(Message.fromLotus(estimate.result).value, msg.value)
   })
 
-  it(`gas estimate to delegated address`, async function () {
+  it('gas estimate to delegated address', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
 
     const nonce = await rpc.nonce('t1pc2apytmdas3sn5ylwhfa32jfpx7ez7ykieelna')
@@ -98,7 +98,7 @@ describe('lotus rpc', function () {
     assert.equal(Message.fromLotus(estimate.result).value, msg.value)
   })
 
-  it(`gas estimate to 0x address`, async function () {
+  it('gas estimate to 0x address', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
 
     const nonce = await rpc.nonce('t1pc2apytmdas3sn5ylwhfa32jfpx7ez7ykieelna')
@@ -124,7 +124,7 @@ describe('lotus rpc', function () {
     assert.equal(Message.fromLotus(estimate.result).value, msg.value)
   })
 
-  it(`balance`, async function () {
+  it('balance', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
 
     const balance = await rpc.balance(
@@ -137,7 +137,7 @@ describe('lotus rpc', function () {
     assert.ok(typeof balance.result === 'string')
   })
 
-  it(`balance from delegated address`, async function () {
+  it('balance from delegated address', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
 
     const balance = await rpc.balance(
@@ -151,7 +151,7 @@ describe('lotus rpc', function () {
     assert.ok(BigInt(balance.result) > 0n)
   })
 
-  it(`balance from 0x address`, async function () {
+  it('balance from 0x address', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
 
     const balance = await rpc.balance(
@@ -168,7 +168,7 @@ describe('lotus rpc', function () {
     assert.ok(BigInt(balance.result) > 0n)
   })
 
-  it(`send message`, async function () {
+  it('send message', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
     const account = Wallet.accountFromMnemonic(
       'already turtle birth enroll since owner keep patch skirt drift any dinner',
@@ -196,7 +196,7 @@ describe('lotus rpc', function () {
     assert.ok(typeof balance.result['/'] === 'string')
   })
 
-  it(`send message to 0x`, async function () {
+  it('send message to 0x', async () => {
     const rpc = new RPC({ api: API, network: 'testnet' })
     const account = Wallet.accountFromMnemonic(
       'already turtle birth enroll since owner keep patch skirt drift any dinner',
@@ -231,7 +231,7 @@ describe('lotus rpc', function () {
 describe('lotus rpc aborts', function () {
   this.retries(3)
   this.timeout(10_000)
-  it(`timeout`, async function () {
+  it('timeout', async () => {
     const rpc = new RPC({ api: API }, { timeout: 100 })
 
     const version = await rpc.version()
@@ -241,7 +241,7 @@ describe('lotus rpc aborts', function () {
     assert.ok(version.error.message.includes('FETCH_ERROR'))
   })
 
-  it(`timeout on method`, async function () {
+  it('timeout on method', async () => {
     const rpc = new RPC({ api: API }, { timeout: 100 })
 
     const version = await rpc.version({ timeout: 10 })
@@ -250,7 +250,7 @@ describe('lotus rpc aborts', function () {
     assert.ok(version.error.message.includes('FETCH_ERROR'))
   })
 
-  it(`timeout default`, async function () {
+  it('timeout default', async () => {
     const rpc = new RPC({ api: API })
 
     const version = await rpc.version()
@@ -258,7 +258,7 @@ describe('lotus rpc aborts', function () {
     assert.ok(version.result)
   })
 
-  it(`aborted`, async function () {
+  it('aborted', async () => {
     const rpc = new RPC({ api: API }, { signal: AbortSignal.abort() })
 
     const version = await rpc.version()
@@ -268,7 +268,7 @@ describe('lotus rpc aborts', function () {
     assert.ok(version.error.message.includes('FETCH_ERROR'))
   })
 
-  it(`abort`, async function () {
+  it('abort', async () => {
     const controller = new AbortController()
     const rpc = new RPC({ api: API })
 

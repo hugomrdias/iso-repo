@@ -1,9 +1,9 @@
 import { resolve } from 'iso-web/doh'
 
+import { parse } from './index.js'
 // @ts-ignore
 // eslint-disable-next-line no-unused-vars
 import * as T from './types.js'
-import { parse } from './index.js'
 
 /** @type {import('did-resolver').DIDResolver} */
 export async function didFissionResolver(did, parsedDid) {
@@ -13,7 +13,7 @@ export async function didFissionResolver(did, parsedDid) {
     : `https://${hostname}/dns-query`
 
   const parsed = new URL(`http://${hostname}`)
-  const records = await resolve('_did.' + parsed.hostname, 'TXT', {
+  const records = await resolve(`_did.${parsed.hostname}`, 'TXT', {
     server,
   })
 

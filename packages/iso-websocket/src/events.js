@@ -71,6 +71,7 @@ export class CloseEvent extends Event {
   }
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 export class GenericEvent extends Event {
   /**
    * @param {{ type: string; }} event

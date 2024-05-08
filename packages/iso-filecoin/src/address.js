@@ -363,9 +363,8 @@ export class AddressSecp256k1 extends Address {
 
     if (validateChecksum(newAddress.checksum(), checksum)) {
       return newAddress
-    } else {
-      throw new Error(`Invalid checksum`)
     }
+    throw new Error('Invalid checksum')
   }
 
   /**
@@ -448,9 +447,8 @@ export class AddressActor extends Address {
 
     if (validateChecksum(newAddress.checksum(), checksum)) {
       return newAddress
-    } else {
-      throw new Error(`Invalid checksum`)
     }
+    throw new Error('Invalid checksum')
   }
 
   /**
@@ -517,9 +515,8 @@ export class AddressBLS extends Address {
 
     if (validateChecksum(newAddress.checksum(), checksum)) {
       return newAddress
-    } else {
-      throw new Error(`Invalid checksum`)
     }
+    throw new Error('Invalid checksum')
   }
 
   /**
@@ -616,9 +613,8 @@ export class AddressDelegated extends Address {
 
     if (validateChecksum(newAddress.checksum(), checksum)) {
       return newAddress
-    } else {
-      throw new Error(`Invalid checksum`)
     }
+    throw new Error('Invalid checksum')
   }
 
   /**

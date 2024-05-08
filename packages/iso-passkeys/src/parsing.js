@@ -221,31 +221,28 @@ export function publicKeyCredentialToJSON(credential) {
     }
 
     return rsp
-  } else {
-    const { rawId, id, type, authenticatorAttachment, response } =
-      /** @type {import('./types').RegistrationPublicKeyCredential} */ (
-        credential
-      )
-    /** @type {import('./types').RegistrationResponseJSON} */
-    const rsp = {
-      id,
-      rawId: base64url.encode(new Uint8Array(rawId)),
-      type,
-      authenticatorAttachment,
-      clientExtensionResults: credential.getClientExtensionResults(),
-      response: {
-        clientDataJSON: base64url.encode(
-          new Uint8Array(response.clientDataJSON)
-        ),
-        attestationObject: base64url.encode(
-          new Uint8Array(response.attestationObject)
-        ),
-        // @ts-ignore
-        transports: response.getTransports(),
-      },
-    }
-    return rsp
   }
+  const { rawId, id, type, authenticatorAttachment, response } =
+    /** @type {import('./types').RegistrationPublicKeyCredential} */ (
+      credential
+    )
+  /** @type {import('./types').RegistrationResponseJSON} */
+  const rsp = {
+    id,
+    rawId: base64url.encode(new Uint8Array(rawId)),
+    type,
+    authenticatorAttachment,
+    clientExtensionResults: credential.getClientExtensionResults(),
+    response: {
+      clientDataJSON: base64url.encode(new Uint8Array(response.clientDataJSON)),
+      attestationObject: base64url.encode(
+        new Uint8Array(response.attestationObject)
+      ),
+      // @ts-ignore
+      transports: response.getTransports(),
+    },
+  }
+  return rsp
 }
 
 /**

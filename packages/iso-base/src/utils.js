@@ -182,7 +182,9 @@ export function concat(arrays, length) {
  * @param {Uint8Array} bb
  */
 export function equals(aa, bb) {
-  if (aa === bb) return true
+  if (aa === bb) {
+    return true
+  }
   if (aa.byteLength !== bb.byteLength) {
     return false
   }

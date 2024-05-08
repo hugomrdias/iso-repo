@@ -13,12 +13,7 @@
   "bugs": {
     "url": "https://github.com/hugomrdias/iso-repo/issues"
   },
-  "keywords": [
-    "websocket",
-    "reconnect",
-    "retry",
-    "websocket-client"
-  ],
+  "keywords": ["websocket", "reconnect", "retry", "websocket-client"],
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -27,13 +22,9 @@
   },
   "main": "src/index.js",
   "types": "dist/src/index.d.ts",
-  "files": [
-    "src",
-    "dist/src/*.d.ts",
-    "dist/src/*.d.ts.map"
-  ],
+  "files": ["src", "dist/src/*.d.ts", "dist/src/*.d.ts.map"],
   "scripts": {
-    "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
     "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
     "test:browser": "playwright-test 'test/**/!(*.node).test.js' --assets test/mocks"
@@ -54,32 +45,13 @@
     "p-defer": "^4.0.0",
     "playwright-test": "^14.1.1",
     "type-fest": "^4.12.0",
-    "typescript": "5.3.3"
+    "typescript": "5.4.5"
   },
   "publishConfig": {
     "provenance": true
   },
-  "eslintConfig": {
-    "extends": [
-      "../../node_modules/hd-scripts/eslint/index.js"
-    ],
-    "env": {
-      "mocha": true
-    },
-    "ignorePatterns": [
-      "dist",
-      "test/mocks/mockServiceWorker.js"
-    ]
-  },
   "depcheck": {
-    "specials": [
-      "bin"
-    ],
-    "ignores": [
-      "@types/*",
-      "hd-scripts",
-      "assert",
-      "type-fest"
-    ]
+    "specials": ["bin"],
+    "ignores": ["@types/*", "assert", "type-fest"]
   }
 }

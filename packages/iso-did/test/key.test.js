@@ -65,7 +65,7 @@ const VECTORS = {
   ],
 }
 
-describe('did:key', function () {
+describe('did:key', () => {
   for (const [
     type,
     fixtures,
@@ -73,11 +73,11 @@ describe('did:key', function () {
     Object.entries(VECTORS)
   )) {
     for (const { did, pub } of fixtures) {
-      it(`should parse ${type}`, function () {
+      it(`should parse ${type}`, () => {
         assert.deepStrictEqual(DIDKey.fromString(did).publicKey, pub)
       })
 
-      it(`should create did from ${type} public key`, function () {
+      it(`should create did from ${type} public key`, () => {
         assert.deepStrictEqual(DIDKey.fromPublicKey(type, pub).toString(), did)
       })
     }

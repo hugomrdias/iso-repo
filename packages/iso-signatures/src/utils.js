@@ -1,5 +1,5 @@
-import { DIDKey } from 'iso-did/key'
 import { equals, u8 } from 'iso-base/utils'
+import { DIDKey } from 'iso-did/key'
 
 /**
  * Create web crypto params for ECDSA.

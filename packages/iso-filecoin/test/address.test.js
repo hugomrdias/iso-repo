@@ -96,22 +96,22 @@ const id = [
   ['f018446744073709551615', '00ffffffffffffffffff01'],
 ]
 
-describe('address', function () {
+describe('address', () => {
   for (const [address, expected] of id) {
-    it(`id vectors ${address} fromString`, function () {
+    it(`id vectors ${address} fromString`, () => {
       const a = fromString(address)
       assert.ok(isAddress(a))
       assert.equal(a.protocol, 0)
       assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
     })
 
-    it(`id vectors ${address} fromBytes`, function () {
+    it(`id vectors ${address} fromBytes`, () => {
       const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
 
       assert.strictEqual(a.toString(), address)
     })
 
-    it(`id vectors ${address} from`, function () {
+    it(`id vectors ${address} from`, () => {
       const a = from(base16.decode(expected.toUpperCase()), 'mainnet')
       assert.strictEqual(a.toString(), address)
       assert.ok(isAddress(a))
@@ -123,20 +123,20 @@ describe('address', function () {
   }
 
   for (const [address, expected] of bls) {
-    it(`bls vectors ${address} fromString`, function () {
+    it(`bls vectors ${address} fromString`, () => {
       const a = fromString(address)
       assert.ok(isAddress(a))
       assert.equal(a.protocol, 3)
       assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
     })
 
-    it(`bls vectors ${address} fromBytes`, function () {
+    it(`bls vectors ${address} fromBytes`, () => {
       const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
 
       assert.strictEqual(a.toString(), address)
     })
 
-    it(`bls vectors ${address} from`, function () {
+    it(`bls vectors ${address} from`, () => {
       const a = from(base16.decode(expected.toUpperCase()), 'mainnet')
       assert.strictEqual(a.toString(), address)
       assert.ok(isAddress(a))
@@ -148,20 +148,20 @@ describe('address', function () {
   }
 
   for (const [address, expected] of actor) {
-    it(`actor vectors ${address} fromString`, function () {
+    it(`actor vectors ${address} fromString`, () => {
       const a = fromString(address)
       assert.ok(isAddress(a))
       assert.equal(a.protocol, 2)
       assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
     })
 
-    it(`actor vectors ${address} fromBytes`, function () {
+    it(`actor vectors ${address} fromBytes`, () => {
       const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
 
       assert.strictEqual(a.toString(), address)
     })
 
-    it(`actor vectors ${address} from`, function () {
+    it(`actor vectors ${address} from`, () => {
       const a = from(base16.decode(expected.toUpperCase()), 'mainnet')
       assert.strictEqual(a.toString(), address)
       assert.ok(isAddress(a))
@@ -173,20 +173,20 @@ describe('address', function () {
   }
 
   for (const [address, expected] of secp) {
-    it(`sepc256k1 vectors ${address} fromString`, function () {
+    it(`sepc256k1 vectors ${address} fromString`, () => {
       const a = fromString(address)
       assert.ok(isAddress(a))
       assert.equal(a.protocol, 1)
       assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
     })
 
-    it(`sepc256k1 vectors ${address} fromBytes`, function () {
+    it(`sepc256k1 vectors ${address} fromBytes`, () => {
       const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
 
       assert.strictEqual(a.toString(), address)
     })
 
-    it(`sepc256k1 vectors ${address} from`, function () {
+    it(`sepc256k1 vectors ${address} from`, () => {
       const a = from(base16.decode(expected.toUpperCase()), 'mainnet')
       assert.strictEqual(a.toString(), address)
       assert.ok(isAddress(a))
@@ -197,7 +197,7 @@ describe('address', function () {
     })
   }
 
-  it('from public key', function () {
+  it('from public key', () => {
     const a = fromPublicKey(
       base64pad.decode(
         'BIgvf8Me7SAb7jpWOH2B5PwmhiaCz1R5BZKraZ2heQuFPk3DACNkUwP3ffqTYcE7Y1SjZeqrF8J0uraaYQjBtSs='
@@ -213,7 +213,7 @@ describe('address', function () {
   })
 
   for (const [address, expected] of delegated) {
-    it(`delegated vectors ${address}`, function () {
+    it(`delegated vectors ${address}`, () => {
       const a = fromString(address)
 
       assert.ok(isAddress(a))
@@ -221,18 +221,18 @@ describe('address', function () {
       assert.strictEqual(base16.encode(a.toBytes()).toLowerCase(), expected)
     })
 
-    it(`delegated vectors ${address} fromBytes`, function () {
+    it(`delegated vectors ${address} fromBytes`, () => {
       const a = fromBytes(base16.decode(expected.toUpperCase()), 'mainnet')
 
       assert.strictEqual(a.toString(), address)
     })
   }
 
-  it('is eth address', function () {
+  it('is eth address', () => {
     assert.ok(isEthAddress('0xd388ab098ed3e84c0d808776440b48f685198498'))
   })
 
-  it('should convert from eth address', function () {
+  it('should convert from eth address', () => {
     const f4 = fromEthAddress(
       '0xd388ab098ed3e84c0d808776440b48f685198498',
       'testnet'
@@ -244,7 +244,7 @@ describe('address', function () {
     )
   })
 
-  it('should convert from eth address with "from" ', function () {
+  it('should convert from eth address with "from" ', () => {
     const f4 = from('0xd388ab098ed3e84c0d808776440b48f685198498', 'testnet')
 
     assert.strictEqual(
@@ -253,7 +253,7 @@ describe('address', function () {
     )
   })
 
-  it('should convert from f4 to eth address', function () {
+  it('should convert from f4 to eth address', () => {
     const f4 = fromString('f410f2oekwcmo2pueydmaq53eic2i62crtbeyuzx2gmy')
 
     assert.strictEqual(
@@ -262,13 +262,13 @@ describe('address', function () {
     )
   })
 
-  it('should fail convert from f1 to eth address', function () {
+  it('should fail convert from f1 to eth address', () => {
     const f1 = fromString('f1wbxhu3ypkuo6eyp6hjx6davuelxaxrvwb2kuwva')
 
     assert.throws(() => toEthAddress(f1))
   })
 
-  it('should convert from f1 address to contract destination and back', function () {
+  it('should convert from f1 address to contract destination and back', () => {
     const f1 = fromString('f1wbxhu3ypkuo6eyp6hjx6davuelxaxrvwb2kuwva')
     const contractDestination = f1.toContractDestination()
     const f1FromContractDestination = fromContractDestination(
@@ -279,7 +279,7 @@ describe('address', function () {
     assert.strictEqual(f1.toString(), f1FromContractDestination.toString())
   })
 
-  it('should convert from f1 address to contract destination and back on testnet', function () {
+  it('should convert from f1 address to contract destination and back on testnet', () => {
     const t1 = fromString('t1wbxhu3ypkuo6eyp6hjx6davuelxaxrvwb2kuwva')
     const contractDestination = t1.toContractDestination()
     const t1FromContractDestination = fromContractDestination(

@@ -54,6 +54,7 @@ const buffers = {
 const main = () =>
   bench.run(async () => {
     for (const [k, libs] of Object.entries(codecs)) {
+      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
       console.log(`==== ${k} ====`)
       for (const [size, [samples, buf]] of Object.entries(buffers)) {
         // encode
@@ -61,6 +62,7 @@ const main = () =>
           await bench.mark(`${k} (encode) ${size} ${lib}`, samples, () =>
             fn(buf)
           )
+        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
         console.log()
 
         // decode
@@ -69,6 +71,7 @@ const main = () =>
           await bench.mark(`${k} (decode) ${size} ${lib}`, samples, () =>
             fn(str)
           )
+        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
         console.log()
       }
     }

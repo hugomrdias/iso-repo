@@ -1,8 +1,8 @@
 import assert from 'assert'
 import { base64url } from 'iso-base/rfc4648'
-import * as RS256 from '../src/verifiers/rsa.js'
-import { RSASigner } from '../src/signers/rsa.js'
 import { encodeInt, encodeSequence } from '../src/asn1.js'
+import { RSASigner } from '../src/signers/rsa.js'
+import * as RS256 from '../src/verifiers/rsa.js'
 
 /** @type {{rsa: Array<{did: string, jwk : import('iso-did/types').RSAJWKPrivate}>}} */
 const fixtures = {
@@ -57,9 +57,9 @@ function encode([n, e]) {
   return encodeSequence([encodeInt(n), encodeInt(e)])
 }
 
-describe('Verifier RS256', function () {
+describe('Verifier RS256', () => {
   for (const { did, jwk } of fixtures.rsa) {
-    it(`should verify ${jwk.d}`, async function () {
+    it(`should verify ${jwk.d}`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await RSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -76,7 +76,7 @@ describe('Verifier RS256', function () {
       assert.ok(verified)
     })
 
-    it(`should verify ${jwk.d} from did`, async function () {
+    it(`should verify ${jwk.d} from did`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await RSASigner.importJwk(jwk)
       const signature = await signer.sign(message)
@@ -89,7 +89,7 @@ describe('Verifier RS256', function () {
       assert.ok(verified)
     })
 
-    it(`should verify ${jwk.d} from signer directly`, async function () {
+    it(`should verify ${jwk.d} from signer directly`, async () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await RSASigner.importJwk(jwk)
 

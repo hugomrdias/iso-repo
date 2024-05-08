@@ -69,39 +69,19 @@
   },
   "typesVersions": {
     "*": {
-      "utils": [
-        "dist/src/utils"
-      ],
-      "crypto": [
-        "dist/src/crypto"
-      ],
-      "utf8": [
-        "dist/src/utf8"
-      ],
-      "rfc4648": [
-        "dist/src/rfc4648"
-      ],
-      "base-x": [
-        "dist/src/base-x"
-      ],
-      "varint": [
-        "dist/src/varint"
-      ],
-      "ec-compression": [
-        "dist/src/ec-compression"
-      ],
-      "leb128": [
-        "dist/src/leb128"
-      ]
+      "utils": ["dist/src/utils"],
+      "crypto": ["dist/src/crypto"],
+      "utf8": ["dist/src/utf8"],
+      "rfc4648": ["dist/src/rfc4648"],
+      "base-x": ["dist/src/base-x"],
+      "varint": ["dist/src/varint"],
+      "ec-compression": ["dist/src/ec-compression"],
+      "leb128": ["dist/src/leb128"]
     }
   },
-  "files": [
-    "src",
-    "dist/src/*.d.ts",
-    "dist/src/*.d.ts.map"
-  ],
+  "files": ["src", "dist/src/*.d.ts", "dist/src/*.d.ts.map"],
   "scripts": {
-    "lint": "tsc --build && eslint . && prettier --check '**/*.{js,ts,yml,json}' --ignore-path ../../.gitignore",
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
     "test:node": "mocha 'test/**/!(*.browser).test.js'",
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
@@ -119,30 +99,13 @@
     "micro-bmark": "^0.3.1",
     "mocha": "^10.3.0",
     "playwright-test": "^14.1.1",
-    "typescript": "5.3.3"
+    "typescript": "5.4.5"
   },
   "publishConfig": {
     "provenance": true
   },
-  "eslintConfig": {
-    "extends": [
-      "../../node_modules/hd-scripts/eslint/index.js"
-    ],
-    "env": {
-      "mocha": true
-    },
-    "ignorePatterns": [
-      "dist"
-    ]
-  },
   "depcheck": {
-    "specials": [
-      "bin"
-    ],
-    "ignores": [
-      "@types/*",
-      "hd-scripts",
-      "assert"
-    ]
+    "specials": ["bin"],
+    "ignores": ["@types/*", "assert"]
   }
 }

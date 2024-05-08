@@ -261,7 +261,7 @@ function bigToUint8Array(big) {
   }
   let hex = big.toString(16)
   if (hex.length % 2) {
-    hex = '0' + hex
+    hex = `0${hex}`
   }
   const len = hex.length / 2
   const u8 = new Uint8Array(len)

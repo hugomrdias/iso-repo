@@ -1,5 +1,5 @@
+import { http, HttpResponse, delay } from 'msw'
 import { assert, suite } from 'playwright-test/taps'
-import { HttpResponse, delay, http } from 'msw'
 import { HttpError, JsonError, request } from '../src/http.js'
 import { setup } from '../src/msw/msw.js'
 
@@ -270,7 +270,7 @@ test(
   'should delay with retry after header',
   async () => {
     server.use(
-      http.get('https://local.dev/retry-after', ({ request }) => {
+      http.get('https://local.dev/retry-after', () => {
         return HttpResponse.json(
           { error: 'error' },
           { status: 429, headers: { 'retry-after': '5' } }

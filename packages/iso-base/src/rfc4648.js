@@ -43,7 +43,7 @@ const decode = (string, alphabet, bitsPerChar) => {
     // Read one character from the string:
     const value = codes[string[i]]
     if (value === undefined) {
-      throw new SyntaxError('Invalid character ' + string[i])
+      throw new SyntaxError(`Invalid character ${string[i]}`)
     }
 
     // Append the bits to the buffer:
@@ -133,6 +133,8 @@ const bases = {
  * @param {((str: string) => string)} [normalize] - Normalize
  * @returns {Codec} - Codec
  */
+
+// biome-ignore lint/style/useDefaultParameterLast: <explanation>
 export function rfc4648(base, padding = false, normalize) {
   const [bits, alphabet] = bases[base]
   return {

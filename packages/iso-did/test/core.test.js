@@ -1,8 +1,8 @@
 import assert from 'assert'
 import { DIDCore } from '../src/core.js'
 
-describe('did core ', function () {
-  it(`should parse from string`, function () {
+describe('did core ', () => {
+  it('should parse from string', () => {
     const did = DIDCore.fromString(
       'did:example:21tDAKCERh95uGgKbJNHYp;service=agent;foo:bar=high/some/path?foo=bar#key1'
     )

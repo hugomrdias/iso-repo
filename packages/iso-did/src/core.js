@@ -33,9 +33,8 @@ export class DIDCore {
     const parsedDid = /** @type {DIDURLObject} */ (parse(did))
     if (parsedDid) {
       return new DIDCore(parsedDid)
-    } else {
-      throw new TypeError(`Invalid DID "${did}"`)
     }
+    throw new TypeError(`Invalid DID "${did}"`)
   }
 
   toString() {

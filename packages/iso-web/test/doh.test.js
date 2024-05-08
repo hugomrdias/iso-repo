@@ -1,12 +1,12 @@
-import { assert, suite } from 'playwright-test/taps'
-import { KV } from 'iso-kv'
 import delay from 'delay'
+import { KV } from 'iso-kv'
 import { http } from 'msw'
+import { assert, suite } from 'playwright-test/taps'
 import { DohError, HttpError, JsonError, resolve } from '../src/doh/index.js'
 import { setup } from '../src/msw/msw.js'
 
 let expireCount = 0
-export const handlers = [
+const handlers = [
   http.get('https://cloudflare-dns.com/dns-query', ({ request }) => {
     const params = Object.fromEntries(new URL(request.url).searchParams)
     if (params.name === 'google.com' && params.type === 'A') {
@@ -100,7 +100,7 @@ test('should resolve A', async () => {
 
 test('should resolve from cache', async () => {
   const cache = new KV()
-  const url = `https://cloudflare-dns.com/dns-query?name=google.com&type=A`
+  const url = 'https://cloudflare-dns.com/dns-query?name=google.com&type=A'
   const result = await resolve('google.com', 'A', {
     cache,
   })

@@ -253,7 +253,7 @@ export class KV {
       if (reverse) {
         data.push({ key, value })
       } else {
-        yield /** @type {import('./types').KvEntry} */ ({ key, value })
+        yield/** @type {import('./types').KvEntry} */ ({ key, value })
       }
 
       count++
@@ -265,7 +265,7 @@ export class KV {
     if (reverse) {
       data.reverse()
       for (const item of data) {
-        yield /** @type {import('./types').KvEntry} */ (item)
+        yield/** @type {import('./types').KvEntry} */ (item)
       }
     }
   }

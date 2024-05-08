@@ -1,8 +1,8 @@
 import assert from 'assert'
+import { sha256 } from '@noble/hashes/sha256'
+import * as EC from 'iso-base/ec-compression'
 import { base64pad, base64url } from 'iso-base/rfc4648'
 import { setup } from 'iso-web/msw'
-import * as EC from 'iso-base/ec-compression'
-import { sha256 } from '@noble/hashes/sha256'
 import { http } from 'msw'
 import { DID, dereference, parse, resolve } from '../src/index.js'
 import { DIDKey } from '../src/key.js'
@@ -67,7 +67,7 @@ const server = setup([
   }),
 ])
 
-describe('did', function () {
+describe('did', () => {
   before(async () => {
     await server.start({ quiet: true })
   })
@@ -80,7 +80,7 @@ describe('did', function () {
     server.stop()
   })
 
-  it(`should resolve did:key`, async function () {
+  it('should resolve did:key', async () => {
     const out = await resolve(
       'did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp'
     )
@@ -115,7 +115,7 @@ describe('did', function () {
     })
   })
 
-  it(`should deref did:key`, async function () {
+  it('should deref did:key', async () => {
     const out = await dereference(
       parse('did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp')
     )
@@ -127,7 +127,7 @@ describe('did', function () {
     })
   })
 
-  it(`should deref from did:key instance`, async function () {
+  it('should deref from did:key instance', async () => {
     const out = await dereference(
       DIDKey.fromString(
         'did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp'
@@ -141,7 +141,7 @@ describe('did', function () {
     })
   })
 
-  it(`should create a valid verifiable did`, async function () {
+  it('should create a valid verifiable did', async () => {
     const out = await DID.fromString(
       'did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp'
     )
@@ -153,7 +153,7 @@ describe('did', function () {
     assert.strictEqual(out.alg, 'EdDSA')
   })
 
-  it(`should create a real verifiable did OKP`, async function () {
+  it('should create a real verifiable did OKP', async () => {
     server.use(
       http.get('https://demo.spruceid.com/.well-known/did.json', () => {
         return Response.json(
@@ -209,7 +209,7 @@ describe('did', function () {
     )
   })
 
-  it(`should create a verifiable did from EC 256 jwk`, async function () {
+  it('should create a verifiable did from EC 256 jwk', async () => {
     const host = encodeURIComponent('localhost:3000')
     const out = await DID.fromString(`did:web:${host}#key-41`, {
       resolvers: {
@@ -223,7 +223,7 @@ describe('did', function () {
     assert.strictEqual(y, 'efsX5b10x8yjyrj4ny3pGfLcY7Xby1KzgqOdqnsrJIM')
   })
 
-  it(`should create a verifiable did from EC 384 jwk`, async function () {
+  it('should create a verifiable did from EC 384 jwk', async () => {
     const host = encodeURIComponent('localhost:3000')
     const out = await DID.fromString(`did:web:${host}#key-5`, {
       resolvers: {

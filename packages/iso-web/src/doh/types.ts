@@ -1,5 +1,5 @@
-import type { Options } from 'p-retry'
 import type { IKV } from 'iso-kv'
+import type { Options } from 'p-retry'
 
 export type RecordType =
   | 'A'

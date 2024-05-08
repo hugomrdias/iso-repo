@@ -7,9 +7,9 @@ export function setup(handlers) {
   const server = setupServer(...handlers)
   return {
     /**
-     * @param {import('msw/browser').StartOptions} options
+     * @param {import('msw/browser').StartOptions} _options
      */
-    async start(options) {
+    async start(_options) {
       server.listen()
     },
     stop() {

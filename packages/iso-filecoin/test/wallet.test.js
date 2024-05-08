@@ -1,22 +1,22 @@
 import assert from 'assert'
 import { base16, base64pad } from 'iso-base/rfc4648'
-import * as Wallet from '../src/wallet.js'
 import { Message } from '../src/message.js'
+import * as Wallet from '../src/wallet.js'
 
 const mnemonic =
   'raw include ecology social turtle still perfect trip dance food welcome aunt patient very toss very program estate diet portion city camera loop guess'
 
-describe('wallet', function () {
-  it('should generate 24 word mnemonic', function () {
+describe('wallet', () => {
+  it('should generate 24 word mnemonic', () => {
     assert.strictEqual(Wallet.generateMnemonic().split(' ').length, 24)
   })
 
-  it('should generate seed from mnemonic', function () {
+  it('should generate seed from mnemonic', () => {
     const seed = Wallet.mnemonicToSeed(Wallet.generateMnemonic())
     assert.strictEqual(toString.call(seed).slice(8, -1), 'Uint8Array')
   })
 
-  it('should generate create account from mnemonic', function () {
+  it('should generate create account from mnemonic', () => {
     const account = Wallet.accountFromMnemonic(
       mnemonic,
       'SECP256K1',
@@ -29,7 +29,7 @@ describe('wallet', function () {
     )
   })
 
-  it('should generate create account from seed', function () {
+  it('should generate create account from seed', () => {
     const seed = Wallet.mnemonicToSeed(mnemonic)
     const account = Wallet.accountFromSeed(
       seed,
@@ -43,7 +43,7 @@ describe('wallet', function () {
     )
   })
 
-  it('should generate create account from mnemonic metamask', function () {
+  it('should generate create account from mnemonic metamask', () => {
     const seed = Wallet.mnemonicToSeed(
       'already turtle birth enroll since owner keep patch skirt drift any dinner'
     )
@@ -59,7 +59,7 @@ describe('wallet', function () {
     )
   })
 
-  it('should sign', function () {
+  it('should sign', () => {
     const account = Wallet.accountFromPrivateKey(
       base64pad.decode('tI1wF8uJseC1QdNj3CbpBAVC8G9/pfgtSYt4yXlJ+UY='),
       'SECP256K1',

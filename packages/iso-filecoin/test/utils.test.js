@@ -1,8 +1,8 @@
 import assert from 'assert'
 import { parseDerivationPath } from '../src/utils.js'
 
-describe('derivation path', function () {
-  it('should parse testnet bip44 derivation path', async function () {
+describe('derivation path', () => {
+  it('should parse testnet bip44 derivation path', async () => {
     const components = parseDerivationPath("m/44'/1'/0'/0/0")
 
     assert.deepStrictEqual(components, {
@@ -14,7 +14,7 @@ describe('derivation path', function () {
     })
   })
 
-  it('should parse mainnet bip44 derivation path', async function () {
+  it('should parse mainnet bip44 derivation path', async () => {
     const components = parseDerivationPath("m/44'/461'/0'/0/0")
 
     assert.deepStrictEqual(components, {
@@ -26,20 +26,20 @@ describe('derivation path', function () {
     })
   })
 
-  it('should fail parse short bip44 derivation path', async function () {
+  it('should fail parse short bip44 derivation path', async () => {
     assert.throws(() => parseDerivationPath("m/44'/461'/0'/0"), {
       message:
         "Invalid derivation path: depth must be 5 \"m / purpose' / coin_type' / account' / change / address_index\"",
     })
   })
 
-  it('should fail parse bip44 derivation path without m', async function () {
+  it('should fail parse bip44 derivation path without m', async () => {
     assert.throws(() => parseDerivationPath("/44'/461'/0'/0/0"), {
       message: 'Invalid derivation path: depth 0 must be "m"',
     })
   })
 
-  it("should fail parse bip44 derivation path with part 1 != 44'", async function () {
+  it("should fail parse bip44 derivation path with part 1 != 44'", async () => {
     assert.throws(() => parseDerivationPath("m/j4'/461'/0'/0/0"), {
       message:
         'Invalid derivation path: The "purpose" node (depth 1) must be the string "44\'"',

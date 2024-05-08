@@ -1,5 +1,5 @@
-import { assert, test } from 'playwright-test/taps'
 import delay from 'delay'
+import { assert, test } from 'playwright-test/taps'
 import { anySignal } from '../src/signals.js'
 
 test('should abort from any signal', async () => {

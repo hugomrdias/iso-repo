@@ -1,5 +1,5 @@
-import pRetry from 'p-retry'
 import delay from 'delay'
+import pRetry from 'p-retry'
 import { anySignal } from './signals.js'
 
 const symbol = Symbol.for('request-error')
@@ -60,7 +60,7 @@ export class JsonError extends RequestError {
    * @param {{ cause: import('type-fest').JsonValue }} options
    */
   constructor(options) {
-    super(`Failed with a JSON error, see cause.`, options)
+    super('Failed with a JSON error, see cause.', options)
 
     this.cause = options.cause
   }
@@ -391,7 +391,7 @@ request.head = function head(resource, options = {}) {
  * @param {import("./types.js").RequestOptions} options
  * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
  */
-request.options = function options(resource, options = {}) {
+request.options = function optionsFn(resource, options = {}) {
   return request(resource, { ...options, method: 'OPTIONS' })
 }
 
@@ -523,7 +523,7 @@ request.json.head = function head(resource, options = {}) {
  * @param {import("./types.js").JSONRequestOptions} options
  * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError>>}
  */
-request.json.options = function options(resource, options = {}) {
+request.json.options = function optionsFn(resource, options = {}) {
   return request.json(resource, { ...options, method: 'OPTIONS' })
 }
 
