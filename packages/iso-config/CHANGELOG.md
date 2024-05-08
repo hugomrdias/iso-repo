@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-config-v0.1.5...iso-config-v0.1.6) (2024-05-08)
+
+
+### Bug Fixes
+
+* improve ruleset ([42e253d](https://github.com/hugomrdias/iso-repo/commit/42e253d7b2cdcfbae901f1ecadda4b5576e48ff1))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/iso-config-v0.0.1...iso-config-v0.1.5) (2024-05-08)
 
 
