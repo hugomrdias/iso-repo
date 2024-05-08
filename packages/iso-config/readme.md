@@ -16,7 +16,7 @@ pnpm install iso-config
 {
   "main": "src/index.js",
   "types": "dist/src/index.d.ts",
-  "files": ["dist/src", "src", "index.js", "cli.js"],
+  "files": ["dist/src", "src"],
   "scripts": {
     "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true ."
   },
