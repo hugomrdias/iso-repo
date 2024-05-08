@@ -11,12 +11,12 @@ importers:
       '@biomejs/biome':
         specifier: 1.7.3
         version: 1.7.3
+      '@hugomrdias/configs':
+        specifier: workspace:^
+        version: link:packages/configs
       depcheck:
         specifier: ^1.4.7
         version: 1.4.7
-      iso-config:
-        specifier: workspace:^
-        version: link:packages/iso-config
       lint-staged:
         specifier: ^15.2.2
         version: 15.2.2
@@ -32,6 +32,19 @@ importers:
       typedoc-plugin-missing-exports:
         specifier: ^2.2.0
         version: 2.2.0(typedoc@0.25.13(typescript@5.4.5))
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
+  packages/configs:
+    dependencies:
+      '@biomejs/biome':
+        specifier: ^1.7.3
+        version: 1.7.3
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.30
+        version: 20.12.11
       typescript:
         specifier: 5.4.5
         version: 5.4.5
@@ -69,19 +82,6 @@ importers:
       playwright-test:
         specifier: ^14.1.1
         version: 14.1.3
-      typescript:
-        specifier: 5.4.5
-        version: 5.4.5
-
-  packages/iso-config:
-    dependencies:
-      '@biomejs/biome':
-        specifier: ^1.7.3
-        version: 1.7.3
-    devDependencies:
-      '@types/node':
-        specifier: ^20.11.30
-        version: 20.12.11
       typescript:
         specifier: 5.4.5
         version: 5.4.5

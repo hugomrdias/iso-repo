@@ -1,11 +1,11 @@
-# iso-config [![NPM Version](https://img.shields.io/npm/v/iso-config.svg)](https://www.npmjs.com/package/iso-config) [![License](https://img.shields.io/npm/l/iso-config.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-config](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-config.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-config.yml)
+# @hugomrdias/configs [![NPM Version](https://img.shields.io/npm/v/@hugomrdias/configs.svg)](https://www.npmjs.com/package/@hugomrdias/configs) [![License](https://img.shields.io/npm/l/@hugomrdias/configs.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![@hugomrdias/configs](https://github.com/hugomrdias/iso-repo/actions/workflows/@hugomrdias/configs.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/@hugomrdias/configs.yml)
 
 > JS tooling config
 
 ## Install
 
 ```bash
-pnpm install iso-config
+pnpm install @hugomrdias/configs
 ```
 
 ## Usage
@@ -33,7 +33,7 @@ pnpm install iso-config
 
 ```json
 {
-  "extends": "iso-config/tsconfig",
+  "extends": "@hugomrdias/configs/tsconfig",
   "compilerOptions": {
     "outDir": "dist",
     "emitDeclarationOnly": true
@@ -46,7 +46,7 @@ For typescript code bases:
 
 ```json
 {
-  "extends": "iso-config/tsconfig",
+  "extends": "@hugomrdias/configs/tsconfig",
   "compilerOptions": {
     "outDir": "dist",
     "module": "NodeNext",
@@ -56,7 +56,7 @@ For typescript code bases:
 }
 ```
 
-In monorepos you can install `iso-config` only in the root and extend the root `tsconfig.json` in the packages.
+In monorepos you can install `@hugomrdias/configs` only in the root and extend the root `tsconfig.json` in the packages.
 
 ## License
 

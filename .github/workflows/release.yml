@@ -37,7 +37,7 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-web') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-websocket')  ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-config') 
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/configs') 
     runs-on: ubuntu-latest
     permissions:
       contents: read

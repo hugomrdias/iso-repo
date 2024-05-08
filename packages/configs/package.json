@@ -1,13 +1,13 @@
 {
-  "name": "iso-config",
+  "name": "@hugomrdias/configs",
   "type": "module",
-  "version": "0.1.6",
+  "version": "0.0.1",
   "description": "JS tooling configs",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
   "repository": {
     "url": "hugomrdias/iso-repo",
-    "directory": "packages/iso-config"
+    "directory": "packages/configs"
   },
   "keywords": [
     "biome",
