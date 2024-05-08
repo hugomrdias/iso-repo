@@ -442,11 +442,9 @@ export class WS extends TypedEventTarget {
     if (this.#ws && this.#ws.readyState === WS.OPEN) {
       log('send', data)
       this.#ws.send(data)
-    } else {
-      if (this.#queue.length < 100) {
-        log('enqueue', data)
-        this.#queue.push(data)
-      }
+    } else if (this.#queue.length < 100) {
+      log('enqueue', data)
+      this.#queue.push(data)
     }
   }
 

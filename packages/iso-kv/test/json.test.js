@@ -3,7 +3,7 @@ import { parse, stringify } from '../src/json.js'
 
 const { test } = suite('json')
 
-test('should support data types', async () => {
+test('should support data types', () => {
   let v
   assert.deepEqual(parse(stringify({ a: 1 })), { a: 1 })
   assert.deepEqual(parse(stringify([1n])), [1n])
