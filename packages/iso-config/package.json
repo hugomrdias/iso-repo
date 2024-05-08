@@ -1,0 +1,34 @@
+{
+  "name": "iso-config",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "JS tooling configs",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-config"
+  },
+  "keywords": ["biome", "typescript", "config", "tooling"],
+  "exports": {
+    "./biome": "./biome.jsonc",
+    "./tsconfig": "./tsconfig.json"
+  },
+  "scripts": {
+    "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true ."
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "5.4.5"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "depcheck": {
+    "specials": ["bin"],
+    "ignores": ["@types/*"]
+  },
+  "peerDependencies": {
+    "@biomejs/biome": "^1.7.3"
+  }
+}
