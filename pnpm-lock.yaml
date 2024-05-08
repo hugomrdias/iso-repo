@@ -7,11 +7,10 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@biomejs/biome':
-        specifier: ^1.7.3
-        version: 1.7.3
     devDependencies:
+      '@biomejs/biome':
+        specifier: 1.7.3
+        version: 1.7.3
       depcheck:
         specifier: ^1.4.7
         version: 1.4.7
