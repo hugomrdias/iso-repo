@@ -10,6 +10,16 @@ pnpm install @hugomrdias/configs
 
 ## Usage
 
+`biome.json`
+
+```json
+
+{
+  "extends": ["@hugomrdias/configs/biome"]
+}
+
+```
+
 `package.json`
 
 ```json
@@ -38,7 +48,7 @@ pnpm install @hugomrdias/configs
     "outDir": "dist",
     "emitDeclarationOnly": true
   },
-  "include": ["src", "test.js", "cli.js", "package.json"]
+  "include": ["src", "test"]
 }
 ```
 
@@ -52,7 +62,7 @@ For typescript code bases:
     "module": "NodeNext",
     "moduleResolution": "NodeNext"
   },
-  "include": ["src", "test.js", "cli.js", "package.json"]
+  "include": ["src", "test"]
 }
 ```
 
