@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.7](https://github.com/hugomrdias/iso-repo/compare/configs-v0.1.6...configs-v0.1.7) (2024-05-16)
+
+
+### Bug Fixes
+
+* bump config ([9e65409](https://github.com/hugomrdias/iso-repo/commit/9e65409f19d86d1eb7f058066ef46237aaf5253f))
+
 ## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/configs-v0.1.5...configs-v0.1.6) (2024-05-16)
 
 
