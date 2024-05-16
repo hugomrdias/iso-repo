@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/configs-v0.1.5...configs-v0.1.6) (2024-05-16)
+
+
+### Bug Fixes
+
+* remove tsconfig include ([ae75c2f](https://github.com/hugomrdias/iso-repo/commit/ae75c2f5a9bb8afecb707f021ecc32a6ecca386b))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/configs-v0.0.1...configs-v0.1.5) (2024-05-08)
 
 
