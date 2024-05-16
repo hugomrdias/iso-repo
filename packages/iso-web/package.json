@@ -2,7 +2,7 @@
   "name": "iso-web",
   "type": "module",
   "version": "1.0.5",
-  "description": "Isomorphic Web APIs",
+  "description": "Isomorphic web apis utilities for fetch, signals, crypto and doh.",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
   "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-web",
