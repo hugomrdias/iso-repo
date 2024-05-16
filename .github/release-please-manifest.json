@@ -7,5 +7,5 @@
   "packages/iso-web": "1.0.5",
   "packages/iso-kv": "3.0.2",
   "packages/iso-websocket": "0.2.0",
-  "packages/configs": "0.1.6"
+  "packages/configs": "0.1.7"
 }
