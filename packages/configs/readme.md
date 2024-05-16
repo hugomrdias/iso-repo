@@ -6,6 +6,10 @@
 
 ```bash
 pnpm install @hugomrdias/configs
+
+# in monorepo root install
+pnpm install @hugomrdias/configs -w -D  
+pnpm install @biomejs/biome -w -D
 ```
 
 ## Usage
