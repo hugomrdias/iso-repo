@@ -37,6 +37,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": false,
     "skipLibCheck": true
-  },
-  "include": ["src", "mocks", "eslint"]
+  }
 }
