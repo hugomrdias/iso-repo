@@ -5,7 +5,7 @@
   "packages/iso-did": "1.6.0",
   "packages/iso-signatures": "0.3.2",
   "packages/iso-web": "1.0.6",
-  "packages/iso-kv": "3.0.2",
+  "packages/iso-kv": "3.0.3",
   "packages/iso-websocket": "0.2.0",
   "packages/configs": "0.1.7"
 }
