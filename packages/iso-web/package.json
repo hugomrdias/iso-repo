@@ -1,7 +1,7 @@
 {
   "name": "iso-web",
   "type": "module",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Isomorphic web apis utilities for fetch, signals, crypto and doh.",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
@@ -68,13 +68,27 @@
   },
   "typesVersions": {
     "*": {
-      "crypto": ["dist/src/crypto"],
-      "signals": ["dist/src/signals"],
-      "http": ["dist/src/http"],
-      "doh": ["dist/src/doh/index"],
-      "msw": ["dist/src/msw/msw"],
-      "dnslink": ["dist/src/doh/dnslink"],
-      "types": ["dist/src/types"]
+      "crypto": [
+        "dist/src/crypto"
+      ],
+      "signals": [
+        "dist/src/signals"
+      ],
+      "http": [
+        "dist/src/http"
+      ],
+      "doh": [
+        "dist/src/doh/index"
+      ],
+      "msw": [
+        "dist/src/msw/msw"
+      ],
+      "dnslink": [
+        "dist/src/doh/dnslink"
+      ],
+      "types": [
+        "dist/src/types"
+      ]
     }
   },
   "files": [
@@ -110,8 +124,14 @@
     "provenance": true
   },
   "depcheck": {
-    "specials": ["bin"],
-    "ignores": ["@types/*", "assert", "type-fest"]
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*",
+      "assert",
+      "type-fest"
+    ]
   },
   "msw": {
     "workerDirectory": "test/mocks"

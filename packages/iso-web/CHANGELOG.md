@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.5...iso-web-v1.0.6) (2024-05-16)
+
+
+### Bug Fixes
+
+* update readme and descriptions ([5c9c2cc](https://github.com/hugomrdias/iso-repo/commit/5c9c2cca303efa513be94a45ff10e5e5b9ea4a06))
+
 ## [1.0.5](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.4...iso-web-v1.0.5) (2024-03-25)
 
 
