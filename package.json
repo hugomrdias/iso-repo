@@ -19,7 +19,7 @@
   "devDependencies": {
     "depcheck": "^1.4.7",
     "@hugomrdias/configs": "workspace:^",
-    "lint-staged": "^15.2.2",
+    "lint-staged": "^15.2.5",
     "prettier": "3.2.5",
     "simple-git-hooks": "^2.11.0",
     "typedoc": "^0.25.12",
