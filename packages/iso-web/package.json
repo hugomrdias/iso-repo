@@ -114,7 +114,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^20.11.30",
+    "@types/node": "^20.14.0",
     "msw": "^2.2.3",
     "playwright-test": "^14.1.1",
     "type-fest": "^4.12.0",
