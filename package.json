@@ -20,7 +20,7 @@
     "depcheck": "^1.4.7",
     "@hugomrdias/configs": "workspace:^",
     "lint-staged": "^15.2.2",
-    "prettier": "3.2.5",
+    "prettier": "3.3.0",
     "simple-git-hooks": "^2.11.0",
     "typedoc": "^0.25.12",
     "typedoc-plugin-missing-exports": "^2.2.0",
