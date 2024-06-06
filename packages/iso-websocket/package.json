@@ -17,6 +17,7 @@
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
+      "events": "./dist/src/events.js",
       "default": "./src/index.js"
     }
   },
