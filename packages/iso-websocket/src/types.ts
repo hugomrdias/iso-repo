@@ -69,4 +69,12 @@ export interface WSOptions {
    * @param event - The close or connection timeout event
    */
   shouldRetry?: ShouldRetryFn
+  /**
+   * Reveal connection-time error information in Websocket error
+   *
+   * The *browser* spec for Websockets disallows revealing connection error info to prevent attacks but this is not applicable to *server* usage of WS in a trusted environment.
+   *
+   * @default false
+   * */
+  errorInfo?: boolean
 }
