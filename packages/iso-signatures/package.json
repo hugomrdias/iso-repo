@@ -82,7 +82,7 @@
     "assert": "^2.1.0",
     "mocha": "^10.3.0",
     "playwright-test": "^14.1.1",
-    "type-fest": "^4.12.0",
+    "type-fest": "^4.20.0",
     "typescript": "5.4.5"
   },
   "publishConfig": {
