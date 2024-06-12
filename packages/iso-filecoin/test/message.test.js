@@ -2,7 +2,7 @@ import assert from 'assert'
 import { Schemas } from '../src/message.js'
 
 describe('message validation', () => {
-  it('should validate', async () => {
+  it('should validate', () => {
     const valid = Schemas.message.safeParse({
       version: 0,
       to: 't1pc2apytmdas3sn5ylwhfa32jfpx7ez7ykieelna',
@@ -19,7 +19,7 @@ describe('message validation', () => {
     assert.ok(valid.success)
   })
 
-  it('should validate from partial', async () => {
+  it('should validate from partial', () => {
     const valid = Schemas.message.safeParse({
       to: 't1pc2apytmdas3sn5ylwhfa32jfpx7ez7ykieelna',
       from: 't1pc2apytmdas3sn5ylwhfa32jfpx7ez7ykieelna',

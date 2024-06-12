@@ -456,6 +456,8 @@ export class WS extends TypedEventTarget {
    * @param {number} [code]
    * @param {string} [reason]
    */
+
+  // biome-ignore lint/style/useDefaultParameterLast: <explanation>
   close(code = 1000, reason) {
     log('close %s %s', code, reason)
     this.#removeListeners()

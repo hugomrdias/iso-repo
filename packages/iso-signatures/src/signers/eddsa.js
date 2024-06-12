@@ -94,7 +94,7 @@ export class EdDSASigner {
    *
    * @param {Uint8Array} message
    */
-  async sign(message) {
+  sign(message) {
     return signAsync(message, this.#privateKey)
   }
 

@@ -126,7 +126,7 @@ export async function validateOKP(data, key) {
  * @param {AuthData} data
  * @param {import("./types").COSEPublicKey} pubKey
  */
-export async function validateAuth(data, pubKey) {
+export function validateAuth(data, pubKey) {
   const keyType = getCoseKeyType(pubKey)
 
   switch (keyType) {

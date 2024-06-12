@@ -1,9 +1,40 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.1/schema.json",
   "files": {
-    // this should be just in the formatter
-    // https://github.com/biomejs/biome-vscode/issues/211
-    "ignore": ["**/package.json"]
+    "ignore": [
+      "**/node_modules",
+      "**/dist",
+      "**/package-lock.json",
+      "**/yarn.lock",
+      "**/pnpm-lock.yaml",
+      "**/bun.lockb",
+
+      "**/output",
+      "**/coverage",
+      "**/temp",
+      "**/.temp",
+      "**/tmp",
+      "**/.tmp",
+      "**/.history",
+      "**/.vitepress/cache",
+      "**/.nuxt",
+      "**/.next",
+      "**/.vercel",
+      "**/.changeset",
+      "**/.idea",
+      "**/.cache",
+      "**/.output",
+      "**/.vite-inspect",
+      "**/.yarn",
+
+      "**/CHANGELOG*.md",
+      "**/*.min.*",
+      "**/LICENSE*",
+      "**/__snapshots__",
+      "**/auto-import?(s).d.ts",
+      "**/components.d.ts",
+      "**/mockServiceWorker.js"
+    ]
   },
   "vcs": {
     "clientKind": "git",
@@ -17,7 +48,8 @@
     "indentWidth": 2,
     "lineEnding": "lf",
     "lineWidth": 80,
-    "attributePosition": "auto"
+    "attributePosition": "auto",
+    "ignore": ["**/package.json"]
   },
   "organizeImports": { "enabled": true },
   "linter": {
@@ -63,41 +95,7 @@
         "noEmptyBlockStatements": "error",
         "useAwait": "warn"
       }
-    },
-    "ignore": [
-      "**/node_modules",
-      "**/dist",
-      "**/package-lock.json",
-      "**/yarn.lock",
-      "**/pnpm-lock.yaml",
-      "**/bun.lockb",
-
-      "**/output",
-      "**/coverage",
-      "**/temp",
-      "**/.temp",
-      "**/tmp",
-      "**/.tmp",
-      "**/.history",
-      "**/.vitepress/cache",
-      "**/.nuxt",
-      "**/.next",
-      "**/.vercel",
-      "**/.changeset",
-      "**/.idea",
-      "**/.cache",
-      "**/.output",
-      "**/.vite-inspect",
-      "**/.yarn",
-
-      "**/CHANGELOG*.md",
-      "**/*.min.*",
-      "**/LICENSE*",
-      "**/__snapshots__",
-      "**/auto-import?(s).d.ts",
-      "**/components.d.ts",
-      "**/mockServiceWorker.js"
-    ]
+    }
   },
   "javascript": {
     "formatter": {

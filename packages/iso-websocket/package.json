@@ -13,7 +13,12 @@
   "bugs": {
     "url": "https://github.com/hugomrdias/iso-repo/issues"
   },
-  "keywords": ["websocket", "reconnect", "retry", "websocket-client"],
+  "keywords": [
+    "websocket",
+    "reconnect",
+    "retry",
+    "websocket-client"
+  ],
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -22,7 +27,11 @@
   },
   "main": "src/index.js",
   "types": "dist/src/index.d.ts",
-  "files": ["src", "dist/src/*.d.ts", "dist/src/*.d.ts.map"],
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
@@ -30,7 +39,7 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js' --assets test/mocks"
   },
   "dependencies": {
-    "debug": "^4.3.4",
+    "debug": "^4.3.5",
     "retry": "^0.13.1",
     "typescript-event-target": "^1.1.0",
     "unws": "^0.2.4",
@@ -44,14 +53,20 @@
     "delay": "^6.0.0",
     "p-defer": "^4.0.0",
     "playwright-test": "^14.1.1",
-    "type-fest": "^4.12.0",
+    "type-fest": "^4.20.0",
     "typescript": "5.4.5"
   },
   "publishConfig": {
     "provenance": true
   },
   "depcheck": {
-    "specials": ["bin"],
-    "ignores": ["@types/*", "assert", "type-fest"]
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*",
+      "assert",
+      "type-fest"
+    ]
   }
 }

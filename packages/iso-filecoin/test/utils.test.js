@@ -2,7 +2,7 @@ import assert from 'assert'
 import { parseDerivationPath } from '../src/utils.js'
 
 describe('derivation path', () => {
-  it('should parse testnet bip44 derivation path', async () => {
+  it('should parse testnet bip44 derivation path', () => {
     const components = parseDerivationPath("m/44'/1'/0'/0/0")
 
     assert.deepStrictEqual(components, {
@@ -14,7 +14,7 @@ describe('derivation path', () => {
     })
   })
 
-  it('should parse mainnet bip44 derivation path', async () => {
+  it('should parse mainnet bip44 derivation path', () => {
     const components = parseDerivationPath("m/44'/461'/0'/0/0")
 
     assert.deepStrictEqual(components, {
