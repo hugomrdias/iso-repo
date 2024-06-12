@@ -20,7 +20,7 @@
     "./tsconfig": "./tsconfig.json"
   },
   "scripts": {
-    "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true ."
+    "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true"
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
@@ -38,6 +38,6 @@
     ]
   },
   "peerDependencies": {
-    "@biomejs/biome": "^1.7.3"
+    "@biomejs/biome": "^1.8.1"
   }
 }
