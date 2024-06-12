@@ -75,6 +75,7 @@ export class WS extends TypedEventTarget {
         randomize: false,
       },
       shouldRetry: defaultShouldRetry,
+      errorInfo: false,
       ...options,
     }
 
@@ -312,15 +313,26 @@ export class WS extends TypedEventTarget {
 
   /**
    * @see https://stackoverflow.com/questions/31002592/javascript-doesnt-catch-error-in-websocket-instantiation/31003057#31003057
-   * @param {globalThis.Event} event
+   * @param {globalThis.Event|globalThis.ErrorEvent} event
    */
   #handleError = (event) => {
     log('error event', event)
 
-    const err = new ErrorEvent({
+    let err = new ErrorEvent({
       message: 'Websocket error',
       error: new Error('Websocket error'),
     })
+
+    if (
+      'error' in event &&
+      event.error !== undefined &&
+      this.options.errorInfo
+    ) {
+      err = new ErrorEvent({
+        message: `Websocket error: ${event.error.message}`,
+        error: new Error('Websocket error', { cause: event.error }),
+      })
+    }
 
     if (this.onerror) {
       this.onerror(err)
