@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/hugomrdias/iso-repo/compare/configs-v0.1.7...configs-v0.1.8) (2024-06-12)
+
+
+### Bug Fixes
+
+* update to biome 1.8.1 ([46134aa](https://github.com/hugomrdias/iso-repo/commit/46134aa4c3535f84b2c3c4f279ca34e6feea0462))
+
 ## [0.1.7](https://github.com/hugomrdias/iso-repo/compare/configs-v0.1.6...configs-v0.1.7) (2024-05-16)
 
 
