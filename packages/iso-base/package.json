@@ -94,7 +94,7 @@
     "@scure/base": "^1.1.5",
     "@types/assert": "^1.5.10",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.14.2",
+    "@types/node": "^20.14.3",
     "assert": "^2.1.0",
     "micro-bmark": "^0.3.1",
     "mocha": "^10.3.0",
