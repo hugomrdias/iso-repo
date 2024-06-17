@@ -43,7 +43,7 @@
     "retry": "^0.13.1",
     "typescript-event-target": "^1.1.0",
     "unws": "^0.2.4",
-    "ws": "^8.16.0"
+    "ws": "^8.17.1"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
