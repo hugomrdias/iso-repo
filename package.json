@@ -24,7 +24,7 @@
     "depcheck": "^1.4.7",
     "simple-git-hooks": "^2.11.0",
     "typedoc": "^0.25.12",
-    "typedoc-plugin-missing-exports": "^2.2.0",
+    "typedoc-plugin-missing-exports": "^2.3.0",
     "typescript": "5.4.5"
   },
   "simple-git-hooks": {
