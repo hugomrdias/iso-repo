@@ -23,9 +23,9 @@
     "@hugomrdias/configs": "workspace:^",
     "depcheck": "^1.4.7",
     "simple-git-hooks": "^2.11.0",
-    "typedoc": "^0.25.12",
+    "typedoc": "^0.26.2",
     "typedoc-plugin-missing-exports": "^2.2.0",
-    "typescript": "5.4.5"
+    "typescript": "5.5.2"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec biome check --no-errors-on-unmatched --files-ignore-unknown=true --staged"
