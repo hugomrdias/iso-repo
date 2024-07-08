@@ -91,7 +91,7 @@
     "mocha": "^10.3.0",
     "msw": "^2.2.3",
     "playwright-test": "^14.1.1",
-    "type-fest": "^4.20.0",
+    "type-fest": "^4.21.0",
     "typescript": "5.4.5"
   },
   "publishConfig": {
