@@ -321,7 +321,7 @@ export class WS extends TypedEventTarget {
 
     const err = new ErrorEvent({
       message: 'Websocket error',
-      error: new Error('Websocket error'),
+      error: new Error('Websocket error', { cause: event }),
     })
 
     if (this.onerror) {
