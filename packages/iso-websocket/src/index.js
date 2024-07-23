@@ -12,6 +12,8 @@ import {
 
 const log = debug('iso-ws')
 
+export * from './events.js'
+
 /**
  * @typedef {import('./types.js').WebSocketEventMap} WebSocketEventMap
  * @typedef {import('./types.js').WSOptions} WSOptions
