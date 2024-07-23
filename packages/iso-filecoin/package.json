@@ -10,7 +10,12 @@
     "url": "hugomrdias/iso-repo",
     "directory": "packages/iso-filecoin"
   },
-  "keywords": ["token", "filecoin", "crypto", "wallet"],
+  "keywords": [
+    "token",
+    "filecoin",
+    "crypto",
+    "wallet"
+  ],
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -52,17 +57,37 @@
   "types": "dist/src/index.d.ts",
   "typesVersions": {
     "*": {
-      "address": ["dist/src/address"],
-      "message": ["dist/src/message"],
-      "rpc": ["dist/src/rpc"],
-      "signature": ["dist/src/signature"],
-      "token": ["dist/src/token"],
-      "wallet": ["dist/src/wallet"],
-      "types": ["dist/src/types"],
-      "utils": ["dist/src/utils"]
+      "address": [
+        "dist/src/address"
+      ],
+      "message": [
+        "dist/src/message"
+      ],
+      "rpc": [
+        "dist/src/rpc"
+      ],
+      "signature": [
+        "dist/src/signature"
+      ],
+      "token": [
+        "dist/src/token"
+      ],
+      "wallet": [
+        "dist/src/wallet"
+      ],
+      "types": [
+        "dist/src/types"
+      ],
+      "utils": [
+        "dist/src/utils"
+      ]
     }
   },
-  "files": ["src", "dist/src/*.d.ts", "dist/src/*.d.ts.map"],
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
@@ -71,7 +96,7 @@
   },
   "dependencies": {
     "@ipld/dag-cbor": "^9.2.1",
-    "@noble/curves": "^1.3.0",
+    "@noble/curves": "^1.4.2",
     "@noble/hashes": "^1.3.3",
     "@scure/bip32": "^1.3.3",
     "@scure/bip39": "^1.2.1",
@@ -82,18 +107,23 @@
   },
   "devDependencies": {
     "@types/assert": "^1.5.10",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^20.14.8",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.14.11",
     "assert": "^2.1.0",
-    "mocha": "^10.3.0",
+    "mocha": "^10.7.0",
     "playwright-test": "^14.1.1",
-    "typescript": "5.4.5"
+    "typescript": "5.5.4"
   },
   "publishConfig": {
     "provenance": true
   },
   "depcheck": {
-    "specials": ["bin"],
-    "ignores": ["@types/*", "assert"]
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*",
+      "assert"
+    ]
   }
 }

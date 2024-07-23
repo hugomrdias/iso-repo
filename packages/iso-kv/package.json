@@ -50,19 +50,19 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "conf": "^12.0.0",
+    "conf": "^13.0.1",
     "idb-keyval": "^6.2.1",
-    "kysely": "^0.27.3"
+    "kysely": "^0.27.4"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.9",
-    "@types/node": "^20.14.8",
-    "better-sqlite3": "^11.0.0",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^20.14.11",
+    "better-sqlite3": "^11.1.2",
     "delay": "^6.0.0",
     "playwright-test": "^14.1.1",
     "quick-lru": "^7.0.0",
     "tempy": "^3.1.0",
-    "typescript": "5.4.5"
+    "typescript": "5.5.4"
   },
   "publishConfig": {
     "provenance": true

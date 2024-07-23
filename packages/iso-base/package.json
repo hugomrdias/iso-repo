@@ -69,17 +69,37 @@
   },
   "typesVersions": {
     "*": {
-      "utils": ["dist/src/utils"],
-      "crypto": ["dist/src/crypto"],
-      "utf8": ["dist/src/utf8"],
-      "rfc4648": ["dist/src/rfc4648"],
-      "base-x": ["dist/src/base-x"],
-      "varint": ["dist/src/varint"],
-      "ec-compression": ["dist/src/ec-compression"],
-      "leb128": ["dist/src/leb128"]
+      "utils": [
+        "dist/src/utils"
+      ],
+      "crypto": [
+        "dist/src/crypto"
+      ],
+      "utf8": [
+        "dist/src/utf8"
+      ],
+      "rfc4648": [
+        "dist/src/rfc4648"
+      ],
+      "base-x": [
+        "dist/src/base-x"
+      ],
+      "varint": [
+        "dist/src/varint"
+      ],
+      "ec-compression": [
+        "dist/src/ec-compression"
+      ],
+      "leb128": [
+        "dist/src/leb128"
+      ]
     }
   },
-  "files": ["src", "dist/src/*.d.ts", "dist/src/*.d.ts.map"],
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
@@ -87,25 +107,30 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "base-x": "^4.0.0",
+    "base-x": "^5.0.0",
     "bigint-mod-arith": "^3.3.1"
   },
   "devDependencies": {
     "@scure/base": "^1.1.7",
     "@types/assert": "^1.5.10",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^20.14.8",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.14.11",
     "assert": "^2.1.0",
     "micro-bmark": "^0.3.1",
-    "mocha": "^10.3.0",
+    "mocha": "^10.7.0",
     "playwright-test": "^14.1.1",
-    "typescript": "5.4.5"
+    "typescript": "5.5.4"
   },
   "publishConfig": {
     "provenance": true
   },
   "depcheck": {
-    "specials": ["bin"],
-    "ignores": ["@types/*", "assert"]
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*",
+      "assert"
+    ]
   }
 }

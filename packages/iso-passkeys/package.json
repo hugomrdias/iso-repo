@@ -10,7 +10,12 @@
     "url": "hugomrdias/iso-repo",
     "directory": "packages/iso-passkeys"
   },
-  "keywords": ["webauthn", "passkeys", "authentication", "fido"],
+  "keywords": [
+    "webauthn",
+    "passkeys",
+    "authentication",
+    "fido"
+  ],
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -25,11 +30,19 @@
   "types": "dist/src/index.d.ts",
   "typesVersions": {
     "*": {
-      ".": ["dist/src/index"],
-      "types": ["dist/src/types"]
+      ".": [
+        "dist/src/index"
+      ],
+      "types": [
+        "dist/src/types"
+      ]
     }
   },
-  "files": ["src", "dist/src/*.d.ts", "dist/src/*.d.ts.map"],
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
@@ -46,18 +59,23 @@
   },
   "devDependencies": {
     "@types/assert": "^1.5.10",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^20.14.8",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.14.11",
     "assert": "^2.1.0",
-    "mocha": "^10.3.0",
+    "mocha": "^10.7.0",
     "playwright-test": "^14.1.1",
-    "typescript": "5.4.5"
+    "typescript": "5.5.4"
   },
   "publishConfig": {
     "provenance": true
   },
   "depcheck": {
-    "specials": ["bin"],
-    "ignores": ["@types/*", "assert"]
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*",
+      "assert"
+    ]
   }
 }
