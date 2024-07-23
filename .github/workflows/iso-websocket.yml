@@ -7,12 +7,12 @@ on:
     branches:
       - main
     paths:
-      - 'packages/iso-ws/**'
+      - 'packages/iso-websocket/**'
       - .github/workflows/iso-websocket.yml
       - pnpm-lock.yaml
   pull_request:
     paths:
-      - 'packages/iso-ws/**'
+      - 'packages/iso-websocket/**'
       - .github/workflows/iso-websocket.yml
       - pnpm-lock.yaml
 jobs:
