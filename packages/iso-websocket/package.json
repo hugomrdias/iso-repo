@@ -1,7 +1,7 @@
 {
   "name": "iso-websocket",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Isomorphic, resilient and extensible Websocket.",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
