@@ -92,8 +92,8 @@ importers:
         specifier: workspace:^
         version: link:../iso-web
       multiformats:
-        specifier: ^13.2.0
-        version: 13.2.0
+        specifier: ^13.2.2
+        version: 13.2.2
     devDependencies:
       '@noble/hashes':
         specifier: ^1.3.3
@@ -1763,8 +1763,8 @@ packages:
       typescript:
         optional: true
 
-  multiformats@13.2.0:
-    resolution: {integrity: sha512-ztpoAm2qHcdMR/RuOB0IhdYV6MocCLU2bp2Hcpwi2UHE5CT2PcCMyvwhSHMCS0gdApb3t6YzI/uQ5tmN7y/DRA==}
+  multiformats@13.2.2:
+    resolution: {integrity: sha512-RWI+nyf0q64vyOxL8LbKtjJMki0sogRL/8axvklNtiTM0iFCVtHwME9w6+0P1/v4dQvsIg8A45oT3ka1t/M/+A==}
 
   multimatch@5.0.0:
     resolution: {integrity: sha512-ypMKuglUrZUD99Tk2bUQ+xNQj43lPEfAeX2o9cTteAmShXy2VHDJpuwu1o0xqoKCt9jLVAvwyFKdLTPXKAfJyA==}
@@ -2685,7 +2685,7 @@ snapshots:
   '@ipld/dag-cbor@9.2.1':
     dependencies:
       cborg: 4.2.1
-      multiformats: 13.2.0
+      multiformats: 13.2.2
 
   '@istanbuljs/schema@0.1.3': {}
 
@@ -3765,7 +3765,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.5.4
 
-  multiformats@13.2.0: {}
+  multiformats@13.2.2: {}
 
   multimatch@5.0.0:
     dependencies:
