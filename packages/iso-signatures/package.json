@@ -94,7 +94,7 @@
   "devDependencies": {
     "@types/assert": "^1.5.10",
     "@types/mocha": "^10.0.7",
-    "@types/node": "^20.14.11",
+    "@types/node": "^22.5.0",
     "assert": "^2.1.0",
     "mocha": "^10.7.0",
     "playwright-test": "^14.1.1",
