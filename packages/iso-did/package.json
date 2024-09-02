@@ -89,7 +89,7 @@
     "@types/node": "^20.14.11",
     "assert": "^2.1.0",
     "mocha": "^10.7.0",
-    "msw": "^2.3.3",
+    "msw": "^2.4.1",
     "playwright-test": "^14.1.1",
     "type-fest": "^4.23.0",
     "typescript": "5.5.4"
