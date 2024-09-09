@@ -116,7 +116,7 @@
     "@types/debug": "^4.1.12",
     "@types/node": "^20.14.11",
     "msw": "^2.3.3",
-    "playwright-test": "^14.1.1",
+    "playwright-test": "^14.1.5",
     "type-fest": "^4.23.0",
     "typescript": "5.5.4"
   },
