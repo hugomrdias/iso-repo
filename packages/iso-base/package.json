@@ -118,7 +118,7 @@
     "assert": "^2.1.0",
     "micro-bmark": "^0.3.1",
     "mocha": "^10.7.0",
-    "playwright-test": "^14.1.1",
+    "playwright-test": "^14.1.6",
     "typescript": "5.5.4"
   },
   "publishConfig": {
