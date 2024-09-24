@@ -93,13 +93,13 @@
   },
   "devDependencies": {
     "@types/assert": "^1.5.10",
-    "@types/mocha": "^10.0.7",
-    "@types/node": "^20.14.11",
+    "@types/mocha": "^10.0.8",
+    "@types/node": "^22.5.5",
     "assert": "^2.1.0",
-    "mocha": "^10.7.0",
-    "playwright-test": "^14.1.1",
-    "type-fest": "^4.23.0",
-    "typescript": "5.5.4"
+    "mocha": "^10.7.3",
+    "playwright-test": "^14.1.6",
+    "type-fest": "^4.26.1",
+    "typescript": "5.6.2"
   },
   "publishConfig": {
     "provenance": true

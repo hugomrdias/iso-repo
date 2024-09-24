@@ -183,7 +183,7 @@ export class HttpError extends RequestError {
   constructor(options) {
     const msg = `HttpError: ${options.response.status} - ${options.response.statusText}`
 
-    super(msg, options)
+    super(msg)
 
     this.code = options.response?.status ?? 0
     this.response = options.response
@@ -245,7 +245,7 @@ export async function request(resource, options = {}) {
     const response = await (retry
       ? pRetry(
           async () => {
-            const rsp = await fetch(resource)
+            const rsp = await fetch(request)
             if (!rsp.ok) {
               // Delay if needed using Retry-After header
               const delayValue = calculateRetryAfter(rsp)
