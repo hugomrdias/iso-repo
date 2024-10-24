@@ -92,14 +92,14 @@
     "iso-did": "workspace:^"
   },
   "devDependencies": {
-    "@types/assert": "^1.5.10",
-    "@types/mocha": "^10.0.8",
-    "@types/node": "^22.5.5",
+    "@types/assert": "^1.5.11",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.7.9",
     "assert": "^2.1.0",
     "mocha": "^10.7.3",
     "playwright-test": "^14.1.6",
     "type-fest": "^4.26.1",
-    "typescript": "5.6.2"
+    "typescript": "5.6.3"
   },
   "publishConfig": {
     "provenance": true

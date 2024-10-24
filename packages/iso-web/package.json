@@ -114,11 +114,11 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^22.5.5",
+    "@types/node": "^22.7.9",
     "msw": "2.4.3",
     "playwright-test": "^14.1.6",
     "type-fest": "^4.26.1",
-    "typescript": "5.6.2"
+    "typescript": "5.6.3"
   },
   "publishConfig": {
     "provenance": true

@@ -23,8 +23,8 @@
     "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true"
   },
   "devDependencies": {
-    "@types/node": "^22.5.5",
-    "typescript": "5.6.2"
+    "@types/node": "^22.7.9",
+    "typescript": "5.6.3"
   },
   "publishConfig": {
     "provenance": false

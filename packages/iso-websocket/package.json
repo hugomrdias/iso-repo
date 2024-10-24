@@ -47,14 +47,14 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^22.5.5",
+    "@types/node": "^22.7.9",
     "@types/retry": "^0.12.5",
     "@types/ws": "^8.5.12",
     "delay": "^6.0.0",
     "p-defer": "^4.0.0",
     "playwright-test": "^14.1.6",
     "type-fest": "^4.26.1",
-    "typescript": "5.6.2"
+    "typescript": "5.6.3"
   },
   "publishConfig": {
     "provenance": true

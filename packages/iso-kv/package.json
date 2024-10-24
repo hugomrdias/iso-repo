@@ -56,13 +56,13 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",
-    "@types/node": "^22.5.5",
-    "better-sqlite3": "^11.3.0",
+    "@types/node": "^22.7.9",
+    "better-sqlite3": "^11.5.0",
     "delay": "^6.0.0",
     "playwright-test": "^14.1.6",
     "quick-lru": "^7.0.0",
     "tempy": "^3.1.0",
-    "typescript": "5.6.2"
+    "typescript": "5.6.3"
   },
   "publishConfig": {
     "provenance": true
