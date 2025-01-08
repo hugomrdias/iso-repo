@@ -4,7 +4,6 @@
     "entryPointStrategy": "packages",
     "entryPoints": [
       "packages/iso-base",
-      "packages/iso-filecoin",
       "packages/iso-passkeys",
       "packages/iso-did",
       "packages/iso-signatures",

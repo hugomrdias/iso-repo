@@ -11,7 +11,6 @@
 - [iso-signatures](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-signatures) - Isomorphic signatures tooling
 - [iso-web](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-signatures) - Isomorphic web apis utilities for fetch, signals, crypto and doh.
 - [iso-websocket](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-websocket) - `iso-websocket` implements the [Websocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) interface and is compatible with the browser, node.js and any other engine that implements basic Web APIs.
-- [iso-filecoin](https://github.com/hugomrdias/filecoin) - Filecoin tooling was moved to its own repository
 
 ## Contributing
 
