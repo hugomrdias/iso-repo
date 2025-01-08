@@ -87,19 +87,19 @@
     "test:browser": "pw-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "@noble/ed25519": "^2.0.0",
+    "@noble/ed25519": "^2.2.2",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^"
   },
   "devDependencies": {
     "@types/assert": "^1.5.11",
-    "@types/mocha": "^10.0.9",
-    "@types/node": "^22.7.9",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.5",
     "assert": "^2.1.0",
-    "mocha": "^10.7.3",
-    "playwright-test": "^14.1.6",
-    "type-fest": "^4.26.1",
-    "typescript": "5.6.3"
+    "mocha": "^11.0.1",
+    "playwright-test": "^14.1.7",
+    "type-fest": "^4.31.0",
+    "typescript": "5.7.2"
   },
   "publishConfig": {
     "provenance": true
