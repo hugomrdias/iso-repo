@@ -4,7 +4,6 @@
     "packages/iso-base": {},
     "packages/iso-did": {},
     "packages/iso-signatures": {},
-    "packages/iso-filecoin": {},
     "packages/iso-passkeys": {},
     "packages/iso-web": {},
     "packages/iso-kv": {},
