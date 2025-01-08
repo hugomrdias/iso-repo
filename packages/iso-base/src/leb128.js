@@ -1,3 +1,13 @@
+/**
+ * Unsigned LEB128 encoding and decoding.
+ *
+ * Supports bigints and numbers.
+ *
+ * @see https://en.wikipedia.org/wiki/LEB128
+ *
+ * @module
+ */
+
 export const unsigned = {
   /**
    * Decode a Uint8Array into a number.

@@ -1,4 +1,5 @@
 import assert from 'assert'
+import { hex } from '../src/rfc4648.js'
 import { decode, encode, encodingLength } from '../src/varint.js'
 
 /**
@@ -135,4 +136,32 @@ describe('varint', () => {
       }
     )
   })
+
+  /** @type {Array<[string, number , number]>} */
+  const VECTORS = [
+    ['01', 1, 1],
+    ['7f', 127, 1],
+    ['8001', 128, 2],
+    ['ff01', 255, 2],
+    ['ac02', 300, 2],
+    ['808001', 16384, 3],
+    ['d901', 217, 2],
+    ['e29a01', 19_810, 3],
+    ['e086bd2b', 91_177_824, 4],
+    ['e599c7ed09', 2_645_675_237, 5],
+  ]
+  for (const [b, num, size] of VECTORS) {
+    const bytes = hex.decode(b)
+    it(`${b} decode`, () => {
+      assert.deepStrictEqual(decode(bytes)[0], num)
+    })
+
+    it(`${b} size`, () => {
+      assert.deepStrictEqual(encodingLength(num), size)
+    })
+
+    it(`${b} encode`, () => {
+      assert.deepStrictEqual(encode(num)[0], bytes)
+    })
+  }
 })

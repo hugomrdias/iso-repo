@@ -15,7 +15,8 @@
       "src/utils.js",
       "src/base-x.js",
       "src/varint.js",
-      "src/ec-compression.js"
+      "src/ec-compression.js",
+      "src/leb128.js"
     ],
     "includeVersion": true,
     "excludeExternals": true,

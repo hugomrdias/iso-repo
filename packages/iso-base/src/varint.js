@@ -1,6 +1,9 @@
-/* eslint-disable no-fallthrough */
 /**
- * Variable length integer encoding with helpers for tagging Uint8Arrays with multicodec prefixes.
+ * Unsigned variable length integer encoding with helpers for tagging Uint8Arrays with multicodec prefixes.
+ * Same as unsigned leb128 encoding but with js safe integers limitations and multiformats rules.
+ *
+ *
+ * @see https://github.com/multiformats/unsigned-varint
  *
  * @module
  */
@@ -135,7 +138,7 @@ export function encode(value, buf, offset = 0) {
 }
 
 /**
- * Decodes buf from position offset or default 0 and returns the decoded original integer.
+ * Decodes buffer from position offset or default 0 and returns the decoded original integer.
  *
  * @param {Uint8Array} buf
  * @param {number} [offset]
