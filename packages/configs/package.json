@@ -23,7 +23,7 @@
     "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
+    "@types/node": "^22.10.6",
     "typescript": "5.7.2"
   },
   "publishConfig": {
