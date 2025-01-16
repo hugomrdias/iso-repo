@@ -221,7 +221,9 @@ export async function request(resource, options = {}) {
 
   // validate resource type
   if (typeof resource !== 'string' && !(resource instanceof URL)) {
-    throw new TypeError('`resource` must be a string or URL object')
+    return {
+      error: new RequestError('`resource` must be a string or URL object'),
+    }
   }
 
   const timeoutSignal = AbortSignal.timeout(timeout)
@@ -417,7 +419,6 @@ request.trace = function trace(resource, options = {}) {
 request.json = async function json(resource, options = {}) {
   const { error, result } = await request(resource, {
     ...options,
-    // eslint-disable-next-line unicorn/no-null
     body: null,
     json: options.body,
   })

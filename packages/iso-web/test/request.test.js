@@ -1,6 +1,6 @@
 import { http, HttpResponse, delay } from 'msw'
 import { assert, suite } from 'playwright-test/taps'
-import { HttpError, JsonError, request } from '../src/http.js'
+import { HttpError, JsonError, RequestError, request } from '../src/http.js'
 import { setup } from '../src/msw/msw.js'
 
 const test = suite('request')
@@ -86,6 +86,17 @@ test('should request 500', async () => {
   if (HttpError.is(error)) {
     assert.equal(error.message, 'HttpError: 500 - Internal Server Error')
     assert.equal(error.code, 500)
+  } else {
+    assert.fail('should fail')
+  }
+})
+
+test('should fail with bad resource', async () => {
+  // @ts-expect-error - tests bad resource
+  const { error } = await request(1000)
+
+  if (RequestError.is(error)) {
+    assert.equal(error.message, '`resource` must be a string or URL object')
   } else {
     assert.fail('should fail')
   }
