@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.7](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.6...iso-web-v1.0.7) (2025-01-16)
+
+
+### Bug Fixes
+
+* move a type error throw into MaybeResult ([cc66a47](https://github.com/hugomrdias/iso-repo/commit/cc66a4771316edf2be46ee12f31702d52c0afff8))
+
 ## [1.0.6](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.5...iso-web-v1.0.6) (2024-05-16)
 
 
