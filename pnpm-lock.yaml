@@ -120,8 +120,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       type-fest:
-        specifier: ^4.31.0
-        version: 4.31.0
+        specifier: ^4.33.0
+        version: 4.33.0
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -237,8 +237,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       type-fest:
-        specifier: ^4.31.0
-        version: 4.31.0
+        specifier: ^4.33.0
+        version: 4.33.0
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -268,8 +268,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       type-fest:
-        specifier: ^4.31.0
-        version: 4.31.0
+        specifier: ^4.33.0
+        version: 4.33.0
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -314,8 +314,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       type-fest:
-        specifier: ^4.31.0
-        version: 4.31.0
+        specifier: ^4.33.0
+        version: 4.33.0
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -1071,7 +1071,7 @@ packages:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
   concat-map@0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   conf@13.1.0:
     resolution: {integrity: sha512-Bi6v586cy1CoTFViVO4lGTtx780lfF96fUmS1lSX6wpZf6330NvHUu6fReVuDP1de8Mg0nkZb01c8tAQdz1o3w==}
@@ -2186,8 +2186,8 @@ packages:
     resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
     engines: {node: '>=12.20'}
 
-  type-fest@4.31.0:
-    resolution: {integrity: sha512-yCxltHW07Nkhv/1F6wWBr8kz+5BGMfP+RbRSYFnegVb0qV/UMT0G0ElBloPVerqn4M2ZV80Ir1FtCcYv1cT6vQ==}
+  type-fest@4.33.0:
+    resolution: {integrity: sha512-s6zVrxuyKbbAsSAD5ZPTB77q4YIdRctkTbJ2/Dqlinwz+8ooH2gd+YA7VA6Pa93KML9GockVvoxjZ2vHP+mu8g==}
     engines: {node: '>=16'}
 
   typedoc-plugin-missing-exports@3.1.0:
@@ -3163,7 +3163,7 @@ snapshots:
 
   dot-prop@9.0.0:
     dependencies:
-      type-fest: 4.31.0
+      type-fest: 4.33.0
 
   eastasianwidth@0.2.0: {}
 
@@ -3669,7 +3669,7 @@ snapshots:
       outvariant: 1.4.3
       path-to-regexp: 6.3.0
       strict-event-emitter: 0.5.1
-      type-fest: 4.31.0
+      type-fest: 4.33.0
       yargs: 17.7.2
     optionalDependencies:
       typescript: 5.7.2
@@ -4159,7 +4159,7 @@ snapshots:
 
   type-fest@2.19.0: {}
 
-  type-fest@4.31.0: {}
+  type-fest@4.33.0: {}
 
   typedoc-plugin-missing-exports@3.1.0(typedoc@0.27.6(typescript@5.7.2)):
     dependencies:
