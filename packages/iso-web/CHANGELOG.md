@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.6...iso-web-v1.1.0) (2025-02-10)
+
+
+### Features
+
+* add typed event target ([b15e299](https://github.com/hugomrdias/iso-repo/commit/b15e2996f89f163e137083d8a55ff84783f2e217))
+
+
+### Bug Fixes
+
+* move a type error throw into MaybeResult ([cc66a47](https://github.com/hugomrdias/iso-repo/commit/cc66a4771316edf2be46ee12f31702d52c0afff8))
+
 ## [1.0.6](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.5...iso-web-v1.0.6) (2024-05-16)
 
 
