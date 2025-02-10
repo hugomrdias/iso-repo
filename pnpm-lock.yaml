@@ -68,8 +68,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       micro-bmark:
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: ^0.4.0
+        version: 0.4.0
       mocha:
         specifier: ^11.1.0
         version: 11.1.0
@@ -1584,8 +1584,8 @@ packages:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
     engines: {node: '>= 8'}
 
-  micro-bmark@0.3.1:
-    resolution: {integrity: sha512-bNaKObD4yPAAPrpEqp5jO6LJ2sEFgLoFSmRjEY809mJ62+2AehI/K3+RlVpN3Oo92RHpgC2RQhj6b1Tb4dmo+w==}
+  micro-bmark@0.4.0:
+    resolution: {integrity: sha512-lQHxIE9BurlmqBR3J4NJnUH6I72kChBYXuBeNkvNT3viFHKfYj2c070OysLZwtjBTxTjIgsUqjgcttMWlmASVA==}
 
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
@@ -3500,7 +3500,7 @@ snapshots:
 
   merge2@1.4.1: {}
 
-  micro-bmark@0.3.1: {}
+  micro-bmark@0.4.0: {}
 
   micromatch@4.0.8:
     dependencies:
