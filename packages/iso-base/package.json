@@ -117,15 +117,15 @@
     "bigint-mod-arith": "^3.3.1"
   },
   "devDependencies": {
-    "@scure/base": "^1.2.1",
+    "@scure/base": "^1.2.4",
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.5",
+    "@types/node": "^22.13.1",
     "assert": "^2.1.0",
     "micro-bmark": "^0.3.1",
-    "mocha": "^11.0.1",
+    "mocha": "^11.1.0",
     "playwright-test": "^14.1.7",
-    "typescript": "5.7.2"
+    "typescript": "5.7.3"
   },
   "publishConfig": {
     "provenance": true
