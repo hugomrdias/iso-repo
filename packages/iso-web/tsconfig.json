@@ -7,6 +7,9 @@
   "references": [
     {
       "path": "../iso-kv"
+    },
+    {
+      "path": "../iso-base"
     }
   ],
   "include": ["src", "scripts", "test", "package.json"],

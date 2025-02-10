@@ -2,7 +2,7 @@
   "name": "iso-web",
   "type": "module",
   "version": "1.0.6",
-  "description": "Isomorphic web apis utilities for fetch, signals, crypto and doh.",
+  "description": "Isomorphic web apis utilities for fetch, event target, signals, crypto and doh.",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
   "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-web",
@@ -20,7 +20,8 @@
     "abortcontroller",
     "abortsignal",
     "doh",
-    "dnslink"
+    "dnslink",
+    "event-target"
   ],
   "exports": {
     ".": {
@@ -54,6 +55,10 @@
       "types": "./dist/src/doh/dnslink.d.ts",
       "default": "./src/doh/dnslink.js"
     },
+    "./event-target": {
+      "types" : "./dist/src/event-target/index.d.ts",
+      "default": "./src/event-target/index.js"
+    },
     "./types": {
       "types": "./dist/src/types.d.ts"
     }
@@ -86,6 +91,9 @@
       "dnslink": [
         "dist/src/doh/dnslink"
       ],
+      "event-target": [
+        "dist/src/event-target/index"
+      ],
       "types": [
         "dist/src/types"
       ]
@@ -98,7 +106,9 @@
     "dist/src/doh/*.d.ts",
     "dist/src/doh/*.d.ts.map",
     "dist/src/msw/*.d.ts",
-    "dist/src/msw/*.d.ts.map"
+    "dist/src/msw/*.d.ts.map",
+    "dist/src/event-target/*.d.ts",
+    "dist/src/event-target/*.d.ts.map"
   ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
@@ -115,6 +125,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.12",
     "@types/node": "^22.10.5",
+    "iso-base": "workspace:^",
     "msw": "2.4.3",
     "playwright-test": "^14.1.7",
     "type-fest": "^4.31.0",
