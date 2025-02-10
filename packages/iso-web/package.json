@@ -124,7 +124,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^22.10.5",
+    "@types/node": "^22.13.1",
     "iso-base": "workspace:^",
     "msw": "2.4.3",
     "playwright-test": "^14.1.7",
