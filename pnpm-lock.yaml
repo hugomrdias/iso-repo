@@ -22,13 +22,13 @@ importers:
         version: 2.11.1
       typedoc:
         specifier: ^0.27.6
-        version: 0.27.6(typescript@5.7.2)
+        version: 0.27.6(typescript@5.7.3)
       typedoc-plugin-missing-exports:
         specifier: ^3.1.0
-        version: 3.1.0(typedoc@0.27.6(typescript@5.7.2))
+        version: 3.1.0(typedoc@0.27.6(typescript@5.7.3))
       typescript:
-        specifier: 5.7.2
-        version: 5.7.2
+        specifier: 5.7.3
+        version: 5.7.3
 
   packages/configs:
     dependencies:
@@ -40,8 +40,8 @@ importers:
         specifier: ^22.10.5
         version: 22.10.5
       typescript:
-        specifier: 5.7.2
-        version: 5.7.2
+        specifier: 5.7.3
+        version: 5.7.3
 
   packages/iso-base:
     dependencies:
@@ -77,8 +77,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       typescript:
-        specifier: 5.7.2
-        version: 5.7.2
+        specifier: 5.7.3
+        version: 5.7.3
 
   packages/iso-did:
     dependencies:
@@ -115,7 +115,7 @@ importers:
         version: 11.0.1
       msw:
         specifier: 2.4.3
-        version: 2.4.3(typescript@5.7.2)
+        version: 2.4.3(typescript@5.7.3)
       playwright-test:
         specifier: ^14.1.7
         version: 14.1.7
@@ -123,8 +123,8 @@ importers:
         specifier: ^4.31.0
         version: 4.31.0
       typescript:
-        specifier: 5.7.2
-        version: 5.7.2
+        specifier: 5.7.3
+        version: 5.7.3
 
   packages/iso-kv:
     dependencies:
@@ -160,8 +160,8 @@ importers:
         specifier: ^3.1.0
         version: 3.1.0
       typescript:
-        specifier: 5.7.2
-        version: 5.7.2
+        specifier: 5.7.3
+        version: 5.7.3
 
   packages/iso-passkeys:
     dependencies:
@@ -203,8 +203,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       typescript:
-        specifier: 5.7.2
-        version: 5.7.2
+        specifier: 5.7.3
+        version: 5.7.3
 
   packages/iso-signatures:
     dependencies:
@@ -240,8 +240,8 @@ importers:
         specifier: ^4.31.0
         version: 4.31.0
       typescript:
-        specifier: 5.7.2
-        version: 5.7.2
+        specifier: 5.7.3
+        version: 5.7.3
 
   packages/iso-web:
     dependencies:
@@ -266,7 +266,7 @@ importers:
         version: link:../iso-base
       msw:
         specifier: 2.4.3
-        version: 2.4.3(typescript@5.7.2)
+        version: 2.4.3(typescript@5.7.3)
       playwright-test:
         specifier: ^14.1.7
         version: 14.1.7
@@ -274,8 +274,8 @@ importers:
         specifier: ^4.31.0
         version: 4.31.0
       typescript:
-        specifier: 5.7.2
-        version: 5.7.2
+        specifier: 5.7.3
+        version: 5.7.3
 
   packages/iso-websocket:
     dependencies:
@@ -320,8 +320,8 @@ importers:
         specifier: ^4.31.0
         version: 4.31.0
       typescript:
-        specifier: 5.7.2
-        version: 5.7.2
+        specifier: 5.7.3
+        version: 5.7.3
 
 packages:
 
@@ -2208,8 +2208,8 @@ packages:
   typescript-event-target@1.1.1:
     resolution: {integrity: sha512-dFSOFBKV6uwaloBCCUhxlD3Pr/P1a/tJdcmPrTXCHlEFD3faj0mztjcGn6VBAhQ0/Bdy8K3VWrrqwbt/ffsYsg==}
 
-  typescript@5.7.2:
-    resolution: {integrity: sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==}
+  typescript@5.7.3:
+    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -3655,7 +3655,7 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.4.3(typescript@5.7.2):
+  msw@2.4.3(typescript@5.7.3):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.0
       '@bundled-es-modules/statuses': 1.0.1
@@ -3675,7 +3675,7 @@ snapshots:
       type-fest: 4.31.0
       yargs: 17.7.2
     optionalDependencies:
-      typescript: 5.7.2
+      typescript: 5.7.3
 
   multiformats@13.3.1: {}
 
@@ -4164,22 +4164,22 @@ snapshots:
 
   type-fest@4.31.0: {}
 
-  typedoc-plugin-missing-exports@3.1.0(typedoc@0.27.6(typescript@5.7.2)):
+  typedoc-plugin-missing-exports@3.1.0(typedoc@0.27.6(typescript@5.7.3)):
     dependencies:
-      typedoc: 0.27.6(typescript@5.7.2)
+      typedoc: 0.27.6(typescript@5.7.3)
 
-  typedoc@0.27.6(typescript@5.7.2):
+  typedoc@0.27.6(typescript@5.7.3):
     dependencies:
       '@gerrit0/mini-shiki': 1.26.1
       lunr: 2.3.9
       markdown-it: 14.1.0
       minimatch: 9.0.5
-      typescript: 5.7.2
+      typescript: 5.7.3
       yaml: 2.7.0
 
   typescript-event-target@1.1.1: {}
 
-  typescript@5.7.2: {}
+  typescript@5.7.3: {}
 
   uc.micro@2.1.0: {}
 
