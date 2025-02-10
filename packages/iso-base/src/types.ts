@@ -21,3 +21,12 @@ export interface Codec {
   encode: (data: BufferSource | string, pad?: boolean) => string
   decode: (data: BufferSource | string) => Uint8Array
 }
+
+/**
+ * Generic types
+ */
+
+// biome-ignore lint/complexity/noBannedTypes: <explanation>
+export type IsAny<T> = unknown extends T ? (T extends {} ? T : never) : never
+
+export type NotAny<T> = T extends IsAny<T> ? never : T

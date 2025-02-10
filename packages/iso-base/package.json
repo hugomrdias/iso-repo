@@ -59,6 +59,9 @@
     "./leb128": {
       "types": "./dist/src/leb128.d.ts",
       "default": "./src/leb128.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts"
     }
   },
   "main": "src/index.js",
@@ -92,6 +95,9 @@
       ],
       "leb128": [
         "dist/src/leb128"
+      ],
+      "types": [
+        "dist/src/types"
       ]
     }
   },
