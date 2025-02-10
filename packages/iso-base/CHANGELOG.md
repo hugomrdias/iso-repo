@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.0.0...iso-base-v4.0.1) (2025-02-10)
+
+
+### Bug Fixes
+
+* add IsAny and NotAny types ([a0cf197](https://github.com/hugomrdias/iso-repo/commit/a0cf1979fda25b1ca6ef5128421fab338f2599f8))
+
 ## [4.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v3.0.0...iso-base-v4.0.0) (2024-03-13)
 
 
