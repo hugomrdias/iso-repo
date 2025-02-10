@@ -128,7 +128,7 @@
     "iso-base": "workspace:^",
     "msw": "2.4.3",
     "playwright-test": "^14.1.7",
-    "type-fest": "^4.31.0",
+    "type-fest": "^4.34.1",
     "typescript": "5.7.2"
   },
   "publishConfig": {

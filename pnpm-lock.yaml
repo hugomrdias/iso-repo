@@ -120,8 +120,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       type-fest:
-        specifier: ^4.31.0
-        version: 4.31.0
+        specifier: ^4.34.1
+        version: 4.34.1
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -237,8 +237,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       type-fest:
-        specifier: ^4.31.0
-        version: 4.31.0
+        specifier: ^4.34.1
+        version: 4.34.1
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -271,8 +271,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       type-fest:
-        specifier: ^4.31.0
-        version: 4.31.0
+        specifier: ^4.34.1
+        version: 4.34.1
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -317,8 +317,8 @@ importers:
         specifier: ^14.1.7
         version: 14.1.7
       type-fest:
-        specifier: ^4.31.0
-        version: 4.31.0
+        specifier: ^4.34.1
+        version: 4.34.1
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -2189,8 +2189,8 @@ packages:
     resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
     engines: {node: '>=12.20'}
 
-  type-fest@4.31.0:
-    resolution: {integrity: sha512-yCxltHW07Nkhv/1F6wWBr8kz+5BGMfP+RbRSYFnegVb0qV/UMT0G0ElBloPVerqn4M2ZV80Ir1FtCcYv1cT6vQ==}
+  type-fest@4.34.1:
+    resolution: {integrity: sha512-6kSc32kT0rbwxD6QL1CYe8IqdzN/J/ILMrNK+HMQCKH3insCDRY/3ITb0vcBss0a3t72fzh2YSzj8ko1HgwT3g==}
     engines: {node: '>=16'}
 
   typedoc-plugin-missing-exports@3.1.0:
@@ -3166,7 +3166,7 @@ snapshots:
 
   dot-prop@9.0.0:
     dependencies:
-      type-fest: 4.31.0
+      type-fest: 4.34.1
 
   eastasianwidth@0.2.0: {}
 
@@ -3672,7 +3672,7 @@ snapshots:
       outvariant: 1.4.3
       path-to-regexp: 6.3.0
       strict-event-emitter: 0.5.1
-      type-fest: 4.31.0
+      type-fest: 4.34.1
       yargs: 17.7.2
     optionalDependencies:
       typescript: 5.7.2
@@ -4162,7 +4162,7 @@ snapshots:
 
   type-fest@2.19.0: {}
 
-  type-fest@4.31.0: {}
+  type-fest@4.34.1: {}
 
   typedoc-plugin-missing-exports@3.1.0(typedoc@0.27.6(typescript@5.7.2)):
     dependencies:
