@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.2](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.0.1...iso-base-v4.0.2) (2025-02-11)
+
+
+### Bug Fixes
+
+* dont normalize hex input string ([0fb4d68](https://github.com/hugomrdias/iso-repo/commit/0fb4d6816b7c195e31c4db161eebba8ea454f4a0))
+
 ## [4.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.0.0...iso-base-v4.0.1) (2025-02-10)
 
 
