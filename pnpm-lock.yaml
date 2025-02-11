@@ -289,8 +289,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.1
       unws:
-        specifier: ^0.2.4
-        version: 0.2.4(ws@8.18.0)
+        specifier: ^0.3.0
+        version: 0.3.0(ws@8.18.0)
       ws:
         specifier: ^8.18.0
         version: 8.18.0
@@ -2174,8 +2174,8 @@ packages:
     resolution: {integrity: sha512-CJ1QgKmNg3CwvAv/kOFmtnEN05f0D/cn9QntgNOQlQF9dgvVTHj3t+8JPdjqawCHk7V/KA+fbUqzZ9XWhcqPUg==}
     engines: {node: '>= 4.0.0'}
 
-  unws@0.2.4:
-    resolution: {integrity: sha512-/N1ajiqrSp0A/26/LBg7r10fOcPtGXCqJRJ61sijUFoGZMr6ESWGYn7i0cwr7fR7eEECY5HsitqtjGHDZLAu2w==}
+  unws@0.3.0:
+    resolution: {integrity: sha512-HvlomOv5Lx7ovLXi8KeVFzyJsREn5WAiDyD0kJmrtZNKgRg6VKjdghWHn7pcyN36OC+wGfk27vWui/HcmGRPnw==}
     engines: {node: '>=16.14.0'}
     peerDependencies:
       ws: '*'
@@ -4106,7 +4106,7 @@ snapshots:
 
   universalify@0.2.0: {}
 
-  unws@0.2.4(ws@8.18.0):
+  unws@0.3.0(ws@8.18.0):
     dependencies:
       ws: 8.18.0
 
