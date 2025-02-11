@@ -140,9 +140,6 @@ export function rfc4648(base, padding = false, normalize) {
   return {
     encode(input, pad) {
       if (typeof input === 'string') {
-        if (normalize) {
-          input = normalize(input)
-        }
         input = utf8.decode(input)
       }
 
