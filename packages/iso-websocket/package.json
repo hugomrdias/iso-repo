@@ -52,7 +52,7 @@
     "@types/ws": "^8.5.14",
     "delay": "^6.0.0",
     "p-defer": "^4.0.0",
-    "playwright-test": "^14.1.7",
+    "playwright-test": "^14.1.9",
     "type-fest": "^4.34.1",
     "typescript": "5.7.3"
   },
