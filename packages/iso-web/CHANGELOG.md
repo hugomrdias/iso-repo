@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.1.0...iso-web-v1.1.1) (2025-03-28)
+
+
+### Bug Fixes
+
+* dnslink for empty result ([89570a4](https://github.com/hugomrdias/iso-repo/commit/89570a4f79d874b24628251e81366a7ac22d58bd))
+
 ## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.0.6...iso-web-v1.1.0) (2025-02-10)
 
 

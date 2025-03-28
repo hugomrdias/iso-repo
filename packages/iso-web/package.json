@@ -1,7 +1,7 @@
 {
   "name": "iso-web",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Isomorphic web apis utilities for fetch, event target, signals, crypto and doh.",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
