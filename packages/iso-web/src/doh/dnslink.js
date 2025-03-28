@@ -33,7 +33,7 @@ export async function resolve(domain, options) {
 
   const main = await _resolve(`_dnslink.${domain}`, options)
 
-  if (main.error) {
+  if (main.error || main.result.length === 0) {
     return await _resolve(domain, options)
   }
 

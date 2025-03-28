@@ -172,7 +172,7 @@ test('should resolve on main domain as fallback of empty records', async () => {
   if (error) {
     assert.fail(error.message)
   } else {
-    assert.deepEqual(result, [])
+    assert.deepEqual(result, ['/ipns/ipns/path/here'])
   }
 })
 
