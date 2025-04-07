@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.6.0...iso-did-v1.7.0) (2025-04-07)
+
+
+### Features
+
+* add support for did:plc ([e0fb1bb](https://github.com/hugomrdias/iso-repo/commit/e0fb1bbf581a9a90a1ca4bd3db52a5d9ebe5cd53))
+
+
+### Bug Fixes
+
+* add entrypoint for plc ([9b6e62a](https://github.com/hugomrdias/iso-repo/commit/9b6e62a71cf56a13986c2fb63453589d355f233f))
+
 ## [1.6.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.5.0...iso-did-v1.6.0) (2024-02-01)
 
 
