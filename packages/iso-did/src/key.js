@@ -178,6 +178,7 @@ export class DIDKey extends DIDCore {
 }
 
 /** @type {import('did-resolver').DIDResolver} */
+// biome-ignore lint/suspicious/useAwait: <explanation>
 async function didKeyResolver(did, _parsedDid) {
   const didKey = DIDKey.fromString(did)
   return {

@@ -133,7 +133,7 @@ export class DID {
       throw new Error(`No verification method found for ${did}`)
     }
 
-    if (method.type === 'MultiKey') {
+    if (method.type === 'MultiKey' || method.type === 'Multikey') {
       const encodedKey = base58btc.decode(method.publicKeyMultibase)
       const [code, size] = varint.decode(encodedKey)
       const key = validateRawPublicKeyLength(code, encodedKey.slice(size))
@@ -148,40 +148,45 @@ export class DID {
         document,
       })
     }
+    if (
+      method.type === 'JsonWebKey2020' ||
+      method.type === 'JsonWebKey' ||
+      method.type === 'Ed25519VerificationKey2018'
+    ) {
+      if (method.publicKeyJwk && method.publicKeyJwk.kty === 'OKP') {
+        const publicKey = base64url.decode(method.publicKeyJwk.x)
+        const type = method.publicKeyJwk.crv
+        const alg = keyTypeToAlg(type)
+        return new DID({
+          did: parsedDid.did,
+          alg,
+          type,
+          publicKey,
+          url: parsedDid,
+          document,
+        })
+      }
 
-    if (method.publicKeyJwk && method.publicKeyJwk.kty === 'OKP') {
-      const publicKey = base64url.decode(method.publicKeyJwk.x)
-      const type = method.publicKeyJwk.crv
-      const alg = keyTypeToAlg(type)
-      return new DID({
-        did: parsedDid.did,
-        alg,
-        type,
-        publicKey,
-        url: parsedDid,
-        document,
-      })
-    }
-
-    if (method.publicKeyJwk && method.publicKeyJwk.kty === 'EC') {
-      const type = method.publicKeyJwk.crv
-      const didkey = DidKey.DIDKey.fromPublicKey(
-        type,
-        concat([
-          [4],
-          base64url.decode(method.publicKeyJwk.x),
-          base64url.decode(method.publicKeyJwk.y),
-        ])
-      )
-      const alg = keyTypeToAlg(type)
-      return new DID({
-        did: parsedDid.did,
-        alg,
-        type,
-        publicKey: didkey.publicKey,
-        url: parsedDid,
-        document,
-      })
+      if (method.publicKeyJwk && method.publicKeyJwk.kty === 'EC') {
+        const type = method.publicKeyJwk.crv
+        const didkey = DidKey.DIDKey.fromPublicKey(
+          type,
+          concat([
+            [4],
+            base64url.decode(method.publicKeyJwk.x),
+            base64url.decode(method.publicKeyJwk.y),
+          ])
+        )
+        const alg = keyTypeToAlg(type)
+        return new DID({
+          did: parsedDid.did,
+          alg,
+          type,
+          publicKey: didkey.publicKey,
+          url: parsedDid,
+          document,
+        })
+      }
     }
     throw new Error(`Unsupported verification method type "${method.type}"`)
   }

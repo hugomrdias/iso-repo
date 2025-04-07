@@ -41,28 +41,43 @@ export type DIDURL = string
  * This data type includes public key representations that are no longer present in the spec but are still used by
  * several DID methods / resolvers and kept for backward compatibility.
  *
- * @see {@link https://www.w3.org/TR/did-core/#verification-methods}
- * @see {@link https://www.w3.org/TR/did-core/#verification-method-properties}
+ * @see {@link https://www.w3.org/TR/cid-1.0/#verification-methods}
  */
-export type VerificationMethod = MultiKeyMethod | JsonWebKey2020Method
+export type VerificationMethod = MultiKeyMethod | JsonWebKeyMethod
 
 /**
- * @see https://www.w3.org/TR/vc-data-integrity/#multikey
+ * @see {@link https://www.w3.org/TR/cid-1.0/#dfn-verificationmethod}
  */
-export interface MultiKeyMethod {
+export interface VerificationMethodBase {
   id: DIDURL
-  type: 'MultiKey'
   controller: DID
+  /**
+   * ISO date time string
+   * @see {@link https://www.w3.org/TR/xmlschema11-2/#dateTimeStamp}
+   * @example "2024-12-10T15:28:32Z"
+   */
+  expires?: string
+  /**
+   * ISO date time string
+   * @see {@link https://www.w3.org/TR/xmlschema11-2/#dateTimeStamp}
+   * @example "2024-12-10T15:28:32Z"
+   */
+  revoked?: string
+}
+
+/**
+ * @see https://www.w3.org/TR/cid-1.0/#Multikey
+ */
+export interface MultiKeyMethod extends VerificationMethodBase {
+  type: 'MultiKey' | 'Multikey'
   publicKeyMultibase: string
 }
 
-export interface JsonWebKey2020Method {
-  /**
-   * The hash fragment should be the `kid` of the JWK.
-   */
-  id: DIDURL
-  type: 'JsonWebKey2020'
-  controller: DID
+/**
+ * @see https://www.w3.org/TR/cid-1.0/#JsonWebKey
+ */
+export interface JsonWebKeyMethod extends VerificationMethodBase {
+  type: 'JsonWebKey2020' | 'JsonWebKey'
   publicKeyJwk: JWK
 }
 
