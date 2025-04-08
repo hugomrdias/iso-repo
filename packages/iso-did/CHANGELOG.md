@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.7.0...iso-did-v1.8.0) (2025-04-08)
+
+
+### Features
+
+* add support for atp ([6f4d41d](https://github.com/hugomrdias/iso-repo/commit/6f4d41dd1faa028511754497281394826a51b810))
+
 ## [1.7.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.6.0...iso-did-v1.7.0) (2025-04-07)
 
 
