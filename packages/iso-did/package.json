@@ -40,6 +40,10 @@
       "types": "./dist/src/plc.d.ts",
       "import": "./src/plc.js"
     },
+    "./atp": {
+      "types": "./dist/src/atp.d.ts",
+      "import": "./src/atp.js"
+    },
     "./types": {
       "types": "./dist/src/types.d.ts"
     }
@@ -66,6 +70,9 @@
       "plc": [
         "dist/src/plc"
       ],
+      "atp": [
+        "dist/src/atp"
+      ],
       "types": [
         "dist/src/types"
       ]
@@ -87,7 +94,8 @@
     "did-resolver": "^4.1.0",
     "iso-base": "workspace:^",
     "iso-web": "workspace:^",
-    "multiformats": "^13.3.1"
+    "multiformats": "^13.3.1",
+    "p-race": "^3.1.0"
   },
   "devDependencies": {
     "@noble/hashes": "^1.7.1",

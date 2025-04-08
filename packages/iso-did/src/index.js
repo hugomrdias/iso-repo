@@ -32,7 +32,7 @@ export async function resolve(did, opts = {}) {
   )
 
   const r = await resolver.resolve(did, {
-    accept: 'application/did+ld+json',
+    accept: 'application/did+ld+json,application/json',
   })
 
   if (r.didResolutionMetadata.error) {

@@ -1,6 +1,4 @@
 import { request } from 'iso-web/http'
-
-// eslint-disable-next-line no-unused-vars
 import * as T from './types.js'
 
 /** @type {import('did-resolver').DIDResolver} */
@@ -31,7 +29,6 @@ export async function didWebResolver(did, parsedDid) {
         error: 'notFound',
         message: resolve.error.message,
       },
-      // eslint-disable-next-line unicorn/no-null
       didDocument: null,
     }
   }
@@ -43,7 +40,6 @@ export async function didWebResolver(did, parsedDid) {
         error: 'notFound',
         message: `DID mismatch: ${resolve.result.id} !== ${did}`,
       },
-      // eslint-disable-next-line unicorn/no-null
       didDocument: null,
     }
   }
