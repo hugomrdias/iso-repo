@@ -10,12 +10,12 @@
   },
   "scripts": {
     "fix": "biome check --fix --no-errors-on-unmatched --files-ignore-unknown=true",
-    "clean": "rm -rf docs node_modules pnpm-lock.yaml packages/*/{pnpm-lock.yaml,coverage,.nyc_output,dist,node_modules,.next}",
-    "lint": "pnpm -r --if-present run lint",
-    "test": "pnpm -r --if-present run test",
-    "check": "pnpm -r --if-present run check",
-    "build": "pnpm -r --if-present run build",
-    "update-msw": "pnpm -r --if-present run update-msw",
+    "clean": "rm -rf docs node_modules pnpm-lock.yaml packages/*/{pnpm-lock.yaml,coverage,.nyc_output,dist,node_modules,.next} examples/*/{pnpm-lock.yaml,coverage,.nyc_output,dist,node_modules,.next}",
+    "lint": "pnpm -r --filter './packages/**' --if-present run lint",
+    "test": "pnpm -r --filter './packages/**' --if-present run test",
+    "check": "pnpm -r --filter './packages/**' --if-present run check",
+    "build": "pnpm -r --filter './packages/**' --if-present run build",
+    "update-msw": "pnpm -r --filter './packages/**' --if-present run update-msw",
     "docs": "typedoc --out docs --plugin typedoc-plugin-missing-exports"
   },
   "devDependencies": {
@@ -23,9 +23,9 @@
     "@hugomrdias/configs": "workspace:^",
     "depcheck": "^1.4.7",
     "simple-git-hooks": "^2.11.0",
-    "typedoc": "^0.27.7",
-    "typedoc-plugin-missing-exports": "^3.1.0",
-    "typescript": "5.7.3"
+    "typedoc": "^0.28.4",
+    "typedoc-plugin-missing-exports": "^4.0.0",
+    "typescript": "5.8.3"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec biome check --no-errors-on-unmatched --files-ignore-unknown=true --staged"
