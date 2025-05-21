@@ -65,13 +65,13 @@ describe('Verifier RS256', () => {
       const signature = await signer.sign(message)
       const pub = encode([base64url.decode(jwk.n), base64url.decode(jwk.e)])
 
-      assert.deepStrictEqual(signer.publicKey, pub)
-      assert.strictEqual(signer.did.toString(), did)
+      assert.deepStrictEqual(signer.verifiableDid.publicKey, pub)
+      assert.strictEqual(signer.verifiableDid.toString(), did)
 
       const verified = await RS256.verify({
         signature,
         message,
-        publicKey: pub,
+        did: signer,
       })
       assert.ok(verified)
     })
@@ -84,7 +84,7 @@ describe('Verifier RS256', () => {
       const verified = await RS256.verify({
         signature,
         message,
-        ...signer,
+        did: signer,
       })
       assert.ok(verified)
     })
@@ -98,7 +98,7 @@ describe('Verifier RS256', () => {
       const verified = await RS256.verify({
         signature,
         message,
-        ...signer,
+        did: signer,
       })
       assert.ok(verified)
     })

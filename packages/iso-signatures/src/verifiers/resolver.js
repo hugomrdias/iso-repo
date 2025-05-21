@@ -2,6 +2,8 @@
  * @typedef {import('../types').IResolver} IResolver
  */
 
+import { hex } from 'iso-base/rfc4648'
+
 /**
  * No cache
  *
@@ -21,7 +23,7 @@ function memoryCache() {
 
   /** @type {import('../types').Cache} */
   async function fn(input, verify) {
-    const key = JSON.stringify(input)
+    const key = `${input.did.verifiableDid.toString()}:${hex.encode(input.signature)}:${hex.encode(input.message)}`
     if (cache.has(key)) {
       return cache.get(key)
     }
@@ -42,7 +44,7 @@ function memoryCache() {
 export class Resolver {
   /**
    *
-   * @param {import('../types').VerifierRegistry<import('iso-did/types').SignatureAlgorithm>} registry
+   * @param {import('../types').VerifierRegistry<import('../types').SignatureType>} registry
    * @param {import('../types').ResolverOptions} options
    */
   constructor(registry = {}, options = {}) {
@@ -52,10 +54,10 @@ export class Resolver {
   }
 
   /** @type {IResolver['verify']} */
-  async verify(input) {
-    const verify = this.registry[input.alg]
+  verify(input) {
+    const verify = this.registry[input.type]
     if (!verify) {
-      throw new TypeError(`Unsupported signature type "${input.alg}"`)
+      throw new TypeError(`Unsupported signature type "${input.type}"`)
     }
 
     return this.cache(input, verify)

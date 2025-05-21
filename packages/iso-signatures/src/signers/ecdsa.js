@@ -1,57 +1,112 @@
 import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
-import { DIDKey, algToKeyType, keyTypeToAlg } from 'iso-did/key'
-import { createEcdsaParams, didKeyOrVerifiableDID } from '../utils.js'
+import { DID } from 'iso-did'
+import { DIDKey } from 'iso-did/key'
+import { didKeyOrVerifiableDID } from '../utils.js'
 
 /**
  * @typedef {import('../types.js').ISigner<CryptoKeyPair>} ISigner
- * @typedef {Extract<import('iso-did/types').SignatureAlgorithm, 'ES256' | 'ES384' | 'ES512'>} ECDSAAlg
+ * @typedef {Extract<import('iso-did/types').KeyType, 'P-256' | 'P-384' | 'P-521'>} Curves
+ * @typedef {Extract<import('../types.js').SignatureType, 'ES256' | 'ES384' | 'ES512'>} SignatureTypes
  */
 
 /**
- * @param {string} alg
+ *
+ * @param {import('iso-did/types').KeyType} type
+ * @returns
  */
-function asECDSAAlg(alg) {
-  if (['ES256', 'ES384', 'ES512'].includes(alg)) {
-    return /** @type {ECDSAAlg} */ (alg)
+function checkCurve(type) {
+  if (['P-256', 'P-384', 'P-521'].includes(type)) {
+    return /** @type {Curves} */ (type)
   }
-  throw new TypeError(`Unsupported algorithm ${alg}`)
+  throw new TypeError(`Unsupported algorithm ${type}`)
 }
 
 /**
- * ECDSA signer
+ * @param {Curves} type
+ */
+function curveToSignatureType(type) {
+  switch (type) {
+    case 'P-256':
+      return 'ES256'
+    case 'P-384':
+      return 'ES384'
+    case 'P-521':
+      return 'ES512'
+    default:
+      throw new TypeError(`Unsupported key type ${type}`)
+  }
+}
+
+/**
+ * Create web crypto params for ECDSA.
+ *
+ * @param {Curves} curve
+ * @returns {{name: 'ECDSA', namedCurve: 'P-256' | 'P-384' | 'P-521', hash: 'SHA-256' | 'SHA-384' | 'SHA-512'}}
+ */
+export function createEcdsaParams(curve) {
+  switch (curve) {
+    case 'P-256': {
+      return {
+        name: 'ECDSA',
+        namedCurve: 'P-256',
+        hash: 'SHA-256',
+      }
+    }
+    case 'P-384': {
+      return {
+        name: 'ECDSA',
+        namedCurve: 'P-384',
+        hash: 'SHA-384',
+      }
+    }
+    case 'P-521': {
+      return {
+        name: 'ECDSA',
+        namedCurve: 'P-521',
+        hash: 'SHA-512',
+      }
+    }
+
+    default: {
+      throw new TypeError(`Unsupported algorithm ${curve}`)
+    }
+  }
+}
+
+/**
+ * ECDSA signer for ES256, ES384, and ES512 using WebCrypto
  *
  * @implements {ISigner}
  */
-export class ECDSASigner {
+export class ECDSASigner extends DID {
   /** @type {ReturnType<createEcdsaParams>} */
   #params
 
   /** @type {CryptoKeyPair} */
   #keypair
+
+  /** @type {import('../types.js').SignatureType} */
+  signatureType
   /**
    * @param {import('iso-did/types').VerifiableDID} did
    * @param {CryptoKeyPair} keypair
    */
   constructor(did, keypair) {
-    this.did = did.did
-    this.url = did.url
-    this.type = did.type
-    this.publicKey = did.publicKey
-    this.alg = asECDSAAlg(did.alg)
-    this.document = did.document
-    this.#params = createEcdsaParams(this.alg)
+    super(did)
+    this.curve = checkCurve(did.verifiableDid.type)
+    this.signatureType = curveToSignatureType(this.curve)
+    this.#params = createEcdsaParams(this.curve)
     this.#keypair = keypair
-    this.didKey = did.didKey
   }
 
   /**
    * Generate a new signer
    *
-   * @param {ECDSAAlg} alg
+   * @param {Curves} curve
    */
-  static async generate(alg) {
-    const params = createEcdsaParams(alg)
+  static async generate(curve) {
+    const params = createEcdsaParams(curve)
     const cryptoKeyPair = await webcrypto.subtle.generateKey(params, false, [
       'sign',
       'verify',
@@ -63,7 +118,7 @@ export class ECDSASigner {
     )
 
     return new ECDSASigner(
-      DIDKey.fromPublicKey(algToKeyType(alg), u8(publicKey)),
+      DIDKey.fromPublicKey(curve, u8(publicKey)),
       cryptoKeyPair
     )
   }
@@ -75,8 +130,8 @@ export class ECDSASigner {
    * @param {import('iso-did/types').VerifiableDID} [did]
    */
   static async importJwk(jwk, did) {
-    const alg = asECDSAAlg(keyTypeToAlg(jwk.crv))
-    const params = createEcdsaParams(alg)
+    const curve = checkCurve(jwk.crv)
+    const params = createEcdsaParams(curve)
     const type = jwk.crv
     const privateKey = await webcrypto.subtle.importKey(
       'jwk',
@@ -110,19 +165,19 @@ export class ECDSASigner {
   static async import(key, did) {
     const publicKey = await webcrypto.subtle.exportKey('raw', key.publicKey)
 
-    /** @type { ECDSAAlg } */
-    let alg
+    /** @type { Curves } */
+    let curve
     switch (publicKey.byteLength) {
       case 65: {
-        alg = 'ES256'
+        curve = 'P-256'
         break
       }
       case 97: {
-        alg = 'ES384'
+        curve = 'P-384'
         break
       }
       case 133: {
-        alg = 'ES512'
+        curve = 'P-521'
         break
       }
 
@@ -131,10 +186,7 @@ export class ECDSASigner {
       }
     }
 
-    return new ECDSASigner(
-      didKeyOrVerifiableDID(algToKeyType(alg), publicKey, did),
-      key
-    )
+    return new ECDSASigner(didKeyOrVerifiableDID(curve, publicKey, did), key)
   }
 
   /**
@@ -162,6 +214,6 @@ export class ECDSASigner {
   }
 
   toString() {
-    return this.url.didUrl
+    return this.didObject.didUrl
   }
 }

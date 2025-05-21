@@ -2,10 +2,10 @@ import { webcrypto } from 'iso-base/crypto'
 import { spki } from '../spki.js'
 
 /** @type {import('../types.js').Verify} */
-export async function verify({ signature, message, publicKey }) {
+export async function verify({ signature, message, did }) {
   const key = await webcrypto.subtle.importKey(
     'spki',
-    spki.encode(publicKey),
+    spki.encode(did.verifiableDid.publicKey),
     { name: 'RSASSA-PKCS1-v1_5', hash: { name: 'SHA-256' } },
     true,
     ['verify']

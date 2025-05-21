@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { base64url } from 'iso-base/rfc4648'
 import { concat } from 'iso-base/utils'
+import { DIDKey } from 'iso-did/key'
 import { ECDSASigner } from '../src/signers/ecdsa.js'
 import * as ECDSA from '../src/verifiers/ecdsa.js'
 
@@ -94,7 +95,7 @@ describe('Verifier ES256', () => {
       ])
 
       assert.deepStrictEqual(
-        signer.publicKey.subarray(1),
+        signer.verifiableDid.publicKey.subarray(1),
         base64url.decode(jwk.x)
       )
 
@@ -103,7 +104,7 @@ describe('Verifier ES256', () => {
       const verified = await ECDSA.verify('ES256', {
         signature,
         message,
-        publicKey: pub,
+        did: DIDKey.fromPublicKey('P-256', pub),
       })
       assert.ok(verified)
     })
@@ -116,7 +117,7 @@ describe('Verifier ES256', () => {
       const verified = await ECDSA.verify('ES256', {
         signature,
         message,
-        ...signer,
+        did: signer,
       })
       assert.ok(verified)
     })
@@ -128,7 +129,7 @@ describe('Verifier ES256', () => {
       const verified = await ECDSA.verify('ES256', {
         signature,
         message,
-        ...signer,
+        did: signer,
       })
       assert.ok(verified)
     })
@@ -148,7 +149,7 @@ describe('Verifier ES384', () => {
       ])
 
       assert.deepStrictEqual(
-        signer.publicKey.subarray(1),
+        signer.verifiableDid.publicKey.subarray(1),
         base64url.decode(jwk.x)
       )
 
@@ -157,7 +158,7 @@ describe('Verifier ES384', () => {
       const verified = await ECDSA.verify('ES384', {
         signature,
         message,
-        publicKey: pub,
+        did: DIDKey.fromPublicKey('P-384', pub),
       })
       assert.ok(verified)
     })
@@ -170,7 +171,7 @@ describe('Verifier ES384', () => {
       const verified = await ECDSA.verify('ES384', {
         signature,
         message,
-        ...signer,
+        did: signer,
       })
       assert.ok(verified)
     })
@@ -182,7 +183,7 @@ describe('Verifier ES384', () => {
       const verified = await ECDSA.verify('ES384', {
         signature,
         message,
-        ...signer,
+        did: signer,
       })
       assert.ok(verified)
     })
@@ -202,7 +203,7 @@ describe('Verifier ES521', () => {
       ])
 
       assert.deepStrictEqual(
-        signer.publicKey.subarray(1),
+        signer.verifiableDid.publicKey.subarray(1),
         base64url.decode(jwk.x)
       )
 
@@ -211,7 +212,7 @@ describe('Verifier ES521', () => {
       const verified = await ECDSA.verify('ES512', {
         signature,
         message,
-        publicKey: pub,
+        did: DIDKey.fromPublicKey('P-521', pub),
       })
       assert.ok(verified)
     })
@@ -224,7 +225,7 @@ describe('Verifier ES521', () => {
       const verified = await ECDSA.verify('ES512', {
         signature,
         message,
-        ...signer,
+        did: signer,
       })
       assert.ok(verified)
     })
@@ -236,7 +237,7 @@ describe('Verifier ES521', () => {
       const verified = await ECDSA.verify('ES512', {
         signature,
         message,
-        ...signer,
+        did: signer,
       })
       assert.ok(verified)
     })

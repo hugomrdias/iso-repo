@@ -1,16 +1,19 @@
+import { verify as secpVerify } from '@noble/secp256k1'
 import { webcrypto } from 'iso-base/crypto'
 import { decompress, isCompressed } from 'iso-base/ec-compression'
-import { createEcdsaParams } from '../utils.js'
+import { u8 } from 'iso-base/utils'
+import { createEcdsaParams } from '../signers/ecdsa.js'
 
 /**
  *
- * @param {import('iso-did/types').SignatureAlgorithm} type
+ * @param {import('../signers/ecdsa.js').Curves} curve
  */
-function createVerifier(type) {
-  const params = createEcdsaParams(type)
+function createVerifier(curve) {
+  const params = createEcdsaParams(curve)
 
   /** @type {import('../types.js').Verify} */
-  async function fn({ signature, message, publicKey }) {
+  async function fn({ signature, message, did }) {
+    let publicKey = did.verifiableDid.publicKey
     if (isCompressed(publicKey)) {
       publicKey = decompress(publicKey, params.namedCurve)
     }
@@ -36,20 +39,31 @@ function createVerifier(type) {
 
   return fn
 }
+/** @type {import('../types.js').Verify} */
+async function es256kVerify({ signature, message, did }) {
+  if (signature.length !== 64) {
+    throw new Error('Invalid signature length')
+  }
 
-/** @type {import('../types.js').Verifier<'ES256' | 'ES384' | 'ES512'>} */
+  const hash = await globalThis.crypto.subtle.digest('SHA-256', message)
+
+  return secpVerify(signature, u8(hash), did.verifiableDid.publicKey)
+}
+
+/** @type {import('../types.js').Verifier<'ES256' | 'ES384' | 'ES512' | 'ES256K'>} */
 export const verifier = {
-  ES256: createVerifier('ES256'),
-  ES384: createVerifier('ES384'),
-  ES512: createVerifier('ES512'),
+  ES256: createVerifier('P-256'),
+  ES384: createVerifier('P-384'),
+  ES512: createVerifier('P-521'),
+  ES256K: es256kVerify,
 }
 
 /**
  *
- * @param {'ES256' | 'ES384' | 'ES512'} type
+ * @param {'ES256' | 'ES384' | 'ES512' | 'ES256K'} type
  * @param {import('../types.js').VerifyInput} param1
  * @returns
  */
-export async function verify(type, { signature, message, publicKey }) {
-  return await verifier[type]({ signature, message, publicKey })
+export async function verify(type, { signature, message, did }) {
+  return await verifier[type]({ signature, message, did })
 }

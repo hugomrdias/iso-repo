@@ -1,6 +1,7 @@
 /* eslint-disable unicorn/numeric-separators-style */
 import { webcrypto } from 'iso-base/crypto'
 import { u8 } from 'iso-base/utils'
+import { DID } from 'iso-did'
 import { DIDKey } from 'iso-did/key'
 import { spki } from '../spki.js'
 import { didKeyOrVerifiableDID } from '../utils.js'
@@ -14,11 +15,8 @@ import { didKeyOrVerifiableDID } from '../utils.js'
  * @param {import('iso-did/types').VerifiableDID} did
  */
 function checkDid(did) {
-  if (did.type !== RSASigner.type) {
-    throw new TypeError(`Unsupported key type ${did.type}`)
-  }
-  if (did.alg !== RSASigner.alg) {
-    throw new TypeError(`Unsupported algorithm ${did.alg}`)
+  if (did.verifiableDid.type !== 'RSA') {
+    throw new TypeError(`Unsupported key type ${did.verifiableDid.type}`)
   }
 }
 
@@ -27,18 +25,15 @@ function checkDid(did) {
  *
  * @implements {ISigner}
  */
-export class RSASigner {
-  /** @type {Extract<import('iso-did/types').SignatureAlgorithm, "RS256">} */
-  static alg = 'RS256'
-
-  /** @type {Extract<import('iso-did/types').KeyType, "RSA">} */
-  static type = 'RSA'
-
+export class RSASigner extends DID {
   // multicodec code for RSA private key
   static code = 0x1305
 
   /** @type {CryptoKeyPair} */
   #keypair
+
+  /** @type {import('../types.js').SignatureType} */
+  signatureType
 
   /**
    * @param {import('iso-did/types').VerifiableDID} did
@@ -46,14 +41,9 @@ export class RSASigner {
    */
   constructor(did, keypair) {
     checkDid(did)
-    this.did = did.did
-    this.url = did.url
-    this.type = did.type
-    this.publicKey = did.publicKey
-    this.alg = did.alg
-    this.document = did.document
+    super(did)
     this.#keypair = keypair
-    this.didKey = did.didKey
+    this.signatureType = 'RS256'
   }
 
   /**
@@ -162,6 +152,6 @@ export class RSASigner {
   }
 
   toString() {
-    return this.url.didUrl
+    return this.didObject.didUrl
   }
 }

@@ -1,4 +1,13 @@
-import type { SignatureAlgorithm, VerifiableDID } from 'iso-did/types'
+import type { VerifiableDID } from 'iso-did/types'
+
+export type SignatureType =
+  | 'Ed25519'
+  | 'ES256'
+  | 'ES384'
+  | 'ES512'
+  | 'ES256K'
+  | 'RS256'
+  | 'EIP191'
 
 export interface Sign {
   sign: (message: Uint8Array) => Promise<Uint8Array>
@@ -7,25 +16,26 @@ export interface Sign {
 export interface ISigner<Export extends CryptoKeyPair | string>
   extends VerifiableDID,
     Sign {
-  code?: number
   export: () => Export
+  signatureType: SignatureType
 }
 
 export interface VerifyInput {
   signature: Uint8Array
   message: Uint8Array
-  publicKey: Uint8Array
+  did: VerifiableDID
 }
 export type Verify = (input: VerifyInput) => Promise<boolean>
 
-export type Verifier<T extends SignatureAlgorithm> = Record<T, Verify>
+export type Verifier<T extends SignatureType> = Record<T, Verify>
 
-export type VerifierRegistry<T extends SignatureAlgorithm> = Partial<
-  Verifier<T>
->
+export type VerifierRegistry<T extends SignatureType> = Partial<Verifier<T>>
 
 export interface ResolverVerifyInput extends VerifyInput {
-  alg: SignatureAlgorithm
+  /**
+   * The type of signature to verify
+   */
+  type: SignatureType
 }
 export type Cache = (parsed: VerifyInput, verify: Verify) => Promise<boolean>
 

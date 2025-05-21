@@ -29,14 +29,14 @@ describe('Verifier EdDSA', () => {
       const message = new TextEncoder().encode('hello world')
       const signer = await EdDSASigner.generate(priv)
 
-      assert.deepStrictEqual(pub, signer.publicKey)
+      assert.deepStrictEqual(pub, signer.verifiableDid.publicKey)
 
       const signature = await signer.sign(message)
 
       const verified = await EdDSA.verify({
         signature,
         message,
-        publicKey: pub,
+        did: signer,
       })
       assert.ok(verified)
     })

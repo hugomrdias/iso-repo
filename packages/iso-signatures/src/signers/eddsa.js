@@ -1,8 +1,9 @@
 /* eslint-disable unicorn/numeric-separators-style */
 import { getPublicKeyAsync, signAsync, utils } from '@noble/ed25519'
 import { webcrypto } from 'iso-base/crypto'
-import { base64pad } from 'iso-base/rfc4648'
+import { base64pad, base64url } from 'iso-base/rfc4648'
 import { tag, untag } from 'iso-base/varint'
+import { DID } from 'iso-did'
 import { DIDKey } from 'iso-did/key'
 import { didKeyOrVerifiableDID } from '../utils.js'
 
@@ -18,11 +19,8 @@ if (!globalThis.crypto) globalThis.crypto = webcrypto
  * @param {import('iso-did/types').VerifiableDID} did
  */
 function checkDid(did) {
-  if (did.type !== 'Ed25519') {
-    throw new TypeError(`Unsupported key type ${did.type}`)
-  }
-  if (did.alg !== 'EdDSA') {
-    throw new TypeError(`Unsupported algorithm ${did.alg}`)
+  if (did.verifiableDid.type !== 'Ed25519') {
+    throw new TypeError(`Unsupported key type ${did.verifiableDid.type}`)
   }
 }
 
@@ -31,17 +29,19 @@ function checkDid(did) {
  *
  * @implements {ISigner}
  */
-export class EdDSASigner {
-  /** @type {Extract<import('iso-did/types').SignatureAlgorithm, "EdDSA">} */
-  static alg = 'EdDSA'
-
-  /** @type {Extract<import('iso-did/types').KeyType, "Ed25519">} */
-  static type = 'Ed25519'
-
+export class EdDSASigner extends DID {
+  /**
+   * Multibase code for ed25519 private key
+   * @see https://github.com/multiformats/multicodec/blob/3bc7f4c20afe28e10d9d539e2a565578de6dd71c/table.csv#L181
+   * @type {number}
+   */
   static code = 0x1300
 
   /** @type {Uint8Array} */
   #privateKey
+
+  /** @type {import('../types.js').SignatureType} */
+  signatureType
 
   /**
    * @param {import('iso-did/types').VerifiableDID} did
@@ -49,14 +49,9 @@ export class EdDSASigner {
    */
   constructor(did, privateKey) {
     checkDid(did)
-    this.did = did.did
-    this.url = did.url
-    this.type = did.type
-    this.publicKey = did.publicKey
-    this.alg = did.alg
-    this.document = did.document
+    super(did)
     this.#privateKey = privateKey
-    this.didKey = did.didKey
+    this.signatureType = 'Ed25519'
   }
 
   /**
@@ -90,6 +85,22 @@ export class EdDSASigner {
   }
 
   /**
+   * Import a signer from a JWK
+   *
+   * @param {import('iso-did/types').OKPJWKPrivate} jwk
+   * @param {import('iso-did/types').VerifiableDID} [did] - Optional DID to verify the JWK
+   */
+  static importJwk(jwk, did) {
+    const privateKey = base64url.decode(jwk.d)
+    const publicKey = base64url.decode(jwk.x)
+
+    return new EdDSASigner(
+      didKeyOrVerifiableDID('Ed25519', publicKey, did),
+      privateKey
+    )
+  }
+
+  /**
    * Sign a message
    *
    * @param {Uint8Array} message
@@ -106,6 +117,6 @@ export class EdDSASigner {
   }
 
   toString() {
-    return this.url.didUrl
+    return this.didObject.didUrl
   }
 }

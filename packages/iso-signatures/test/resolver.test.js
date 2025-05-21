@@ -17,7 +17,8 @@ describe('Verifier Resolver', () => {
     const verified = await resolver.verify({
       signature,
       message,
-      ...signer,
+      did: signer,
+      type: 'Ed25519',
     })
     assert.ok(verified)
   })
@@ -32,7 +33,8 @@ describe('Verifier Resolver', () => {
     const verified = await resolver.verify({
       signature,
       message,
-      ...signer,
+      did: signer,
+      type: 'Ed25519',
     })
     assert.ok(verified)
   })
@@ -50,7 +52,8 @@ describe('Verifier Resolver', () => {
     const verified = await resolver.verify({
       signature,
       message,
-      ...signer,
+      did: signer,
+      type: 'Ed25519',
     })
     assert.ok(verified)
   })
@@ -69,7 +72,8 @@ describe('Verifier Resolver', () => {
     const verified = await resolver.verify({
       signature,
       message,
-      ...signer,
+      did: signer,
+      type: 'Ed25519',
     })
     assert.ok(verified)
   })
@@ -84,11 +88,12 @@ describe('Verifier Resolver', () => {
         await resolver.verify({
           signature,
           message,
-          ...signer,
+          did: signer,
+          type: 'Ed25519',
         })
       },
       {
-        message: 'Unsupported signature type "EdDSA"',
+        message: 'Unsupported signature type "Ed25519"',
       }
     )
   })
@@ -105,7 +110,8 @@ describe('Verifier Resolver', () => {
     const verified = await resolver.verify({
       signature,
       message,
-      ...signer,
+      did: signer,
+      type: 'RS256',
     })
     assert.ok(verified)
   })
