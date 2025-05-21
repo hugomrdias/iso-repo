@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.8.0...iso-did-v2.0.0) (2025-05-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-did:** add did:pkh support and refactor DID handling
+
+### Features
+
+* **iso-did:** add did:pkh support and refactor DID handling ([e0fbbd2](https://github.com/hugomrdias/iso-repo/commit/e0fbbd2661196271f8ee8a45a89a2e3a67e4c44f))
+
 ## [1.8.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.7.0...iso-did-v1.8.0) (2025-04-08)
 
 
