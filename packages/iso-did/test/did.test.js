@@ -146,11 +146,9 @@ describe('did', () => {
       'did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp'
     )
     assert.deepStrictEqual(
-      out.publicKey,
+      out.verifiableDid.publicKey,
       base64pad.decode('O2onvM62pC1io6jQKm8Nc2UyFXcd4kOmOsBIoYtZ2ik=')
     )
-
-    assert.strictEqual(out.alg, 'EdDSA')
   })
 
   it('should create a real verifiable did OKP', async () => {
@@ -197,7 +195,7 @@ describe('did', () => {
         },
       }
     )
-    const x = base64url.encode(out.publicKey)
+    const x = base64url.encode(out.verifiableDid.publicKey)
     assert.strictEqual(x, '2yv3J-Sf263OmwDLS9uFPTRD0PzbvfBGKLiSnPHtXIU')
 
     const thumbprint = base64url.encode(
@@ -216,7 +214,7 @@ describe('did', () => {
         web: didWebResolver,
       },
     })
-    const uncompressed = EC.decompress(out.publicKey)
+    const uncompressed = EC.decompress(out.verifiableDid.publicKey)
     const x = base64url.encode(uncompressed.subarray(1, 33))
     const y = base64url.encode(uncompressed.subarray(33, 66))
     assert.strictEqual(x, 'igrFmi0whuihKnj9R3Om1SoMph72wUGeFaBbzG2vzns')
@@ -230,7 +228,7 @@ describe('did', () => {
         web: didWebResolver,
       },
     })
-    const uncompressed = EC.decompress(out.publicKey, 'P-384')
+    const uncompressed = EC.decompress(out.verifiableDid.publicKey, 'P-384')
     const x = base64url.encode(uncompressed.subarray(1, 49))
     const y = base64url.encode(uncompressed.subarray(49))
     assert.strictEqual(
@@ -242,7 +240,6 @@ describe('did', () => {
       'y6N1IC-2mXxHreETBW7K3mBcw0qGr3CWHCs-yl09yCQRLcyfGv7XhqAngHOu51Zv'
     )
 
-    assert.strictEqual(out.alg, 'ES384')
     assert.strictEqual(out.toString(), `did:web:${host}#key-5`)
     assert.strictEqual(out.did, `did:web:${host}`)
   })

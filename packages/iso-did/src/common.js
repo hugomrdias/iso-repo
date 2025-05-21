@@ -43,34 +43,3 @@ export const CODE_KEY_TYPE = /** @type {const} */ ({
 /**
  * @typedef {keyof CODE_KEY_TYPE} PublicKeyCode
  */
-
-/**
- * Key type to signature algorithm name.
- *
- * @param {string} type
- * @throws {TypeError} if the key type is not supported.
- */
-export function keyTypeToAlg(type) {
-  // @ts-ignore
-  const alg = /** @type {SignatureAlgorithm} */ (KEY_TYPE_ALG[type])
-
-  if (!alg) {
-    throw new TypeError(`Unsupported key type ${type}`)
-  }
-  return alg
-}
-
-/**
- * Signature algorithm name to key type.
- *
- * @param {SignatureAlgorithm} alg
- * @throws {TypeError} if the algorithm is not supported.
- */
-export function algToKeyType(alg) {
-  const type = ALG_KEY_TYPE[alg]
-
-  if (!type) {
-    throw new TypeError(`Unsupported algorithm ${alg}`)
-  }
-  return type
-}

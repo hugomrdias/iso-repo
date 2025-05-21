@@ -101,7 +101,7 @@ describe('did fission ', () => {
     })
 
     assert.strictEqual(
-      did.didKey.toString(),
+      did.verifiableDid.toString(),
       'did:key:z6MkmPDXimDnjrKPrvhmP85aUnPVMvDvyqWd9XXqYxALyFcC'
     )
   })

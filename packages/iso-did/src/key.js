@@ -2,7 +2,7 @@ import * as EC from 'iso-base/ec-compression'
 import { u8 } from 'iso-base/utils'
 import { tag, varint } from 'iso-base/varint'
 import { base58btc } from 'multiformats/bases/base58'
-import { CODE_KEY_TYPE, KEY_TYPE_CODE, keyTypeToAlg } from './common.js'
+import { CODE_KEY_TYPE, KEY_TYPE_CODE } from './common.js'
 import { DIDCore } from './core.js'
 
 // eslint-disable-next-line no-unused-vars
@@ -95,9 +95,8 @@ export class DIDKey extends DIDCore {
     this.type = type
     this.publicKey = key
     this.code = KEY_TYPE_CODE[type]
-    this.alg = keyTypeToAlg(type)
-    this.url = did
-    this.didKey = did.did
+    this.didObject = did
+    this.verifiableDid = this
   }
 
   /**

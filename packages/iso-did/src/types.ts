@@ -5,8 +5,9 @@ import type {
   Service,
   ResolverOptions as _ResolverOptions,
 } from 'did-resolver'
-import type { KeyType, SignatureAlgorithm } from './common'
 import type { JWK } from './jwk-types'
+import type { DIDKey } from './key'
+import type { DIDPkh } from './pkh'
 
 export type { KeyType, PublicKeyCode, SignatureAlgorithm } from './common'
 
@@ -43,7 +44,10 @@ export type DIDURL = string
  *
  * @see {@link https://www.w3.org/TR/cid-1.0/#verification-methods}
  */
-export type VerificationMethod = MultiKeyMethod | JsonWebKeyMethod
+export type VerificationMethod =
+  | MultiKeyMethod
+  | JsonWebKeyMethod
+  | EcdsaSecp256k1RecoveryMethod2020
 
 /**
  * @see {@link https://www.w3.org/TR/cid-1.0/#dfn-verificationmethod}
@@ -82,6 +86,15 @@ export interface JsonWebKeyMethod extends VerificationMethodBase {
 }
 
 /**
+ * @see https://identity.foundation/EcdsaSecp256k1RecoverySignature2020/#blockchainAccountId
+ */
+export interface EcdsaSecp256k1RecoveryMethod2020
+  extends VerificationMethodBase {
+  type: 'EcdsaSecp256k1RecoveryMethod2020'
+  blockchainAccountId: string
+}
+
+/**
  * Represents a DID document.
  *
  * @see {@link https://www.w3.org/TR/did-core/#did-document-properties}
@@ -98,18 +111,25 @@ export type DIDDocument = {
 }
 
 export interface VerifiableDID {
+  /**
+   * DID String - top level DID
+   * @example "did:web:example.com"
+   */
   did: DID
-  url: DIDURLObject
   /**
-   * Keypair type
+   * DID URL Object - parsed top level DID
    */
-  type: KeyType
-  publicKey: Uint8Array
-  didKey: DID
+  didObject: DIDURLObject
   /**
-   * JWT signing algorithm
+   * Verifiable DID - resolved from the {@link did}
    */
-  alg: SignatureAlgorithm
+  verifiableDid: DIDKey | DIDPkh
+  /**
+   * DID Document
+   */
   document: DIDDocument
+  /**
+   * Returns the DID URL
+   */
   toString: () => DIDURL
 }

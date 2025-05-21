@@ -5,15 +5,10 @@ import { varint } from 'iso-base/varint'
 import { base58btc } from 'multiformats/bases/base58'
 import { DIDCore } from './core.js'
 import * as DidKey from './key.js'
-
-import {
-  CODE_KEY_TYPE,
-  keyTypeToAlg,
-  validateRawPublicKeyLength,
-} from './key.js'
-// eslint-disable-next-line no-unused-vars
+import * as DidPkh from './pkh.js'
 import * as T from './types.js'
 
+import { CODE_KEY_TYPE, validateRawPublicKeyLength } from './key.js'
 /**
  * Resolve a DID to a DID Document
  *
@@ -27,6 +22,7 @@ export async function resolve(did, opts = {}) {
     {
       ...DidKey.resolver,
       ...opts.resolvers,
+      ...DidPkh.resolver,
     },
     { cache: opts.cache ?? true }
   )
@@ -107,16 +103,13 @@ export function derefDocument(didObject, document) {
 export class DID {
   /**
    *
-   * @param {Omit<T.VerifiableDID, 'didKey'>} opts
+   * @param {Omit<T.VerifiableDID, 'did'>} opts
    */
   constructor(opts) {
-    this.did = opts.did
-    this.publicKey = opts.publicKey
-    this.alg = opts.alg
-    this.type = opts.type
+    this.did = opts.didObject.did
     this.document = opts.document
-    this.url = opts.url
-    this.didKey = DidKey.DIDKey.fromPublicKey(opts.type, opts.publicKey).url.did
+    this.didObject = opts.didObject
+    this.verifiableDid = opts.verifiableDid
   }
 
   /**
@@ -133,6 +126,15 @@ export class DID {
       throw new Error(`No verification method found for ${did}`)
     }
 
+    if (method.type === 'EcdsaSecp256k1RecoveryMethod2020') {
+      const didPkh = new DidPkh.DIDPkh(parsedDid)
+      return new DID({
+        didObject: parsedDid,
+        document,
+        verifiableDid: didPkh,
+      })
+    }
+
     if (method.type === 'MultiKey' || method.type === 'Multikey') {
       const encodedKey = base58btc.decode(method.publicKeyMultibase)
       const [code, size] = varint.decode(encodedKey)
@@ -140,12 +142,9 @@ export class DID {
       const type = CODE_KEY_TYPE[/** @type {T.PublicKeyCode} */ (code)]
 
       return new DID({
-        did: parsedDid.did,
-        alg: keyTypeToAlg(type),
-        type,
-        publicKey: key,
-        url: parsedDid,
+        didObject: parsedDid,
         document,
+        verifiableDid: DidKey.DIDKey.fromPublicKey(type, key),
       })
     }
     if (
@@ -156,14 +155,11 @@ export class DID {
       if (method.publicKeyJwk && method.publicKeyJwk.kty === 'OKP') {
         const publicKey = base64url.decode(method.publicKeyJwk.x)
         const type = method.publicKeyJwk.crv
-        const alg = keyTypeToAlg(type)
+        // const alg = keyTypeToAlg(type)
         return new DID({
-          did: parsedDid.did,
-          alg,
-          type,
-          publicKey,
-          url: parsedDid,
+          didObject: parsedDid,
           document,
+          verifiableDid: DidKey.DIDKey.fromPublicKey(type, publicKey),
         })
       }
 
@@ -177,14 +173,11 @@ export class DID {
             base64url.decode(method.publicKeyJwk.y),
           ])
         )
-        const alg = keyTypeToAlg(type)
+        // const alg = keyTypeToAlg(type)
         return new DID({
-          did: parsedDid.did,
-          alg,
-          type,
-          publicKey: didkey.publicKey,
-          url: parsedDid,
+          didObject: parsedDid,
           document,
+          verifiableDid: didkey,
         })
       }
     }
@@ -192,6 +185,6 @@ export class DID {
   }
 
   toString() {
-    return this.url.didUrl
+    return this.didObject.didUrl
   }
 }
