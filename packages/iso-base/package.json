@@ -125,7 +125,7 @@
     "micro-bmark": "^0.3.1",
     "mocha": "^11.1.0",
     "playwright-test": "^14.1.7",
-    "typescript": "5.7.3"
+    "typescript": "5.8.3"
   },
   "publishConfig": {
     "provenance": true

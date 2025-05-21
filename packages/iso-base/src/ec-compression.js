@@ -140,3 +140,36 @@ export function decompress(comp, curve = 'P-256') {
   const publicKey = concat([[0x04], x, yPadded])
   return publicKey
 }
+
+const primeSecp256k1 =
+  0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn
+const pIdentSecp256k1 = (primeSecp256k1 + 1n) / 4n
+
+/**
+ * secp256k1 decompression
+ *
+ * @param {Uint8Array} compressed
+ */
+export function decompressSecp256k1(compressed) {
+  const signY = BigInt(compressed[0] - 2)
+  const x = compressed.subarray(1)
+  const xBig = BigInt(base10.encode(x))
+
+  const a = bigintModArith.modPow(xBig, 3n, primeSecp256k1)
+  const b = (a + 7n) % primeSecp256k1
+  let yBig = bigintModArith.modPow(b, pIdentSecp256k1, primeSecp256k1)
+
+  if (yBig % 2n !== signY) {
+    yBig = primeSecp256k1 - yBig
+  }
+
+  const y = base10.decode(yBig.toString(10))
+
+  // left-pad for smaller than curve size byte y
+  const offset = 64 / 2 - y.length
+  const yPadded = new Uint8Array(64 / 2)
+  yPadded.set(y, offset)
+
+  const publicKey = concat([[0x04], x, yPadded])
+  return publicKey
+}
