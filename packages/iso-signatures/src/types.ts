@@ -13,7 +13,7 @@ export interface Sign {
   sign: (message: Uint8Array) => Promise<Uint8Array>
 }
 
-export interface ISigner<Export extends CryptoKeyPair | string>
+export interface ISigner<Export extends CryptoKeyPair | string = string>
   extends VerifiableDID,
     Sign {
   export: () => Export
