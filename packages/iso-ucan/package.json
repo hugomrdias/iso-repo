@@ -1,0 +1,121 @@
+{
+  "name": "iso-ucan",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Isomorphic UCAN",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-ucan"
+  },
+  "keywords": [
+    "ucan",
+    "varsig",
+    "crypto",
+    "isomorphic"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./capability": {
+      "types": "./dist/src/capability.d.ts",
+      "default": "./src/capability.js"
+    },
+    "./delegation": {
+      "types": "./dist/src/delegation.d.ts",
+      "default": "./src/delegation.js"
+    },
+    "./invocation": {
+      "types": "./dist/src/invocation.d.ts",
+      "default": "./src/invocation.js"
+    },
+    "./envelope": {
+      "types": "./dist/src/envelope.d.ts",
+      "default": "./src/envelope.js"
+    },
+    "./store": {
+      "types": "./dist/src/store.d.ts",
+      "default": "./src/store.js"
+    },
+    "./varsig": {
+      "types": "./dist/src/varsig.d.ts",
+      "default": "./src/varsig.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts"
+    }
+  },
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "capability": [
+        "dist/src/capability"
+      ],
+      "delegation": [
+        "dist/src/delegation"
+      ],
+      "varsig": [
+        "dist/src/varsig"
+      ],
+      "invocation": [
+        "dist/src/invocation"
+      ],
+      "envelope": [
+        "dist/src/envelope"
+      ],
+      "store": [
+        "dist/src/store"
+      ],
+      "types": [
+        "dist/src/types"
+      ]
+    }
+  },
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
+  "scripts": {
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
+    "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+  },
+  "dependencies": {
+    "@ipld/dag-cbor": "^9.2.4",
+    "@standard-schema/spec": "^1.0.0",
+    "@standard-schema/utils": "^0.3.0",
+    "iobuffer": "^6.0.0",
+    "iso-base": "workspace:^",
+    "iso-did": "workspace:^",
+    "iso-kv": "^3.0.3",
+    "iso-signatures": "workspace:^",
+    "iso-web": "^1.1.1",
+    "multiformats": "^13.3.7"
+  },
+  "devDependencies": {
+    "@noble/hashes": "^1.7.2",
+    "@noble/secp256k1": "^2.3.0",
+    "@types/node": "^24.0.14",
+    "playwright-test": "^14.1.7",
+    "typescript": "5.8.3",
+    "viem": "^2.31.7",
+    "zod": "^4.0.5"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*"
+    ]
+  }
+}

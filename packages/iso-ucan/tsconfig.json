@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "outDir": "dist"
+  },
+  "references": [
+    {
+      "path": "../iso-base"
+    },
+    {
+      "path": "../iso-did"
+    },
+    {
+      "path": "../iso-signatures"
+    }
+  ],
+  "include": ["src", "scripts", "test", "package.json"],
+  "exclude": ["node_modules", "dist", "out"],
+  "typedocOptions": {
+    "entryPointStrategy": "resolve",
+    "entryPoints": ["src/varsig.js"],
+    "includeVersion": true,
+    "excludeExternals": true,
+    "internalModule": "<internal>"
+  }
+}
