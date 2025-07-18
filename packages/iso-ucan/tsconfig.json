@@ -13,13 +13,23 @@
     },
     {
       "path": "../iso-signatures"
+    },
+    {
+      "path": "../iso-kv"
     }
   ],
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
   "typedocOptions": {
     "entryPointStrategy": "resolve",
-    "entryPoints": ["src/varsig.js"],
+    "entryPoints": [
+      "src/varsig.js",
+      "src/capability.js",
+      "src/delegation.js",
+      "src/invocation.js",
+      "src/envelope.js",
+      "src/store.js"
+    ],
     "includeVersion": true,
     "excludeExternals": true,
     "internalModule": "<internal>"

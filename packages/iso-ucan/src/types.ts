@@ -5,6 +5,9 @@ import type { Resolver } from 'iso-signatures/verifiers/resolver.js'
 import type { CID } from 'multiformats'
 import type { Delegation } from './delegation'
 import type { Store } from './store'
+
+export type { DIDURL } from 'iso-did/types'
+
 /**
  * Varsig types
  */
@@ -195,15 +198,29 @@ export interface DelegationOptions {
   meta?: Record<string, unknown>
 }
 
-export interface InvocationOptions<Schema extends StandardSchemaV1> {
+export interface InvocationOptions {
+  iss: ISigner
+  aud?: VerifiableDID
+  sub: VerifiableDID
+  cmd: string
+  args: Record<string, unknown>
+  /**
+   * Proofs of the chain of authority
+   */
+  prf: Delegation[]
+  exp: number | null
+  iat?: number
+  nbf?: number
+  nonce?: Uint8Array
+  cause?: CID
+  meta?: Record<string, unknown>
+}
+
+export interface CapabilityInvokeOptions<Schema extends StandardSchemaV1> {
   iss: ISigner
   aud?: VerifiableDID
   sub: VerifiableDID
   args: StandardSchemaV1.InferOutput<Schema>
-  /**
-   * Proofs of the chain of authority
-   */
-  // prf: [Delegation, ...Delegation[]]
   exp: number | null
   iat?: number
   nbf?: number
@@ -217,13 +234,35 @@ export interface InvocationValidateOptions {
   audience: VerifiableDID
   isRevoked: (cid: CID) => Promise<boolean>
   didResolveOptions?: ResolveOptions
-  verifyResolver: Resolver
+  signatureVerifierResolver: Resolver
   resolveProofs: (proofs: CID[]) => Promise<Delegation[]>
 }
 
 export interface DelegationValidateOptions {
   isRevoked: (cid: CID) => Promise<boolean>
   didResolveOptions?: ResolveOptions
-  verifyResolver: Resolver
+  signatureVerifierResolver: Resolver
+}
+
+export interface InvocationFromOptions {
+  bytes: Uint8Array
+  audience: VerifiableDID
+  didResolveOptions?: ResolveOptions
+  signatureVerifierResolver: Resolver
+  isRevoked: (cid: CID) => Promise<boolean>
   resolveProofs: (proofs: CID[]) => Promise<Delegation[]>
+}
+
+export interface DelegationFromOptions {
+  bytes: Uint8Array
+  envelope?: DecodedEnvelope<'dlg'>
+  didResolveOptions?: ResolveOptions
+  signatureVerifierResolver: Resolver
+  isRevoked: (cid: CID) => Promise<boolean>
+}
+
+export interface ResolveProofsOptions {
+  aud?: DIDURL
+  sub: DIDURL | null
+  cmd: string
 }

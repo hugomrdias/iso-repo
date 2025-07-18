@@ -1,9 +1,11 @@
+import { KV } from 'iso-kv'
+import merge from 'it-merge'
 /**
  * @import {Delegation} from './delegation.js'
  * @import {Driver} from 'iso-kv'
  */
 
-import { KV } from 'iso-kv'
+const POWERLINE = '$pwrl'
 
 /**
  * Store
@@ -37,13 +39,24 @@ export class Store {
     }
     const cid = delegation.cid.toString()
 
+    // Index by CID
     await this.kv.set([cid], delegation, options)
 
-    await this.kv.set(
-      [delegation.envelope.payload.cmd, delegation.envelope.payload.aud],
-      cid,
-      options
-    )
+    // Index by subject and audience
+    let sub = delegation.sub
+    if (sub === null) {
+      sub = POWERLINE
+    }
+    await this.kv.set([sub, delegation.aud, cid], cid, options)
+  }
+
+  /**
+   * @param {Delegation[]} delegations
+   */
+  async add(delegations) {
+    for (const delegation of delegations) {
+      await this.set(delegation)
+    }
   }
 
   /**
@@ -52,58 +65,104 @@ export class Store {
    * @param {string} cid
    */
   get(cid) {
-    return /** @type {typeof this.kv.get<string>} */ (this.kv.get)([cid])
+    return /** @type {typeof this.kv.get<Delegation>} */ (this.kv.get)([cid])
   }
 
   /**
-   * Get a proof by cmd and iss
+   * List proofs by sub and aud
    *
-   * @param {string} cmd
-   * @param {string} iss
+   * @param {import('./types.js').ResolveProofsOptions} options
    */
-  async proof(cmd, iss) {
-    /** @type {string | undefined} */
-    const cid = await /** @type {typeof this.kv.get<string>} */ (this.kv.get)([
-      cmd,
-      iss,
-    ])
+  async *proofs(options) {
+    let sub = options.sub
+    let aud = options.aud
 
-    if (cid) {
-      return /** @type {typeof this.kv.get<Delegation>} */ (this.kv.get)([cid])
+    if (!aud && !sub) {
+      throw new Error('No audience or subject provided')
+    }
+    if (!aud && sub) {
+      aud = sub
+    }
+    if (sub === null) {
+      sub = POWERLINE
+    }
+    if (!aud) {
+      throw new Error('No audience provided')
     }
 
-    return undefined
+    for await (const element of this.kv.list({
+      prefix: [sub, aud],
+    })) {
+      const value = await this.get(element.value)
+
+      if (value) {
+        yield value
+      }
+    }
   }
 
   /**
-   * Resolve proofs by cmd and iss
+   * Resolve a single chain of proofs ending with a root (subject === issuer).
+   * Returns the first such chain found (depth-first).
    *
-   * @param {string} cmd
-   * @param {string} iss
+   * @param {import('./types.js').ResolveProofsOptions} options
+   * @returns {Promise<Delegation[]>}
    */
-  async resolveProofs(cmd, iss) {
-    /** @type {Delegation[]} */
-    const proofs = []
-    const parts = cmd.split('/')
+  async chain({ aud, sub, cmd }) {
+    // console.log('🚀 ~ aud', aud, 'sub', sub, 'cmd', cmd)
+    const parents = parentCmds(cmd)
 
-    for (let i = 0; i < parts.length; i++) {
-      let cmd = `${parts.slice(0, i + 1).join('/')}`
-      if (cmd === '') {
-        cmd = '/'
-      }
-      const proof = await this.proof(cmd, iss)
+    const sources = merge(
+      this.proofs({ sub, aud, cmd }),
+      this.proofs({ sub: null, aud, cmd })
+    )
 
-      if (proof && proof.envelope.payload.iss === proof.envelope.payload.sub) {
-        proofs.push(proof)
-        break
+    for await (const proof of sources) {
+      if (!parents.includes(proof.cmd)) continue
+
+      // If root, return this proof as the end of the path
+      if (proof.sub === proof.iss) {
+        // console.log('🚀 ~ found root:', proof.iss, proof.sub, proof.cmd)
+        return [proof]
       }
-      if (proof) {
-        proofs.push(proof)
-        const more = await this.resolveProofs(cmd, proof.envelope.payload.iss)
-        proofs.push(...more)
+
+      // Otherwise, go deeper and prepend this proof if a path is found
+      // console.log('🚀 ~ trying deeper:', proof.iss, proof.sub, proof.cmd)
+      const nextPath = await this.chain({
+        aud: proof.iss,
+        sub: proof.sub ?? sub,
+        cmd: proof.cmd,
+      })
+      if (nextPath?.length) {
+        return [proof, ...nextPath]
       }
+      // console.log('🚀 ~ no path found')
     }
 
-    return proofs.reverse()
+    // No path found
+    return []
   }
+}
+
+/**
+ * Returns all parent commands for a given command string.
+ *
+ * @param {string} cmd
+ * @returns {string[]}
+ * @example
+ * ```ts twoslash
+ * import { parentCmds } from 'iso-ucan/store'
+ * parentCmds('/foo/bar/baz') // ["/", "/foo", "/foo/bar", "/foo/bar/baz"]
+ * ```
+ */
+function parentCmds(cmd) {
+  if (!cmd || cmd === '/') return ['/']
+  const parts = cmd.split('/').filter(Boolean)
+  const result = ['/']
+  let current = ''
+  for (const part of parts) {
+    current += `/${part}`
+    result.push(current)
+  }
+  return result
 }
