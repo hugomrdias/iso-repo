@@ -113,15 +113,61 @@ function deepEqual(a, b) {
 }
 
 /**
+ * Converts a UCAN glob pattern to a regular expression.
+ * @param {string} pattern
+ * @returns {RegExp}
+ */
+function likeRegex(pattern) {
+  // Convert UCAN glob pattern to a regular expression.
+  // The glob pattern has `*` as a wildcard (zero or more chars)
+  // and `\*` as an escape for a literal asterisk.
+  let regexString = '^'
+  let i = 0
+  while (i < pattern.length) {
+    const char = pattern[i]
+
+    if (char === '\\') {
+      // Handle escape sequence
+      if (i + 1 < pattern.length) {
+        const nextChar = pattern[i + 1]
+        if (nextChar === '*') {
+          // This is an escaped asterisk `\*`. Match a literal `*`.
+          regexString += '\\*'
+          i += 2 // Move past both `\` and `*`
+        } else {
+          // This is another escape, like `\\`. Treat the `\` as a literal character.
+          regexString += '\\\\'
+          i++
+        }
+      } else {
+        // Trailing backslash. Treat as a literal `\`.
+        regexString += '\\\\'
+        i++
+      }
+    } else if (char === '*') {
+      // This is a wildcard `*`. Match zero or more characters.
+      regexString += '.*'
+      i++
+    } else {
+      // This is a regular character. Escape it if it's a special regex metacharacter.
+      regexString += char.replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+      i++
+    }
+  }
+  regexString += '$'
+
+  return new RegExp(regexString)
+}
+
+/**
  * Evaluates a single policy statement against the invocation args.
  *
- * @param {object} args The invocation arguments.
- * @param {Statement} statement The policy statement.
+ * @template Args
+ * @param {Args} args The invocation arguments.
+ * @param {import("./types.js").Statement<Args>} statement The policy statement.
  * @returns {boolean} The result of the evaluation.
  */
 function evaluateStatement(args, statement) {
-  console.log('🚀 ~ evaluateStatement ~ statement:', statement)
-
   const [op, ...params] = statement
 
   try {
@@ -154,11 +200,7 @@ function evaluateStatement(args, statement) {
         const [selector, pattern] = /** @type {[string, string]} */ (params)
         const selected = resolveSelector(args, selector)
         if (typeof selected !== 'string') return false
-        const regex = new RegExp(
-          `^${pattern
-            .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-            .replace(/\\\*/g, '.*')}$`
-        )
+        const regex = likeRegex(pattern)
         return regex.test(selected)
       }
       // Connectives
@@ -168,6 +210,7 @@ function evaluateStatement(args, statement) {
       }
       case 'or': {
         const [statements] = /** @type {[Statement[]]} */ (params)
+        if (statements.length === 0) return true
         return statements.some((stmt) => evaluateStatement(args, stmt))
       }
       case 'not': {
@@ -190,9 +233,12 @@ function evaluateStatement(args, statement) {
         }
         if (!Array.isArray(collection)) return false
         if (collection.length === 0) return true
-
+        console.log('collection', collection)
         if (op === 'all') {
-          return collection.every((item) => evaluateStatement(item, innerStmt))
+          return collection.every((item) => {
+            console.log('item', item)
+            return evaluateStatement(item, innerStmt)
+          })
         }
         // any
         return collection.some((item) => evaluateStatement(item, innerStmt))
@@ -210,8 +256,9 @@ function evaluateStatement(args, statement) {
 /**
  * Validates invocation arguments against a UCAN policy.
  *
- * @param {Record<string, unknown>} args The arguments of the eventual invocation.
- * @param {import("./types.js").Policy} policy An array of policy statements.
+ * @template {Record<string, unknown>} Args
+ * @param {Args} args The arguments of the eventual invocation.
+ * @param {import("./types.js").Policy<Args>} policy An array of policy statements.
  * @returns {boolean} True if the args are valid according to the policy, false otherwise.
  */
 export function validate(args, policy) {

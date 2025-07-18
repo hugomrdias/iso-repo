@@ -9,6 +9,59 @@ import type { Store } from './store'
 export type { DIDURL } from 'iso-did/types'
 
 /**
+ * Type-safe selector utilities
+ */
+
+/**
+ * Extracts all possible paths from a data structure as string literals
+ */
+type PathsToStringProps<T> = T extends
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  ? never
+  : T extends Array<infer U>
+    ?
+        | `[]`
+        | `[${number}]`
+        | `[${number}:${number}]`
+        | `[${number}:]`
+        | `[:${number}]`
+        | `[:]`
+        | PathsToStringProps<U>
+    : T extends object
+      ? {
+          [K in keyof T & (string | number)]: K extends string
+            ? `.${K}` | `.${K}?` | `.${K}${PathsToStringProps<T[K]>}`
+            : `[${K}]` | `[${K}]?` | `[${K}]${PathsToStringProps<T[K]>}`
+        }[keyof T & (string | number)]
+      : never
+
+/**
+ * Flattens nested path strings into a union of all possible selectors
+ */
+type FlattenPaths<T> = T extends string
+  ? T
+  : T extends object
+    ? {
+        [K in keyof T]: T[K] extends string
+          ? T[K]
+          : T[K] extends object
+            ? FlattenPaths<T[K]>
+            : never
+      }[keyof T]
+    : never
+
+/**
+ * Type-safe selector that only allows valid paths for the given data structure
+ */
+export type Selector<Args = unknown> = Args extends unknown
+  ? FlattenPaths<PathsToStringProps<Args>> | '.'
+  : string
+
+/**
  * Varsig types
  */
 
@@ -100,23 +153,25 @@ export interface InvocationPayload extends PayloadBase {
   cause?: CID
 }
 
-export interface DelegationPayload extends PayloadBase {
+export interface DelegationPayload<Args = unknown> extends PayloadBase {
   aud: DIDURL
   /**
    * Subject can be null here for Powerline
    * @see https://github.com/ucan-wg/delegation/#powerline
    */
   sub: DIDURL | null
-  pol: Policy
+  pol: Policy<Args>
 }
 
-export type Payload = InvocationPayload | DelegationPayload
-export type SignaturePayload = {
+export type Payload<Args = unknown> =
+  | InvocationPayload
+  | DelegationPayload<Args>
+export type SignaturePayload<Args = unknown> = {
   h: Uint8Array
-  [payloadTag: PayloadTag]: Payload
+  [payloadTag: PayloadTag]: Payload<Args>
 }
 
-export type Envelope = [Uint8Array, SignaturePayload]
+export type Envelope<Args = unknown> = [Uint8Array, SignaturePayload<Args>]
 
 /**
  * @see https://github.com/ucan-wg/spec#envelope
@@ -159,39 +214,42 @@ export type DecodedEnvelope<Spec extends PayloadSpec> = {
  */
 
 /** Connectives */
-export type Selector = string
 export type EqualityOp = '==' | '!='
-export type Equality = [EqualityOp, Selector, unknown]
+export type Equality<Args = unknown> = [EqualityOp, Selector<Args>, unknown]
 export type InequalityOp = '<' | '<=' | '>' | '>='
-export type Inequality = [InequalityOp, Selector, number]
+export type Inequality<Args = unknown> = [InequalityOp, Selector<Args>, number]
 export type NegateOp = 'not'
-export type Negate = [NegateOp, Statement]
+export type Negate<Args = unknown> = [NegateOp, Statement<Args>]
 export type ConnectiveOp = 'and' | 'or'
-export type Connective = [ConnectiveOp, Statement[]]
+export type Connective<Args = unknown> = [ConnectiveOp, Statement<Args>[]]
 export type QuantifierOp = 'all' | 'any'
-export type Quantifier = [QuantifierOp, Selector, Statement]
+export type Quantifier<Args = unknown> = [
+  QuantifierOp,
+  Selector<Args>,
+  Statement<Args>,
+]
 export type LikeOp = 'like'
-export type Like = [LikeOp, Selector, string]
+export type Like<Args = unknown> = [LikeOp, Selector<Args>, string]
 
-export type Statement =
-  | Equality
-  | Inequality
-  | Negate
-  | Connective
-  | Quantifier
-  | Like
+export type Statement<Args = unknown> =
+  | Equality<Args>
+  | Inequality<Args>
+  | Negate<Args>
+  | Connective<Args>
+  | Quantifier<Args>
+  | Like<Args>
 
-export type Policy = Statement[]
+export type Policy<Args = unknown> = Statement<Args>[]
 
 /**
  * Delegation
  */
 
-export interface DelegationOptions {
+export interface DelegationOptions<Args = unknown> {
   iss: ISigner
   aud: VerifiableDID
   sub: VerifiableDID | null
-  pol: Policy
+  pol: Policy<Args>
   exp: number | null
   nbf?: number
   nonce?: Uint8Array

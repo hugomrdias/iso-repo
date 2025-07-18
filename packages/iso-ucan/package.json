@@ -83,8 +83,8 @@
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
-    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
-    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+    "test:node": "playwright-test 'test/**/!(*.browser).test.{js,ts}' --mode node",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.{js,ts}'"
   },
   "dependencies": {
     "@ipld/dag-cbor": "^9.2.4",
