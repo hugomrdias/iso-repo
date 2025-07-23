@@ -1,3 +1,4 @@
+import { base64pad } from 'iso-base/rfc4648'
 import { parse as didParse } from 'iso-did'
 import { randomBytes } from 'iso-web/crypto'
 import * as Envelope from './envelope.js'
@@ -9,11 +10,12 @@ import {
   assertNotBefore,
   assertNotRevoked,
   cid,
+  expOrTtl,
   verifySignature,
 } from './utils.js'
 
 /**
- * @import {DelegationValidateOptions, DIDURL, Policy, DelegationOptions, DelegationPayload} from './types.js'
+ * @import {DelegationValidateOptions, Policy, DelegationOptions, DelegationPayload, DID, DIDURL} from './types.js'
  * @import {CID} from 'multiformats'
  */
 
@@ -23,9 +25,9 @@ import {
 export class Delegation {
   /** @type {DIDURL} */
   iss
-  /** @type {DIDURL} */
+  /** @type {DID} */
   aud
-  /** @type {DIDURL | null} */
+  /** @type {DID | null} */
   sub
   /** @type {string} */
   cmd
@@ -53,7 +55,7 @@ export class Delegation {
 
     this.iss = envelope.payload.iss
     this.aud = envelope.payload.aud
-    this.sub = envelope.payload.sub
+    this.sub = envelope.payload.sub ? envelope.payload.sub : null
     this.cmd = envelope.payload.cmd
     this.pol = envelope.payload.pol
     this.exp = envelope.payload.exp
@@ -67,14 +69,11 @@ export class Delegation {
    * @param {import("./types.js").DelegationFromOptions} options
    */
   static async from(options) {
-    let { bytes, envelope, didResolveOptions, signatureVerifierResolver } =
-      options
+    const { bytes, didResolver: didResolveOptions, verifierResolver } = options
 
-    if (!envelope) {
-      envelope = /** @type {typeof Envelope.decode<"dlg">} */ (Envelope.decode)(
-        { envelope: bytes }
-      )
-    }
+    const envelope = /** @type {typeof Envelope.decode<"dlg">} */ (
+      Envelope.decode
+    )({ envelope: bytes })
 
     if (envelope.spec !== 'dlg') {
       throw new Error(
@@ -84,11 +83,7 @@ export class Delegation {
 
     assertStructure(envelope.payload)
 
-    await verifySignature(
-      envelope,
-      signatureVerifierResolver,
-      didResolveOptions
-    )
+    await verifySignature(envelope, verifierResolver, didResolveOptions)
 
     const _cid = await cid(envelope)
     await assertNotRevoked(_cid, options.isRevoked)
@@ -106,12 +101,12 @@ export class Delegation {
     /** @type {DelegationPayload} */
     const payload = {
       iss: options.iss.toString(),
-      aud: options.aud.toString(),
-      sub: options.sub !== null ? options.sub.toString() : options.sub,
+      aud: options.aud,
+      sub: options.sub ? options.sub : null,
       pol: options.pol,
       cmd: options.cmd,
       nonce,
-      exp: options.exp,
+      exp: expOrTtl(options),
     }
 
     if (options.nbf) {
@@ -150,17 +145,19 @@ export class Delegation {
    */
   async validate(options) {
     assertStructure(this.envelope.payload)
+    assertNotBefore(this.envelope.payload.nbf)
     await verifySignature(
       this.envelope,
-      options.signatureVerifierResolver,
-      options.didResolveOptions
+      options.verifierResolver,
+      options.didResolver
     )
-
-    assertNotBefore(this.envelope.payload.nbf)
-
     await assertNotRevoked(this.cid, options.isRevoked)
 
     return true
+  }
+
+  toString() {
+    return base64pad.encode(this.bytes)
   }
 }
 
@@ -177,11 +174,10 @@ function assertStructure(payload) {
   }
 
   assertIsValidCommand(payload.cmd)
-
-  // TODO: validate policy
-
+  assertExpiration(payload.exp)
   assertNonce(payload.nonce)
 
+  // assertPolicy(payload.pol)
+
   assertMeta(payload.meta)
-  assertExpiration(payload.exp)
 }

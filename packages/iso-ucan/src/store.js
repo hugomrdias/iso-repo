@@ -1,8 +1,10 @@
+import { parse as didParse } from 'iso-did'
 import { KV } from 'iso-kv'
 import merge from 'it-merge'
 /**
  * @import {Delegation} from './delegation.js'
  * @import {Driver} from 'iso-kv'
+ * @import {CID} from 'multiformats'
  */
 
 const POWERLINE = '$pwrl'
@@ -33,7 +35,7 @@ export class Store {
    *
    * @param {Delegation} delegation
    */
-  async set(delegation) {
+  async #set(delegation) {
     const options = {
       expiration: delegation.envelope.payload.exp,
     }
@@ -43,7 +45,8 @@ export class Store {
     await this.kv.set([cid], delegation, options)
 
     // Index by subject and audience
-    let sub = delegation.sub
+    /** @type {string | null} */
+    let sub = delegation.sub ? delegation.sub : null
     if (sub === null) {
       sub = POWERLINE
     }
@@ -55,7 +58,7 @@ export class Store {
    */
   async add(delegations) {
     for (const delegation of delegations) {
-      await this.set(delegation)
+      await this.#set(delegation)
     }
   }
 
@@ -69,13 +72,28 @@ export class Store {
   }
 
   /**
+   * Resolve a proof by CID
+   *
+   * @param {CID} cid
+   */
+  async resolveProof(cid) {
+    const delegation = await this.get(cid.toString())
+    if (!delegation) {
+      throw new Error(`Delegation not found: ${cid.toString()}`)
+    }
+    return delegation
+  }
+
+  /**
    * List proofs by sub and aud
    *
-   * @param {import('./types.js').ResolveProofsOptions} options
+   * @param {import('./types.js').StoreProofsOptions} options
    */
   async *proofs(options) {
-    let sub = options.sub
-    let aud = options.aud
+    /**@type {string | null} */
+    let sub = options.sub ? options.sub.toString() : null
+    /**@type {string | undefined} */
+    let aud = options.aud ? options.aud.toString() : undefined
 
     if (!aud && !sub) {
       throw new Error('No audience or subject provided')
@@ -105,7 +123,7 @@ export class Store {
    * Resolve a single chain of proofs ending with a root (subject === issuer).
    * Returns the first such chain found (depth-first).
    *
-   * @param {import('./types.js').ResolveProofsOptions} options
+   * @param {import('./types.js').StoreProofsOptions} options
    * @returns {Promise<Delegation[]>}
    */
   async chain({ aud, sub, cmd }) {
@@ -121,7 +139,7 @@ export class Store {
       if (!parents.includes(proof.cmd)) continue
 
       // If root, return this proof as the end of the path
-      if (proof.sub === proof.iss) {
+      if (proof.sub === didParse(proof.iss).did) {
         // console.log('🚀 ~ found root:', proof.iss, proof.sub, proof.cmd)
         return [proof]
       }
@@ -129,8 +147,8 @@ export class Store {
       // Otherwise, go deeper and prepend this proof if a path is found
       // console.log('🚀 ~ trying deeper:', proof.iss, proof.sub, proof.cmd)
       const nextPath = await this.chain({
-        aud: proof.iss,
-        sub: proof.sub ?? sub,
+        aud: didParse(proof.iss).did,
+        sub: proof.sub ? proof.sub : sub,
         cmd: proof.cmd,
       })
       if (nextPath?.length) {

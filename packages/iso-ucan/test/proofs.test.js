@@ -36,17 +36,15 @@ const proofs = suite('proofs')
 
 proofs('direct proof', async () => {
   const store = new Store(new MemoryDriver())
-  const exp = Math.floor(Date.now() / 1000) + 1000
 
   const ownerDelegation = await AccountCap.delegate({
     iss: owner,
-    aud: invoker,
-    sub: owner,
+    aud: invoker.did,
+    sub: owner.did,
     pol: [],
-    exp,
   })
 
-  await store.set(ownerDelegation)
+  await store.add([ownerDelegation])
 
   const proofs = await store.chain({
     sub: owner.did,
@@ -63,26 +61,22 @@ proofs('direct proof', async () => {
 
 proofs('resolve owner > bob > invoker', async () => {
   const store = new Store(new MemoryDriver())
-  const exp = Math.floor(Date.now() / 1000) + 1000
 
   const ownerDelegation = await AccountCap.delegate({
     iss: owner,
-    aud: bob,
-    sub: owner,
+    aud: bob.did,
+    sub: owner.did,
     pol: [],
-    exp,
   })
 
   const bobDelegation = await AccountCreateCap.delegate({
     iss: bob,
-    aud: invoker,
-    sub: owner,
+    aud: invoker.did,
+    sub: owner.did,
     pol: [],
-    exp,
   })
 
-  await store.set(bobDelegation)
-  await store.set(ownerDelegation)
+  await store.add([bobDelegation, ownerDelegation])
 
   const proofs = await store.chain({
     sub: owner.did,
@@ -103,26 +97,22 @@ proofs('resolve owner > bob > invoker', async () => {
 
 proofs('resolve owner > bob(powerline) > invoker', async () => {
   const store = new Store(new MemoryDriver())
-  const exp = Math.floor(Date.now() / 1000) + 1000
 
   const ownerDelegation = await AccountCap.delegate({
     iss: owner,
-    aud: bob,
-    sub: owner,
+    aud: bob.did,
+    sub: owner.did,
     pol: [],
-    exp,
   })
 
   const bobDelegation = await AccountCreateCap.delegate({
     iss: bob,
-    aud: invoker,
+    aud: invoker.did,
     sub: null,
     pol: [],
-    exp,
   })
 
-  await store.set(bobDelegation)
-  await store.set(ownerDelegation)
+  await store.add([bobDelegation, ownerDelegation])
 
   const proofs = await store.chain({
     sub: owner.did,
@@ -143,37 +133,32 @@ proofs('resolve owner > bob(powerline) > invoker', async () => {
 
 proofs('resolve with broken branch', async () => {
   const store = new Store(new MemoryDriver())
-  const exp = Math.floor(Date.now() / 1000) + 1000
 
   const ownerDelegation = await AccountCap.delegate({
     iss: owner,
-    aud: bob,
-    sub: owner,
+    aud: bob.did,
+    sub: owner.did,
     pol: [],
-    exp,
   })
 
   const bobDelegation = await AccountCreateCap.delegate({
     iss: bob,
-    aud: invoker,
-    sub: owner,
+    aud: invoker.did,
+    sub: owner.did,
     pol: [],
-    exp,
   })
 
   const ownerAliceDelegation = await TopCap.delegate({
     iss: invoker,
-    aud: alice,
-    sub: owner,
+    aud: alice.did,
+    sub: owner.did,
     pol: [],
-    exp,
   })
   const aliceDelegation = await AccountCreateCap.delegate({
     iss: alice,
-    aud: invoker,
-    sub: owner,
+    aud: invoker.did,
+    sub: owner.did,
     pol: [],
-    exp,
   })
 
   await store.add([

@@ -44,6 +44,18 @@
       "types": "./dist/src/varsig.d.ts",
       "default": "./src/varsig.js"
     },
+    "./server": {
+      "types": "./dist/src/server.d.ts",
+      "default": "./src/server.js"
+    },
+    "./policy": {
+      "types": "./dist/src/policy.d.ts",
+      "default": "./src/policy.js"
+    },
+    "./client": {
+      "types": "./dist/src/client.d.ts",
+      "default": "./src/client.js"
+    },
     "./types": {
       "types": "./dist/src/types.d.ts"
     }
@@ -69,6 +81,15 @@
       ],
       "store": [
         "dist/src/store"
+      ],
+      "server": [
+        "dist/src/server"
+      ],
+      "policy": [
+        "dist/src/policy"
+      ],
+      "client": [
+        "dist/src/client"
       ],
       "types": [
         "dist/src/types"
@@ -100,10 +121,13 @@
     "multiformats": "^13.3.7"
   },
   "devDependencies": {
+    "@hono/node-server": "^1.17.1",
     "@noble/hashes": "^1.7.2",
     "@noble/secp256k1": "^2.3.0",
     "@types/node": "^24.0.14",
-    "playwright-test": "^14.1.7",
+    "hono": "^4.8.5",
+    "playwright-test": "^14.1.11",
+    "type-fest": "^4.41.0",
     "typescript": "5.8.3",
     "viem": "^2.31.7",
     "zod": "^4.0.5"

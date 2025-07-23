@@ -1,8 +1,4 @@
 /**
- * @import {Statement} from './types.js'
- */
-
-/**
  * Resolves a selector string against a data object, inspired by jq.
  *
  * @param {any} data The data to select from.
@@ -175,6 +171,7 @@ function evaluateStatement(args, statement) {
       // Comparisons
       case '==': {
         const [selector, value] = /** @type {[string, unknown]} */ (params)
+
         return deepEqual(resolveSelector(args, selector), value)
       }
       case '!=': {
@@ -205,25 +202,35 @@ function evaluateStatement(args, statement) {
       }
       // Connectives
       case 'and': {
-        const [statements] = /** @type {[Statement[]]} */ (params)
+        const [statements] = /** @type {[import("./types.js").Statement[]]} */ (
+          params
+        )
         return statements.every((stmt) => evaluateStatement(args, stmt))
       }
       case 'or': {
-        const [statements] = /** @type {[Statement[]]} */ (params)
+        const [statements] = /** @type {[import("./types.js").Statement[]]} */ (
+          params
+        )
         if (statements.length === 0) return true
         return statements.some((stmt) => evaluateStatement(args, stmt))
       }
       case 'not': {
-        const [statement] = /** @type {[Statement]} */ (params)
+        const [statement] = /** @type {[import("./types.js").Statement]} */ (
+          params
+        )
         return !evaluateStatement(args, statement)
       }
       // Quantification
       case 'all':
       case 'any': {
-        const [selector, innerStmt] = /** @type {[string, Statement]} */ (
-          params
-        )
+        const [selector, innerStmt] =
+          /** @type {[string, import("./types.js").Statement]} */ (params)
         let collection = resolveSelector(args, selector)
+
+        if (innerStmt[0] === 'any' || innerStmt[0] === 'all') {
+          return evaluateStatement(collection, innerStmt)
+        }
+
         if (
           collection &&
           typeof collection === 'object' &&
@@ -233,10 +240,8 @@ function evaluateStatement(args, statement) {
         }
         if (!Array.isArray(collection)) return false
         if (collection.length === 0) return true
-        console.log('collection', collection)
         if (op === 'all') {
           return collection.every((item) => {
-            console.log('item', item)
             return evaluateStatement(item, innerStmt)
           })
         }

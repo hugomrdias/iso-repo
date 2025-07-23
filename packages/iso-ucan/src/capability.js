@@ -8,17 +8,19 @@ import { Invocation } from './invocation.js'
 
 /**
  * @template {StandardSchemaV1} Schema
+ * @template {string} [Cmd=string]
  * @typedef {Object} CapabilityOptions
  * @prop {Schema} schema
- * @prop {string} cmd
+ * @prop {Cmd} cmd
  */
 
 /**
  * @template {StandardSchemaV1} Schema
+ * @template {string} [Cmd=string]
  */
 export class Capability {
   /**
-   * @param {CapabilityOptions<Schema>} options
+   * @param {CapabilityOptions<Schema, Cmd>} options
    */
   constructor(options) {
     this.schema = options.schema
@@ -27,10 +29,19 @@ export class Capability {
 
   /**
    * @template {StandardSchemaV1} Schema
-   * @param {CapabilityOptions<Schema>} options
+   * @template {string} [Cmd=string]
+   * @param {CapabilityOptions<Schema, Cmd>} options
    */
   static from(options) {
     return new Capability(options)
+  }
+
+  /**
+   * @param {StandardSchemaV1.InferInput<Schema>} args
+   */
+  async validate(args) {
+    const result = await this.schema['~standard'].validate(args)
+    return result
   }
 
   /**
@@ -44,29 +55,21 @@ export class Capability {
 
     const proofs = await options.store.chain({
       cmd: this.cmd,
-      sub: options.sub.did,
+      sub: options.sub,
       aud: options.iss.did,
     })
 
     return await Invocation.create({
-      iss: options.iss,
-      sub: options.sub,
-      cmd: this.cmd,
+      ...options,
       args: result.value,
+      cmd: this.cmd,
       prf: proofs,
-      exp: options.exp,
-      iat: options.iat,
-      nonce: options.nonce,
-      cause: options.cause,
-      meta: options.meta,
-      aud: options.aud,
-      nbf: options.nbf,
     })
   }
 
   /**
    *
-   * @param {import("./types.js").DelegationOptions} options
+   * @param {import("./types.js").CapabilityDelegateOptions} options
    */
   delegate(options) {
     return Delegation.create({ ...options, cmd: this.cmd })

@@ -2,6 +2,7 @@ import * as dagCbor from '@ipld/dag-cbor'
 import { DID } from 'iso-did'
 import { CID } from 'multiformats/cid'
 import { sha256 } from 'multiformats/hashes/sha2'
+import { z } from 'zod'
 
 import * as Envelope from './envelope.js'
 import * as varsig from './varsig.js'
@@ -95,13 +96,15 @@ export function assertExpiration(exp) {
   const now = nowInSeconds()
 
   if (exp !== null && !Number.isSafeInteger(exp)) {
-    throw new Error(
+    throw new TypeError(
       `UCAN expiration must be null or a safe integer. Received: ${exp}`
     )
   }
 
   if (exp !== null && exp < now) {
-    throw new Error(`UCAN expired. Received: ${exp} but current time is ${now}`)
+    throw new TypeError(
+      `UCAN expiration must be in the future. Received: ${exp} but current time is ${now}`
+    )
   }
 }
 
@@ -112,7 +115,7 @@ export function assertExpiration(exp) {
  */
 export function assertNotBefore(nbf) {
   if (nbf && nbf > nowInSeconds()) {
-    throw new Error('UCAN not yet valid')
+    throw new Error('UCAN not valid yet')
   }
 }
 
@@ -120,10 +123,10 @@ export function assertNotBefore(nbf) {
  * Validate the issuer and signature of a UCAN
  *
  * @param {import('./types.js').DecodedEnvelope<PayloadSpec>} envelope
- * @param {import('iso-did/types').ResolveOptions} [didResolveOptions]
+ * @param {import('iso-did').Resolver} [didResolver]
  */
-export async function validateIssuerAndSignature(envelope, didResolveOptions) {
-  const issuer = await DID.fromString(envelope.payload.iss, didResolveOptions)
+export async function validateIssuerAndSignature(envelope, didResolver) {
+  const issuer = await DID.fromString(envelope.payload.iss, didResolver)
   if (!isSigAndDidCompatible(issuer, envelope.alg)) {
     throw new Error(
       `UCAN issuer type mismatch: DID ${issuer.verifiableDid.type} and Signature ${envelope.alg} are not compatible`
@@ -138,14 +141,14 @@ export async function validateIssuerAndSignature(envelope, didResolveOptions) {
  *
  * @param {import('./types.js').DecodedEnvelope<PayloadSpec>} envelope
  * @param {import('iso-signatures/verifiers/resolver.js').Resolver} signatureVerifierResolver
- * @param {import('iso-did/types').ResolveOptions} [didResolveOptions]
+ * @param {import('iso-did').Resolver} [didResolver]
  */
 export async function verifySignature(
   envelope,
   signatureVerifierResolver,
-  didResolveOptions
+  didResolver
 ) {
-  const issuer = await validateIssuerAndSignature(envelope, didResolveOptions)
+  const issuer = await validateIssuerAndSignature(envelope, didResolver)
   const isVerified = await signatureVerifierResolver.verify({
     signature: envelope.signature,
     message: dagCbor.encode(signaturePayload(envelope)),
@@ -177,35 +180,35 @@ export async function verifySignature(
 export function assertIsValidCommand(command) {
   // Rule: Must be a string
   if (typeof command !== 'string') {
-    throw new Error(
-      `Invalid command: Input must be a string, but received type ${typeof command}.`
+    throw new TypeError(
+      `Invalid command: Input must be a string, but received type ${typeof command}`
     )
   }
 
   // Rule: Must begin with a slash
   if (!command.startsWith('/')) {
-    throw new Error(
+    throw new TypeError(
       `Invalid command: Must begin with a slash (/). Received: "${command}"`
     )
   }
 
   // Rule: No trailing slash, unless the command is exactly "/"
   if (command.length > 1 && command.endsWith('/')) {
-    throw new Error(
+    throw new TypeError(
       `Invalid command: Must not have a trailing slash. Received: "${command}"`
     )
   }
 
   // Rule: Must be lowercase
   if (command !== command.toLowerCase()) {
-    throw new Error(
+    throw new TypeError(
       `Invalid command: Must be lowercase. Received: "${command}"`
     )
   }
 
   // Rule: No empty segments
   if (command.includes('//')) {
-    throw new Error(
+    throw new TypeError(
       `Invalid command: Must not contain empty segments (e.g., "//"). Received: "${command}"`
     )
   }
@@ -229,64 +232,23 @@ export function assertIsValidCommand(command) {
  */
 export function assertNonce(nonce) {
   if (!(nonce instanceof Uint8Array)) {
-    throw new Error(
-      `Expected Uint8Array, got ${Object.prototype.toString.call(nonce)}`
+    throw new TypeError(
+      `Invalid nonce: Expected Uint8Array, got ${Object.prototype.toString.call(nonce)}`
     )
   }
 }
-
-/**
- * A type guard for Record<PropertyKey, unknown>.
- *
- * @param {unknown} value - The value to check.
- * @returns {value is Record<PropertyKey, unknown>} Whether the specified value has a runtime type of `object` and is
- * neither `null` nor an `Array`.
- */
-export function isObject(value) {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
-}
-
-/**
- * Assert that the input is JSON serializable.
- *
- * @param {unknown} value - The value to check.
- * @throws {Error} If value is not JSON serializable.
- * @returns {void}
- *
- * @example
- * ```ts twoslash
- * import { assertJsonSerializable } from 'iso-ucan/utils'
- * assertJsonSerializable({ foo: 1 }) // ok
- * assertJsonSerializable(undefined) // throws
- * assertJsonSerializable({ a: () => {} }) // throws
- * ```
- */
-export function assertJsonSerializable(value) {
-  try {
-    // JSON.stringify throws on non-serializable values (e.g., functions, undefined in objects, circular refs)
-    // Note: JSON.stringify(undefined) returns undefined, not an error, so we check for that
-    const str = JSON.stringify(value)
-    if (str === undefined) {
-      throw new Error('Value is not JSON serializable')
-    }
-  } catch (err) {
-    throw new Error(
-      `Value is not JSON serializable: ${/** @type {Error} */ (err).message}`
-    )
-  }
-}
-
 /**
  * Assert that args is a JSON serializable object.
  *
  * @param {unknown} args
  */
 export function assertArgs(args) {
-  if (!isObject(args)) {
-    throw new Error(`UCAN args must be an object. Received: ${args}`)
-  }
+  const parsed = cborObject.safeParse(args)
+  if (parsed.error) {
+    const pretty = z.prettifyError(parsed.error)
 
-  assertJsonSerializable(args)
+    throw new TypeError(`Invalid args: ${pretty}`, { cause: parsed.error })
+  }
 }
 
 /**
@@ -297,8 +259,13 @@ export function assertArgs(args) {
  * @returns {void}
  */
 export function assertMeta(meta) {
-  if (meta && !isObject(meta) && assertJsonSerializable(meta)) {
-    throw new Error(`UCAN meta must be an object. Received: ${meta}`)
+  if (meta) {
+    const parsed = cborObject.safeParse(meta)
+    if (parsed.error) {
+      const pretty = z.prettifyError(parsed.error)
+
+      throw new TypeError(`Invalid meta: ${pretty}`, { cause: parsed.error })
+    }
   }
 }
 
@@ -313,5 +280,96 @@ export async function assertNotRevoked(cid, isRevokedFn) {
   const isRevoked = await isRevokedFn(cid)
   if (isRevoked) {
     throw new Error('UCAN revoked')
+  }
+}
+
+/**
+ * Expiration or TTL (default 300 seconds)
+ *
+ * @param {object} options
+ * @param {number | null} [options.exp]
+ * @param {number} [options.ttl]
+ */
+export function expOrTtl({ exp, ttl }) {
+  if (exp === null) {
+    return exp
+  }
+  const currentTimeInSeconds = Math.floor(Date.now() / 1000)
+  const expiration = exp ?? currentTimeInSeconds + (ttl ?? 300)
+
+  return expiration
+}
+
+export const cborValue =
+  /** @type {typeof z.lazy<z.ZodType<import('../src/types.js').CborValue>>} */ (
+    z.lazy
+  )(() => {
+    return z.union([
+      z.string(),
+      z.number(),
+      z.boolean(),
+      z.null(),
+      z.boolean(),
+      z.bigint(),
+      z.instanceof(Uint8Array),
+      z.array(cborValue),
+      z.record(z.string(), cborValue),
+    ])
+  })
+export const cborObject = z.record(z.string(), cborValue)
+
+export const selector = z.union([
+  z.literal('.'),
+  z.templateLiteral([z.literal('.'), z.string()]),
+])
+
+/**
+ * @typedef {z.infer<typeof selector>} Selector
+ */
+
+/**
+ * Statement
+ */
+export const statement =
+  /** @type {typeof z.lazy<z.ZodType<import('../src/types.js').Statement<unknown>>>} */ (
+    z.lazy
+    // @ts-ignore
+  )(() => {
+    return z.union([
+      z.tuple([
+        z.union([z.literal('=='), z.literal('!=')]),
+        selector,
+        z.unknown(),
+      ]), // Equality
+      z.tuple([
+        z.union([
+          z.literal('<'),
+          z.literal('<='),
+          z.literal('>'),
+          z.literal('>='),
+        ]),
+        selector,
+        z.number(),
+      ]), // Inequality
+      z.tuple([z.literal('like'), selector, z.string()]), // Like
+      z.tuple([z.literal('not'), statement]),
+      z.tuple([z.literal('and'), z.array(statement)]),
+      z.tuple([z.literal('or'), z.array(statement)]),
+      z.tuple([z.literal('all'), z.string(), statement]),
+      z.tuple([z.literal('any'), z.string(), statement]),
+    ])
+  })
+
+export const policySchema = z.array(statement)
+
+/**
+ * @param {unknown} policy
+ */
+export function assertPolicy(policy) {
+  const parsed = policySchema.safeParse(policy)
+  if (parsed.error) {
+    const pretty = z.prettifyError(parsed.error)
+
+    throw new TypeError(`Invalid policy: ${pretty}`, { cause: parsed.error })
   }
 }

@@ -7,12 +7,12 @@ import {
   assertIsValidCommand,
   assertMeta,
   assertNonce,
+  expOrTtl,
   verifySignature,
 } from './utils.js'
 import { cid } from './utils.js'
 
 /**
- * @import {InvocationValidateOptions} from './types.js'
  * @import {Delegation} from './delegation.js'
  * @import {CID} from 'multiformats'
  */
@@ -40,6 +40,7 @@ export class Invocation {
    */
   constructor(envelope, bytes, cid, delegations) {
     this.envelope = envelope
+    this.payload = envelope.payload
     this.bytes = bytes
     this.cid = cid
     this.delegations = delegations
@@ -64,22 +65,31 @@ export class Invocation {
     assertStructure(envelope.payload)
     await verifySignature(
       envelope,
-      options.signatureVerifierResolver,
-      options.didResolveOptions
+      options.verifierResolver,
+      options.didResolver
     )
+
     // Audience or subject must match receiver
     if (
-      envelope.payload.aud !== audience.toString() &&
-      envelope.payload.sub !== audience.toString()
+      envelope.payload.aud !== audience.did &&
+      envelope.payload.sub !== audience.did
     ) {
       throw new Error(
-        `UCAN Invocation audience or subject does not match receiver. Expected: ${audience.toString()} but got: ${envelope.payload.aud}`
+        `UCAN Invocation audience or subject does not match receiver. Expected: ${audience.did} but got: ${envelope.payload.aud ?? envelope.payload.sub ?? 'null'}`
       )
     }
 
-    const proofs = await options.resolveProofs(envelope.payload.prf)
+    // Resolve and validate proofs
+
+    /** @type {Delegation[]} */
+    const proofs = []
+    for (const proof of envelope.payload.prf) {
+      const delegation = await options.resolveProof(proof)
+      await delegation.validate(options)
+      proofs.push(delegation)
+    }
+
     assertProofs(envelope.payload, proofs)
-    await validateProofs(proofs, options)
 
     const _cid = await cid(envelope)
     return new Invocation(envelope, bytes, _cid, proofs)
@@ -94,11 +104,11 @@ export class Invocation {
     /** @type {import("./types.js").InvocationPayload} */
     const payload = {
       iss: options.iss.toString(),
-      aud: options.aud ? options.aud.toString() : options.sub.toString(),
-      sub: options.sub.toString(),
+      aud: options.aud ? options.aud : options.sub,
+      sub: options.sub,
       cmd: options.cmd,
       nonce,
-      exp: options.exp,
+      exp: expOrTtl(options),
       args: options.args,
       prf: options.prf.map((p) => p.cid),
     }
@@ -159,16 +169,6 @@ function assertStructure(payload) {
 }
 
 /**
- * @param {Delegation[]} proofs
- * @param {InvocationValidateOptions} options
- */
-async function validateProofs(proofs, options) {
-  for (const proof of proofs) {
-    await proof.validate(options)
-  }
-}
-
-/**
  *
  * @param {import("./types.js").InvocationPayload} payload
  * @param {Delegation[]} proofs
@@ -183,7 +183,8 @@ export function assertProofs(payload, proofs) {
   }
 
   const lastProof = proofs[proofs.length - 1]
-  if (lastProof.envelope.payload.iss !== lastProof.envelope.payload.sub) {
+  const issuerDid = didParse(lastProof.envelope.payload.iss).did
+  if (issuerDid !== lastProof.envelope.payload.sub) {
     throw new Error('UCAN Invocation root proof is not self-signed')
   }
 
@@ -191,9 +192,13 @@ export function assertProofs(payload, proofs) {
     const current = proofs[index].envelope.payload
     const currentAudience = didParse(current.aud)
     const currentSubject = didParse(current.sub ?? payload.sub)
+
+    const nextProof = proofs[index + 1]
     /** @type {import("./types.js").Payload} */
-    let next = proofs[index + 1].envelope.payload
-    if (!next) {
+    let next
+    if (nextProof) {
+      next = nextProof.envelope.payload
+    } else {
       next = payload
     }
 
