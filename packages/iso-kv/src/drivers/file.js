@@ -45,6 +45,7 @@ export class FileDriver {
 
   /** @type {DriverSync['has']} */
   has(key) {
+    // @ts-ignore
     return this.conf.has(key)
   }
 

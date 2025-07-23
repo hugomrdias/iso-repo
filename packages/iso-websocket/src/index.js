@@ -459,7 +459,7 @@ export class WS extends TypedEventTarget {
    * @param {string} [reason]
    */
 
-  // biome-ignore lint/style/useDefaultParameterLast: <explanation>
+  // biome-ignore lint/style/useDefaultParameterLast: todo
   close(code = 1000, reason) {
     log('close %s %s', code, reason)
     this.#removeListeners()

@@ -2,7 +2,7 @@ import assert from 'assert'
 import { setup } from 'iso-web/msw'
 import { http } from 'msw'
 import { didFissionResolver, format } from '../src/fission.js'
-import { DID, Resolver, parse } from '../src/index.js'
+import { DID, parse, Resolver } from '../src/index.js'
 
 const server = setup([])
 

@@ -5,7 +5,7 @@ import {
   resolveHttp,
   resolvePlcDid,
 } from '../src/atp.js'
-import { Resolver, parse, resolve as resolveDid } from '../src/index.js'
+import { parse, Resolver, resolve as resolveDid } from '../src/index.js'
 import { didWebResolver } from '../src/web.js'
 
 const resolver = new Resolver({

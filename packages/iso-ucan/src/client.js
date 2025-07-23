@@ -1,12 +1,23 @@
 /**
- * @import {InferProtocol, RouteOutput, StandardSchemaV1} from './types'
+ * @import {InferProtocol, RouteOutput, StandardSchemaV1, ClientOptions, RouterClient} from './types'
  * @import {Capability} from './capability'
  */
 
 /**
+ * Workaround to make imports types work
+ * @template {{ cmd: string; in: unknown; out: unknown; }} T
+ * @typedef {Object} DELETE_ME
+ * @prop {string} url
+ * @prop {Capability<StandardSchemaV1, string>[]} capabilities
+ * @prop {InferProtocol<Record<string, RouteOutput<Capability<StandardSchemaV1>, unknown>>>} router
+ * @prop {ClientOptions} options
+ * @prop {RouterClient<T>} routerClient
+ */
+
+/**
  * @template {InferProtocol<Record<string, RouteOutput<Capability<StandardSchemaV1>, unknown>>>} T
- * @param {import('./types.js').ClientOptions} options
- * @returns {import('./types.js').RouterClient<T>}
+ * @param {ClientOptions} options
+ * @returns {RouterClient<T>}
  */
 export function createClient(options) {
   const { url, capabilities } = options

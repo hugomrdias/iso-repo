@@ -1,4 +1,4 @@
-import { Encoder, decode, encode } from 'cbor-x'
+import { decode, Encoder, encode } from 'cbor-x'
 
 const encoder = new Encoder({
   mapsAsObjects: false,

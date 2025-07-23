@@ -1,6 +1,7 @@
 import { parse as didParse } from 'iso-did'
 import { KV } from 'iso-kv'
 import merge from 'it-merge'
+
 /**
  * @import {Delegation} from './delegation.js'
  * @import {Driver} from 'iso-kv'

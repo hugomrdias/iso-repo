@@ -7,6 +7,7 @@
  *
  * @module
  */
+/** biome-ignore-all lint/suspicious/noFallthroughSwitchClause: needed */
 
 /** Most significant bit of a byte */
 const MSB = 0x80
@@ -84,43 +85,36 @@ export function encode(value, buf, offset = 0) {
 
   switch (size) {
     // @ts-ignore
-    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 8: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
     // @ts-ignore
-    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 7: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
     // @ts-ignore
-    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 6: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
     // @ts-ignore
-    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 5: {
       buf[offset++] = (value & 0xff) | MSB
       value /= 128
     }
     // @ts-ignore
-    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 4: {
       buf[offset++] = (value & 0xff) | MSB
       value >>>= 7
     }
     // @ts-ignore
-    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 3: {
       buf[offset++] = (value & 0xff) | MSB
       value >>>= 7
     }
     // @ts-ignore
-    // biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
     case 2: {
       buf[offset++] = (value & 0xff) | MSB
       value >>>= 7

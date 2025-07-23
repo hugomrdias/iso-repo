@@ -1,10 +1,10 @@
-import assert from 'assert'
 import { sha256 } from '@noble/hashes/sha256'
+import assert from 'assert'
 import * as EC from 'iso-base/ec-compression'
 import { base64pad, base64url } from 'iso-base/rfc4648'
 import { setup } from 'iso-web/msw'
 import { http } from 'msw'
-import { DID, Resolver, dereference, parse, resolve } from '../src/index.js'
+import { DID, dereference, parse, Resolver, resolve } from '../src/index.js'
 import { DIDKey } from '../src/key.js'
 import { didWebResolver } from '../src/web.js'
 

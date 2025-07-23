@@ -2,7 +2,7 @@ import delay from 'delay'
 import { assert, test } from 'playwright-test/taps'
 import { anySignal } from '../src/signals.js'
 
-test('should abort from any signal', async () => {
+test('should abort from any signal', () => {
   const controllers = Array.from({ length: 5 }).map(() => new AbortController())
   const signals = controllers.map((c) => c.signal)
   const signal = anySignal(signals)
@@ -17,7 +17,7 @@ test('should abort from any signal', async () => {
   assert.equal(signals[2].aborted, false)
 })
 
-test('should ignore non signal', async () => {
+test('should ignore non signal', () => {
   const controllers = Array.from({ length: 5 }).map(() => new AbortController())
   const signals = controllers.map((c) => c.signal)
   // @ts-ignore
