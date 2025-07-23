@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.3.2...iso-signatures-v0.4.0) (2025-07-23)
+
+
+### Features
+
+* **iso-signatures:** enhance signature handling and add new signers ([62a931b](https://github.com/hugomrdias/iso-repo/commit/62a931bfcfe251d197f4cb571af9f6f935f298e9))
+
 ## [0.3.2](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.3.1...iso-signatures-v0.3.2) (2024-02-05)
 
 
