@@ -79,8 +79,8 @@ importers:
         specifier: ^2.1.2
         version: 2.1.2
       '@hugomrdias/configs':
-        specifier: ^0.1.9
-        version: 0.1.9(@biomejs/biome@2.1.2)
+        specifier: workspace:*
+        version: link:../../packages/configs
       '@types/node':
         specifier: ^24.1.0
         version: 24.1.0
@@ -1101,11 +1101,6 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
-
-  '@hugomrdias/configs@0.1.9':
-    resolution: {integrity: sha512-Wp0SGxPgEVI2KfTI6b7RXjgyIqT5IrnojJKnh/t9iTXnwh+PHwC9NBs2gG8zrtlRrYKc1SgE0wvsZnoiW0Y3Hw==}
-    peerDependencies:
-      '@biomejs/biome': ^1.9.2
 
   '@img/sharp-darwin-arm64@0.33.5':
     resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
@@ -4195,10 +4190,6 @@ snapshots:
     dependencies:
       hono: 4.8.5
 
-  '@hugomrdias/configs@0.1.9(@biomejs/biome@2.1.2)':
-    dependencies:
-      '@biomejs/biome': 2.1.2
-
   '@img/sharp-darwin-arm64@0.33.5':
     optionalDependencies:
       '@img/sharp-libvips-darwin-arm64': 1.0.4
@@ -4515,7 +4506,7 @@ snapshots:
 
   '@scure/bip32@1.7.0':
     dependencies:
-      '@noble/curves': 1.9.2
+      '@noble/curves': 1.9.4
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
 
