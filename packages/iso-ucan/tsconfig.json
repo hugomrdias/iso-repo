@@ -23,12 +23,16 @@
   "typedocOptions": {
     "entryPointStrategy": "resolve",
     "entryPoints": [
-      "src/varsig.js",
       "src/capability.js",
+      "src/client.js",
       "src/delegation.js",
-      "src/invocation.js",
       "src/envelope.js",
-      "src/store.js"
+      "src/invocation.js",
+      "src/policy.js",
+      "src/server.js",
+      "src/store.js",
+      "src/utils.js",
+      "src/varsig.js"
     ],
     "includeVersion": true,
     "excludeExternals": true,

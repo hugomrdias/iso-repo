@@ -1,8 +1,8 @@
-/* eslint-disable no-console */
 // @ts-nocheck
-import bench from 'micro-bmark'
+/** biome-ignore-all lint/suspicious/noConsole: benckmark */
 
 import * as scure from '@scure/base'
+import bench from 'micro-bmark'
 import * as iso from './src/index.js'
 
 const codecs = {
@@ -54,7 +54,6 @@ const buffers = {
 const main = () =>
   bench.run(async () => {
     for (const [k, libs] of Object.entries(codecs)) {
-      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
       console.log(`==== ${k} ====`)
       for (const [size, [samples, buf]] of Object.entries(buffers)) {
         // encode
@@ -62,7 +61,6 @@ const main = () =>
           await bench.mark(`${k} (encode) ${size} ${lib}`, samples, () =>
             fn(buf)
           )
-        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
         console.log()
 
         // decode
@@ -71,7 +69,6 @@ const main = () =>
           await bench.mark(`${k} (decode) ${size} ${lib}`, samples, () =>
             fn(str)
           )
-        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
         console.log()
       }
     }

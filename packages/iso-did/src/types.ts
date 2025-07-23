@@ -1,9 +1,9 @@
 import type {
+  ResolverOptions as _ResolverOptions,
   KeyCapabilitySection,
   ParsedDID,
   ResolverRegistry,
   Service,
-  ResolverOptions as _ResolverOptions,
 } from 'did-resolver'
 import type { Tagged } from 'type-fest'
 

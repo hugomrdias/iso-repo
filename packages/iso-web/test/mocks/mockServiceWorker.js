@@ -1,5 +1,5 @@
-/* eslint-disable */
-/* tslint:disable */
+// biome-ignore-all lint: generated file
+// @ts-nocheck
 
 /**
  * Mock Service Worker.
@@ -13,15 +13,15 @@ const INTEGRITY_CHECKSUM = '26357c79639bfa20d64c0efca2a87423'
 const IS_MOCKED_RESPONSE = Symbol('isMockedResponse')
 const activeClientIds = new Set()
 
-self.addEventListener('install', function () {
+self.addEventListener('install', () => {
   self.skipWaiting()
 })
 
-self.addEventListener('activate', function (event) {
+self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim())
 })
 
-self.addEventListener('message', async function (event) {
+self.addEventListener('message', async (event) => {
   const clientId = event.source.id
 
   if (!clientId || !self.clients) {
@@ -89,7 +89,7 @@ self.addEventListener('message', async function (event) {
   }
 })
 
-self.addEventListener('fetch', function (event) {
+self.addEventListener('fetch', (event) => {
   const { request } = event
 
   // Bypass navigation requests.
@@ -123,7 +123,7 @@ async function handleRequest(event, requestId) {
   // Ensure MSW is active and ready to handle the message, otherwise
   // this message will pend indefinitely.
   if (client && activeClientIds.has(client.id)) {
-    ;(async function () {
+    ;(async () => {
       const responseClone = response.clone()
 
       sendToClient(
@@ -140,7 +140,7 @@ async function handleRequest(event, requestId) {
             headers: Object.fromEntries(responseClone.headers.entries()),
           },
         },
-        [responseClone.body],
+        [responseClone.body]
       )
     })()
   }
@@ -229,7 +229,7 @@ async function getResponse(event, client, requestId) {
         keepalive: request.keepalive,
       },
     },
-    [requestBuffer],
+    [requestBuffer]
   )
 
   switch (clientMessage.type) {
@@ -259,7 +259,7 @@ function sendToClient(client, message, transferrables = []) {
 
     client.postMessage(
       message,
-      [channel.port2].concat(transferrables.filter(Boolean)),
+      [channel.port2].concat(transferrables.filter(Boolean))
     )
   })
 }

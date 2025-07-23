@@ -134,7 +134,7 @@ const bases = {
  * @returns {Codec} - Codec
  */
 
-// biome-ignore lint/style/useDefaultParameterLast: <explanation>
+// biome-ignore lint/style/useDefaultParameterLast: needed
 export function rfc4648(base, padding = false, normalize) {
   const [bits, alphabet] = bases[base]
   return {

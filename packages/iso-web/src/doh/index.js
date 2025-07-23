@@ -13,11 +13,11 @@ const symbol = Symbol.for('doh-error')
 export {
   AbortError,
   HttpError,
+  JsonError,
   NetworkError,
   RequestError,
   RetryError,
   TimeoutError,
-  JsonError,
 } from '../http.js'
 
 /**

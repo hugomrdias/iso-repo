@@ -26,7 +26,7 @@ export interface Codec {
  * Generic types
  */
 
-// biome-ignore lint/complexity/noBannedTypes: <explanation>
+// biome-ignore lint/complexity/noBannedTypes: needed
 export type IsAny<T> = unknown extends T ? (T extends {} ? T : never) : never
 
 export type NotAny<T> = T extends IsAny<T> ? never : T

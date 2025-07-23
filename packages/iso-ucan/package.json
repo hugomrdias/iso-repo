@@ -121,15 +121,9 @@
     "multiformats": "^13.3.7"
   },
   "devDependencies": {
-    "@hono/node-server": "^1.17.1",
-    "@noble/hashes": "^1.7.2",
-    "@noble/secp256k1": "^2.3.0",
-    "@types/node": "^24.0.14",
-    "hono": "^4.8.5",
+    "@types/node": "^24.1.0",
     "playwright-test": "^14.1.11",
-    "type-fest": "^4.41.0",
     "typescript": "5.8.3",
-    "viem": "^2.31.7",
     "zod": "^4.0.5"
   },
   "publishConfig": {

@@ -33,7 +33,7 @@ await store.add([delegation1])
 export const client = createClient<Protocol>({
   url: '/ucan',
   issuer,
-  audience: audience.toString(),
+  audience: audience.didObject,
   store,
   capabilities: [...capabilities],
 })

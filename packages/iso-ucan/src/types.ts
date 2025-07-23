@@ -10,12 +10,11 @@ import type { Invocation } from './invocation'
 import type { Store } from './store'
 import type { Policy } from './types/policy'
 
-export type { DIDURL, DIDURLObject, DID } from 'iso-did/types'
-
+export type { StandardSchemaV1 } from '@standard-schema/spec'
+export type { DID, DIDURL, DIDURLObject } from 'iso-did/types'
+export * from './types/envelope'
 export * from './types/policy'
 export * from './types/varsig'
-export * from './types/envelope'
-export type { StandardSchemaV1 } from '@standard-schema/spec'
 
 export type ResolveProof = (proof: CID) => Promise<Delegation>
 export type IsRevoked = (cid: CID) => Promise<boolean>
