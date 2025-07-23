@@ -1,4 +1,5 @@
 import { request } from 'iso-web/http'
+// biome-ignore lint/correctness/noUnusedImports: needed
 import * as T from './types.js'
 
 /** @type {import('did-resolver').DIDResolver} */

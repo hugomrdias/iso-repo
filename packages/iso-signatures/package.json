@@ -92,18 +92,18 @@
     "@noble/secp256k1": "^2.3.0",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
-    "ox": "^0.7.1"
+    "ox": "^0.8.5"
   },
   "devDependencies": {
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.0.14",
+    "@types/node": "^24.1.0",
     "assert": "^2.1.0",
     "mocha": "^11.7.1",
     "playwright-test": "^14.1.11",
     "type-fest": "^4.34.1",
     "typescript": "5.8.3",
-    "viem": "^2.31.7"
+    "viem": "^2.33.0"
   },
   "publishConfig": {
     "provenance": true

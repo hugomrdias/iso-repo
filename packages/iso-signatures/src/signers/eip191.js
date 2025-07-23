@@ -5,7 +5,7 @@ import { Provider } from 'ox'
 
 /**
  * @typedef {import('../types.js').ISigner<string>} ISigner
- * @typedef{import('ox').Provider.Provider} Provider
+ * @typedef {import('ox').Provider.Provider} Provider
  */
 
 /**

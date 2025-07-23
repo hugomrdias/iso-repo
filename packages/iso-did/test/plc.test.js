@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { Resolver, parse, resolve } from '../src/index.js'
+import { parse, Resolver, resolve } from '../src/index.js'
 import { createPlcResolver } from '../src/plc.js'
 
 const resolver = new Resolver({

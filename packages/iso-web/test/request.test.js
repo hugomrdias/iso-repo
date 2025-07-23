@@ -1,4 +1,4 @@
-import { http, HttpResponse, delay } from 'msw'
+import { delay, HttpResponse, http } from 'msw'
 import { assert, suite } from 'playwright-test/taps'
 import { HttpError, JsonError, RequestError, request } from '../src/http.js'
 import { setup } from '../src/msw/msw.js'

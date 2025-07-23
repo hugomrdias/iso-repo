@@ -101,7 +101,7 @@ export class DIDPkh extends DIDCore {
 }
 
 /** @type {import('did-resolver').DIDResolver} */
-// biome-ignore lint/suspicious/useAwait: <explanation>
+// biome-ignore lint/suspicious/useAwait: needs to be async
 async function didPkhResolver(did, _parsedDid) {
   const didPkh = DIDPkh.fromString(did)
   return {

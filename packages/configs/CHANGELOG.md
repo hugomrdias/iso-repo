@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/configs-v0.1.9...configs-v1.0.0) (2025-07-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* add .gitignore and update biome configuration
+
+### Features
+
+* add .gitignore and update biome configuration ([20d5743](https://github.com/hugomrdias/iso-repo/commit/20d5743c466c80182f6823d5aa42d6b468679cb6))
+
 ## [0.1.9](https://github.com/hugomrdias/iso-repo/compare/configs-v0.1.8...configs-v0.1.9) (2024-09-24)
 
 

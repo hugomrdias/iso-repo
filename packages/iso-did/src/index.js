@@ -5,10 +5,9 @@ import { varint } from 'iso-base/varint'
 import { base58btc } from 'multiformats/bases/base58'
 import { DIDCore } from './core.js'
 import * as DidKey from './key.js'
+import { CODE_KEY_TYPE, validateRawPublicKeyLength } from './key.js'
 import * as DidPkh from './pkh.js'
 import * as T from './types.js'
-
-import { CODE_KEY_TYPE, validateRawPublicKeyLength } from './key.js'
 
 export { Resolver } from 'did-resolver'
 

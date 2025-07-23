@@ -7,10 +7,10 @@ import {
   assertIsValidCommand,
   assertMeta,
   assertNonce,
+  cid,
   expOrTtl,
   verifySignature,
 } from './utils.js'
-import { cid } from './utils.js'
 
 /**
  * @import {Delegation} from './delegation.js'
