@@ -1,7 +1,7 @@
 {
   "name": "iso-base",
   "type": "module",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "description": "Isomorphic Utils",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",

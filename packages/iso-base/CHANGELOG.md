@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.0.2...iso-base-v4.1.0) (2025-07-23)
+
+
+### Features
+
+* **iso-base:** add secp256k1 decompression function ([6092947](https://github.com/hugomrdias/iso-repo/commit/60929478c06815a0ca986a50c6092a93cd72ca4c))
+
 ## [4.0.2](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.0.1...iso-base-v4.0.2) (2025-02-11)
 
 
