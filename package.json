@@ -36,7 +36,9 @@
       "better-sqlite3",
       "cbor-extract",
       "esbuild",
-      "msw"
+      "msw",
+      "sharp",
+      "workerd"
     ]
   }
 }
