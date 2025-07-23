@@ -4,7 +4,7 @@ import * as Capabilities from './capabilities'
 
 const accountRoute = route({
   capability: Capabilities.CapAccount,
-  handler: ({ args, store }) => {
+  handler: ({ args }) => {
     console.log(args)
 
     return {
@@ -18,7 +18,7 @@ const accountRoute = route({
 
 const accountCreate = route({
   capability: Capabilities.CapAccountCreate,
-  handler: ({ args, store }) => {
+  handler: ({ args }) => {
     console.log(args)
 
     return {

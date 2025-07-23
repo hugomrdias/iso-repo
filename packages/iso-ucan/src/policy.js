@@ -100,7 +100,7 @@ function deepEqual(a, b) {
     const keys = Object.keys(a)
     if (keys.length !== Object.keys(b).length) return false
     for (const key of keys) {
-      // biome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
+      // biome-ignore lint/suspicious/noPrototypeBuiltins: needed
       if (!b.hasOwnProperty(key) || !deepEqual(a[key], b[key])) return false
     }
     return true
@@ -251,7 +251,7 @@ function evaluateStatement(args, statement) {
       default:
         return false // Unknown operator
     }
-  } catch (e) {
+  } catch {
     // As per the spec, if a selector cannot be resolved, the statement MUST return false.
     return false
   }

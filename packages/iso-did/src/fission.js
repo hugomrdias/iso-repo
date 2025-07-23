@@ -1,9 +1,6 @@
 import { resolve } from 'iso-web/doh'
 
 import { parse } from './index.js'
-// @ts-ignore
-// eslint-disable-next-line no-unused-vars
-import * as T from './types.js'
 
 /** @type {import('did-resolver').DIDResolver} */
 export async function didFissionResolver(did, parsedDid) {
@@ -54,7 +51,6 @@ export async function didFissionResolver(did, parsedDid) {
       error: 'notFound',
       message: records.error?.message,
     },
-    // eslint-disable-next-line unicorn/no-null
     didDocument: null,
   }
 }

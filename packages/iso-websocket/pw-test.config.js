@@ -1,4 +1,3 @@
-/* eslint-disable n/no-callback-literal */
 import { WebSocketServer } from 'ws'
 
 /**
@@ -6,12 +5,13 @@ import { WebSocketServer } from 'ws'
  */
 let server
 
-/** @type {import('playwright-test').RunnerOptions} */
+/** @type {Partial<import('playwright-test').RunnerOptions>} */
 const config = {
   beforeTests() {
     server = new WebSocketServer({
       port: 8080,
       verifyClient: (info, cb) => {
+        // @ts-ignore
         const url = new URL(info.req.url, `http://${info.req.headers.host}`)
 
         if (url.pathname.startsWith('/timeout')) {
@@ -25,9 +25,11 @@ const config = {
     })
 
     server.on('connection', (socket, req) => {
+      // @ts-ignore
       const url = new URL(req.url, `http://${req.headers.host}`)
       const query = url.searchParams
 
+      // biome-ignore lint/suspicious/noConsole: needed
       socket.on('error', console.error)
 
       if (query.get('exitCode')) {
@@ -60,6 +62,7 @@ const config = {
         }
       })
     })
+    return Promise.resolve()
   },
 
   afterTests() {
@@ -68,6 +71,7 @@ const config = {
     }
     server.removeAllListeners()
     server.close()
+    return Promise.resolve()
   },
 }
 

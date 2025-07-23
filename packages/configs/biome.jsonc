@@ -1,67 +1,79 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.2/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "root": false,
   "files": {
-    "ignore": [
-      "**/node_modules",
-      "**/dist",
-      "**/package-lock.json",
-      "**/yarn.lock",
-      "**/pnpm-lock.yaml",
-      "**/bun.lockb",
-
-      "**/output",
-      "**/coverage",
-      "**/temp",
-      "**/.temp",
-      "**/tmp",
-      "**/.tmp",
-      "**/.history",
-      "**/.vitepress/cache",
-      "**/.nuxt",
-      "**/.next",
-      "**/.vercel",
-      "**/.changeset",
-      "**/.idea",
-      "**/.cache",
-      "**/.output",
-      "**/.vite-inspect",
-      "**/.yarn",
-
-      "**/CHANGELOG*.md",
-      "**/*.min.*",
-      "**/LICENSE*",
-      "**/__snapshots__",
-      "**/auto-import?(s).d.ts",
-      "**/components.d.ts",
-      "**/mockServiceWorker.js"
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/package-lock.json",
+      "!**/yarn.lock",
+      "!**/pnpm-lock.yaml",
+      "!**/bun.lockb",
+      "!**/output",
+      "!**/coverage",
+      "!**/temp",
+      "!**/.temp",
+      "!**/tmp",
+      "!**/.tmp",
+      "!**/.history",
+      "!**/.vitepress/cache",
+      "!**/.nuxt",
+      "!**/.next",
+      "!**/.vercel",
+      "!**/.changeset",
+      "!**/.idea",
+      "!**/.cache",
+      "!**/.output",
+      "!**/.vite-inspect",
+      "!**/.yarn",
+      "!**/CHANGELOG*.md",
+      "!**/*.min.*",
+      "!**/LICENSE*",
+      "!**/__snapshots__",
+      "!**/components.d.ts",
+      "!**/mockServiceWorker.js"
     ]
   },
   "vcs": {
     "clientKind": "git",
     "enabled": true,
-    "useIgnoreFile": true
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
   },
   "formatter": {
     "enabled": true,
-    "formatWithErrors": false,
+    "formatWithErrors": true,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf",
     "lineWidth": 80,
     "attributePosition": "auto",
-    "ignore": ["**/package.json"]
+    "includes": ["**"]
   },
-  "organizeImports": { "enabled": true },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on",
+        "useSortedAttributes": "on",
+        "useSortedKeys": "off"
+      }
+    }
+  },
   "linter": {
     "enabled": true,
+    "domains": {
+      "test": "recommended"
+    },
     "rules": {
       "recommended": true,
       "complexity": {
         "useSimpleNumberKeys": "off"
       },
       "correctness": {
-        "noNewSymbol": "error",
-        "noUnusedVariables": "warn"
+        "noUnusedVariables": "warn",
+        "noInvalidBuiltinInstantiation": "error"
       },
       "style": {
         "noNamespace": "error",
@@ -69,7 +81,12 @@
         "noParameterAssign": "off",
         "noRestrictedGlobals": {
           "level": "error",
-          "options": { "deniedGlobals": ["global", "self"] }
+          "options": {
+            "deniedGlobals": {
+              "global": "TODO: Add a custom message here.",
+              "self": "TODO: Add a custom message here."
+            }
+          }
         },
         // "useBlockStatements": "error",
         "useCollapsedElseIf": "error",
@@ -91,9 +108,9 @@
       "suspicious": {
         "noAssignInExpressions": "warn",
         "noExportsInTest": "off",
-        "noConsoleLog": "warn",
         "noEmptyBlockStatements": "error",
-        "useAwait": "warn"
+        "useAwait": "warn",
+        "noConsole": { "level": "warn" }
       }
     }
   },

@@ -1,7 +1,7 @@
 import { IOBuffer } from 'iobuffer'
 import { varint } from 'iso-base/varint'
 import { assert, suite } from 'playwright-test/taps'
-import { VARSIG, VERSION, decode, encode } from '../src/varsig.js'
+import { decode, encode, VARSIG, VERSION } from '../src/varsig.js'
 
 const test = suite('varsig')
 

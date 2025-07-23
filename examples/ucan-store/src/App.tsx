@@ -2,7 +2,7 @@ import { useState } from 'react'
 import viteLogo from '/vite.svg'
 import cloudflareLogo from './assets/Cloudflare_Logo.svg'
 import reactLogo from './assets/react.svg'
-import './App.css'
+import './app.css'
 import { client } from './client'
 
 function App() {
@@ -12,30 +12,30 @@ function App() {
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
+        <a href="https://vite.dev" rel="noreferrer" target="_blank">
+          <img alt="Vite logo" className="logo" src={viteLogo} />
         </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
+        <a href="https://react.dev" rel="noreferrer" target="_blank">
+          <img alt="React logo" className="logo react" src={reactLogo} />
         </a>
         <a
           href="https://workers.cloudflare.com/"
-          target="_blank"
           rel="noreferrer"
+          target="_blank"
         >
           <img
-            src={cloudflareLogo}
-            className="logo cloudflare"
             alt="Cloudflare logo"
+            className="logo cloudflare"
+            src={cloudflareLogo}
           />
         </a>
       </div>
       <h1>Vite + React + Cloudflare</h1>
       <div className="card">
         <button
-          type="button"
-          onClick={() => setCount((count) => count + 1)}
           aria-label="increment"
+          onClick={() => setCount((count) => count + 1)}
+          type="button"
         >
           count is {count}
         </button>
@@ -45,7 +45,7 @@ function App() {
       </div>
       <div className="card">
         <button
-          type="button"
+          aria-label="get name"
           onClick={async () => {
             const result = await client.request('/account/create', {
               type: 'object',
@@ -55,7 +55,7 @@ function App() {
             })
             setName(result.id)
           }}
-          aria-label="get name"
+          type="button"
         >
           Name from API is: {name}
         </button>
