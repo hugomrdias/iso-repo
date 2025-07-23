@@ -26,7 +26,7 @@ export function createClient(options) {
       const inv = await capability.invoke({
         args,
         iss: options.issuer,
-        sub: options.audience,
+        sub: options.audience.did,
         store: options.store,
         exp: null,
       })
