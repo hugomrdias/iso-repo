@@ -5,8 +5,12 @@ import {
   resolveHttp,
   resolvePlcDid,
 } from '../src/atp.js'
-import { parse, resolve as resolveDid } from '../src/index.js'
+import { Resolver, parse, resolve as resolveDid } from '../src/index.js'
 import { didWebResolver } from '../src/web.js'
+
+const resolver = new Resolver({
+  atp: createAtpResolver('https://plc.directory'),
+})
 
 describe('did atp ', () => {
   it('should fail with not found', async () => {
@@ -86,11 +90,7 @@ describe('did atp ', () => {
   })
 
   it('should resolve did:atp full', async () => {
-    const did2 = await resolveDid('did:atp:retr0.id', {
-      resolvers: {
-        atp: createAtpResolver('https://plc.directory'),
-      },
-    })
+    const did2 = await resolveDid('did:atp:retr0.id', resolver)
 
     assert.deepStrictEqual(did2, {
       '@context': [

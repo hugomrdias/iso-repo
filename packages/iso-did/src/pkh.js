@@ -76,7 +76,7 @@ export class DIDPkh extends DIDCore {
    * @returns {T.DIDDocument}
    */
   get document() {
-    const id = `${this.did}#blockchainAccountId`
+    const id = /** @type {T.DIDURL} */ (`${this.did}#blockchainAccountId`)
     return {
       '@context': [
         'https://www.w3.org/ns/did/v1',

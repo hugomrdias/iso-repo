@@ -9,25 +9,34 @@ import * as DidPkh from './pkh.js'
 import * as T from './types.js'
 
 import { CODE_KEY_TYPE, validateRawPublicKeyLength } from './key.js'
+
+export { Resolver } from 'did-resolver'
+
+/**
+ * Default resolver for DID resolution.
+ * Supports `did:key` and `did:pkh` methods.
+ *
+ * @type {import('did-resolver').Resolver}
+ */
+export const defaultResolver = new Resolver(
+  {
+    key: DidKey.resolver.key,
+    pkh: DidPkh.resolver.pkh,
+  },
+  { cache: true }
+)
+
 /**
  * Resolve a DID to a DID Document
  *
  * @see https://www.w3.org/TR/did-core/#resolution
  *
- * @param {T.DID} did
- * @param {T.ResolveOptions} [opts]
+ * @param {string} did
+ * @param {import('did-resolver').Resolver} [resolver]
  */
-export async function resolve(did, opts = {}) {
-  const resolver = new Resolver(
-    {
-      ...DidKey.resolver,
-      ...opts.resolvers,
-      ...DidPkh.resolver,
-    },
-    { cache: opts.cache ?? true }
-  )
-
-  const r = await resolver.resolve(did, {
+export async function resolve(did, resolver = defaultResolver) {
+  const parsed = parse(did)
+  const r = await resolver.resolve(parsed.did, {
     accept: 'application/did+ld+json,application/json',
   })
 
@@ -54,10 +63,10 @@ export function parse(did) {
  *
  * @see https://www.w3.org/TR/did-core/#did-url-dereferencing
  * @param {T.DIDURLObject} didObject
- * @param {T.ResolveOptions} [opts]
+ * @param {import('did-resolver').Resolver} [resolver]
  */
-export async function dereference(didObject, opts) {
-  const didDocument = await resolve(didObject.did, opts)
+export async function dereference(didObject, resolver = defaultResolver) {
+  const didDocument = await resolve(didObject.did, resolver)
 
   if (!didDocument) {
     throw new Error(`No DID Document found for ${didObject.did}`)
@@ -103,23 +112,30 @@ export function derefDocument(didObject, document) {
 export class DID {
   /**
    *
-   * @param {Omit<T.VerifiableDID, 'did'>} opts
+   * @param {T.VerifiableDidOptions} opts
    */
   constructor(opts) {
     this.did = opts.didObject.did
+    this.didUrl = opts.didObject.didUrl
+    this.method = opts.didObject.method
+    this.id = opts.didObject.id
+    this.path = opts.didObject.path
+    this.fragment = opts.didObject.fragment
+    this.query = opts.didObject.query
+
     this.document = opts.document
-    this.didObject = opts.didObject
     this.verifiableDid = opts.verifiableDid
+    this.didObject = opts.didObject
   }
 
   /**
    *
-   * @param {T.DIDURL} did
-   * @param {T.ResolveOptions} [opts]
+   * @param {string} did
+   * @param {import('did-resolver').Resolver} [resolver]
    */
-  static async fromString(did, opts = {}) {
+  static async fromString(did, resolver = defaultResolver) {
     const parsedDid = parse(did)
-    const document = await resolve(parsedDid.did, opts)
+    const document = await resolve(parsedDid.did, resolver)
     const method = derefDocument(parsedDid, document)
 
     if (!method) {
@@ -185,6 +201,6 @@ export class DID {
   }
 
   toString() {
-    return this.didObject.didUrl
+    return this.didUrl
   }
 }

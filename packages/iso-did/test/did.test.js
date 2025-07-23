@@ -4,9 +4,13 @@ import * as EC from 'iso-base/ec-compression'
 import { base64pad, base64url } from 'iso-base/rfc4648'
 import { setup } from 'iso-web/msw'
 import { http } from 'msw'
-import { DID, dereference, parse, resolve } from '../src/index.js'
+import { DID, Resolver, dereference, parse, resolve } from '../src/index.js'
 import { DIDKey } from '../src/key.js'
 import { didWebResolver } from '../src/web.js'
+
+const resolver = new Resolver({
+  web: didWebResolver,
+})
 
 const server = setup([
   http.get('https://localhost:3000/.well-known/did.json', () => {
@@ -189,11 +193,7 @@ describe('did', () => {
     )
     const out = await DID.fromString(
       'did:web:demo.spruceid.com#_t-v-Ep7AtkELhhvAzCCDzy1O5Bn_z1CVFv9yiRXdHY',
-      {
-        resolvers: {
-          web: didWebResolver,
-        },
-      }
+      resolver
     )
     const x = base64url.encode(out.verifiableDid.publicKey)
     assert.strictEqual(x, '2yv3J-Sf263OmwDLS9uFPTRD0PzbvfBGKLiSnPHtXIU')
@@ -209,11 +209,7 @@ describe('did', () => {
 
   it('should create a verifiable did from EC 256 jwk', async () => {
     const host = encodeURIComponent('localhost:3000')
-    const out = await DID.fromString(`did:web:${host}#key-41`, {
-      resolvers: {
-        web: didWebResolver,
-      },
-    })
+    const out = await DID.fromString(`did:web:${host}#key-41`, resolver)
     const uncompressed = EC.decompress(out.verifiableDid.publicKey)
     const x = base64url.encode(uncompressed.subarray(1, 33))
     const y = base64url.encode(uncompressed.subarray(33, 66))
@@ -223,11 +219,7 @@ describe('did', () => {
 
   it('should create a verifiable did from EC 384 jwk', async () => {
     const host = encodeURIComponent('localhost:3000')
-    const out = await DID.fromString(`did:web:${host}#key-5`, {
-      resolvers: {
-        web: didWebResolver,
-      },
-    })
+    const out = await DID.fromString(`did:web:${host}#key-5`, resolver)
     const uncompressed = EC.decompress(out.verifiableDid.publicKey, 'P-384')
     const x = base64url.encode(uncompressed.subarray(1, 49))
     const y = base64url.encode(uncompressed.subarray(49))

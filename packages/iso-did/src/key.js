@@ -138,8 +138,8 @@ export class DIDKey extends DIDCore {
 
     return new DIDKey(
       {
-        did: `${DID_KEY_PREFIX}${id}`,
-        didUrl: `${DID_KEY_PREFIX}${id}`,
+        did: /** @type {T.DID} */ (`${DID_KEY_PREFIX}${id}`),
+        didUrl: /** @type {T.DIDURL} */ (`${DID_KEY_PREFIX}${id}`),
         id,
         method: 'key',
       },
@@ -153,7 +153,7 @@ export class DIDKey extends DIDCore {
    * @returns {T.DIDDocument}
    */
   get document() {
-    const id = `${this.did}#${this.id}`
+    const id = /** @type {T.DIDURL} */ (`${this.did}#${this.id}`)
     return {
       '@context': [
         'https://www.w3.org/ns/did/v1',

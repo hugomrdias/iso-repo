@@ -5,6 +5,8 @@ import type {
   Service,
   ResolverOptions as _ResolverOptions,
 } from 'did-resolver'
+import type { Tagged } from 'type-fest'
+
 import type { JWK } from './jwk-types'
 import type { DIDKey } from './key'
 import type { DIDPkh } from './pkh'
@@ -23,13 +25,30 @@ export interface ResolveOptions {
  */
 
 /**
+ * DID string
+ */
+export type DID = Tagged<`did:${string}:${string}`, 'DID'>
+
+/**
+ * DID URL string
+ */
+export type DIDURL = Tagged<string, 'DIDURL'>
+
+/**
  * Represents a DID URL object.
  */
 export interface DIDURLObject extends Omit<ParsedDID, 'params'> {
+  /**
+   * DID String - top level DID
+   * @example "did:web:example.com"
+   */
   did: DID
+  /**
+   * DID URL string
+   * @example "did:web:example.com#fragment1?query=value"
+   */
+  didUrl: DIDURL
 }
-export type DID = `did:${string}:${string}`
-export type DIDURL = string
 
 /**
  * @see https://www.iana.org/assignments/cose/cose.xhtml#algorithms
@@ -110,16 +129,7 @@ export type DIDDocument = {
   [x in KeyCapabilitySection]?: Array<string | VerificationMethod>
 }
 
-export interface VerifiableDID {
-  /**
-   * DID String - top level DID
-   * @example "did:web:example.com"
-   */
-  did: DID
-  /**
-   * DID URL Object - parsed top level DID
-   */
-  didObject: DIDURLObject
+export interface VerifiableDID extends DIDURLObject {
   /**
    * Verifiable DID - resolved from the {@link did}
    */
@@ -128,8 +138,19 @@ export interface VerifiableDID {
    * DID Document
    */
   document: DIDDocument
+
+  /**
+   * DID URL Object
+   */
+  didObject: DIDURLObject
   /**
    * Returns the DID URL
    */
   toString: () => DIDURL
+}
+
+export interface VerifiableDidOptions {
+  verifiableDid: DIDKey | DIDPkh
+  document: DIDDocument
+  didObject: DIDURLObject
 }

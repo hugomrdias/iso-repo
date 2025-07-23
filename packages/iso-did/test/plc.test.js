@@ -1,6 +1,10 @@
 import assert from 'assert'
-import { parse, resolve } from '../src/index.js'
+import { Resolver, parse, resolve } from '../src/index.js'
 import { createPlcResolver } from '../src/plc.js'
+
+const resolver = new Resolver({
+  plc: createPlcResolver(),
+})
 
 describe('did plc ', () => {
   it('should fail with not found', async () => {
@@ -49,11 +53,7 @@ describe('did plc ', () => {
   })
 
   it('should resolve with resolver ', async () => {
-    const doc = await resolve('did:plc:ewvi7nxzyoun6zhxrhs64oiz', {
-      resolvers: {
-        plc: createPlcResolver(),
-      },
-    })
+    const doc = await resolve('did:plc:ewvi7nxzyoun6zhxrhs64oiz', resolver)
     assert.deepStrictEqual(doc, {
       '@context': [
         'https://www.w3.org/ns/did/v1',

@@ -2,9 +2,13 @@ import assert from 'assert'
 import { setup } from 'iso-web/msw'
 import { http } from 'msw'
 import { didFissionResolver, format } from '../src/fission.js'
-import { DID, parse } from '../src/index.js'
+import { DID, Resolver, parse } from '../src/index.js'
 
 const server = setup([])
+
+const resolver = new Resolver({
+  fission: didFissionResolver,
+})
 
 describe('did fission ', () => {
   before(async () => {
@@ -94,11 +98,7 @@ describe('did fission ', () => {
       capabilityInvocation: ['did:fission:localhost%3A4400#localhost%3A4400'],
     })
 
-    const did = await DID.fromString(didString, {
-      resolvers: {
-        fission: didFissionResolver,
-      },
-    })
+    const did = await DID.fromString(didString, resolver)
 
     assert.strictEqual(
       did.verifiableDid.toString(),
