@@ -59,7 +59,7 @@
     "@types/node": "^24.0.14",
     "better-sqlite3": "^12.2.0",
     "delay": "^6.0.0",
-    "playwright-test": "^14.1.7",
+    "playwright-test": "^14.1.11",
     "quick-lru": "^7.0.0",
     "tempy": "^3.1.0",
     "typescript": "5.8.3"

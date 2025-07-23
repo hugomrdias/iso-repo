@@ -127,7 +127,7 @@
     "@types/node": "^24.0.14",
     "iso-base": "workspace:^",
     "msw": "2.4.3",
-    "playwright-test": "^14.1.7",
+    "playwright-test": "^14.1.11",
     "type-fest": "^4.34.1",
     "typescript": "5.8.3"
   },

@@ -100,7 +100,7 @@
     "@types/node": "^24.0.14",
     "assert": "^2.1.0",
     "mocha": "^11.7.1",
-    "playwright-test": "^14.1.7",
+    "playwright-test": "^14.1.11",
     "type-fest": "^4.34.1",
     "typescript": "5.8.3",
     "viem": "^2.31.7"
