@@ -98,8 +98,8 @@
   },
   "files": [
     "src",
-    "dist/src/*.d.ts",
-    "dist/src/*.d.ts.map"
+    "dist/src/**/*.d.ts",
+    "dist/src/**/*.d.ts.map"
   ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",

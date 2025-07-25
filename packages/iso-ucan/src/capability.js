@@ -45,7 +45,10 @@ export class Capability {
   }
 
   /**
+   * Invoke this capability
+   *
    * @param {import("./types.js").CapabilityInvokeOptions<Schema>} options
+   * @returns {Promise<Invocation>}
    */
   async invoke(options) {
     const result = await this.schema['~standard'].validate(options.args)
@@ -68,8 +71,10 @@ export class Capability {
   }
 
   /**
+   * Create a delegation for this capability
    *
    * @param {import("./types.js").CapabilityDelegateOptions} options
+   * @returns {Promise<Delegation>}
    */
   delegate(options) {
     return Delegation.create({ ...options, cmd: this.cmd })

@@ -159,6 +159,30 @@ export class Delegation {
   toString() {
     return base64pad.encode(this.bytes)
   }
+  toJSON() {
+    return {
+      token: this.toString(),
+      cid: this.cid.toString(),
+      envelope: {
+        payload: {
+          iss: this.iss.toString(),
+          aud: this.aud.toString(),
+          sub: this.sub ? this.sub.toString() : null,
+          cmd: this.cmd,
+          pol: this.pol,
+          exp: this.exp,
+          nbf: this.nbf,
+          nonce: base64pad.encode(this.nonce),
+          meta: this.meta,
+        },
+        signature: base64pad.encode(this.envelope.signature),
+        alg: this.envelope.alg,
+        enc: this.envelope.enc,
+        spec: this.envelope.spec,
+        version: this.envelope.version,
+      },
+    }
+  }
 }
 
 /**
