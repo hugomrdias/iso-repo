@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.1.5...iso-ucan-v0.1.6) (2025-07-25)
+
+
+### Bug Fixes
+
+* **iso-ucan:** update package.json and tsconfig.json for improved type definitions and include test files ([f4c1218](https://github.com/hugomrdias/iso-repo/commit/f4c1218aebdc64c169d4163f9694d76081382b24))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.0.1...iso-ucan-v0.1.5) (2025-07-23)
 
 
