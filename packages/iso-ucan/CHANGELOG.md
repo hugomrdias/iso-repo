@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.1.6...iso-ucan-v0.2.0) (2025-07-28)
+
+
+### Features
+
+* **iso-ucan:** enhance envelope functionality with signature payload handling ([863fd43](https://github.com/hugomrdias/iso-repo/commit/863fd438d793b362620cefb3220591e35e7a56d2))
+
+
+### Bug Fixes
+
+* **iso-ucan:** return signature payload directly in getSignaturePayload ([16eb072](https://github.com/hugomrdias/iso-repo/commit/16eb072f562ce5e401116dcd17f37fe998c0f72c))
+
 ## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.1.5...iso-ucan-v0.1.6) (2025-07-25)
 
 
