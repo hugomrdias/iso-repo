@@ -12,6 +12,7 @@ import type { Policy } from './types/policy'
 
 export type { StandardSchemaV1 } from '@standard-schema/spec'
 export type { DID, DIDURL, DIDURLObject } from 'iso-did/types'
+export type { ISigner } from 'iso-signatures/types'
 export * from './types/envelope'
 export * from './types/policy'
 export * from './types/varsig'

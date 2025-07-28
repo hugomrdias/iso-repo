@@ -373,3 +373,14 @@ export function assertPolicy(policy) {
     throw new TypeError(`Invalid policy: ${pretty}`, { cause: parsed.error })
   }
 }
+
+/**
+ * A type guard for Record<PropertyKey, unknown>.
+ *
+ * @param {unknown} value - The value to check.
+ * @returns {value is Record<PropertyKey, unknown>} Whether the specified value has a runtime type of `object` and is
+ * neither `null` nor an `Array`.
+ */
+export function isObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+}

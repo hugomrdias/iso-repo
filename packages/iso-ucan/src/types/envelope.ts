@@ -88,6 +88,7 @@ export interface DelegationPayload<Args = unknown> extends PayloadBase {
 export type Payload<Args = unknown> =
   | InvocationPayload
   | DelegationPayload<Args>
+
 export type SignaturePayload<Args = unknown> = {
   h: Uint8Array
   [payloadTag: PayloadTag]: Payload<Args>
