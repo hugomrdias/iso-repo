@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.2.0...iso-ucan-v0.2.1) (2025-07-28)
+
+
+### Bug Fixes
+
+* **iso-ucan:** correct signature payload validation logic in decodeSignaturePayload ([db8bd18](https://github.com/hugomrdias/iso-repo/commit/db8bd18c6dd94605db1aa4c536d0ade37caaa07c))
+
 ## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.1.6...iso-ucan-v0.2.0) (2025-07-28)
 
 
