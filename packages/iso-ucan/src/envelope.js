@@ -33,7 +33,7 @@ export function getSignaturePayload(options) {
     [payloadTag]: payload,
   })
 
-  return cbor.encode(signaturePayload)
+  return signaturePayload
 }
 
 /**
@@ -108,7 +108,6 @@ export async function sign(options) {
     signatureType: signer.signatureType,
     payload,
   })
-
   const signature = await signer.sign(cbor.encode(signaturePayload))
   return {
     signature,
