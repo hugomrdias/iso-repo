@@ -61,7 +61,7 @@ export function decodeSignaturePayload(bytes) {
       `Invalid signature payload expected 2 keys got ${keys.length}`
     )
   }
-  if (!keys[1].startsWith('ucan/dlg') || !keys[1].startsWith('ucan/inv')) {
+  if (!keys[1].startsWith('ucan/dlg') && !keys[1].startsWith('ucan/inv')) {
     throw new TypeError('Invalid signature payload missing payload')
   }
 
