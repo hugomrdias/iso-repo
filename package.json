@@ -23,7 +23,7 @@
     "@hugomrdias/configs": "workspace:^",
     "depcheck": "^1.4.7",
     "simple-git-hooks": "^2.11.0",
-    "typedoc": "^0.28.7",
+    "typedoc": "^0.28.8",
     "typedoc-plugin-missing-exports": "^4.0.0",
     "typescript": "5.8.3"
   },
