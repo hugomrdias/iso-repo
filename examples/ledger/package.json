@@ -25,7 +25,7 @@
     "iso-passkeys": "workspace:*",
     "iso-signatures": "workspace:*",
     "ox": "^0.8.5",
-    "react-dom": "^19.1.0",
+    "react-dom": "^19.1.1",
     "react-hook-form": "^7.60.0",
     "react-hot-toast": "^2.5.2",
     "water.css": "^2.1.1"
