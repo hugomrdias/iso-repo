@@ -35,6 +35,7 @@ export const defaultResolver = new Resolver(
  */
 export async function resolve(did, resolver = defaultResolver) {
   const parsed = parse(did)
+
   const r = await resolver.resolve(parsed.did, {
     accept: 'application/did+ld+json,application/json',
   })
@@ -81,7 +82,10 @@ export async function dereference(didObject, resolver = defaultResolver) {
  * @param {T.DIDDocument} document
  */
 export function derefDocument(didObject, document) {
-  const fragment = didObject.fragment ?? didObject.id
+  let fragment = didObject.fragment ?? didObject.id
+  if (didObject.method === 'pkh') {
+    fragment = 'blockchainAccountId'
+  }
   /** @type {T.VerificationMethod | undefined} */
   let method
 
