@@ -38,6 +38,6 @@
     ]
   },
   "peerDependencies": {
-    "@biomejs/biome": "2.1.2"
+    "@biomejs/biome": "^2.1.2"
   }
 }
