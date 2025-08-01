@@ -1,7 +1,7 @@
 {
   "name": "@hugomrdias/configs",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JS tooling configs",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
