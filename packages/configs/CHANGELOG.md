@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/hugomrdias/iso-repo/compare/configs-v1.0.0...configs-v1.0.1) (2025-08-01)
+
+
+### Bug Fixes
+
+* **configs:** update peerDependency version for @biomejs/biome ([17ba511](https://github.com/hugomrdias/iso-repo/commit/17ba511bfb2737e6993ddb4ac682ac1ff26635fb))
+
 ## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/configs-v0.1.9...configs-v1.0.0) (2025-07-23)
 
 
