@@ -1,5 +1,5 @@
 {
-  "name": "ucan-store",
+  "name": "eip191",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,12 +12,17 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.83.0",
+    "filsnap-adapter": "^3.2.0",
     "iso-base": "workspace:*",
+    "iso-did": "workspace:*",
     "iso-kv": "workspace:*",
     "iso-signatures": "workspace:*",
     "iso-ucan": "workspace:*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "viem": "~2.33.0",
+    "wagmi": "^2.16.0",
     "zod": "^4.0.5"
   },
   "devDependencies": {
