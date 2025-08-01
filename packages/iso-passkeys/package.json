@@ -64,7 +64,7 @@
     "assert": "^2.1.0",
     "mocha": "^11.7.1",
     "playwright-test": "^14.1.11",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   },
   "publishConfig": {
     "provenance": true
