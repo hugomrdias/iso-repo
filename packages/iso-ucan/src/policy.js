@@ -261,7 +261,7 @@ function evaluateStatement(args, statement) {
 /**
  * Validates invocation arguments against a UCAN policy.
  *
- * @template {Record<string, unknown>} Args
+ * @template {unknown} Args
  * @param {Args} args The arguments of the eventual invocation.
  * @param {import("./types.js").Policy<Args>} policy An array of policy statements.
  * @returns {boolean} True if the args are valid according to the policy, false otherwise.

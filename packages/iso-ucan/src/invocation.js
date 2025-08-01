@@ -1,6 +1,7 @@
 import { parse as didParse } from 'iso-did'
 import { randomBytes } from 'iso-web/crypto'
 import * as Envelope from './envelope.js'
+import { validate } from './policy.js'
 import {
   assertArgs,
   assertExpiration,
@@ -58,10 +59,20 @@ export class Invocation {
     )({ envelope: bytes })
 
     if (envelope.spec !== 'inv') {
-      throw new Error(
-        `Invalid envelope type. Expected: Invocation but got: ${envelope.spec}`
+      throw new TypeError(
+        `Invalid envelope type. Expected "inv" but got "${envelope.spec}"`
       )
     }
+    // Audience or subject must match receiver
+    if (
+      envelope.payload.aud !== audience.did &&
+      envelope.payload.sub !== audience.did
+    ) {
+      throw new TypeError(
+        `UCAN Invocation audience or subject does not match receiver. Expected: ${audience.did} but got: ${envelope.payload.aud ?? envelope.payload.sub ?? 'null'}`
+      )
+    }
+
     assertStructure(envelope.payload)
     await verifySignature(
       envelope,
@@ -69,27 +80,19 @@ export class Invocation {
       options.didResolver
     )
 
-    // Audience or subject must match receiver
-    if (
-      envelope.payload.aud !== audience.did &&
-      envelope.payload.sub !== audience.did
-    ) {
-      throw new Error(
-        `UCAN Invocation audience or subject does not match receiver. Expected: ${audience.did} but got: ${envelope.payload.aud ?? envelope.payload.sub ?? 'null'}`
-      )
-    }
-
     // Resolve and validate proofs
-
     /** @type {Delegation[]} */
     const proofs = []
-    for (const proof of envelope.payload.prf) {
-      const delegation = await options.resolveProof(proof)
-      await delegation.validate(options)
-      proofs.push(delegation)
-    }
+    const iss = didParse(envelope.payload.iss)
+    if (iss.did !== envelope.payload.sub) {
+      for (const proof of envelope.payload.prf) {
+        const delegation = await options.resolveProof(proof)
+        await delegation.validate(options)
+        proofs.push(delegation)
+      }
 
-    assertProofs(envelope.payload, proofs)
+      assertProofs(envelope.payload, proofs)
+    }
 
     const _cid = await cid(envelope)
     return new Invocation(envelope, bytes, _cid, proofs)
@@ -126,7 +129,14 @@ export class Invocation {
     }
 
     assertStructure(payload)
-    assertProofs(payload, options.prf)
+
+    if (options.iss.did !== options.sub) {
+      for (const proof of options.prf) {
+        await proof.validate(options)
+      }
+
+      assertProofs(payload, options.prf)
+    }
 
     const { signature, signaturePayload } = await Envelope.sign({
       spec: 'inv',
@@ -192,6 +202,12 @@ export function assertProofs(payload, proofs) {
     const current = proofs[index].envelope.payload
     const currentAudience = didParse(current.aud)
     const currentSubject = didParse(current.sub ?? payload.sub)
+
+    if (!validate(payload.args, current.pol)) {
+      throw new Error(
+        `UCAN Invocation invalid arguments, expected ${JSON.stringify(payload.args)} to be valid for policy ${JSON.stringify(current.pol)} `
+      )
+    }
 
     const nextProof = proofs[index + 1]
     /** @type {import("./types.js").Payload} */

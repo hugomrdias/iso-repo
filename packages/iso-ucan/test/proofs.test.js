@@ -1,186 +1,157 @@
-import { MemoryDriver } from 'iso-kv/drivers/memory.js'
-import { EdDSASigner } from 'iso-signatures/signers/eddsa.js'
 import { assert, suite } from 'playwright-test/taps'
-import { z } from 'zod'
-import { Capability } from '../src/capability.js'
-import { Store } from '../src/store.js'
-
-const owner = await EdDSASigner.generate()
-const bob = await EdDSASigner.generate()
-const alice = await EdDSASigner.generate()
-const invoker = await EdDSASigner.generate()
-
-const AccountCreateCap = Capability.from({
-  schema: z.object({
-    type: z.string(),
-    properties: z
-      .object({
-        name: z.string(),
-      })
-      .strict(),
-  }),
-  cmd: '/account/create',
-})
-
-const AccountCap = Capability.from({
-  schema: z.never(),
-  cmd: '/account',
-})
-
-const TopCap = Capability.from({
-  schema: z.never(),
-  cmd: '/',
-})
+import * as mocks from './mocks.js'
 
 const proofs = suite('proofs')
 
 proofs('direct proof', async () => {
-  const store = new Store(new MemoryDriver())
+  const store = mocks.createStore()
 
-  const ownerDelegation = await AccountCap.delegate({
-    iss: owner,
-    aud: invoker.did,
-    sub: owner.did,
+  await mocks.AccountCreateCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
     pol: [],
+    store,
   })
 
-  await store.add([ownerDelegation])
-
   const proofs = await store.chain({
-    sub: owner.did,
-    aud: invoker.did,
+    sub: mocks.bob.did,
+    aud: mocks.alice.did,
     cmd: '/account/create',
+    args: {},
   })
 
   assert.equal(proofs.length, 1)
-  assert.equal(proofs[0].cmd, '/account')
-  assert.equal(proofs[0].iss, owner.did)
-  assert.equal(proofs[0].sub, owner.did)
-  assert.equal(proofs[0].aud, invoker.did)
+  assert.equal(proofs[0].cmd, '/account/create')
+  assert.equal(proofs[0].iss, mocks.bob.did)
+  assert.equal(proofs[0].sub, mocks.bob.did)
+  assert.equal(proofs[0].aud, mocks.alice.did)
 })
 
-proofs('resolve owner > bob > invoker', async () => {
-  const store = new Store(new MemoryDriver())
+proofs('resolve bob > alice > carol', async () => {
+  const store = mocks.createStore()
 
-  const ownerDelegation = await AccountCap.delegate({
-    iss: owner,
-    aud: bob.did,
-    sub: owner.did,
+  await mocks.AccountCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
     pol: [],
+    store,
   })
 
-  const bobDelegation = await AccountCreateCap.delegate({
-    iss: bob,
-    aud: invoker.did,
-    sub: owner.did,
+  await mocks.AccountCreateCap.delegate({
+    iss: mocks.alice,
+    aud: mocks.carol.did,
+    sub: mocks.bob.did,
     pol: [],
+    store,
   })
-
-  await store.add([bobDelegation, ownerDelegation])
 
   const proofs = await store.chain({
-    sub: owner.did,
-    aud: invoker.did,
+    sub: mocks.bob.did,
+    aud: mocks.carol.did,
     cmd: '/account/create',
+    args: {},
   })
 
   assert.equal(proofs.length, 2)
   assert.equal(proofs[0].cmd, '/account/create')
-  assert.equal(proofs[0].iss, bob.did)
-  assert.equal(proofs[0].sub, owner.did)
-  assert.equal(proofs[0].aud, invoker.did)
+  assert.equal(proofs[0].iss, mocks.alice.did)
+  assert.equal(proofs[0].sub, mocks.bob.did)
+  assert.equal(proofs[0].aud, mocks.carol.did)
   assert.equal(proofs[1].cmd, '/account')
-  assert.equal(proofs[1].iss, owner.did)
-  assert.equal(proofs[1].sub, owner.did)
-  assert.equal(proofs[1].aud, bob.did)
+  assert.equal(proofs[1].iss, mocks.bob.did)
+  assert.equal(proofs[1].aud, mocks.alice.did)
+  assert.equal(proofs[1].sub, mocks.bob.did)
 })
 
-proofs('resolve owner > bob(powerline) > invoker', async () => {
-  const store = new Store(new MemoryDriver())
+proofs('resolve bob > alice(powerline) > carol', async () => {
+  const store = mocks.createStore()
 
-  const ownerDelegation = await AccountCap.delegate({
-    iss: owner,
-    aud: bob.did,
-    sub: owner.did,
+  await mocks.AccountCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
     pol: [],
+    store,
   })
 
-  const bobDelegation = await AccountCreateCap.delegate({
-    iss: bob,
-    aud: invoker.did,
+  await mocks.AccountCreateCap.delegate({
+    iss: mocks.alice,
+    aud: mocks.carol.did,
     sub: null,
     pol: [],
+    store,
   })
 
-  await store.add([bobDelegation, ownerDelegation])
-
   const proofs = await store.chain({
-    sub: owner.did,
-    aud: invoker.did,
+    sub: mocks.bob.did,
+    aud: mocks.carol.did,
     cmd: '/account/create',
+    args: {},
   })
 
   assert.equal(proofs.length, 2)
   assert.equal(proofs[0].cmd, '/account/create')
-  assert.equal(proofs[0].iss, bob.did)
+  assert.equal(proofs[0].iss, mocks.alice.did)
   assert.equal(proofs[0].sub, null)
-  assert.equal(proofs[0].aud, invoker.did)
+  assert.equal(proofs[0].aud, mocks.carol.did)
   assert.equal(proofs[1].cmd, '/account')
-  assert.equal(proofs[1].iss, owner.did)
-  assert.equal(proofs[1].sub, owner.did)
-  assert.equal(proofs[1].aud, bob.did)
+  assert.equal(proofs[1].iss, mocks.bob.did)
+  assert.equal(proofs[1].sub, mocks.bob.did)
+  assert.equal(proofs[1].aud, mocks.alice.did)
 })
 
 proofs('resolve with broken branch', async () => {
-  const store = new Store(new MemoryDriver())
+  const store = mocks.createStore()
 
-  const ownerDelegation = await AccountCap.delegate({
-    iss: owner,
-    aud: bob.did,
-    sub: owner.did,
+  // valid path
+  await mocks.AccountCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
     pol: [],
+    store,
   })
 
-  const bobDelegation = await AccountCreateCap.delegate({
-    iss: bob,
-    aud: invoker.did,
-    sub: owner.did,
+  await mocks.AccountCreateCap.delegate({
+    iss: mocks.alice,
+    aud: mocks.carol.did,
+    sub: mocks.bob.did,
     pol: [],
+    store,
   })
 
-  const ownerAliceDelegation = await TopCap.delegate({
-    iss: invoker,
-    aud: alice.did,
-    sub: owner.did,
+  // broken path
+  await mocks.AccountCreateCap.delegate({
+    iss: mocks.alice,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
     pol: [],
+    store,
   })
-  const aliceDelegation = await AccountCreateCap.delegate({
-    iss: alice,
-    aud: invoker.did,
-    sub: owner.did,
+  await mocks.AccountCreateCap.delegate({
+    iss: mocks.alice,
+    aud: mocks.carol.did,
+    sub: mocks.bob.did,
     pol: [],
+    store,
   })
-
-  await store.add([
-    aliceDelegation,
-    bobDelegation,
-    ownerAliceDelegation,
-    ownerDelegation,
-  ])
 
   const proofs = await store.chain({
-    sub: owner.did,
-    aud: invoker.did,
+    sub: mocks.bob.did,
+    aud: mocks.carol.did,
     cmd: '/account/create',
+    args: {},
   })
 
   assert.equal(proofs.length, 2)
   assert.equal(proofs[0].cmd, '/account/create')
-  assert.equal(proofs[0].iss, bob.did)
-  assert.equal(proofs[0].sub, owner.did)
-  assert.equal(proofs[0].aud, invoker.did)
+  assert.equal(proofs[0].iss, mocks.alice.did)
+  assert.equal(proofs[0].sub, mocks.bob.did)
+  assert.equal(proofs[0].aud, mocks.carol.did)
   assert.equal(proofs[1].cmd, '/account')
-  assert.equal(proofs[1].iss, owner.did)
-  assert.equal(proofs[1].sub, owner.did)
-  assert.equal(proofs[1].aud, bob.did)
+  assert.equal(proofs[1].iss, mocks.bob.did)
+  assert.equal(proofs[1].sub, mocks.bob.did)
+  assert.equal(proofs[1].aud, mocks.alice.did)
 })

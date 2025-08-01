@@ -41,11 +41,11 @@ export type CborValue = CborPrimitive | CborArray | CborObject
  * Delegation
  */
 
-export interface DelegationOptions<Args = unknown> {
+export interface DelegationOptions<Schema extends StandardSchemaV1> {
   iss: ISigner
   aud: DID
   sub: DID | null
-  pol: Policy<Args>
+  pol: Policy<StandardSchemaV1.InferOutput<Schema>>
   /**
    * Expiration time in seconds or null for no expiration
    */
@@ -65,23 +65,16 @@ export interface DelegationOptions<Args = unknown> {
   meta?: CborObject
 }
 
-export interface DelegationFromOptions {
-  bytes: Uint8Array
-  isRevoked?: IsRevoked
-  didResolver?: DidResolver
-  verifierResolver: VerifierResolver
-}
-
 export interface DelegationValidateOptions {
   isRevoked?: IsRevoked
   didResolver?: DidResolver
   verifierResolver: VerifierResolver
 }
 
-export type CapabilityDelegateOptions<Args = unknown> = Omit<
-  DelegationOptions<Args>,
-  'cmd'
->
+export interface DelegationFromOptions extends DelegationValidateOptions {
+  bytes: Uint8Array
+}
+
 /**
  * Invocation
  */
@@ -89,7 +82,7 @@ export type CapabilityDelegateOptions<Args = unknown> = Omit<
 /**
  * Invocation options
  */
-export interface InvocationOptions {
+export interface InvocationOptions extends DelegationValidateOptions {
   iss: ISigner
   aud?: DID
   sub: DID
@@ -118,18 +111,50 @@ export interface InvocationOptions {
   meta?: CborObject
 }
 
-export interface InvocationFromOptions {
+export interface InvocationFromOptions extends DelegationValidateOptions {
   bytes: Uint8Array
   audience: VerifiableDID
-  didResolver?: DidResolver
-  verifierResolver: VerifierResolver
-  isRevoked?: IsRevoked
   resolveProof: ResolveProof
 }
 
+/**
+ * Capability types
+ */
+
+/**
+ * Capability options
+ */
+export interface CapabilityOptions<
+  Schema extends StandardSchemaV1,
+  Cmd extends string = string,
+> extends DelegationValidateOptions {
+  schema: Schema
+  cmd: Cmd
+}
+
+/**
+ * Delegate a capability
+ */
+export interface CapabilityDelegateOptions<Schema extends StandardSchemaV1>
+  extends Omit<DelegationOptions<Schema>, 'cmd'> {
+  /**
+   * Store to add the delegation to
+   */
+  store: Store
+}
+
+/**
+ * Invoke a capability
+ */
 export interface CapabilityInvokeOptions<Schema extends StandardSchemaV1>
-  extends Omit<InvocationOptions, 'cmd' | 'args' | 'prf'> {
+  extends Omit<
+    InvocationOptions,
+    'cmd' | 'args' | 'prf' | 'verifierResolver' | 'didResolver' | 'isRevoked'
+  > {
   args: StandardSchemaV1.InferOutput<Schema>
+  /**
+   * Store to resolve proofs from
+   */
   store: Store
 }
 
@@ -144,6 +169,7 @@ export interface StoreProofsOptions {
   aud?: DID
   sub: DID | null
   cmd: string
+  args: CborObject
 }
 
 /**

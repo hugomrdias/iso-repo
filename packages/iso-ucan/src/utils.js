@@ -94,7 +94,6 @@ export function isSigAndDidCompatible(did, sigType) {
  */
 export function assertExpiration(exp) {
   const now = nowInSeconds()
-
   if (exp !== null && !Number.isSafeInteger(exp)) {
     throw new TypeError(
       `UCAN expiration must be null or a safe integer. Received: ${exp}`
@@ -239,7 +238,7 @@ export function assertNonce(nonce) {
   }
 }
 /**
- * Assert that args is a JSON serializable object.
+ * Assert that args is a CBOR serializable object.
  *
  * @param {unknown} args
  */

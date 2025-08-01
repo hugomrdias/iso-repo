@@ -2,6 +2,7 @@ import { parse as didParse } from 'iso-did'
 import { KV } from 'iso-kv'
 import merge from 'it-merge'
 import { Delegation } from './delegation.js'
+import { validate } from './policy.js'
 
 /**
  * @import {Driver} from 'iso-kv'
@@ -94,7 +95,7 @@ export class Store {
   /**
    * List proofs by sub and aud
    *
-   * @param {import('./types.js').StoreProofsOptions} options
+   * @param {Omit<import('./types.js').StoreProofsOptions, 'args'>} options
    */
   async *proofs(options) {
     /**@type {string | null} */
@@ -133,7 +134,7 @@ export class Store {
    * @param {import('./types.js').StoreProofsOptions} options
    * @returns {Promise<Delegation[]>}
    */
-  async chain({ aud, sub, cmd }) {
+  async chain({ aud, sub, cmd, args }) {
     // console.log('🚀 ~ aud', aud, 'sub', sub, 'cmd', cmd)
     const parents = parentCmds(cmd)
 
@@ -144,6 +145,7 @@ export class Store {
 
     for await (const proof of sources) {
       if (!parents.includes(proof.cmd)) continue
+      if (!validate(args, proof.pol)) continue
 
       // If root, return this proof as the end of the path
       if (proof.sub === didParse(proof.iss).did) {
@@ -157,6 +159,7 @@ export class Store {
         aud: didParse(proof.iss).did,
         sub: proof.sub ? proof.sub : sub,
         cmd: proof.cmd,
+        args,
       })
       if (nextPath?.length) {
         return [proof, ...nextPath]

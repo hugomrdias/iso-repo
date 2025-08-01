@@ -15,7 +15,7 @@ import {
 } from './utils.js'
 
 /**
- * @import {DelegationValidateOptions, Policy, DelegationOptions, DelegationPayload, DID, DIDURL} from './types.js'
+ * @import {DelegationValidateOptions, Policy, DelegationOptions, DelegationPayload, DID, DIDURL, StandardSchemaV1} from './types.js'
  * @import {CID} from 'multiformats'
  */
 
@@ -118,12 +118,13 @@ export class Delegation {
 
   /**
    *
-   * @param {DelegationOptions & { cmd: string }} options
+   * @template {StandardSchemaV1} Schema
+   * @param {DelegationOptions<Schema>} options
    */
   static async create(options) {
     const nonce = options.nonce || randomBytes(12)
 
-    /** @type {DelegationPayload} */
+    /** @type {DelegationPayload<StandardSchemaV1.InferOutput<Schema>>} */
     const payload = {
       iss: options.iss.toString(),
       aud: options.aud,
