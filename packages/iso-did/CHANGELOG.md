@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.0.0...iso-did-v2.0.1) (2025-07-31)
+
+
+### Bug Fixes
+
+* **iso-did:** update resolve and derefDocument functions for improved handling ([78ca4b4](https://github.com/hugomrdias/iso-repo/commit/78ca4b419ac89b3773733b502ff65e70f34b1cd6))
+
 ## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v1.8.0...iso-did-v2.0.0) (2025-07-23)
 
 
