@@ -102,7 +102,7 @@
     "mocha": "^11.7.1",
     "playwright-test": "^14.1.11",
     "type-fest": "^4.34.1",
-    "typescript": "5.8.3",
+    "typescript": "5.9.2",
     "viem": "^2.33.0"
   },
   "publishConfig": {
