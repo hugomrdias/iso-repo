@@ -123,7 +123,7 @@
   "devDependencies": {
     "@types/node": "^24.1.0",
     "playwright-test": "^14.1.11",
-    "typescript": "5.9.2",
+    "typescript": "5.8.2",
     "zod": "^4.0.5"
   },
   "publishConfig": {

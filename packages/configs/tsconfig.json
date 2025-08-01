@@ -4,8 +4,8 @@
     "incremental": true,
     "composite": true,
     /* Language and Environment */
-    "target": "ES2022",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "target": "es2024",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "moduleDetection": "force",
     /* Modules */
     "module": "ESNext", // "NodeNext"
