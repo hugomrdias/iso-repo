@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.0.0...iso-did-v2.0.1) (2025-07-31)
+## [2.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.0.0...iso-did-v2.0.1) (2025-08-01)
 
 
 ### Bug Fixes
