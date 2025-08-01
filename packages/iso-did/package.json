@@ -114,7 +114,7 @@
     "msw": "2.4.3",
     "playwright-test": "^14.1.11",
     "type-fest": "^4.41.0",
-    "typescript": "5.9.2"
+    "typescript": "5.8.2"
   },
   "publishConfig": {
     "provenance": true

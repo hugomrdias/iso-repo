@@ -18,7 +18,6 @@ const typedArrayTypeNames = /** @type {const} */ ([
   'BigUint64Array',
 ])
 
-// eslint-disable-next-line unicorn/prefer-set-has
 const objectTypeNames = /** @type {const} */ ([
   'Function',
   'Generator',

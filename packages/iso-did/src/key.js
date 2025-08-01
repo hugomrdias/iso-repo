@@ -5,7 +5,6 @@ import { base58btc } from 'multiformats/bases/base58'
 import { CODE_KEY_TYPE, KEY_TYPE_CODE } from './common.js'
 import { DIDCore } from './core.js'
 
-// eslint-disable-next-line no-unused-vars
 import * as T from './types.js'
 
 export * from './common.js'
@@ -125,7 +124,7 @@ export class DIDKey extends DIDCore {
    * Create a DIDKey from a public key bytes
    *
    * @param {T.KeyType} type
-   * @param {BufferSource} key
+   * @param {Uint8Array} key
    */
   static fromPublicKey(type, key) {
     const code = KEY_TYPE_CODE[type]
