@@ -127,6 +127,7 @@ export function assertNotBefore(nbf) {
  */
 export async function validateIssuerAndSignature(envelope, didResolver) {
   const issuer = await DID.fromString(envelope.payload.iss, didResolver)
+
   if (!isSigAndDidCompatible(issuer, envelope.alg)) {
     throw new Error(
       `UCAN issuer type mismatch: DID ${issuer.verifiableDid.type} and Signature ${envelope.alg} are not compatible`

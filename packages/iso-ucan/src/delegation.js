@@ -65,6 +65,9 @@ export class Delegation {
   }
 
   /**
+   * Create a delegation from bytes and validate it
+   *
+   * Does not validate "not before" time, call {@link Delegation.validate} to validate it
    *
    * @param {import("./types.js").DelegationFromOptions} options
    */
@@ -88,6 +91,28 @@ export class Delegation {
     const _cid = await cid(envelope)
     await assertNotRevoked(_cid, options.isRevoked)
 
+    return new Delegation(envelope, bytes, _cid)
+  }
+
+  /**
+   * Create a delegation from a base64 encoded string
+   *
+   * @param {string} token
+   */
+  static async fromString(token) {
+    const bytes = base64pad.decode(token)
+    const envelope = /** @type {typeof Envelope.decode<"dlg">} */ (
+      Envelope.decode
+    )({ envelope: bytes })
+
+    if (envelope.spec !== 'dlg') {
+      throw new Error(
+        `Invalid envelope type. Expected: Delegation but got: ${envelope.spec}`
+      )
+    }
+
+    assertStructure(envelope.payload)
+    const _cid = await cid(envelope)
     return new Delegation(envelope, bytes, _cid)
   }
 
@@ -141,6 +166,10 @@ export class Delegation {
   }
 
   /**
+   * Validate a delegation
+   *
+   * Checks the structure, "not before" time, signature, and revocation status
+   *
    * @param {DelegationValidateOptions} options
    */
   async validate(options) {
@@ -159,6 +188,7 @@ export class Delegation {
   toString() {
     return base64pad.encode(this.bytes)
   }
+
   toJSON() {
     return {
       token: this.toString(),

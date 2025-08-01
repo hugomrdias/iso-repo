@@ -1,9 +1,9 @@
 import { parse as didParse } from 'iso-did'
 import { KV } from 'iso-kv'
 import merge from 'it-merge'
+import { Delegation } from './delegation.js'
 
 /**
- * @import {Delegation} from './delegation.js'
  * @import {Driver} from 'iso-kv'
  * @import {CID} from 'multiformats'
  */
@@ -43,7 +43,7 @@ export class Store {
     const cid = delegation.cid.toString()
 
     // Index by CID
-    await this.kv.set([cid], delegation, options)
+    await this.kv.set([cid], delegation.toString(), options)
 
     // Index by subject and audience
     /** @type {string | null} */
@@ -68,8 +68,14 @@ export class Store {
    *
    * @param {string} cid
    */
-  get(cid) {
-    return /** @type {typeof this.kv.get<Delegation>} */ (this.kv.get)([cid])
+  async get(cid) {
+    const str = await /** @type {typeof this.kv.get<string>} */ (this.kv.get)([
+      cid,
+    ])
+    if (!str) {
+      return undefined
+    }
+    return await Delegation.fromString(str)
   }
 
   /**
