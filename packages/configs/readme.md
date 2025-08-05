@@ -35,10 +35,7 @@ pnpm install @biomejs/biome -w -D
     "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true ."
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
-  },
-  "lint-staged": {
-    "*": "biome check --no-errors-on-unmatched --files-ignore-unknown=true"
+    "pre-commit": "pnpm exec biome check --no-errors-on-unmatched --files-ignore-unknown=true --staged"
   }
 }
 ```
