@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/configs-v1.0.1...configs-v1.1.0) (2025-08-05)
+
+
+### Features
+
+* bump version ([73de634](https://github.com/hugomrdias/iso-repo/commit/73de634160f6fc99089cca474479b78f45b84086))
+
 ## [1.0.1](https://github.com/hugomrdias/iso-repo/compare/configs-v1.0.0...configs-v1.0.1) (2025-08-01)
 
 
