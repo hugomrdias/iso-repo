@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.2.1...iso-ucan-v0.3.0) (2025-08-05)
+
+
+### Features
+
+* **iso-ucan:** add delegation creation and validation methods ([f81ab7b](https://github.com/hugomrdias/iso-repo/commit/f81ab7b08ce4517a790eeddc0b9a8384f257354c))
+* wired policy validation ([cd317bb](https://github.com/hugomrdias/iso-repo/commit/cd317bb865931d579937bd101c84b903c1fcd2dc))
+
 ## [0.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.2.0...iso-ucan-v0.2.1) (2025-07-28)
 
 
