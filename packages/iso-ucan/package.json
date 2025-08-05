@@ -121,7 +121,7 @@
     "multiformats": "^13.3.7"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.2.0",
     "delay": "^6.0.0",
     "playwright-test": "^14.1.11",
     "typescript": "5.8.2",
