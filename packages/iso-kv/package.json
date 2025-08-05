@@ -52,7 +52,7 @@
   "dependencies": {
     "conf": "^14.0.0",
     "idb-keyval": "^6.2.1",
-    "kysely": "^0.28.3"
+    "kysely": "^0.28.4"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
