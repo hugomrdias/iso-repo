@@ -2,7 +2,7 @@ import * as dagCbor from '@ipld/dag-cbor'
 import { DID } from 'iso-did'
 import { CID } from 'multiformats/cid'
 import { sha256 } from 'multiformats/hashes/sha2'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import * as Envelope from './envelope.js'
 import * as varsig from './varsig.js'

@@ -2,7 +2,7 @@ import { MemoryDriver } from 'iso-kv/drivers/memory.js'
 import { EdDSASigner } from 'iso-signatures/signers/eddsa.js'
 import { verify } from 'iso-signatures/verifiers/eddsa.js'
 import { Resolver } from 'iso-signatures/verifiers/resolver.js'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { Capability } from '../src/capability.js'
 import { Store } from '../src/store.js'
 
