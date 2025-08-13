@@ -1,5 +1,5 @@
 import { Capability } from 'iso-ucan/capability'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export const CapAccountCreate = Capability.from({
   schema: z.object({

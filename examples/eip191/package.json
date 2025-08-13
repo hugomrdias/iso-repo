@@ -23,7 +23,7 @@
     "react-dom": "^19.1.0",
     "viem": "~2.33.0",
     "wagmi": "^2.16.0",
-    "zod": "^4.0.5"
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.10.0",
