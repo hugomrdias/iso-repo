@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.2.1",
     "@types/retry": "^0.12.5",
     "@types/ws": "^8.5.14",
     "delay": "^6.0.0",
