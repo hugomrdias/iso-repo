@@ -111,20 +111,20 @@
     "@ipld/dag-cbor": "^9.2.4",
     "@standard-schema/spec": "^1.0.0",
     "@standard-schema/utils": "^0.3.0",
-    "iobuffer": "^6.0.0",
+    "iobuffer": "^6.0.1",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
     "iso-kv": "^3.0.3",
     "iso-signatures": "workspace:^",
     "iso-web": "^1.1.1",
     "it-merge": "^3.0.12",
-    "multiformats": "^13.3.7",
+    "multiformats": "^13.4.0",
     "zod": "^3.25.0"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.2.1",
     "delay": "^6.0.0",
-    "playwright-test": "^14.1.11",
+    "playwright-test": "^14.1.12",
     "typescript": "5.8.2"
   },
   "publishConfig": {
