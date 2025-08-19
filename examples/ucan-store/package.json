@@ -29,6 +29,6 @@
     "hono": "^4.9.1",
     "typescript": "~5.8.2",
     "vite": "^7.1.2",
-    "wrangler": "^4.29.1"
+    "wrangler": "^4.31.0"
   }
 }
