@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/hugomrdias/iso-repo/compare/configs-v1.1.0...configs-v1.1.1) (2025-08-26)
+
+
+### Bug Fixes
+
+* update to ts 5.9 ([9489858](https://github.com/hugomrdias/iso-repo/commit/94898582fc7335568cc632ae31d714616512e670))
+
 ## [1.1.0](https://github.com/hugomrdias/iso-repo/compare/configs-v1.0.1...configs-v1.1.0) (2025-08-05)
 
 

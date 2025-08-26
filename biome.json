@@ -1,7 +1,4 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["@hugomrdias/configs/biome"],
-  "files": {
-    "includes": ["**"]
-  }
+  "extends": ["@hugomrdias/configs/biome"]
 }
