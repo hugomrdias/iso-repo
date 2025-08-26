@@ -25,7 +25,7 @@ describe('did web ', () => {
         return Response.error()
       })
     )
-    // @ts-ignore
+    // @ts-expect-error - testing
     const out = await didWebResolver(
       'did:web:example.com',
       parse('did:web:example.com')
@@ -77,7 +77,7 @@ describe('did web ', () => {
         return Response.json(document, { status: 200 })
       })
     )
-    // @ts-ignore
+    // @ts-expect-error - testing
     const out = await didWebResolver(
       'did:web:did.actor:alice',
       parse('did:web:did.actor:alice')

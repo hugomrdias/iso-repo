@@ -15,7 +15,7 @@ const DID_KEY_PREFIX = 'did:key:'
  * Validate raw public key length
  *
  * @param {number} code
- * @param {Uint8Array} key
+ * @param {Uint8Array<ArrayBuffer>} key
  */
 export function validateRawPublicKeyLength(code, key) {
   switch (code) {
@@ -87,7 +87,7 @@ export class DIDKey extends DIDCore {
    *
    * @param {T.DIDURLObject} did
    * @param {T.KeyType} type
-   * @param {Uint8Array} key
+   * @param {Uint8Array<ArrayBuffer>} key
    */
   constructor(did, type, key) {
     super(did)
@@ -124,7 +124,7 @@ export class DIDKey extends DIDCore {
    * Create a DIDKey from a public key bytes
    *
    * @param {T.KeyType} type
-   * @param {Uint8Array} key
+   * @param {Uint8Array<ArrayBuffer>} key
    */
   static fromPublicKey(type, key) {
     const code = KEY_TYPE_CODE[type]

@@ -139,7 +139,6 @@ export async function resolve(options) {
     // resolve did:plc
     const plc = await resolvePlc({
       directory: options.directory,
-      // @ts-ignore
       parsed: parse(did),
       options: options.options,
     })
@@ -149,7 +148,7 @@ export async function resolve(options) {
       return await didWebResolver(
         `did:web:${options.parsed.id}`,
         parse(`did:web:${options.parsed.id}`),
-        // @ts-ignore
+        // @ts-expect-error - testing
         {},
         options.options
       )
@@ -161,7 +160,7 @@ export async function resolve(options) {
       didDocumentMetadata: {},
       didResolutionMetadata: {
         error: 'notFound',
-        // @ts-ignore
+        // @ts-expect-error - error.message is not typed
         message: error.message,
       },
       didDocument: null,

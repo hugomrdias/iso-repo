@@ -14,7 +14,7 @@ const resolver = new Resolver({
 
 describe('did atp ', () => {
   it('should fail with not found', async () => {
-    // @ts-ignore
+    // @ts-expect-error - testing
     const out = await createAtpResolver()(
       'did:plc:ewvi7nxzyoun6zhxrhs64oizsss',
       parse('did:plc:ewvi7nxzyoun6zhxrhs64oizsss')
@@ -57,7 +57,7 @@ describe('did atp ', () => {
     const did = await didWebResolver(
       'did:web:retr0.id',
       parse('did:web:retr0.id'),
-      // @ts-ignore
+      // @ts-expect-error - testing
       {},
       {}
     )

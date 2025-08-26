@@ -105,16 +105,16 @@
     "p-race": "^3.1.0"
   },
   "devDependencies": {
-    "@noble/hashes": "^1.7.1",
+    "@noble/hashes": "^2.0.0",
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.2.1",
+    "@types/node": "^24.3.0",
     "assert": "^2.1.0",
     "mocha": "^11.7.1",
     "msw": "2.4.3",
     "playwright-test": "^14.1.12",
     "type-fest": "^4.41.0",
-    "typescript": "5.8.2"
+    "typescript": "5.9.2"
   },
   "publishConfig": {
     "provenance": true

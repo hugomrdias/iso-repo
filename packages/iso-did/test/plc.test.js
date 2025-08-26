@@ -8,7 +8,7 @@ const resolver = new Resolver({
 
 describe('did plc ', () => {
   it('should fail with not found', async () => {
-    // @ts-ignore
+    // @ts-expect-error - testing
     const out = await createPlcResolver()(
       'did:plc:ewvi7nxzyoun6zhxrhs64oizsss',
       parse('did:plc:ewvi7nxzyoun6zhxrhs64oizsss')
@@ -20,7 +20,7 @@ describe('did plc ', () => {
 
   it('should resolve real ', async () => {
     const resolver = createPlcResolver()
-    // @ts-ignore
+    // @ts-expect-error - testing
     const result = await resolver(
       'did:plc:ewvi7nxzyoun6zhxrhs64oiz',
       parse('did:plc:ewvi7nxzyoun6zhxrhs64oiz')

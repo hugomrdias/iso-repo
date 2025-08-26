@@ -1,4 +1,5 @@
-import { sha256 } from '@noble/hashes/sha256'
+import { sha256 } from '@noble/hashes/sha2.js'
+import { utf8ToBytes } from '@noble/hashes/utils.js'
 import assert from 'assert'
 import * as EC from 'iso-base/ec-compression'
 import { base64pad, base64url } from 'iso-base/rfc4648'
@@ -199,7 +200,9 @@ describe('did', () => {
     assert.strictEqual(x, '2yv3J-Sf263OmwDLS9uFPTRD0PzbvfBGKLiSnPHtXIU')
 
     const thumbprint = base64url.encode(
-      sha256(`{"crv":"Ed25519","kty":"OKP","x":"${x}"}`)
+      /** @type {Uint8Array<ArrayBuffer>} */ (
+        sha256(utf8ToBytes(`{"crv":"Ed25519","kty":"OKP","x":"${x}"}`))
+      )
     )
     assert.strictEqual(
       thumbprint,

@@ -6,7 +6,7 @@ import { DIDKey } from '../src/key.js'
  * @typedef {import('../src/types').KeyType} PublicKeyType
  */
 
-/** @type {Record<PublicKeyType, {did: string, pub: Uint8Array}[]>} */
+/** @type {Record<PublicKeyType, {did: string, pub: Uint8Array<ArrayBuffer>}[]>} */
 const VECTORS = {
   Ed25519: [
     {

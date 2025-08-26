@@ -32,7 +32,7 @@ describe('did fission ', () => {
       })
     )
 
-    // @ts-ignore
+    // @ts-expect-error - testing
     const out = await didFissionResolver(didString, parse(didString))
 
     // eslint-disable-next-line unicorn/no-null
@@ -74,7 +74,7 @@ describe('did fission ', () => {
       })
     )
 
-    // @ts-ignore
+    // @ts-expect-error - testing
     const resolution = await didFissionResolver(didString, parse(didString))
 
     assert.deepStrictEqual(resolution.didDocument, {
