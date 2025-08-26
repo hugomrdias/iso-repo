@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.1.0...iso-base-v4.2.0) (2025-08-26)
+
+
+### Features
+
+* update to ts 5.9 ([d8f1665](https://github.com/hugomrdias/iso-repo/commit/d8f1665f308767683dc4873256a6c83eccf7ede4))
+
 ## [4.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.0.2...iso-base-v4.1.0) (2025-07-23)
 
 
