@@ -1,7 +1,7 @@
 import { setupServer } from 'msw/node'
 
 /**
- * @param {import('msw').RequestHandler[]} handlers
+ * @param {Array<import('msw').RequestHandler | import('msw').WebSocketHandler>} handlers
  */
 export function setup(handlers) {
   const server = setupServer(...handlers)
@@ -11,6 +11,7 @@ export function setup(handlers) {
      */
     start(_options) {
       server.listen()
+      return Promise.resolve()
     },
     stop() {
       server.close()
@@ -19,7 +20,7 @@ export function setup(handlers) {
       server.resetHandlers()
     },
     /**
-     * @param {import('msw').RequestHandler[]} handlers
+     * @param {Array<import('msw').RequestHandler | import('msw').WebSocketHandler>} handlers
      */
     use(...handlers) {
       server.use(...handlers)

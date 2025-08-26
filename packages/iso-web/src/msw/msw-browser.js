@@ -1,7 +1,7 @@
 import { setupWorker } from 'msw/browser'
 
 /**
- * @param {import('msw').RequestHandler[]} handlers
+ * @param {Array<import('msw').RequestHandler | import('msw').WebSocketHandler>} handlers
  */
 export function setup(handlers) {
   const server = setupWorker(...handlers)
