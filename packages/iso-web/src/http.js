@@ -217,6 +217,9 @@ export async function request(resource, options = {}) {
     fetch = globalThis.fetch.bind(globalThis),
     json,
     headers,
+    onResponse = () => {
+      // noop
+    },
   } = options
 
   // validate resource type
@@ -243,29 +246,65 @@ export async function request(resource, options = {}) {
     signal: combinedSignals,
   })
 
+  async function fn() {
+    let rsp = await fetch(request)
+
+    const result = await onResponse(rsp.clone(), request)
+
+    if (result instanceof Response) {
+      rsp = result
+    }
+
+    if (!rsp.ok) {
+      throw new HttpError({
+        response: rsp,
+        request,
+        options,
+      })
+    }
+    return rsp
+  }
+
   try {
     const response = await (retry
-      ? pRetry(
-          async () => {
-            const rsp = await fetch(request)
-            if (!rsp.ok) {
+      ? pRetry(() => fn(), {
+          retries: retry.retries,
+          factor: retry.factor ?? 2,
+          minTimeout: retry.minTimeout ?? 1000,
+          maxTimeout: retry.maxTimeout ?? Number.POSITIVE_INFINITY,
+          randomize: retry.randomize ?? false,
+          forever: retry.forever ?? false,
+          unref: retry.unref ?? false,
+          maxRetryTime: retry.maxRetryTime ?? Number.POSITIVE_INFINITY,
+          signal: combinedSignals,
+          onFailedAttempt: async (error) => {
+            const codes = retry.afterStatusCodes ?? [413, 429, 503]
+            if (HttpError.is(error) && codes.includes(error.code)) {
               // Delay if needed using Retry-After header
-              const delayValue = calculateRetryAfter(rsp)
+              const delayValue = calculateRetryAfter(error.response)
               if (delayValue > 0) {
                 await delay(delayValue, { signal: combinedSignals })
               }
-
-              throw new HttpError({
-                response: rsp,
-                request,
-                options,
-              })
             }
-            return rsp
           },
-          { ...retry, signal: combinedSignals }
-        )
-      : fetch(request))
+          shouldRetry: () => {
+            const methods = retry.methods ?? [
+              'get',
+              'put',
+              'head',
+              'delete',
+              'options',
+              'trace',
+            ]
+
+            if (methods.includes(request.method.toLowerCase())) {
+              return true
+            }
+
+            return false
+          },
+        })
+      : fn())
 
     return response.ok
       ? { result: response }
@@ -293,6 +332,12 @@ export async function request(resource, options = {}) {
       }
     }
 
+    if (HttpError.is(err)) {
+      return {
+        error: err,
+      }
+    }
+
     return {
       error: new NetworkError(err.message, { cause: err.cause }),
     }
@@ -304,7 +349,11 @@ export async function request(resource, options = {}) {
  * @param {Response} response
  */
 function calculateRetryAfter(response) {
-  const retryAfter = response.headers.get('Retry-After')
+  const retryAfter =
+    response.headers.get('Retry-After') ??
+    response.headers.get('RateLimit-Reset') ??
+    response.headers.get('X-RateLimit-Reset') ?? // github
+    response.headers.get('X-Rate-Limit-Reset') // twitter
 
   if (retryAfter === null) {
     return 0
@@ -312,8 +361,10 @@ function calculateRetryAfter(response) {
 
   let after = Number(retryAfter)
   if (Number.isNaN(after)) {
+    // is a date string
     after = Date.parse(retryAfter) - Date.now()
   } else {
+    // is a number of seconds
     after *= 1000
   }
 

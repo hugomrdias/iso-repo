@@ -4,6 +4,7 @@ import { HttpError, JsonError, RequestError, request } from '../src/http.js'
 import { setup } from '../src/msw/msw.js'
 
 const test = suite('request')
+
 const server = setup([
   http.get('https://local.dev/error', ({ request }) => {
     const params = Object.fromEntries(new URL(request.url).searchParams)
@@ -58,6 +59,40 @@ test('should request 200 with URL object ', async () => {
     assert.fail(error.message)
   } else {
     assert.deepEqual(await result.json(), { hello: 'world' })
+  }
+})
+
+test('should retry with on response hook', async () => {
+  let count = 0
+  server.use(
+    http.get('https://local.dev/poll', () => {
+      return HttpResponse.json(
+        { hello: 'world', count: count++ },
+        { status: 200 }
+      )
+    })
+  )
+  const { error, result } = await request(
+    new URL('/poll', 'https://local.dev'),
+    {
+      retry: {
+        factor: 1,
+        minTimeout: 1000,
+        retries: 3,
+      },
+      onResponse: async (response) => {
+        const data = await response.json()
+        if (data.count < 3) {
+          return Response.error()
+        }
+      },
+    }
+  )
+
+  if (error) {
+    assert.fail(error.message)
+  } else {
+    assert.deepEqual(await result.json(), { hello: 'world', count: 3 })
   }
 })
 
