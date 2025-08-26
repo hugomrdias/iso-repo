@@ -454,16 +454,16 @@ export interface COSEPublicKey {
 
 export interface COSEPublicKeyOKP extends COSEPublicKey {
   '-1': COSECRV
-  '-2': Uint8Array
+  '-2': Uint8Array<ArrayBuffer>
 }
 
 export interface COSEPublicKeyEC2 extends COSEPublicKey {
   '-1': COSECRV
-  '-2': Uint8Array
-  '-3': Uint8Array
+  '-2': Uint8Array<ArrayBuffer>
+  '-3': Uint8Array<ArrayBuffer>
 }
 
 export interface COSEPublicKeyRSA extends COSEPublicKey {
-  '-1': Uint8Array
-  '-2': Uint8Array
+  '-1': Uint8Array<ArrayBuffer>
+  '-2': Uint8Array<ArrayBuffer>
 }

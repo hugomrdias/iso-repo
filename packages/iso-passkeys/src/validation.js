@@ -11,7 +11,7 @@ import {
 } from './cose.js'
 
 /**
- * @typedef {{ authenticatorDataBytes: Uint8Array, clientDataBytes: Uint8Array, signature:Uint8Array }} AuthData
+ * @typedef {{ authenticatorDataBytes: Uint8Array<ArrayBuffer>, clientDataBytes: Uint8Array<ArrayBuffer>, signature:Uint8Array<ArrayBuffer> }} AuthData
  */
 
 /**
@@ -19,7 +19,7 @@ import {
  *
  * See https://www.w3.org/TR/webauthn-2/#sctn-signature-attestation-types
  *
- * @param {Uint8Array} signature
+ * @param {Uint8Array<ArrayBuffer>} signature
  */
 export function unwrapEC2Signature(signature) {
   const parsedSignature = AsnParser.parse(signature, ECDSASigValue)
@@ -46,7 +46,7 @@ export function unwrapEC2Signature(signature) {
  * "If the leading byte is 0x0, and the the high order bit on the second byte is not set to 0,
  * then remove the leading 0x0 byte"
  *
- * @param {Uint8Array} bytes
+ * @param {Uint8Array<ArrayBuffer>} bytes
  */
 function shouldRemoveLeadingZero(bytes) {
   return bytes[0] === 0x0 && (bytes[1] & (1 << 7)) !== 0
