@@ -1,5 +1,5 @@
 import type { IKV } from 'iso-kv'
-import type { Options } from 'p-retry'
+import type { RetryOptions } from '../types'
 
 export type RecordType =
   | 'A'
@@ -43,7 +43,7 @@ export interface ResolveOptions {
    * @example
    * { retries: 5, factor: 2, minTimeout: 1000 }
    */
-  retry?: Options
+  retry?: RetryOptions
 
   cache?: IKV
 }

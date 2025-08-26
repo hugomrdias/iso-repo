@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/suspicious/noConfusingVoidType: <explanation> */
+/** biome-ignore-all lint/suspicious/noConfusingVoidType: its fine */
 import type { Jsonifiable } from 'type-fest'
 
 export type RequestInput = URL | string
