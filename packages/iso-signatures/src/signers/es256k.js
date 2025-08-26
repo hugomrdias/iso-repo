@@ -1,6 +1,5 @@
 import { getPublicKey, signAsync, utils } from '@noble/secp256k1'
 import { base64pad, base64url } from 'iso-base/rfc4648'
-import { u8 } from 'iso-base/utils'
 import { tag, untag } from 'iso-base/varint'
 import { DID } from 'iso-did'
 import { DIDKey } from 'iso-did/key'
@@ -53,14 +52,17 @@ export class ES256KSigner extends DID {
   /**
    * Generate a new signer
    *
-   * @param {Uint8Array} [bytes]
+   * @param {Uint8Array<ArrayBuffer>} [bytes]
    */
   static generate(bytes) {
-    const privateKey = bytes || utils.randomPrivateKey()
+    const privateKey = bytes || utils.randomSecretKey()
     const publicKey = getPublicKey(privateKey)
 
     return new ES256KSigner(
-      DIDKey.fromPublicKey('secp256k1', publicKey),
+      DIDKey.fromPublicKey(
+        'secp256k1',
+        /** @type {Uint8Array<ArrayBuffer>} */ (publicKey)
+      ),
       privateKey
     )
   }
@@ -76,7 +78,11 @@ export class ES256KSigner extends DID {
     const publicKey = getPublicKey(privateKey)
 
     return new ES256KSigner(
-      didKeyOrVerifiableDID('secp256k1', publicKey, did),
+      didKeyOrVerifiableDID(
+        'secp256k1',
+        /** @type {Uint8Array<ArrayBuffer>} */ (publicKey),
+        did
+      ),
       privateKey
     )
   }
@@ -92,7 +98,11 @@ export class ES256KSigner extends DID {
     const publicKey = getPublicKey(privateKey)
 
     return new ES256KSigner(
-      didKeyOrVerifiableDID('secp256k1', publicKey, did),
+      didKeyOrVerifiableDID(
+        'secp256k1',
+        /** @type {Uint8Array<ArrayBuffer>} */ (publicKey),
+        did
+      ),
       privateKey
     )
   }
@@ -100,12 +110,11 @@ export class ES256KSigner extends DID {
   /**
    * Sign a message
    *
-   * @param {Uint8Array} message
+   * @param {Uint8Array<ArrayBuffer>} message
    */
   async sign(message) {
-    const hash = await globalThis.crypto.subtle.digest('SHA-256', message)
-    const sig = await signAsync(u8(hash), this.#privateKey)
-    return sig.toCompactRawBytes()
+    const sig = await signAsync(message, this.#privateKey)
+    return /** @type {Uint8Array<ArrayBuffer>} */ (sig)
   }
 
   /**

@@ -15,14 +15,14 @@ const SPKI_PARAMS_ENCODED = new Uint8Array([
 ])
 
 /**
- * @param {Uint8Array} key
+ * @param {Uint8Array<ArrayBuffer>} key
  */
 function encode(key) {
   return encodeSequence([SPKI_PARAMS_ENCODED, encodeBitString(key)])
 }
 
 /**
- * @param {Uint8Array} info
+ * @param {Uint8Array<ArrayBuffer>} info
  */
 function decode(info) {
   // go into the top-level SEQUENCE

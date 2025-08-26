@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/numeric-separators-style */
-import { getPublicKeyAsync, signAsync, utils } from '@noble/ed25519'
+import { getPublicKeyAsync, keygenAsync, signAsync } from '@noble/ed25519'
 import { webcrypto } from 'iso-base/crypto'
 import { base64pad, base64url } from 'iso-base/rfc4648'
 import { tag, untag } from 'iso-base/varint'
@@ -7,7 +7,6 @@ import { DID } from 'iso-did'
 import { DIDKey } from 'iso-did/key'
 import { didKeyOrVerifiableDID } from '../utils.js'
 
-// @ts-ignore
 if (!globalThis.crypto) globalThis.crypto = webcrypto
 
 /**
@@ -60,10 +59,21 @@ export class EdDSASigner extends DID {
    * @param {Uint8Array} [bytes]
    */
   static async generate(bytes) {
-    const privateKey = bytes || utils.randomPrivateKey()
-    const publicKey = await getPublicKeyAsync(privateKey)
+    let privateKey
+    let publicKey
+    if (bytes) {
+      privateKey = bytes
+      publicKey = await getPublicKeyAsync(privateKey)
+    } else {
+      const key = await keygenAsync()
+      privateKey = key.secretKey
+      publicKey = key.publicKey
+    }
     return new EdDSASigner(
-      DIDKey.fromPublicKey('Ed25519', publicKey),
+      DIDKey.fromPublicKey(
+        'Ed25519',
+        /** @type {Uint8Array<ArrayBuffer>} */ (publicKey)
+      ),
       privateKey
     )
   }
@@ -79,7 +89,11 @@ export class EdDSASigner extends DID {
     const publicKey = await getPublicKeyAsync(privateKey)
 
     return new EdDSASigner(
-      didKeyOrVerifiableDID('Ed25519', publicKey, did),
+      didKeyOrVerifiableDID(
+        'Ed25519',
+        /** @type {Uint8Array<ArrayBuffer>} */ (publicKey),
+        did
+      ),
       privateKey
     )
   }
@@ -103,10 +117,12 @@ export class EdDSASigner extends DID {
   /**
    * Sign a message
    *
-   * @param {Uint8Array} message
+   * @param {Uint8Array<ArrayBuffer>} message
    */
   sign(message) {
-    return signAsync(message, this.#privateKey)
+    return /** @type {Promise<Uint8Array<ArrayBuffer>>} */ (
+      signAsync(message, this.#privateKey)
+    )
   }
 
   /**

@@ -10,7 +10,7 @@ export type SignatureType =
   | 'EIP191'
 
 export interface Sign {
-  sign: (message: Uint8Array) => Promise<Uint8Array>
+  sign: (message: Uint8Array<ArrayBuffer>) => Promise<Uint8Array<ArrayBuffer>>
 }
 
 export interface ISigner<Export extends CryptoKeyPair | string = string>
@@ -21,8 +21,8 @@ export interface ISigner<Export extends CryptoKeyPair | string = string>
 }
 
 export interface VerifyInput {
-  signature: Uint8Array
-  message: Uint8Array
+  signature: Uint8Array<ArrayBuffer>
+  message: Uint8Array<ArrayBuffer>
   did: VerifiableDID
 }
 export type Verify = (input: VerifyInput) => Promise<boolean>

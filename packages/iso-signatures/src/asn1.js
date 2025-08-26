@@ -13,7 +13,6 @@ export const UNUSED_BIT_PAD = 0x00
 
 /**
  * @param {number} length
- * @returns {Uint8Array}
  */
 export const encodeDERLength = (length) => {
   if (length <= 127) {
@@ -31,9 +30,8 @@ export const encodeDERLength = (length) => {
 }
 
 /**
- * @param {Uint8Array} bytes
+ * @param {Uint8Array<ArrayBuffer>} bytes
  * @param {number} offset
- * @returns {{number: number, consumed: number}}
  */
 export const readDERLength = (bytes, offset = 0) => {
   if ((bytes[offset] & 0x80) === 0) {
@@ -58,10 +56,9 @@ export const readDERLength = (bytes, offset = 0) => {
 }
 
 /**
- * @param {Uint8Array} input
+ * @param {Uint8Array<ArrayBuffer>} input
  * @param {number} expectedTag
  * @param {number} position
- * @returns {number}
  */
 export const skip = (input, expectedTag, position) => {
   const parsed = into(input, expectedTag, position)
@@ -69,10 +66,9 @@ export const skip = (input, expectedTag, position) => {
 }
 
 /**
- * @param {Uint8Array} input
+ * @param {Uint8Array<ArrayBuffer>} input
  * @param {number} expectedTag
  * @param {number} offset
- * @returns {{ position: number, length: number }}
  */
 export const into = (input, expectedTag, offset) => {
   const actualTag = input[offset]
@@ -94,7 +90,7 @@ export const into = (input, expectedTag, offset) => {
 }
 
 /**
- * @param {Uint8Array} input
+ * @param {Uint8Array<ArrayBuffer>} input
  */
 export const encodeBitString = (input) => {
   // encode input length + 1 for unused bit pad
@@ -127,7 +123,7 @@ export const encodeBitString = (input) => {
 }
 
 /**
- * @param {Uint8Array} input
+ * @param {Uint8Array<ArrayBuffer>} input
  */
 export const encodeOctetString = (input) => {
   // encode input length
@@ -151,7 +147,7 @@ export const encodeOctetString = (input) => {
 }
 
 /**
- * @param {Uint8Array[]} sequence
+ * @param {Uint8Array<ArrayBuffer>[]} sequence
  */
 export const encodeSequence = (sequence) => {
   // calculate bytelength for all the parts
@@ -186,7 +182,7 @@ export const encodeSequence = (sequence) => {
 }
 
 /**
- * @param {Uint8Array} bytes
+ * @param {Uint8Array<ArrayBuffer>} bytes
  * @param {number} offset
  */
 export const readSequence = (bytes, offset = 0) => {
@@ -196,7 +192,7 @@ export const readSequence = (bytes, offset = 0) => {
 }
 
 /**
- * @param {Uint8Array} input
+ * @param {Uint8Array<ArrayBuffer>} input
  */
 export const encodeInt = (input) => {
   const extra = input.byteLength === 0 || input[0] & 0x80 ? 1 : 0
@@ -233,33 +229,28 @@ export const encodeInt = (input) => {
 }
 
 /**
- * @param {Uint8Array} bytes
+ * @param {Uint8Array<ArrayBuffer>} bytes
  * @param {number} offset
- * @returns {number}
  */
 
 export const enterSequence = (bytes, offset = 0) =>
   into(bytes, SEQUENCE_TAG, offset).position
 
 /**
- * @param {Uint8Array} bytes
+ * @param {Uint8Array<ArrayBuffer>} bytes
  * @param {number} offset
- * @returns {number}
  */
 export const skipSequence = (bytes, offset = 0) =>
   skip(bytes, SEQUENCE_TAG, offset)
 
 /**
- * @param {Uint8Array} bytes
+ * @param {Uint8Array<ArrayBuffer>} bytes
  * @param {number} offset
- * @returns {number}
  */
 export const skipInt = (bytes, offset = 0) => skip(bytes, INT_TAG, offset)
 
 /**
- * @param {Uint8Array} bytes
- * @param {number} offset
- * @returns {Uint8Array}
+ * @param {Uint8Array<ArrayBuffer>} bytes
  */
 export const readBitString = (bytes, offset = 0) => {
   const { position, length } = into(bytes, BITSTRING_TAG, offset)
@@ -279,9 +270,8 @@ export const readBitString = (bytes, offset = 0) => {
 }
 
 /**
- * @param {Uint8Array} bytes
+ * @param {Uint8Array<ArrayBuffer>} bytes
  * @param {number} byteOffset
- * @returns {Uint8Array}
  */
 export const readInt = (bytes, byteOffset = 0) => {
   const { position, length } = into(bytes, INT_TAG, byteOffset)
@@ -300,9 +290,8 @@ export const readInt = (bytes, byteOffset = 0) => {
 }
 
 /**
- * @param {Uint8Array} bytes
+ * @param {Uint8Array<ArrayBuffer>} bytes
  * @param {number} offset
- * @returns {Uint8Array}
  */
 export const readOctetString = (bytes, offset = 0) => {
   const { position, length } = into(bytes, OCTET_STRING_TAG, offset)
@@ -311,9 +300,9 @@ export const readOctetString = (bytes, offset = 0) => {
 }
 
 /**
- * @typedef {(bytes:Uint8Array, offset:number) => Uint8Array} Reader
+ * @typedef {(bytes:Uint8Array<ArrayBuffer>, offset:number) => Uint8Array<ArrayBuffer>} Reader
  * @param {[Reader, ...Reader[]]} readers
- * @param {Uint8Array} source
+ * @param {Uint8Array<ArrayBuffer>} source
  * @param {number} byteOffset
  */
 export const readSequenceWith = (readers, source, byteOffset = 0) => {

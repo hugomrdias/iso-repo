@@ -1,7 +1,6 @@
-import { verify as secpVerify } from '@noble/secp256k1'
+import { verifyAsync as secpVerify } from '@noble/secp256k1'
 import { webcrypto } from 'iso-base/crypto'
 import { decompress, isCompressed } from 'iso-base/ec-compression'
-import { u8 } from 'iso-base/utils'
 import { createEcdsaParams } from '../signers/ecdsa.js'
 
 /**
@@ -45,9 +44,7 @@ async function es256kVerify({ signature, message, did }) {
     throw new Error('Invalid signature length')
   }
 
-  const hash = await globalThis.crypto.subtle.digest('SHA-256', message)
-
-  return secpVerify(signature, u8(hash), did.verifiableDid.publicKey)
+  return await secpVerify(signature, message, did.verifiableDid.publicKey)
 }
 
 /** @type {import('../types.js').Verifier<'ES256' | 'ES384' | 'ES512' | 'ES256K'>} */

@@ -132,7 +132,7 @@ export class RSASigner extends DID {
   /**
    * Sign a message
    *
-   * @param {Uint8Array} message
+   * @param {Uint8Array<ArrayBuffer>} message
    */
   async sign(message) {
     const buf = await webcrypto.subtle.sign(

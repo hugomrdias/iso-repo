@@ -32,7 +32,7 @@ describe('Verifier ES256K', () => {
     assert.equal(sig.length, 64)
 
     const verified = await ECDSA.verify('ES256K', {
-      signature: sig,
+      signature: /** @type {Uint8Array<ArrayBuffer>} */ (sig),
       message: msg,
       did: signer,
     })

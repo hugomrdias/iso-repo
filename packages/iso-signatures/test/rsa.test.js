@@ -51,7 +51,7 @@ RSAPublicKey ::= SEQUENCE {
 ```
  * https://www.rfc-editor.org/rfc/rfc8017#appendix-A.1.1
  *
- * @param {Uint8Array[]} param0
+ * @param {Uint8Array<ArrayBuffer>[]} param0
  */
 function encode([n, e]) {
   return encodeSequence([encodeInt(n), encodeInt(e)])
