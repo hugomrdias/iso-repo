@@ -16,7 +16,6 @@ import { isBufferSource, u8 } from './utils.js'
  * @param {string} string - Encoded string
  * @param {string} alphabet - Alphabet
  * @param {number} bitsPerChar - Bits per character
- * @returns {Uint8Array} - Decoded data
  */
 const decode = (string, alphabet, bitsPerChar) => {
   // Build the character lookup table:
@@ -72,7 +71,6 @@ const decode = (string, alphabet, bitsPerChar) => {
  * @param {string} alphabet - Alphabet
  * @param {number} bitsPerChar - Bits per character
  * @param {boolean} pad - Pad
- * @returns {string} - Encoded string
  */
 const encode = (data, alphabet, bitsPerChar, pad) => {
   const mask = (1 << bitsPerChar) - 1

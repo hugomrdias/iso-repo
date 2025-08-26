@@ -39,7 +39,9 @@ export function baseX(base) {
         input = utf8.encode(input)
       }
 
-      return _baseX(alphabet).decode(input)
+      return /** @type {Uint8Array<ArrayBuffer>} */ (
+        _baseX(alphabet).decode(input)
+      )
     },
   }
 }

@@ -74,7 +74,7 @@ export function isCompressed(key) {
 }
 
 /**
- * @param {Uint8Array} key
+ * @param {Uint8Array<ArrayBuffer>} key
  */
 export function isUncompressed(key) {
   return key[0] === 0x04
@@ -83,7 +83,7 @@ export function isUncompressed(key) {
 /**
  * Elliptic Curve point compression
  *
- * @param { Uint8Array } pubkeyBytes
+ * @param { Uint8Array<ArrayBuffer> } pubkeyBytes
  */
 export function compress(pubkeyBytes) {
   if (!isUncompressed(pubkeyBytes)) {
@@ -105,7 +105,7 @@ export function compress(pubkeyBytes) {
 /**
  * Elliptic Curve point decompression
  *
- * @param {Uint8Array} comp - Compressed public key. 1st byte: 0x02 for even or 0x03 for odd. Following curve size n bytes: x coordinate expressed as big-endian.
+ * @param {Uint8Array<ArrayBuffer>} comp - Compressed public key. 1st byte: 0x02 for even or 0x03 for odd. Following curve size n bytes: x coordinate expressed as big-endian.
  * @param {Curve} curve
  */
 export function decompress(comp, curve = 'P-256') {
@@ -148,7 +148,7 @@ const pIdentSecp256k1 = (primeSecp256k1 + 1n) / 4n
 /**
  * secp256k1 decompression
  *
- * @param {Uint8Array} compressed
+ * @param {Uint8Array<ArrayBuffer>} compressed
  */
 export function decompressSecp256k1(compressed) {
   const signY = BigInt(compressed[0] - 2)

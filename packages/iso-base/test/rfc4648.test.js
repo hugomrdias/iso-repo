@@ -53,7 +53,7 @@ const VECTORS = [
 
 describe('decode', () => {
   for (const [base, input, output] of VECTORS) {
-    // @ts-ignore
+    // @ts-expect-error - testing
     const codec = /** @type {import('../src/types.js').Codec} */ (BASES[base])
     it(`${base}: ${input}`, () => {
       assert.deepStrictEqual(codec.decode(output), utf8.decode(input))
@@ -63,7 +63,7 @@ describe('decode', () => {
 
 describe('encode', () => {
   for (const [base, input, output] of VECTORS) {
-    // @ts-ignore
+    // @ts-expect-error - testing
     const codec = /** @type {import('../src/types.js').Codec} */ (BASES[base])
 
     it(`${base}: ${input}`, () => {
@@ -74,7 +74,7 @@ describe('encode', () => {
 
 describe('encode/decode', () => {
   for (const [base, input] of VECTORS) {
-    // @ts-ignore
+    // @ts-expect-error - testing
     const codec = /** @type {import('../src/types.js').Codec} */ (BASES[base])
 
     it(`${base}: ${input}`, () => {

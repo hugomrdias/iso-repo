@@ -19,7 +19,7 @@ export interface Codec {
    * @param pad - Should have padding. Defaults: true
    */
   encode: (data: BufferSource | string, pad?: boolean) => string
-  decode: (data: BufferSource | string) => Uint8Array
+  decode: (data: BufferSource | string) => Uint8Array<ArrayBuffer>
 }
 
 /**
