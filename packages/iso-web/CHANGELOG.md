@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.1.1...iso-web-v1.2.0) (2025-08-26)
+
+
+### Features
+
+* enhance request function with onResponse hook and retry options ([9d78bd2](https://github.com/hugomrdias/iso-repo/commit/9d78bd2c3deb60d6bc2b47e03b2a1fc61650e7a1))
+
 ## [1.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.1.0...iso-web-v1.1.1) (2025-03-28)
 
 
