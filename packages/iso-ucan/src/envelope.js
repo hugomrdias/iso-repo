@@ -108,7 +108,9 @@ export async function sign(options) {
     signatureType: signer.signatureType,
     payload,
   })
-  const signature = await signer.sign(cbor.encode(signaturePayload))
+  const signature = await signer.sign(
+    /** @type {Uint8Array<ArrayBuffer>} */ (cbor.encode(signaturePayload))
+  )
   return {
     signature,
     signaturePayload,
@@ -127,7 +129,7 @@ export function encode(options) {
 
   const envelope = [signature, signaturePayload]
 
-  return cbor.encode(envelope)
+  return /** @type {Uint8Array<ArrayBuffer>} */ (cbor.encode(envelope))
 }
 
 /**

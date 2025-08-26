@@ -28,7 +28,7 @@ export type CborPrimitive =
   | boolean
   | null
   | bigint
-  | Uint8Array
+  | Uint8Array<ArrayBuffer>
   | ArrayBuffer
 export type CborArray = CborValue[] | readonly CborValue[]
 export type CborObject =
@@ -60,7 +60,7 @@ export interface DelegationOptions<Schema extends StandardSchemaV1> {
    * Delegation is not valid before this time
    */
   nbf?: number
-  nonce?: Uint8Array
+  nonce?: Uint8Array<ArrayBuffer>
   cmd: string
   meta?: CborObject
 }
@@ -72,7 +72,7 @@ export interface DelegationValidateOptions {
 }
 
 export interface DelegationFromOptions extends DelegationValidateOptions {
-  bytes: Uint8Array
+  bytes: Uint8Array<ArrayBuffer>
 }
 
 /**
@@ -106,13 +106,13 @@ export interface InvocationOptions extends DelegationValidateOptions {
    */
   iat?: number
   nbf?: number
-  nonce?: Uint8Array
+  nonce?: Uint8Array<ArrayBuffer>
   cause?: CID
   meta?: CborObject
 }
 
 export interface InvocationFromOptions extends DelegationValidateOptions {
-  bytes: Uint8Array
+  bytes: Uint8Array<ArrayBuffer>
   audience: VerifiableDID
   resolveProof: ResolveProof
 }

@@ -32,7 +32,7 @@ export interface PayloadBase {
    * The nonce of the UCAN
    * @see https://github.com/ucan-wg/spec#nonce
    */
-  nonce: Uint8Array
+  nonce: Uint8Array<ArrayBuffer>
   /**
    * Meta (asserted, signed data) — is not delegated authority
    */
@@ -90,17 +90,20 @@ export type Payload<Args = unknown> =
   | DelegationPayload<Args>
 
 export type SignaturePayload<Args = unknown> = {
-  h: Uint8Array
+  h: Uint8Array<ArrayBuffer>
   [payloadTag: PayloadTag]: Payload<Args>
 }
 
-export type Envelope<Args = unknown> = [Uint8Array, SignaturePayload<Args>]
+export type Envelope<Args = unknown> = [
+  Uint8Array<ArrayBuffer>,
+  SignaturePayload<Args>,
+]
 
 /**
  * @see https://github.com/ucan-wg/spec#envelope
  */
 export type EnvelopeEncodeOptions = {
-  signature: Uint8Array
+  signature: Uint8Array<ArrayBuffer>
   signaturePayload: SignaturePayload
 }
 
@@ -119,13 +122,13 @@ export interface EnvelopeSignOptions {
 }
 
 export interface EnvelopeDecodeOptions {
-  envelope: Uint8Array
+  envelope: Uint8Array<ArrayBuffer>
 }
 
 export type DecodedEnvelope<Spec extends PayloadSpec> = {
   alg: VarsigAlgorithm
   enc: VarsigEncoding
-  signature: Uint8Array
+  signature: Uint8Array<ArrayBuffer>
   payload: Spec extends 'dlg' ? DelegationPayload : InvocationPayload
   spec: Spec
   version: string
