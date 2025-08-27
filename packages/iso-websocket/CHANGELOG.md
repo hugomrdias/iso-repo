@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.3.0...iso-websocket-v0.4.0) (2025-08-27)
+
+
+### Features
+
+* update to ts 5.9 ([5f1e4b6](https://github.com/hugomrdias/iso-repo/commit/5f1e4b6bb7c70a15b5a6d34d34f109db004115da))
+
 ## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.2.0...iso-websocket-v0.3.0) (2024-07-23)
 
 
