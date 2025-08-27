@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.4.0...iso-signatures-v0.5.0) (2025-08-27)
+
+
+### Features
+
+* update to ts 5.9 ([6302e90](https://github.com/hugomrdias/iso-repo/commit/6302e90ff8970b087a4bd0d5c7082aea18cd9b54))
+
 ## [0.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.3.2...iso-signatures-v0.4.0) (2025-07-23)
 
 

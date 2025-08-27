@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.2.0...iso-web-v1.3.0) (2025-08-27)
+
+
+### Features
+
+* update to ts 5.9 ([e1012fb](https://github.com/hugomrdias/iso-repo/commit/e1012fb008ae79d921c36df9e5faae4131fdfd93))
+
 ## [1.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.1.1...iso-web-v1.2.0) (2025-08-26)
 
 
