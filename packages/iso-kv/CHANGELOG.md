@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.0.3...iso-kv-v3.1.0) (2025-08-26)
+
+
+### Features
+
+* update to ts 5.9 ([6df34c7](https://github.com/hugomrdias/iso-repo/commit/6df34c7720376fe98badbf0a4ed12325fda65fed))
+
 ## [3.0.3](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.0.2...iso-kv-v3.0.3) (2024-05-16)
 
 
