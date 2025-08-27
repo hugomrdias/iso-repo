@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.0.1...iso-did-v2.1.0) (2025-08-27)
+
+
+### Features
+
+* update to ts 5.9 ([7901c75](https://github.com/hugomrdias/iso-repo/commit/7901c754c541cfe06fce73ee243a7118bc9b1aef))
+
 ## [2.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.0.0...iso-did-v2.0.1) (2025-08-01)
 
 
