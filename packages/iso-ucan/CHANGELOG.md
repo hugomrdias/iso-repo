@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.3.0...iso-ucan-v0.4.0) (2025-08-27)
+
+
+### Features
+
+* update to ts 5.9 ([68cfb3b](https://github.com/hugomrdias/iso-repo/commit/68cfb3b3ddfea1ed88a21f002f3db551bacc97bb))
+
 ## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.2.1...iso-ucan-v0.3.0) (2025-08-13)
 
 
