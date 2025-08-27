@@ -1,7 +1,7 @@
 {
   "name": "iso-passkeys",
   "type": "module",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Passkeys tooling.",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",

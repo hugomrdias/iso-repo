@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.2.2...iso-passkeys-v0.3.0) (2025-08-27)
+
+
+### Features
+
+* update to ts 5.9 ([cd6a5cf](https://github.com/hugomrdias/iso-repo/commit/cd6a5cfcdeaf7dcc614b50d30ba0f8b82e304e06))
+
 ## [0.2.2](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.2.1...iso-passkeys-v0.2.2) (2023-09-05)
 
 
