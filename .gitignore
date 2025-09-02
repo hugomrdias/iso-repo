@@ -31,5 +31,6 @@ kv-data
 *.sw?
 
 docs
+!packages/docs
 target
 Cargo.lock

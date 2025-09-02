@@ -38,7 +38,8 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-websocket')  ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ucan') ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/configs') 
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/configs') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/docs')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -69,5 +70,6 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-web') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-websocket') ||
-      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ucan')
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ucan') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/docs')
     uses: ./.github/workflows/reusable-docs.yml
