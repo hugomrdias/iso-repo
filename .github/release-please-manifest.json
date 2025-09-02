@@ -8,5 +8,5 @@
   "packages/iso-websocket": "0.4.0",
   "packages/iso-ucan": "0.4.0",
   "packages/configs": "1.1.1",
-  "packages/docs": "0.0.1"
+  "packages/docs": "0.1.5"
 }
