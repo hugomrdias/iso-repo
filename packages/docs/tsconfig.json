@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": ["docs-plugin.ts"],
+  "exclude": ["node_modules", "dist", "out"],
+  "typedocOptions": {
+    "entryPointStrategy": "resolve",
+    "entryPoints": ["docs-plugin.ts"],
+    "includeVersion": true,
+    "excludeExternals": true,
+    "internalModule": "<internal>"
+  }
+}

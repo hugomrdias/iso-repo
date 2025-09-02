@@ -1,0 +1,50 @@
+{
+  "name": "@hugomrdias/docs",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Docs for iso-repo",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/docs"
+  },
+  "keywords": [
+    "docs",
+    "typescript",
+    "config",
+    "tooling"
+  ],
+  "exports": {
+    "./starlight-typedoc": "./docs-plugin.ts"
+  },
+  "files": [
+    "docs-plugin.ts"
+  ],
+  "scripts": {
+    "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true",
+    "test": "pnpm run lint"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "5.9.2"
+  },
+  "publishConfig": {
+    "provenance": false
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*"
+    ]
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.35.2",
+    "astro": "^5.13.5",
+    "github-slugger": "^2.0.0",
+    "typedoc-plugin-markdown": "^4.8.1",
+    "yaml": "^2.8.1"
+  }
+}
