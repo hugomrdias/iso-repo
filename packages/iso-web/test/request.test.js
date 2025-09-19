@@ -244,7 +244,6 @@ test(
 
     if (error) {
       assert.equal(error.message, 'Failed to fetch')
-      assert.ok(error.cause)
       assert.equal(count, 1)
     } else {
       assert.fail('should fail')

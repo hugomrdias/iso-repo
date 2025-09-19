@@ -124,11 +124,11 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^24.3.0",
+    "@types/node": "^24.5.2",
     "iso-base": "workspace:^",
     "msw": "2.10.5",
     "playwright-test": "^14.1.12",
-    "type-fest": "^4.34.1",
+    "type-fest": "^5.0.1",
     "typescript": "5.9.2"
   },
   "publishConfig": {
