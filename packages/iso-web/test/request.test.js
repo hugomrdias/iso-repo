@@ -119,7 +119,7 @@ test('should request 500', async () => {
   const { error } = await request('https://local.dev/error?status=500')
 
   if (HttpError.is(error)) {
-    assert.equal(error.message, 'HttpError: 500 - Internal Server Error')
+    assert.equal(error.message, '500 - Internal Server Error')
     assert.equal(error.code, 500)
   } else {
     assert.fail('should fail')
@@ -141,7 +141,7 @@ test('should request 501', async () => {
   const { error } = await request('https://local.dev/error?status=501')
 
   if (HttpError.is(error)) {
-    assert.equal(error.message, 'HttpError: 501 - Not Implemented')
+    assert.equal(error.message, '501 - Not Implemented')
     assert.equal(error.code, 501)
     assert.ok(error.response)
   } else {
@@ -163,7 +163,7 @@ test('should request 500 with json body', async () => {
   const { error } = await request('https://local.dev/error-json?status=500')
 
   if (HttpError.is(error)) {
-    assert.equal(error.message, 'HttpError: 500 - Internal Server Error')
+    assert.equal(error.message, '500 - Internal Server Error')
     assert.equal(error.code, 500)
     assert.equal(error.cause, undefined)
     assert.ok(error.response)
@@ -226,6 +226,7 @@ test('should abort manually', async () => {
 test(
   'should retry failed network error',
   async () => {
+    let count = 0
     server.use(
       http.get('https://local.dev/network-error', () => {
         return Response.error()
@@ -234,13 +235,17 @@ test(
     const { error } = await request('https://local.dev/network-error', {
       retry: {
         retries: 1,
+        shouldRetry: () => {
+          count++
+          return true
+        },
       },
     })
 
     if (error) {
-      assert.equal(error.message, 'Request failed after 2 attempts')
+      assert.equal(error.message, 'Failed to fetch')
       assert.ok(error.cause)
-      assert.equal(error.name, 'RetryError')
+      assert.equal(count, 1)
     } else {
       assert.fail('should fail')
     }
@@ -251,14 +256,20 @@ test(
 test(
   'should retry failed',
   async () => {
+    let count = 0
     const { error } = await request('https://local.dev/error?status=500', {
-      retry: { retries: 1 },
+      retry: {
+        retries: 1,
+        shouldRetry: () => {
+          count++
+          return true
+        },
+      },
     })
 
     if (error) {
-      assert.equal(error.message, 'Request failed after 2 attempts')
-      assert.ok(error.cause)
-      assert.equal(error.name, 'RetryError')
+      assert.equal(error.message, '500 - Internal Server Error')
+      assert.equal(count, 1)
     } else {
       assert.fail('should fail')
     }
@@ -348,7 +359,7 @@ test('should set content-type json', async () => {
   })
 
   if (HttpError.is(error)) {
-    assert.equal(error.message, 'HttpError: 500 - Internal Server Error')
+    assert.equal(error.message, '500 - Internal Server Error')
     assert.equal(error.code, 500)
     assert.equal(error.request.headers.get('content-type'), 'application/json')
   } else {
@@ -366,7 +377,7 @@ test('should be able to overide with custom json content-type ', async () => {
   })
 
   if (HttpError.is(error)) {
-    assert.equal(error.message, 'HttpError: 500 - Internal Server Error')
+    assert.equal(error.message, '500 - Internal Server Error')
     assert.equal(error.code, 500)
     assert.equal(
       error.request.headers.get('content-type'),

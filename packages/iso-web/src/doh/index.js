@@ -16,7 +16,6 @@ export {
   JsonError,
   NetworkError,
   RequestError,
-  RetryError,
   TimeoutError,
 } from '../http.js'
 

@@ -175,7 +175,7 @@ test('should fail with non-ascii chars', async () => {
   if (error) {
     assert.ok(HttpError.is(error))
     assert.deepEqual(await error.response.text(), 'malformed')
-    assert.deepEqual(error.message, 'HttpError: 400 - Bad Request')
+    assert.deepEqual(error.message, '400 - Bad Request')
   } else {
     assert.fail('should fail')
   }

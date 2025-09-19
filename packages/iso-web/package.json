@@ -120,7 +120,7 @@
   "dependencies": {
     "delay": "^6.0.0",
     "iso-kv": "workspace:^",
-    "p-retry": "^6.2.1"
+    "p-retry": "^7.0.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",

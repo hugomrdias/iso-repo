@@ -13,7 +13,6 @@ export {
   HttpError,
   NetworkError,
   RequestError,
-  RetryError,
   TimeoutError,
 } from './index.js'
 

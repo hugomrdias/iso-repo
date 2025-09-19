@@ -5,7 +5,7 @@ import { anySignal } from './signals.js'
 const symbol = Symbol.for('request-error')
 
 /**
- * @typedef {NetworkError | TimeoutError | AbortError | HttpError | RetryError} Errors
+ * @typedef {NetworkError | TimeoutError | AbortError | HttpError} Errors
  */
 
 /**
@@ -138,29 +138,6 @@ export class AbortError extends RequestError {
   }
 }
 
-export class RetryError extends RequestError {
-  name = 'RetryError'
-
-  /**
-   *
-   * @param {number} attempts
-   * @param {ErrorOptions} [options]
-   */
-  constructor(attempts, options = {}) {
-    super(`Request failed after ${attempts} attempts`, options)
-  }
-
-  /**
-   * Check if a value is a RetryError
-   *
-   * @param {unknown} value
-   * @returns {value is RetryError}
-   */
-  static is(value) {
-    return isRequestError(value) && value.name === 'RetryError'
-  }
-}
-
 export class HttpError extends RequestError {
   name = 'HttpError'
 
@@ -181,7 +158,7 @@ export class HttpError extends RequestError {
    * @param {ErrorOptions & {response: Response, request: Request, options: import('./types.js').RequestOptions}} options
    */
   constructor(options) {
-    const msg = `HttpError: ${options.response.status} - ${options.response.statusText}`
+    const msg = `${options.response.status} - ${options.response.statusText}`
 
     super(msg)
 
@@ -273,21 +250,27 @@ export async function request(resource, options = {}) {
           minTimeout: retry.minTimeout ?? 1000,
           maxTimeout: retry.maxTimeout ?? Number.POSITIVE_INFINITY,
           randomize: retry.randomize ?? false,
-          forever: retry.forever ?? false,
           unref: retry.unref ?? false,
           maxRetryTime: retry.maxRetryTime ?? Number.POSITIVE_INFINITY,
           signal: combinedSignals,
-          onFailedAttempt: async (error) => {
+          onFailedAttempt: async (ctx) => {
             const codes = retry.afterStatusCodes ?? [413, 429, 503]
-            if (HttpError.is(error) && codes.includes(error.code)) {
+            if (HttpError.is(ctx.error) && codes.includes(ctx.error.code)) {
               // Delay if needed using Retry-After header
-              const delayValue = calculateRetryAfter(error.response)
+              const delayValue = calculateRetryAfter(ctx.error.response)
               if (delayValue > 0) {
                 await delay(delayValue, { signal: combinedSignals })
               }
             }
           },
-          shouldRetry: () => {
+          shouldRetry: async (ctx) => {
+            if (retry.shouldRetry) {
+              const shouldRetry = await retry.shouldRetry(ctx)
+              if (!shouldRetry) {
+                return false
+              }
+            }
+
             const methods = retry.methods ?? [
               'get',
               'put',
@@ -324,12 +307,6 @@ export async function request(resource, options = {}) {
 
     if (signal?.aborted) {
       return { error: new AbortError(signal, { cause: err }) }
-    }
-
-    if ('attemptNumber' in err) {
-      return {
-        error: new RetryError(Number(err.attemptNumber), { cause: err }),
-      }
     }
 
     if (HttpError.is(err)) {
