@@ -85,8 +85,8 @@ importers:
         specifier: ^16.3.0
         version: 16.3.0
       hono:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.7
+        version: 4.9.7
       typescript:
         specifier: ~5.9.2
         version: 5.9.2
@@ -137,8 +137,8 @@ importers:
         specifier: ^16.3.0
         version: 16.3.0
       hono:
-        specifier: ^4.9.4
-        version: 4.9.4
+        specifier: ^4.9.7
+        version: 4.9.7
       typescript:
         specifier: ~5.9.2
         version: 5.9.2
@@ -3430,8 +3430,8 @@ packages:
     resolution: {integrity: sha512-eSmmWE5bZTK2Nou4g0AI3zZ9rswp7GRKoKXS1BLUkvPviOqs4YTN1djQIqrXy9k5gEtdLPy86JjRwsNM9tnDcA==}
     engines: {node: '>=0.10.0'}
 
-  hono@4.9.4:
-    resolution: {integrity: sha512-61hl6MF6ojTl/8QSRu5ran6GXt+6zsngIUN95KzF5v5UjiX/xnrLR358BNRawwIRO49JwUqJqQe3Rb2v559R8Q==}
+  hono@4.9.7:
+    resolution: {integrity: sha512-t4Te6ERzIaC48W3x4hJmBwgNlLhmiEdEE5ViYb02ffw4ignHNHa5IBtPjmbKstmtKa8X6C35iWwK4HaqvrzG9w==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@2.0.2:
@@ -6895,7 +6895,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
       '@types/debug': 4.1.12
-      debug: 4.4.1(supports-color@8.1.1)
+      debug: 4.4.3
       pony-cause: 2.1.11
       semver: 7.7.2
       uuid: 9.0.1
@@ -9667,7 +9667,7 @@ snapshots:
     dependencies:
       parse-passwd: 1.0.0
 
-  hono@4.9.4: {}
+  hono@4.9.7: {}
 
   html-escaper@2.0.2: {}
 
