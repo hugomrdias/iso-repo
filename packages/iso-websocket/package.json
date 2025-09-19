@@ -39,7 +39,7 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js' --assets test/mocks"
   },
   "dependencies": {
-    "debug": "^4.4.0",
+    "debug": "^4.4.3",
     "retry": "^0.13.1",
     "typescript-event-target": "^1.1.0",
     "unws": "^0.3.2",
@@ -47,13 +47,13 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^24.3.0",
+    "@types/node": "^24.5.2",
     "@types/retry": "^0.12.5",
     "@types/ws": "^8.5.14",
     "delay": "^6.0.0",
     "p-defer": "^4.0.0",
     "playwright-test": "^14.1.12",
-    "type-fest": "^4.34.1",
+    "type-fest": "^5.0.1",
     "typescript": "5.9.2"
   },
   "publishConfig": {

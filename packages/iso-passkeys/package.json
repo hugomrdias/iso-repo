@@ -51,8 +51,8 @@
   },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
-    "@peculiar/asn1-ecc": "^2.4.0",
-    "@peculiar/asn1-schema": "^2.4.0",
+    "@peculiar/asn1-ecc": "^2.5.0",
+    "@peculiar/asn1-schema": "^2.5.0",
     "cbor-x": "^1.6.0",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^"
@@ -60,9 +60,9 @@
   "devDependencies": {
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.3.0",
+    "@types/node": "^24.5.2",
     "assert": "^2.1.0",
-    "mocha": "^11.7.1",
+    "mocha": "^11.7.2",
     "playwright-test": "^14.1.12",
     "typescript": "5.9.2"
   },
