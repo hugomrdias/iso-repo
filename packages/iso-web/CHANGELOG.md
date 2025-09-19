@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.3.0...iso-web-v1.4.0) (2025-09-19)
+
+
+### Features
+
+* **iso-web:** add shoudlRetry option, update p-retry to v7.0.0 and remove RetryError class ([a2256ad](https://github.com/hugomrdias/iso-repo/commit/a2256ad76302fd681cd634b410c238fa47ceac99))
+
 ## [1.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.2.0...iso-web-v1.3.0) (2025-08-27)
 
 
