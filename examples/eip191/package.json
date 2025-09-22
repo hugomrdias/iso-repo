@@ -12,7 +12,7 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.89.0",
+    "@tanstack/react-query": "^5.90.1",
     "filsnap-adapter": "^3.3.6",
     "iso-base": "workspace:*",
     "iso-did": "workspace:*",
