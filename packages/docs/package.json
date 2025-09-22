@@ -44,7 +44,7 @@
     "@astrojs/starlight": "^0.35.3",
     "astro": "^5.13.9",
     "github-slugger": "^2.0.0",
-    "typedoc-plugin-markdown": "^4.8.1",
+    "typedoc-plugin-markdown": "^4.9.0",
     "yaml": "^2.8.1"
   }
 }
