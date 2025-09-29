@@ -276,8 +276,8 @@ importers:
   packages/iso-kv:
     dependencies:
       conf:
-        specifier: ^14.0.0
-        version: 14.0.0
+        specifier: ^15.0.0
+        version: 15.0.0
       idb-keyval:
         specifier: ^6.2.1
         version: 6.2.2
@@ -2798,6 +2798,10 @@ packages:
     resolution: {integrity: sha512-L6BuueHTRuJHQvQVc6YXYZRtN5vJUtOdCTLn0tRYYV5azfbAFcPghB5zEE40mVrV6w7slMTqUfkDomutIK14fw==}
     engines: {node: '>=20'}
 
+  conf@15.0.0:
+    resolution: {integrity: sha512-w9BzJHS5swhxUq3+nF5hbI0XbfCNH5nfP/IL4HpkmdLtejSPen20hvRkcnk8Xht7YyLoHjvxDm99bqsa1l9qlw==}
+    engines: {node: '>=20'}
+
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
@@ -2990,6 +2994,10 @@ packages:
 
   dnum@2.15.0:
     resolution: {integrity: sha512-7wyYHrTq32laVKSQSuWsUysCY8kMjFjfgbZmcVECROyeT3yvwF9oaSDFWL1s1s8nAfhhERC04LdtFVbmx8xRWQ==}
+
+  dot-prop@10.0.0:
+    resolution: {integrity: sha512-s7RhKKTxc+GiZkfewpLsuWpPeCPe0patP9G/qRJ2VN/BWA+Ydq65K2Pfse234zjGszTVJCzPLze54vD8eyE8NQ==}
+    engines: {node: '>=20'}
 
   dot-prop@9.0.0:
     resolution: {integrity: sha512-1gxPBJpI/pcjQhKgIU91II6Wkay+dLcN3M6rf2uwP8hRur3HtQXjVrdAK3sjC0piaEuxzMwjXChcETiJl47lAQ==}
@@ -3654,6 +3662,9 @@ packages:
 
   iso-base@4.2.0:
     resolution: {integrity: sha512-moDiW0DkduqvbJXci1xFAslbfh4M/GseAL2LWLeiwr4rpD7RKak5nniQMW9Pg1arBpd1JoABmztBm43J698YTA==}
+
+  iso-base@4.2.1:
+    resolution: {integrity: sha512-D73C0m12lNYCDwSye1UrkM2dp+ODioCXB8EGLSBGLfuIs7b2w+EV1c+pmeC0qz7nntdwtatN+GdfxyKpElZSbw==}
 
   iso-did@2.1.0:
     resolution: {integrity: sha512-AbRND0rWFjs/AiUTeMwZbOBj3tp9BIGrwOaiDWirAhIOk4tSxR0K/6ClvGsKn9PGMw4a9IfrjjylmY2SvN7wRA==}
@@ -8791,6 +8802,18 @@ snapshots:
       semver: 7.7.2
       uint8array-extras: 1.5.0
 
+  conf@15.0.0:
+    dependencies:
+      ajv: 8.17.1
+      ajv-formats: 3.0.1(ajv@8.17.1)
+      atomically: 2.0.3
+      debounce-fn: 6.0.0
+      dot-prop: 10.0.0
+      env-paths: 3.0.0
+      json-schema-typed: 8.0.1
+      semver: 7.7.2
+      uint8array-extras: 1.5.0
+
   convert-source-map@2.0.0: {}
 
   cookie-es@1.2.2: {}
@@ -8971,6 +8994,10 @@ snapshots:
   dnum@2.15.0:
     dependencies:
       from-exponential: 1.1.1
+
+  dot-prop@10.0.0:
+    dependencies:
+      type-fest: 5.0.1
 
   dot-prop@9.0.0:
     dependencies:
@@ -9844,6 +9871,11 @@ snapshots:
       base-x: 5.0.1
       bigint-mod-arith: 3.3.1
 
+  iso-base@4.2.1:
+    dependencies:
+      base-x: 5.0.1
+      bigint-mod-arith: 3.3.1
+
   iso-did@2.1.0:
     dependencies:
       did-resolver: 4.1.0
@@ -9871,7 +9903,7 @@ snapshots:
       '@scure/bip39': 1.6.0
       abitype: 1.1.1(typescript@5.9.2)(zod@3.25.76)
       bignumber.js: 9.3.1
-      iso-base: 4.2.0
+      iso-base: 4.2.1
       iso-kv: 3.1.0
       iso-web: 1.4.0
       zod: 3.25.76
