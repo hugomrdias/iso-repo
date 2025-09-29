@@ -18,7 +18,7 @@
     "iso-ucan": "workspace:*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "zod": "^3.25.0"
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.13.3",
