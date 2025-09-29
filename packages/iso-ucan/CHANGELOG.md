@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.4.0...iso-ucan-v0.4.1) (2025-09-29)
+
+
+### Bug Fixes
+
+* replace BufferSource with Uint8Array in type definitions and function parameters ([09a2277](https://github.com/hugomrdias/iso-repo/commit/09a2277ee5587091bb1b7152d479c1a608ef0d82))
+
 ## [0.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.3.0...iso-ucan-v0.4.0) (2025-08-27)
 
 
