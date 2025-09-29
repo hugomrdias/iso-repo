@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.1.0...iso-did-v2.1.1) (2025-09-29)
+
+
+### Bug Fixes
+
+* replace BufferSource with Uint8Array in type definitions and function parameters ([09a2277](https://github.com/hugomrdias/iso-repo/commit/09a2277ee5587091bb1b7152d479c1a608ef0d82))
+
 ## [2.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.0.1...iso-did-v2.1.0) (2025-08-27)
 
 
