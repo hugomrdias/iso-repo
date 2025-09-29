@@ -1,7 +1,7 @@
 {
   "name": "iso-did",
   "type": "module",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Isomorphic did core and did key tooling",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
