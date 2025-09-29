@@ -132,13 +132,13 @@ export class RSASigner extends DID {
   /**
    * Sign a message
    *
-   * @param {Uint8Array<ArrayBuffer>} message
+   * @param {Uint8Array} message
    */
   async sign(message) {
     const buf = await webcrypto.subtle.sign(
       { name: 'RSASSA-PKCS1-v1_5', saltLength: 128 },
       this.#keypair.privateKey,
-      message
+      /** @type {BufferSource} */ (message)
     )
 
     return u8(buf)

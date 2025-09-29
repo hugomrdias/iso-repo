@@ -14,8 +14,8 @@ export async function verify({ signature, message, did }) {
   return await webcrypto.subtle.verify(
     { name: 'RSASSA-PKCS1-v1_5', saltLength: 128 },
     key,
-    signature,
-    message
+    /** @type {BufferSource} */ (signature),
+    /** @type {BufferSource} */ (message)
   )
 }
 

@@ -70,10 +70,7 @@ export class EdDSASigner extends DID {
       publicKey = key.publicKey
     }
     return new EdDSASigner(
-      DIDKey.fromPublicKey(
-        'Ed25519',
-        /** @type {Uint8Array<ArrayBuffer>} */ (publicKey)
-      ),
+      DIDKey.fromPublicKey('Ed25519', publicKey),
       privateKey
     )
   }
@@ -89,11 +86,7 @@ export class EdDSASigner extends DID {
     const publicKey = await getPublicKeyAsync(privateKey)
 
     return new EdDSASigner(
-      didKeyOrVerifiableDID(
-        'Ed25519',
-        /** @type {Uint8Array<ArrayBuffer>} */ (publicKey),
-        did
-      ),
+      didKeyOrVerifiableDID('Ed25519', publicKey, did),
       privateKey
     )
   }
@@ -117,12 +110,10 @@ export class EdDSASigner extends DID {
   /**
    * Sign a message
    *
-   * @param {Uint8Array<ArrayBuffer>} message
+   * @param {Uint8Array} message
    */
   sign(message) {
-    return /** @type {Promise<Uint8Array<ArrayBuffer>>} */ (
-      signAsync(message, this.#privateKey)
-    )
+    return signAsync(message, this.#privateKey)
   }
 
   /**

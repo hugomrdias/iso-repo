@@ -1,5 +1,4 @@
 import * as EC from 'iso-base/ec-compression'
-import { u8 } from 'iso-base/utils'
 import { tag, varint } from 'iso-base/varint'
 import { base58btc } from 'multiformats/bases/base58'
 import { CODE_KEY_TYPE, KEY_TYPE_CODE } from './common.js'
@@ -15,7 +14,7 @@ const DID_KEY_PREFIX = 'did:key:'
  * Validate raw public key length
  *
  * @param {number} code
- * @param {Uint8Array<ArrayBuffer>} key
+ * @param {Uint8Array} key
  */
 export function validateRawPublicKeyLength(code, key) {
   switch (code) {
@@ -87,7 +86,7 @@ export class DIDKey extends DIDCore {
    *
    * @param {T.DIDURLObject} did
    * @param {T.KeyType} type
-   * @param {Uint8Array<ArrayBuffer>} key
+   * @param {Uint8Array} key
    */
   constructor(did, type, key) {
     super(did)
@@ -124,7 +123,7 @@ export class DIDKey extends DIDCore {
    * Create a DIDKey from a public key bytes
    *
    * @param {T.KeyType} type
-   * @param {Uint8Array<ArrayBuffer>} key
+   * @param {Uint8Array} key
    */
   static fromPublicKey(type, key) {
     const code = KEY_TYPE_CODE[type]
@@ -132,7 +131,7 @@ export class DIDKey extends DIDCore {
       throw new TypeError(`Unsupported key type "${type}"`)
     }
 
-    const keyBytes = validateRawPublicKeyLength(code, u8(key))
+    const keyBytes = validateRawPublicKeyLength(code, key)
     const id = base58btc.encode(tag(code, keyBytes))
 
     return new DIDKey(

@@ -35,7 +35,7 @@ export class Invocation {
   /**
    *
    * @param {import("./types.js").DecodedEnvelope<'inv'>} envelope
-   * @param {Uint8Array<ArrayBuffer>} bytes
+   * @param {Uint8Array} bytes
    * @param {CID} cid
    * @param {Delegation[]} delegations
    */

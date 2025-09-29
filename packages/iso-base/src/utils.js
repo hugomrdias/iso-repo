@@ -124,9 +124,20 @@ export function isBufferSource(value) {
 }
 
 /**
+ * @param {unknown} value
+ * @returns {value is Uint8Array}
+ */
+export function isUint8Array(value) {
+  return (
+    value instanceof Uint8Array ||
+    (ArrayBuffer.isView(value) && value.constructor.name === 'Uint8Array')
+  )
+}
+
+/**
  * Cast typedarray to Uint8Array
  *
- * @param {BufferSource} arr
+ * @param {ArrayBuffer | Int8Array | Uint8ClampedArray | Uint8Array | Uint16Array | Int16Array | Uint32Array | Int32Array } arr
  */
 export function u8(arr) {
   return ArrayBuffer.isView(arr)

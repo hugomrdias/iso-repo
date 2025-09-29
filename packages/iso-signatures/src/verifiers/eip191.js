@@ -1,4 +1,4 @@
-import { keccak_256 } from '@noble/hashes/sha3'
+import { keccak_256 } from '@noble/hashes/sha3.js'
 import { recoverPublicKeyAsync, Signature, verifyAsync } from '@noble/secp256k1'
 import { hex } from 'iso-base/rfc4648'
 import { utf8 } from 'iso-base/utf8'
@@ -17,7 +17,7 @@ export function hexToBytes(signature) {
 }
 
 /**
- * @param {Uint8Array<ArrayBuffer>} data
+ * @param {Uint8Array} data
  */
 export function getSignPayload(data) {
   const prefixBytes = utf8.decode(`${PREFIX}${data.length}`)

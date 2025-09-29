@@ -8,7 +8,7 @@
 
 import _baseX from 'base-x'
 import { utf8 } from './utf8.js'
-import { isBufferSource, u8 } from './utils.js'
+import { isUint8Array, u8 } from './utils.js'
 
 /** @typedef {import('./types.js').Codec} Codec */
 
@@ -35,13 +35,11 @@ export function baseX(base) {
       return _baseX(alphabet).encode(u8(input))
     },
     decode(input) {
-      if (isBufferSource(input)) {
+      if (isUint8Array(input)) {
         input = utf8.encode(input)
       }
 
-      return /** @type {Uint8Array<ArrayBuffer>} */ (
-        _baseX(alphabet).decode(input)
-      )
+      return /** @type {Uint8Array} */ (_baseX(alphabet).decode(input))
     },
   }
 }

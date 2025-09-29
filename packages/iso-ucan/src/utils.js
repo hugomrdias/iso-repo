@@ -151,9 +151,7 @@ export async function verifySignature(
   const issuer = await validateIssuerAndSignature(envelope, didResolver)
   const isVerified = await signatureVerifierResolver.verify({
     signature: envelope.signature,
-    message: /** @type {Uint8Array<ArrayBuffer>} */ (
-      dagCbor.encode(signaturePayload(envelope))
-    ),
+    message: dagCbor.encode(signaturePayload(envelope)),
     did: issuer,
     type: envelope.alg,
   })

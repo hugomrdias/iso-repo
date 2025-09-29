@@ -72,7 +72,7 @@ export class EIP191Signer extends DID {
   /**
    * Sign a message
    *
-   * @param {Uint8Array<ArrayBuffer>} message
+   * @param {Uint8Array} message
    */
   async sign(message) {
     const result = await this.provider.request({

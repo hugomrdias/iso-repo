@@ -150,7 +150,7 @@ export class ECDSASigner extends DID {
 
     const publicKey = await webcrypto.subtle.exportKey('raw', publicKeyJWK)
 
-    return new ECDSASigner(didKeyOrVerifiableDID(type, publicKey, did), {
+    return new ECDSASigner(didKeyOrVerifiableDID(type, u8(publicKey), did), {
       privateKey,
       publicKey: publicKeyJWK,
     })
@@ -186,19 +186,22 @@ export class ECDSASigner extends DID {
       }
     }
 
-    return new ECDSASigner(didKeyOrVerifiableDID(curve, publicKey, did), key)
+    return new ECDSASigner(
+      didKeyOrVerifiableDID(curve, u8(publicKey), did),
+      key
+    )
   }
 
   /**
    * Sign a message
    *
-   * @param {Uint8Array<ArrayBuffer>} message
+   * @param {Uint8Array} message
    */
   async sign(message) {
     const buf = await webcrypto.subtle.sign(
       this.#params,
       this.#keypair.privateKey,
-      message
+      /** @type {BufferSource} */ (message)
     )
 
     return u8(buf)

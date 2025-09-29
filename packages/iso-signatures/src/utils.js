@@ -1,15 +1,15 @@
-import { equals, u8 } from 'iso-base/utils'
+import { equals } from 'iso-base/utils'
 import { DIDKey } from 'iso-did/key'
 
 /**
  *
  * @param {import('iso-did/types').KeyType} type
- * @param {BufferSource} publicKey
+ * @param {Uint8Array} publicKey
  * @param {import('iso-did/types').VerifiableDID} [did]
  */
 export function didKeyOrVerifiableDID(type, publicKey, did) {
   /** @type {import('iso-did/types').VerifiableDID} */
-  let _did = DIDKey.fromPublicKey(type, u8(publicKey))
+  let _did = DIDKey.fromPublicKey(type, publicKey)
   if (did) {
     if (!equals(did.verifiableDid.publicKey, _did.verifiableDid.publicKey)) {
       throw new Error('Public key mismatch')

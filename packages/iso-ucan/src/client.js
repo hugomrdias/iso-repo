@@ -44,7 +44,7 @@ export function createClient(options) {
 
       const response = await fetch(url, {
         method: 'POST',
-        body: inv.bytes,
+        body: /** @type {BufferSource} */ (inv.bytes),
       })
       return response.json()
     },

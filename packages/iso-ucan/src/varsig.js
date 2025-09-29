@@ -99,19 +99,19 @@ function getPreset(bytes, presets) {
 /**
  * Decode varsig header
  *
- * @param {Uint8Array<ArrayBuffer>} buf
+ * @param {Uint8Array} buf
  * @returns {import('./types.js').DecodeOutput}
  */
 export function decode(buf) {
   const bytes = new IOBuffer(buf)
-  const varsig = /** @type {Uint8Array<ArrayBuffer>} */ (bytes.readBytes(1))
+  const varsig = bytes.readBytes(1)
   if (varsig[0] !== VARINT.VARSIG[0]) {
     throw new TypeError(
       `Invalid varsig sigil expected 0x${VARSIG.toString(16)} got 0x${hex.encode(varsig)}`
     )
   }
 
-  const version = /** @type {Uint8Array<ArrayBuffer>} */ (bytes.readBytes(1))
+  const version = bytes.readBytes(1)
   if (version[0] !== VARINT.VERSION[0]) {
     throw new TypeError(
       `Invalid version sigil expected 0x${VERSION.toString(16)} got 0x${hex.encode(version)}`

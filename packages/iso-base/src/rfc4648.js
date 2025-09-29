@@ -8,7 +8,7 @@
 /** @typedef {import('./types').Codec} Codec */
 
 import { utf8 } from './utf8.js'
-import { isBufferSource, u8 } from './utils.js'
+import { isUint8Array, u8 } from './utils.js'
 
 /**
  * Decode
@@ -144,7 +144,7 @@ export function rfc4648(base, padding = false, normalize) {
       return encode(u8(input), alphabet, bits, pad ?? padding)
     },
     decode(input) {
-      if (isBufferSource(input)) {
+      if (isUint8Array(input)) {
         input = utf8.encode(input)
       }
 

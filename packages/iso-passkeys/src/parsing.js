@@ -126,7 +126,7 @@ export function toPublicKeyCredentialDescriptor(descriptor) {
 
   return {
     ...descriptor,
-    id: base64url.decode(id),
+    id: /** @type {BufferSource} */ (base64url.decode(id)),
   }
 }
 
@@ -145,7 +145,9 @@ export function parseRequestOptionsFromJSON(options) {
     )
   }
   return {
-    challenge: base64url.decode(options.challenge),
+    challenge: /** @type {BufferSource} */ (
+      base64url.decode(options.challenge)
+    ),
     timeout: options.timeout,
     rpId: options.rpId,
     allowCredentials,
@@ -175,10 +177,12 @@ export function parseCreationOptionsFromJSON(options) {
       type: 'public-key',
     })),
     ...options,
-    challenge: base64url.decode(options.challenge),
+    challenge: /** @type {BufferSource} */ (
+      base64url.decode(options.challenge)
+    ),
     user: {
       ...options.user,
-      id: utf8.decode(options.user.id),
+      id: /** @type {BufferSource} */ (utf8.decode(options.user.id)),
     },
 
     excludeCredentials,
@@ -194,7 +198,7 @@ export function parseCreationOptionsFromJSON(options) {
  * @param {import('./types').AuthenticationPublicKeyCredential | import('./types').RegistrationPublicKeyCredential} credential
  */
 export function publicKeyCredentialToJSON(credential) {
-  // @ts-ignore
+  // @ts-expect-error TODO: fix this
   if (credential.response.signature) {
     const { rawId, id, type, authenticatorAttachment, response } =
       /** @type {import('./types').AuthenticationPublicKeyCredential} */ (
@@ -239,7 +243,6 @@ export function publicKeyCredentialToJSON(credential) {
       attestationObject: base64url.encode(
         new Uint8Array(response.attestationObject)
       ),
-      // @ts-ignore
       transports: response.getTransports(),
     },
   }

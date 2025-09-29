@@ -35,7 +35,7 @@ export class Delegation {
   pol
   /** @type {number | undefined} */
   nbf
-  /** @type {Uint8Array<ArrayBuffer>} */
+  /** @type {Uint8Array} */
   nonce
   /** @type {Record<string, unknown> | undefined} */
   meta
@@ -45,7 +45,7 @@ export class Delegation {
   /**
    *
    * @param {import("./types.js").DecodedEnvelope<'dlg'>} envelope
-   * @param {Uint8Array<ArrayBuffer>} bytes
+   * @param {Uint8Array} bytes
    * @param {CID} cid
    */
   constructor(envelope, bytes, cid) {

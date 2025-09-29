@@ -19,7 +19,7 @@ function createVerifier(curve) {
 
     const key = await webcrypto.subtle.importKey(
       'raw',
-      publicKey,
+      /** @type {BufferSource} */ (publicKey),
       { name: params.name, namedCurve: params.namedCurve },
       true,
       ['verify']
@@ -31,8 +31,8 @@ function createVerifier(curve) {
         hash: { name: params.hash },
       },
       key,
-      signature,
-      message
+      /** @type {BufferSource} */ (signature),
+      /** @type {BufferSource} */ (message)
     )
   }
 

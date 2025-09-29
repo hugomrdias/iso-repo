@@ -3,7 +3,7 @@
  *
  * @module
  */
-import { isBufferSource, u8 } from './utils.js'
+import { isUint8Array, u8 } from './utils.js'
 
 const textDecoder = new TextDecoder()
 const textEncoder = new TextEncoder()
@@ -19,7 +19,7 @@ export const utf8 = {
     return textDecoder.decode(input)
   },
   decode(input) {
-    if (isBufferSource(input)) {
+    if (isUint8Array(input)) {
       return u8(input)
     }
     return textEncoder.encode(input)

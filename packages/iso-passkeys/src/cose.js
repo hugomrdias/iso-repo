@@ -131,7 +131,7 @@ export function didFromCose(key) {
 /**
  * Hash based on the cose alg using web crypto
  *
- * @param {Uint8Array<ArrayBuffer> | string} data
+ * @param {Uint8Array | string} data
  * @param {import('./cose.js').COSEALG} alg - Cose alg, defaults to -7 (ES256) SHA-256 for web crypto
  */
 export async function hash(data, alg = -7) {
@@ -141,5 +141,7 @@ export async function hash(data, alg = -7) {
 
   const subtleAlg = mapCoseAlgToWebCryptoAlg(alg)
 
-  return new Uint8Array(await webcrypto.subtle.digest(subtleAlg, data))
+  return new Uint8Array(
+    await webcrypto.subtle.digest(subtleAlg, /** @type {BufferSource} */ (data))
+  )
 }
