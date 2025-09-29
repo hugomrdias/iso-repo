@@ -50,7 +50,7 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "conf": "^14.0.0",
+    "conf": "^15.0.0",
     "idb-keyval": "^6.2.1",
     "kysely": "^0.28.7"
   },
