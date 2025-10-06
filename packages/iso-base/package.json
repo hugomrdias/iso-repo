@@ -123,7 +123,7 @@
     "@types/node": "^24.5.2",
     "assert": "^2.1.0",
     "micro-bmark": "^0.4.2",
-    "mocha": "^11.7.2",
+    "mocha": "^11.7.4",
     "playwright-test": "^14.1.12",
     "typescript": "5.9.2"
   },

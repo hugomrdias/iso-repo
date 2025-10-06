@@ -99,7 +99,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.5.2",
     "assert": "^2.1.0",
-    "mocha": "^11.7.2",
+    "mocha": "^11.7.4",
     "playwright-test": "^14.1.12",
     "type-fest": "^5.0.1",
     "typescript": "5.9.2",
