@@ -108,7 +108,7 @@
     "@noble/hashes": "^2.0.0",
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.5.2",
+    "@types/node": "^24.7.0",
     "assert": "^2.1.0",
     "mocha": "^11.7.2",
     "msw": "2.10.5",

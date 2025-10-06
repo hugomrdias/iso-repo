@@ -71,7 +71,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.13.3
-        version: 1.13.7(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@7.1.7(@types/node@24.5.2)(yaml@2.8.1))(workerd@1.20250924.0)(wrangler@4.40.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.13.7(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@7.1.7(@types/node@24.7.0)(yaml@2.8.1))(workerd@1.20250924.0)(wrangler@4.40.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@types/react':
         specifier: ^19.1.13
         version: 19.1.15
@@ -80,7 +80,7 @@ importers:
         version: 19.1.9(@types/react@19.1.15)
       '@vitejs/plugin-react':
         specifier: ^5.0.3
-        version: 5.0.4(vite@7.1.7(@types/node@24.5.2)(yaml@2.8.1))
+        version: 5.0.4(vite@7.1.7(@types/node@24.7.0)(yaml@2.8.1))
       globals:
         specifier: ^16.4.0
         version: 16.4.0
@@ -92,7 +92,7 @@ importers:
         version: 5.9.2
       vite:
         specifier: ^7.1.6
-        version: 7.1.7(@types/node@24.5.2)(yaml@2.8.1)
+        version: 7.1.7(@types/node@24.7.0)(yaml@2.8.1)
       wrangler:
         specifier: ^4.38.0
         version: 4.40.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -123,7 +123,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.13.3
-        version: 1.13.7(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@7.1.7(@types/node@24.5.2)(yaml@2.8.1))(workerd@1.20250924.0)(wrangler@4.40.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        version: 1.13.7(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@7.1.7(@types/node@24.7.0)(yaml@2.8.1))(workerd@1.20250924.0)(wrangler@4.40.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@types/react':
         specifier: ^19.1.13
         version: 19.1.15
@@ -132,7 +132,7 @@ importers:
         version: 19.1.9(@types/react@19.1.15)
       '@vitejs/plugin-react':
         specifier: ^5.0.3
-        version: 5.0.4(vite@7.1.7(@types/node@24.5.2)(yaml@2.8.1))
+        version: 5.0.4(vite@7.1.7(@types/node@24.7.0)(yaml@2.8.1))
       globals:
         specifier: ^16.4.0
         version: 16.4.0
@@ -144,7 +144,7 @@ importers:
         version: 5.9.2
       vite:
         specifier: ^7.1.6
-        version: 7.1.7(@types/node@24.5.2)(yaml@2.8.1)
+        version: 7.1.7(@types/node@24.7.0)(yaml@2.8.1)
       wrangler:
         specifier: ^4.38.0
         version: 4.40.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -156,8 +156,8 @@ importers:
         version: 2.2.4
     devDependencies:
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -166,10 +166,10 @@ importers:
     dependencies:
       '@astrojs/starlight':
         specifier: ^0.36.0
-        version: 0.36.0(astro@5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))
+        version: 0.36.0(astro@5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))
       astro:
         specifier: ^5.13.9
-        version: 5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)
+        version: 5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
@@ -181,8 +181,8 @@ importers:
         version: 2.8.1
     devDependencies:
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -206,8 +206,8 @@ importers:
         specifier: ^10.0.10
         version: 10.0.10
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -252,8 +252,8 @@ importers:
         specifier: ^10.0.10
         version: 10.0.10
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -262,7 +262,7 @@ importers:
         version: 11.7.2
       msw:
         specifier: 2.10.5
-        version: 2.10.5(@types/node@24.5.2)(typescript@5.9.2)
+        version: 2.10.5(@types/node@24.7.0)(typescript@5.9.2)
       playwright-test:
         specifier: ^14.1.12
         version: 14.1.12
@@ -289,8 +289,8 @@ importers:
         specifier: ^7.6.12
         version: 7.6.13
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       better-sqlite3:
         specifier: ^12.2.0
         version: 12.4.1
@@ -338,8 +338,8 @@ importers:
         specifier: ^10.0.10
         version: 10.0.10
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -381,8 +381,8 @@ importers:
         specifier: ^10.0.10
         version: 10.0.10
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -442,8 +442,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       delay:
         specifier: ^6.0.0
         version: 6.0.0
@@ -470,14 +470,14 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       iso-base:
         specifier: workspace:^
         version: link:../iso-base
       msw:
         specifier: 2.10.5
-        version: 2.10.5(@types/node@24.5.2)(typescript@5.9.2)
+        version: 2.10.5(@types/node@24.7.0)(typescript@5.9.2)
       playwright-test:
         specifier: ^14.1.12
         version: 14.1.12
@@ -510,8 +510,8 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12
       '@types/node':
-        specifier: ^24.5.2
-        version: 24.5.2
+        specifier: ^24.7.0
+        version: 24.7.0
       '@types/retry':
         specifier: ^0.12.5
         version: 0.12.5
@@ -1630,8 +1630,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@ledgerhq/errors@6.25.0':
-    resolution: {integrity: sha512-9cU0dgUyq3Adb1bHAjJnbwl+r+4WBjuPq0k+/DbBNpuYHwcz2xKtRIjLimUJyACjHti3iWwRt1sFcbQDDdI08w==}
+  '@ledgerhq/errors@6.26.0':
+    resolution: {integrity: sha512-4OlisaDBafkn7KN5emue08lCGMVREX6T+nxj47C7W30EBA/leLAEDaVvUw5/gFOWrv8Q2A9Scb8aMM3uokyt0w==}
 
   '@lit-labs/ssr-dom-shim@1.4.0':
     resolution: {integrity: sha512-ficsEARKnmmW5njugNYKipTm4SFnbik7CXtoencDZzmzo/dQ+2Q0bgkzJuoJP20Aj0F+izzJjOqsnkd6F/o1bw==}
@@ -2208,8 +2208,8 @@ packages:
   '@types/node@17.0.45':
     resolution: {integrity: sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==}
 
-  '@types/node@24.5.2':
-    resolution: {integrity: sha512-FYxk1I7wPv3K2XBaoyH2cTnocQEu8AOZ60hPbsyukMPLv5/5qr7V1i8PLHdl6Zf87I+xZXFvPCXYjiTFq+YSDQ==}
+  '@types/node@24.7.0':
+    resolution: {integrity: sha512-IbKooQVqUBrlzWTi79E8Fw78l8k1RNtlDDNWsFZs7XonuQSJ8oNYfEeclhprUldXISRMLzBpILuKgPlIxm+/Yw==}
 
   '@types/parse-json@4.0.2':
     resolution: {integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==}
@@ -3654,6 +3654,9 @@ packages:
 
   iso-base@4.2.0:
     resolution: {integrity: sha512-moDiW0DkduqvbJXci1xFAslbfh4M/GseAL2LWLeiwr4rpD7RKak5nniQMW9Pg1arBpd1JoABmztBm43J698YTA==}
+
+  iso-base@4.2.1:
+    resolution: {integrity: sha512-D73C0m12lNYCDwSye1UrkM2dp+ODioCXB8EGLSBGLfuIs7b2w+EV1c+pmeC0qz7nntdwtatN+GdfxyKpElZSbw==}
 
   iso-did@2.1.0:
     resolution: {integrity: sha512-AbRND0rWFjs/AiUTeMwZbOBj3tp9BIGrwOaiDWirAhIOk4tSxR0K/6ClvGsKn9PGMw4a9IfrjjylmY2SvN7wRA==}
@@ -5137,8 +5140,8 @@ packages:
   uncrypto@0.1.3:
     resolution: {integrity: sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q==}
 
-  undici-types@7.12.0:
-    resolution: {integrity: sha512-goOacqME2GYyOZZfb5Lgtu+1IDmAlAEu5xnD3+xTzS10hT0vzpf0SPjkXwAw9Jm+4n/mQGDP3LO8CPbYROeBfQ==}
+  undici-types@7.14.0:
+    resolution: {integrity: sha512-QQiYxHuyZ9gQUIrmPo3IA+hUl4KYk8uSA7cHrcKd/l3p1OTpZcM0Tbp9x7FAtXdAYhlasd60ncPpgu6ihG6TOA==}
 
   undici@7.14.0:
     resolution: {integrity: sha512-Vqs8HTzjpQXZeXdpsfChQTlafcMQaaIwnGwLam1wudSSjlJeQ3bw1j+TLPePgrCnCpUXx7Ba5Pdpf5OBih62NQ==}
@@ -5770,12 +5773,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@4.3.6(astro@5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))':
+  '@astrojs/mdx@4.3.6(astro@5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))':
     dependencies:
       '@astrojs/markdown-remark': 6.3.7
       '@mdx-js/mdx': 3.1.1
       acorn: 8.15.0
-      astro: 5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)
+      astro: 5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)
       es-module-lexer: 1.7.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -5799,17 +5802,17 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 3.25.76
 
-  '@astrojs/starlight@0.36.0(astro@5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))':
+  '@astrojs/starlight@0.36.0(astro@5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))':
     dependencies:
       '@astrojs/markdown-remark': 6.3.7
-      '@astrojs/mdx': 4.3.6(astro@5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))
+      '@astrojs/mdx': 4.3.6(astro@5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))
       '@astrojs/sitemap': 3.6.0
       '@pagefind/default-ui': 1.4.0
       '@types/hast': 3.0.4
       '@types/js-yaml': 4.0.9
       '@types/mdast': 4.0.4
-      astro: 5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)
-      astro-expressive-code: 0.41.3(astro@5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))
+      astro: 5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)
+      astro-expressive-code: 0.41.3(astro@5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1))
       bcp-47: 2.1.0
       hast-util-from-html: 2.0.3
       hast-util-select: 6.0.4
@@ -6064,7 +6067,7 @@ snapshots:
     optionalDependencies:
       workerd: 1.20250924.0
 
-  '@cloudflare/vite-plugin@1.13.7(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@7.1.7(@types/node@24.5.2)(yaml@2.8.1))(workerd@1.20250924.0)(wrangler@4.40.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@cloudflare/vite-plugin@1.13.7(bufferutil@4.0.9)(utf-8-validate@5.0.10)(vite@7.1.7(@types/node@24.7.0)(yaml@2.8.1))(workerd@1.20250924.0)(wrangler@4.40.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@cloudflare/unenv-preset': 2.7.4(unenv@2.0.0-rc.21)(workerd@1.20250924.0)
       '@remix-run/node-fetch-server': 0.8.1
@@ -6073,7 +6076,7 @@ snapshots:
       picocolors: 1.1.1
       tinyglobby: 0.2.15
       unenv: 2.0.0-rc.21
-      vite: 7.1.7(@types/node@24.5.2)(yaml@2.8.1)
+      vite: 7.1.7(@types/node@24.7.0)(yaml@2.8.1)
       wrangler: 4.40.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -6603,31 +6606,31 @@ snapshots:
 
   '@inquirer/ansi@1.0.0': {}
 
-  '@inquirer/confirm@5.1.18(@types/node@24.5.2)':
+  '@inquirer/confirm@5.1.18(@types/node@24.7.0)':
     dependencies:
-      '@inquirer/core': 10.2.2(@types/node@24.5.2)
-      '@inquirer/type': 3.0.8(@types/node@24.5.2)
+      '@inquirer/core': 10.2.2(@types/node@24.7.0)
+      '@inquirer/type': 3.0.8(@types/node@24.7.0)
     optionalDependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.7.0
 
-  '@inquirer/core@10.2.2(@types/node@24.5.2)':
+  '@inquirer/core@10.2.2(@types/node@24.7.0)':
     dependencies:
       '@inquirer/ansi': 1.0.0
       '@inquirer/figures': 1.0.13
-      '@inquirer/type': 3.0.8(@types/node@24.5.2)
+      '@inquirer/type': 3.0.8(@types/node@24.7.0)
       cli-width: 4.1.0
       mute-stream: 2.0.0
       signal-exit: 4.1.0
       wrap-ansi: 6.2.0
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.7.0
 
   '@inquirer/figures@1.0.13': {}
 
-  '@inquirer/type@3.0.8(@types/node@24.5.2)':
+  '@inquirer/type@3.0.8(@types/node@24.7.0)':
     optionalDependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.7.0
 
   '@ipld/dag-cbor@9.2.5':
     dependencies:
@@ -6669,7 +6672,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@ledgerhq/errors@6.25.0': {}
+  '@ledgerhq/errors@6.26.0': {}
 
   '@lit-labs/ssr-dom-shim@1.4.0': {}
 
@@ -7567,7 +7570,7 @@ snapshots:
 
   '@types/better-sqlite3@7.6.13':
     dependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.7.0
 
   '@types/cookie@0.6.0': {}
 
@@ -7583,7 +7586,7 @@ snapshots:
 
   '@types/fontkit@2.0.8':
     dependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.7.0
 
   '@types/hast@3.0.4':
     dependencies:
@@ -7613,9 +7616,9 @@ snapshots:
 
   '@types/node@17.0.45': {}
 
-  '@types/node@24.5.2':
+  '@types/node@24.7.0':
     dependencies:
-      undici-types: 7.12.0
+      undici-types: 7.14.0
 
   '@types/parse-json@4.0.2': {}
 
@@ -7631,7 +7634,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.7.0
 
   '@types/statuses@2.0.6': {}
 
@@ -7645,11 +7648,11 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.7.0
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@vitejs/plugin-react@5.0.4(vite@7.1.7(@types/node@24.5.2)(yaml@2.8.1))':
+  '@vitejs/plugin-react@5.0.4(vite@7.1.7(@types/node@24.7.0)(yaml@2.8.1))':
     dependencies:
       '@babel/core': 7.28.4
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.4)
@@ -7657,7 +7660,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.38
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 7.1.7(@types/node@24.5.2)(yaml@2.8.1)
+      vite: 7.1.7(@types/node@24.7.0)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8402,12 +8405,12 @@ snapshots:
 
   astring@1.9.0: {}
 
-  astro-expressive-code@0.41.3(astro@5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)):
+  astro-expressive-code@0.41.3(astro@5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)):
     dependencies:
-      astro: 5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)
+      astro: 5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1)
       rehype-expressive-code: 0.41.3
 
-  astro@5.14.1(@types/node@24.5.2)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1):
+  astro@5.14.1(@types/node@24.7.0)(idb-keyval@6.2.2)(rollup@4.52.3)(typescript@5.9.2)(yaml@2.8.1):
     dependencies:
       '@astrojs/compiler': 2.13.0
       '@astrojs/internal-helpers': 0.7.3
@@ -8463,8 +8466,8 @@ snapshots:
       unist-util-visit: 5.0.0
       unstorage: 1.17.1(idb-keyval@6.2.2)
       vfile: 6.0.3
-      vite: 6.3.6(@types/node@24.5.2)(yaml@2.8.1)
-      vitefu: 1.1.1(vite@6.3.6(@types/node@24.5.2)(yaml@2.8.1))
+      vite: 6.3.6(@types/node@24.7.0)(yaml@2.8.1)
+      vitefu: 1.1.1(vite@6.3.6(@types/node@24.7.0)(yaml@2.8.1))
       xxhash-wasm: 1.1.0
       yargs-parser: 21.1.1
       yocto-spinner: 0.2.3
@@ -9844,6 +9847,11 @@ snapshots:
       base-x: 5.0.1
       bigint-mod-arith: 3.3.1
 
+  iso-base@4.2.1:
+    dependencies:
+      base-x: 5.0.1
+      bigint-mod-arith: 3.3.1
+
   iso-did@2.1.0:
     dependencies:
       did-resolver: 4.1.0
@@ -9864,14 +9872,14 @@ snapshots:
   iso-filecoin@7.4.4(typescript@5.9.2):
     dependencies:
       '@ipld/dag-cbor': 9.2.5
-      '@ledgerhq/errors': 6.25.0
+      '@ledgerhq/errors': 6.26.0
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
       abitype: 1.1.1(typescript@5.9.2)(zod@3.25.76)
       bignumber.js: 9.3.1
-      iso-base: 4.2.0
+      iso-base: 4.2.1
       iso-kv: 3.1.0
       iso-web: 1.4.0
       zod: 3.25.76
@@ -10638,12 +10646,12 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.10.5(@types/node@24.5.2)(typescript@5.9.2):
+  msw@2.10.5(@types/node@24.7.0)(typescript@5.9.2):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
       '@bundled-es-modules/tough-cookie': 0.1.6
-      '@inquirer/confirm': 5.1.18(@types/node@24.5.2)
+      '@inquirer/confirm': 5.1.18(@types/node@24.7.0)
       '@mswjs/interceptors': 0.39.7
       '@open-draft/deferred-promise': 2.2.0
       '@open-draft/until': 2.1.0
@@ -11906,7 +11914,7 @@ snapshots:
 
   uncrypto@0.1.3: {}
 
-  undici-types@7.12.0: {}
+  undici-types@7.14.0: {}
 
   undici@7.14.0: {}
 
@@ -12150,7 +12158,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  vite@6.3.6(@types/node@24.5.2)(yaml@2.8.1):
+  vite@6.3.6(@types/node@24.7.0)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.3)
@@ -12159,11 +12167,11 @@ snapshots:
       rollup: 4.52.3
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.7.0
       fsevents: 2.3.3
       yaml: 2.8.1
 
-  vite@7.1.7(@types/node@24.5.2)(yaml@2.8.1):
+  vite@7.1.7(@types/node@24.7.0)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.3)
@@ -12172,13 +12180,13 @@ snapshots:
       rollup: 4.52.3
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 24.5.2
+      '@types/node': 24.7.0
       fsevents: 2.3.3
       yaml: 2.8.1
 
-  vitefu@1.1.1(vite@6.3.6(@types/node@24.5.2)(yaml@2.8.1)):
+  vitefu@1.1.1(vite@6.3.6(@types/node@24.7.0)(yaml@2.8.1)):
     optionalDependencies:
-      vite: 6.3.6(@types/node@24.5.2)(yaml@2.8.1)
+      vite: 6.3.6(@types/node@24.7.0)(yaml@2.8.1)
 
   wagmi@2.17.5(@tanstack/query-core@5.90.2)(@tanstack/react-query@5.90.2(react@19.1.1))(@types/react@19.1.15)(bufferutil@4.0.9)(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(viem@2.37.9(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76):
     dependencies:
