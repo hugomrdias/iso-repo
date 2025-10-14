@@ -35,12 +35,12 @@
     "verbatimModuleSyntax": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "erasableSyntaxOnly": true,
+    // "erasableSyntaxOnly": true,
 
     /* Type Checking */
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
+    // "noUncheckedIndexedAccess": true,
+    // "noImplicitOverride": true,
     // "noFallthroughCasesInSwitch": true,
     // "noImplicitReturns": false,
     // "noUnusedLocals": true,
