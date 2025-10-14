@@ -60,8 +60,7 @@ For typescript code bases:
   "extends": "@hugomrdias/configs/tsconfig",
   "compilerOptions": {
     "outDir": "dist",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext"
+    "module": "NodeNext"
   },
   "include": ["src", "test"]
 }

@@ -3,39 +3,48 @@
     /* Projects */
     "incremental": true,
     "composite": true,
+
     /* Language and Environment */
     "target": "es2024",
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "moduleDetection": "force",
+
     /* Modules */
-    "module": "ESNext", // "NodeNext"
-    "moduleResolution": "Bundler", // "NodeNext"
+    "module": "preserve", // "NodeNext"
     "resolveJsonModule": true,
+    "rewriteRelativeImportExtensions": true,
+
     /* JavaScript Support */
     "allowJs": true,
     "checkJs": true,
+
     /* Emit */
+    "outDir": "dist",
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": false,
     "sourceMap": true,
-    "outDir": "dist",
     "removeComments": false,
     "noEmit": false,
     "importsNotUsedAsValues": "remove",
     "stripInternal": true,
     "noEmitOnError": true,
+
     /* Interop Constraints */
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "erasableSyntaxOnly": true,
+
     /* Type Checking */
     "strict": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": false,
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noImplicitReturns": false,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": false,
     "skipLibCheck": true
   }
 }
