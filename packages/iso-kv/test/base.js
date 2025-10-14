@@ -137,7 +137,7 @@ export function baseTests(kv, suite) {
       })
     })
 
-    // @ts-ignore
+    // @ts-expect-error
     off()
 
     await kv.set(['name'], 1)

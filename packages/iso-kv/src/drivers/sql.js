@@ -20,7 +20,7 @@ export function deserialize(data) {
   if (data === undefined) {
     return
   }
-  // @ts-ignore
+  // @ts-expect-error
   return parse(data)
 }
 

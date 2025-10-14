@@ -17,7 +17,7 @@ export function serialize(data) {
  * @param {unknown} data
  */
 export function deserialize(data) {
-  // @ts-ignore
+  // @ts-expect-error
   return parse(data)
 }
 

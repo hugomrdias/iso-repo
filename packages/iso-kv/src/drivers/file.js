@@ -39,13 +39,13 @@ export class FileDriver {
 
   /** @type {DriverSync['delete']} */
   delete(key) {
-    // @ts-ignore
+    // @ts-expect-error
     return this.conf.delete(key)
   }
 
   /** @type {DriverSync['has']} */
   has(key) {
-    // @ts-ignore
+    // @ts-expect-error
     return this.conf.has(key)
   }
 

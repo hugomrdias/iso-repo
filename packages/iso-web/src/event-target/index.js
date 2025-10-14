@@ -40,7 +40,7 @@ export class TypedEventTarget extends EventTarget {
    * @param {boolean | AddEventListenerOptions} [options]
    */
   addEventListener(type, callback, options) {
-    // @ts-ignore
+    // @ts-expect-error
     super.addEventListener(type, callback, options)
   }
 
@@ -65,7 +65,7 @@ export class TypedEventTarget extends EventTarget {
    * @param {boolean | EventListenerOptions} [options]
    */
   removeEventListener(type, callback, options) {
-    // @ts-ignore
+    // @ts-expect-error
     super.removeEventListener(type, callback, options)
   }
 
@@ -78,7 +78,7 @@ export class TypedEventTarget extends EventTarget {
    * @param {boolean | EventListenerOptions} [options]
    */
   off(type, callback, options) {
-    // @ts-ignore
+    // @ts-expect-error
     super.removeEventListener(type, callback, options)
   }
 
