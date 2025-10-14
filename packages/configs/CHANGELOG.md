@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2](https://github.com/hugomrdias/iso-repo/compare/configs-v1.1.1...configs-v1.1.2) (2025-10-14)
+
+
+### Bug Fixes
+
+* comment out type checking options in tsconfig.json ([5e75cbd](https://github.com/hugomrdias/iso-repo/commit/5e75cbd54bc49f9a3e6f22c7ef9db1197f1752d8))
+* update module settings and type checking options ([6fdd373](https://github.com/hugomrdias/iso-repo/commit/6fdd3738cbff71f4c215ed35b14919a358706d63))
+
 ## [1.1.1](https://github.com/hugomrdias/iso-repo/compare/configs-v1.1.0...configs-v1.1.1) (2025-08-26)
 
 
