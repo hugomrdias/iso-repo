@@ -111,7 +111,7 @@
     "@types/node": "^24.7.2",
     "assert": "^2.1.0",
     "mocha": "^11.7.4",
-    "msw": "2.10.5",
+    "msw": "2.11.5",
     "playwright-test": "^14.1.12",
     "type-fest": "^5.1.0",
     "typescript": "5.9.3"
