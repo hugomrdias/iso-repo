@@ -6,6 +6,12 @@ export type RequestInput = URL | string
 
 export interface RetryOptions {
   /**
+	The HTTP status codes allowed to retry.
+
+	@default [408, 413, 429, 500, 502, 503, 504]
+	*/
+  statusCodes?: number[]
+  /**
    * The status codes to retry after
    *
    * Request will wait until the date, timeout, or timestamp given in the Retry-After header has passed to retry the request. If Retry-After is missing, the non-standard RateLimit-Reset header is used in its place as a fallback. If the provided status code is not in the list, the Retry-After header will be ignored.
@@ -84,7 +90,12 @@ export interface RequestOptions {
   headers?: HeadersInit
   signal?: AbortSignal
   keepalive?: boolean
-  timeout?: number
+  /**
+   * Timeout in milliseconds for the request, `false` to disable timeout
+   *
+   * @default 5000
+   */
+  timeout?: number | false
   retry?: RetryOptions
   json?: Jsonifiable
   onResponse?: (

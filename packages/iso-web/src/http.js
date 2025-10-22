@@ -206,7 +206,8 @@ export async function request(resource, options = {}) {
     }
   }
 
-  const timeoutSignal = AbortSignal.timeout(timeout)
+  const timeoutSignal =
+    timeout !== false ? AbortSignal.timeout(timeout) : undefined
   const combinedSignals = anySignal([signal, timeoutSignal])
 
   const _headers = new Headers(headers)
@@ -266,9 +267,7 @@ export async function request(resource, options = {}) {
           shouldRetry: async (ctx) => {
             if (retry.shouldRetry) {
               const shouldRetry = await retry.shouldRetry(ctx)
-              if (!shouldRetry) {
-                return false
-              }
+              return Boolean(shouldRetry)
             }
 
             const methods = retry.methods ?? [
@@ -281,6 +280,13 @@ export async function request(resource, options = {}) {
             ]
 
             if (methods.includes(request.method.toLowerCase())) {
+              return true
+            }
+
+            const statusCodes = retry.statusCodes ?? [
+              408, 413, 429, 500, 502, 503, 504,
+            ]
+            if (statusCodes.includes(response.status)) {
               return true
             }
 
@@ -301,7 +307,7 @@ export async function request(resource, options = {}) {
   } catch (error) {
     const err = /** @type {Error} */ (error)
 
-    if (timeoutSignal.aborted) {
+    if (timeout !== false && timeoutSignal?.aborted) {
       return { error: new TimeoutError(timeout, { cause: err }) }
     }
 
