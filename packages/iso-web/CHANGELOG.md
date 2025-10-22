@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.4.0...iso-web-v1.4.1) (2025-10-22)
+
+
+### Bug Fixes
+
+* enhance request timeout and retry options ([4985e86](https://github.com/hugomrdias/iso-repo/commit/4985e862e19cecc480196928469b7de077c8fbcb))
+
 ## [1.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.3.0...iso-web-v1.4.0) (2025-09-19)
 
 
