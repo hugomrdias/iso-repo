@@ -279,14 +279,14 @@ export async function request(resource, options = {}) {
               'trace',
             ]
 
-            if (methods.includes(request.method.toLowerCase())) {
-              return true
-            }
-
             const statusCodes = retry.statusCodes ?? [
               408, 413, 429, 500, 502, 503, 504,
             ]
-            if (statusCodes.includes(response.status)) {
+            if (
+              methods.includes(request.method.toLowerCase()) &&
+              HttpError.is(ctx.error) &&
+              statusCodes.includes(ctx.error.code)
+            ) {
               return true
             }
 
