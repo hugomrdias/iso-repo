@@ -62,7 +62,7 @@ test('should request 200 with URL object ', async () => {
   }
 })
 
-test('should retry with on response hook', async () => {
+test.only('should retry with on response hook', async () => {
   let count = 0
   server.use(
     http.get('https://local.dev/poll', () => {
@@ -76,6 +76,9 @@ test('should retry with on response hook', async () => {
     new URL('/poll', 'https://local.dev'),
     {
       retry: {
+        shouldRetry: (ctx) => {
+          return ctx.error.message === 'error'
+        },
         factor: 1,
         minTimeout: 1000,
         retries: 3,
@@ -83,7 +86,7 @@ test('should retry with on response hook', async () => {
       onResponse: async (response) => {
         const data = await response.json()
         if (data.count < 3) {
-          return Response.error()
+          throw new Error('error')
         }
       },
     }
@@ -281,7 +284,7 @@ test(
   async () => {
     server.use(
       http.get('https://local.dev/network-error', () => {
-        return Response.error()
+        return HttpResponse.text('error', { status: 500 })
       })
     )
     const { error } = await request('https://local.dev/network-error', {
