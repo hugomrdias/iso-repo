@@ -3,7 +3,7 @@
   "packages/iso-passkeys": "0.3.1",
   "packages/iso-did": "2.1.1",
   "packages/iso-signatures": "0.5.1",
-  "packages/iso-web": "1.4.2",
+  "packages/iso-web": "1.4.3",
   "packages/iso-kv": "3.1.0",
   "packages/iso-websocket": "0.4.0",
   "packages/iso-ucan": "0.4.1",
