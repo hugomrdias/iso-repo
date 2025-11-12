@@ -5,6 +5,7 @@ import { DIDPkh } from 'iso-did/pkh'
 /**
  * @typedef {import('../types.js').ISigner<string>} ISigner
  * @typedef {import('ox').Provider.Provider} Provider
+ * @typedef {import('eventemitter3').EventEmitter} EventEmitter
  */
 
 /**
