@@ -120,10 +120,10 @@
     "@scure/base": "^2.0.0",
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.7.2",
+    "@types/node": "^24.10.1",
     "assert": "^2.1.0",
     "micro-bmark": "^0.4.2",
-    "mocha": "^11.7.4",
+    "mocha": "^11.7.5",
     "playwright-test": "^14.1.12",
     "typescript": "5.9.3"
   },
