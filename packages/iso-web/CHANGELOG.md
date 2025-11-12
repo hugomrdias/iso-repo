@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.3](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.4.2...iso-web-v1.4.3) (2025-11-12)
+
+
+### Bug Fixes
+
+* fix json fetch options ([abc30a1](https://github.com/hugomrdias/iso-repo/commit/abc30a1e9b45011804fd9481a7d90192ae428dce))
+
 ## [1.4.2](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.4.1...iso-web-v1.4.2) (2025-10-22)
 
 
