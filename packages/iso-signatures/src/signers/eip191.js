@@ -1,7 +1,6 @@
 import { hex } from 'iso-base/rfc4648'
 import { DID } from 'iso-did'
 import { DIDPkh } from 'iso-did/pkh'
-import { Provider } from 'ox'
 
 /**
  * @typedef {import('../types.js').ISigner<string>} ISigner

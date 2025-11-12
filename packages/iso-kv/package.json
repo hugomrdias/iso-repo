@@ -52,15 +52,15 @@
   "dependencies": {
     "conf": "^14.0.0",
     "idb-keyval": "^6.2.1",
-    "kysely": "^0.28.7"
+    "kysely": "^0.28.8"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
-    "@types/node": "^24.7.2",
+    "@types/node": "^24.10.1",
     "better-sqlite3": "^12.2.0",
     "delay": "^6.0.0",
     "playwright-test": "^14.1.12",
-    "quick-lru": "^7.2.0",
+    "quick-lru": "^7.3.0",
     "tempy": "^3.1.0",
     "typescript": "5.9.3"
   },
