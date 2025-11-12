@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.1.0...iso-kv-v3.1.1) (2025-11-12)
+
+
+### Bug Fixes
+
+* update conf ([0b7fb64](https://github.com/hugomrdias/iso-repo/commit/0b7fb64f63e7be299abc37f76b084c55e9974492))
+
 ## [3.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.0.3...iso-kv-v3.1.0) (2025-08-26)
 
 
