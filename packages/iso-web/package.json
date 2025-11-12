@@ -118,7 +118,7 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js' --assets test/mocks"
   },
   "dependencies": {
-    "delay": "^6.0.0",
+    "delay": "^7.0.0",
     "iso-kv": "workspace:^",
     "p-retry": "^7.1.0"
   },
