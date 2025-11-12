@@ -117,7 +117,8 @@
       "@types/*",
       "assert",
       "type-fest",
-      "mocha"
+      "mocha",
+      "eventemitter3"
     ]
   }
 }

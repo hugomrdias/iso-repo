@@ -11,7 +11,7 @@ import { parse, stringify } from '../json.js'
  */
 export class FileDriver {
   /**
-   * @param {import('conf').Options<Map<string, unknown>>} [config]
+   * @param {import('conf').Options<Record<string, unknown>>} [config]
    */
   constructor(config = {}) {
     this.conf = new Conf({
@@ -39,13 +39,11 @@ export class FileDriver {
 
   /** @type {DriverSync['delete']} */
   delete(key) {
-    // @ts-expect-error
     return this.conf.delete(key)
   }
 
   /** @type {DriverSync['has']} */
   has(key) {
-    // @ts-expect-error
     return this.conf.has(key)
   }
 
