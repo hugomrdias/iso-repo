@@ -92,18 +92,19 @@
     "@noble/secp256k1": "^3.0.0",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
-    "ox": "^0.9.6"
+    "ox": "^0.9.14"
   },
   "devDependencies": {
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.7.2",
+    "@types/node": "^24.10.1",
     "assert": "^2.1.0",
-    "mocha": "^11.7.4",
+    "eventemitter3": "^5.0.1",
+    "mocha": "^11.7.5",
     "playwright-test": "^14.1.12",
-    "type-fest": "^5.1.0",
+    "type-fest": "^5.2.0",
     "typescript": "5.9.3",
-    "viem": "^2.38.2"
+    "viem": "^2.39.0"
   },
   "publishConfig": {
     "provenance": true
@@ -116,7 +117,8 @@
       "@types/*",
       "assert",
       "type-fest",
-      "mocha"
+      "mocha",
+      "eventemitter3"
     ]
   }
 }

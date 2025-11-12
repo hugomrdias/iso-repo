@@ -18,17 +18,17 @@
     "iso-ucan": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "zod": "^3.25.0"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.13.12",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
-    "@vitejs/plugin-react": "^5.0.3",
-    "globals": "^16.4.0",
-    "hono": "^4.9.12",
+    "@cloudflare/vite-plugin": "^1.14.1",
+    "@types/react": "^19.2.4",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "globals": "^16.5.0",
+    "hono": "^4.10.5",
     "typescript": "~5.9.3",
-    "vite": "^7.1.10",
-    "wrangler": "^4.42.2"
+    "vite": "^7.2.2",
+    "wrangler": "^4.47.0"
   }
 }
