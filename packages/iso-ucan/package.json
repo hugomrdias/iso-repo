@@ -1,7 +1,7 @@
 {
   "name": "iso-ucan",
   "type": "module",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Isomorphic UCAN",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
@@ -123,7 +123,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "delay": "^6.0.0",
+    "delay": "^7.0.0",
     "playwright-test": "^14.1.12",
     "typescript": "5.9.3"
   },

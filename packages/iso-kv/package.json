@@ -1,7 +1,7 @@
 {
   "name": "iso-kv",
   "type": "module",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Isomorphic key-value storage with support for multiple backends",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
@@ -50,7 +50,7 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "conf": "^14.0.0",
+    "conf": "^15.0.2",
     "idb-keyval": "^6.2.1",
     "kysely": "^0.28.8"
   },
@@ -58,7 +58,7 @@
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^24.10.1",
     "better-sqlite3": "^12.2.0",
-    "delay": "^6.0.0",
+    "delay": "^7.0.0",
     "playwright-test": "^14.1.12",
     "quick-lru": "^7.3.0",
     "tempy": "^3.1.0",

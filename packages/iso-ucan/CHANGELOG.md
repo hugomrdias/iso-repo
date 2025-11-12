@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.4.1...iso-ucan-v0.4.2) (2025-11-12)
+
+
+### Bug Fixes
+
+* update zod ([b4f2aba](https://github.com/hugomrdias/iso-repo/commit/b4f2aba1a1cb953548cf364457404ca591ca4cf9))
+
 ## [0.4.1](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.4.0...iso-ucan-v0.4.1) (2025-09-29)
 
 
