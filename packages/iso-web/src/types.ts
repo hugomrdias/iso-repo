@@ -112,7 +112,12 @@ export interface JSONRequestOptions {
   headers?: HeadersInit
   signal?: AbortSignal
   keepalive?: boolean
-  timeout?: number
+  /**
+   * Timeout in milliseconds for the request, `false` to disable timeout
+   *
+   * @default 5000
+   */
+  timeout?: number | false
   retry?: RetryOptions
   onResponse?: (
     response: Response,
