@@ -371,7 +371,7 @@ importers:
         specifier: workspace:^
         version: link:../iso-did
       ox:
-        specifier: 0.9.14
+        specifier: ^0.9.14
         version: 0.9.14(typescript@5.9.3)(zod@4.1.12)
     devDependencies:
       '@types/assert':
