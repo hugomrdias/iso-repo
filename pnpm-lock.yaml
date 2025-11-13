@@ -166,10 +166,10 @@ importers:
     dependencies:
       '@astrojs/starlight':
         specifier: ^0.36.2
-        version: 0.36.2(astro@5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))
+        version: 0.36.2(astro@5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))
       astro:
-        specifier: ^5.15.5
-        version: 5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)
+        specifier: ^5.15.6
+        version: 5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
@@ -2590,6 +2590,7 @@ packages:
 
   '@walletconnect/ethereum-provider@2.21.1':
     resolution: {integrity: sha512-SSlIG6QEVxClgl1s0LMk4xr2wg4eT3Zn/Hb81IocyqNSGfXpjtawWxKxiC5/9Z95f1INyBD6MctJbL/R1oBwIw==}
+    deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
 
   '@walletconnect/events@1.0.1':
     resolution: {integrity: sha512-NPTqaoi0oPBVNuLv7qPaJazmGHs5JGyO8eEAk5VGKmJzDR7AHzD4k6ilox5kxk1iwiOnFopBOOMLs86Oa76HpQ==}
@@ -2821,8 +2822,8 @@ packages:
     peerDependencies:
       astro: ^4.0.0-beta || ^5.0.0-beta || ^3.3.0
 
-  astro@5.15.5:
-    resolution: {integrity: sha512-A56u4H6gFHEb0yRHcGTOADBb7jmEwfDjQpkqVV/Z+ZWlu6mYuwCrIcOUtZjNno0chrRKmOeZWDofW23ql18y3w==}
+  astro@5.15.6:
+    resolution: {integrity: sha512-luLcw+FGkeUHYTfbmYjIWHB4T0D+3VSjCy8DKTXglJ2O3lU40AbwmPVBcnqhRnA1SneKzP5V5pzqjsHzUZ1+Rg==}
     engines: {node: 18.20.8 || ^20.3.0 || >=22.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -4065,8 +4066,14 @@ packages:
   iso-kv@3.1.0:
     resolution: {integrity: sha512-PHGjTGxQNd9ikMATWu/GZl3e+0LKIpOmOnZW8a1Bja77lc2Yk0qBxrZoyut9yZOe68rp2+dBht8kzYoNLtTaeg==}
 
+  iso-kv@3.1.1:
+    resolution: {integrity: sha512-yKTLmUCc8gl0MXJs3ZaTaNDgfG/2ROasZERKPa5aYY7Ks/eb8BvGfLHrC+t1cHxiRkogvaXulDP77ovwLKgLPg==}
+
   iso-web@1.4.2:
     resolution: {integrity: sha512-cDstmvRk/k+akfC0joWbt/e+3VdpmAFAVxwpC7zUDM7bCW+Tq4SDK1n/iLRPRr7URu6RylP3bpVV/7iiIlYAHQ==}
+
+  iso-web@1.4.3:
+    resolution: {integrity: sha512-8XWpz+9WqAk1obMwajwv0waMBy7uCFFGDwW2SGI3fbFO/wt+FRxf2o6DvHoadPuV+wquvz+BAq3sX+oOW+fckQ==}
 
   isomorphic-ws@4.0.1:
     resolution: {integrity: sha512-BhBvN2MBpWTaSHdWRb/bwdZJ1WaehQ2L1KngkCkfLUGF0mAWAT1sQUQacEmQ0jXkFw/czDXPNQSL5u2/Krsz1w==}
@@ -4228,8 +4235,8 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
-  magicast@0.3.5:
-    resolution: {integrity: sha512-L0WhttDl+2BOsybvEOLK7fW3UA0OQ0IQ2d6Zl2x/a6vVRs3bAY0ECOSHHeL5jD+SbOpOCUEi0y1DgHEn9Qn1AQ==}
+  magicast@0.5.1:
+    resolution: {integrity: sha512-xrHS24IxaLrvuo613F719wvOIv9xPHFWQHuvGUBmPnCA/3MQxKI3b+r7n1jAoDHmsbC5bRhTZYR77invLAxVnw==}
 
   make-dir@4.0.0:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
@@ -5269,8 +5276,8 @@ packages:
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
     hasBin: true
 
-  smol-toml@1.4.2:
-    resolution: {integrity: sha512-rInDH6lCNiEyn3+hH8KVGFdbjc099j47+OSgbMrfDYX1CmXLfdKd7qi6IfcWj2wFxvSVkuI46M+wPGYfEOEj6g==}
+  smol-toml@1.5.0:
+    resolution: {integrity: sha512-Jjsa8LZ+DyLbZ7gVi9d18bS8oxq0PQrTlVDfvYXgh7gxLwbW9QWgvakHD+hBLUtr5NahfStd8LQLGSPchaEJ8Q==}
     engines: {node: '>= 18'}
 
   socket.io-client@4.8.1:
@@ -6205,7 +6212,7 @@ snapshots:
       remark-rehype: 11.1.2
       remark-smartypants: 3.0.2
       shiki: 3.15.0
-      smol-toml: 1.4.2
+      smol-toml: 1.5.0
       unified: 11.0.5
       unist-util-remove-position: 5.0.0
       unist-util-visit: 5.0.0
@@ -6214,12 +6221,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@4.3.10(astro@5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))':
+  '@astrojs/mdx@4.3.10(astro@5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))':
     dependencies:
       '@astrojs/markdown-remark': 6.3.8
       '@mdx-js/mdx': 3.1.1
       acorn: 8.15.0
-      astro: 5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)
+      astro: 5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)
       es-module-lexer: 1.7.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -6243,17 +6250,17 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 3.25.76
 
-  '@astrojs/starlight@0.36.2(astro@5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))':
+  '@astrojs/starlight@0.36.2(astro@5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))':
     dependencies:
       '@astrojs/markdown-remark': 6.3.8
-      '@astrojs/mdx': 4.3.10(astro@5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))
+      '@astrojs/mdx': 4.3.10(astro@5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))
       '@astrojs/sitemap': 3.6.0
       '@pagefind/default-ui': 1.4.0
       '@types/hast': 3.0.4
       '@types/js-yaml': 4.0.9
       '@types/mdast': 4.0.4
-      astro: 5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)
-      astro-expressive-code: 0.41.3(astro@5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))
+      astro: 5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)
+      astro-expressive-code: 0.41.3(astro@5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1))
       bcp-47: 2.1.0
       hast-util-from-html: 2.0.3
       hast-util-select: 6.0.4
@@ -9318,12 +9325,12 @@ snapshots:
 
   astring@1.9.0: {}
 
-  astro-expressive-code@0.41.3(astro@5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)):
+  astro-expressive-code@0.41.3(astro@5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)):
     dependencies:
-      astro: 5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)
+      astro: 5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1)
       rehype-expressive-code: 0.41.3
 
-  astro@5.15.5(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1):
+  astro@5.15.6(@types/node@24.10.1)(idb-keyval@6.2.2)(rollup@4.53.2)(typescript@5.9.3)(yaml@2.8.1):
     dependencies:
       '@astrojs/compiler': 2.13.0
       '@astrojs/internal-helpers': 0.7.4
@@ -9358,7 +9365,7 @@ snapshots:
       import-meta-resolve: 4.2.0
       js-yaml: 4.1.1
       magic-string: 0.30.21
-      magicast: 0.3.5
+      magicast: 0.5.1
       mrmime: 2.0.1
       neotraverse: 0.6.18
       p-limit: 6.2.0
@@ -9370,7 +9377,7 @@ snapshots:
       rehype: 13.0.2
       semver: 7.7.3
       shiki: 3.15.0
-      smol-toml: 1.4.2
+      smol-toml: 1.5.0
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
       tsconfck: 3.1.6(typescript@5.9.3)
@@ -10851,8 +10858,8 @@ snapshots:
       abitype: 1.1.1(typescript@5.9.3)(zod@3.25.76)
       bignumber.js: 9.3.1
       iso-base: 4.2.1
-      iso-kv: 3.1.0
-      iso-web: 1.4.2
+      iso-kv: 3.1.1
+      iso-web: 1.4.3
       zod: 3.25.76
     transitivePeerDependencies:
       - typescript
@@ -10863,10 +10870,22 @@ snapshots:
       idb-keyval: 6.2.2
       kysely: 0.28.8
 
+  iso-kv@3.1.1:
+    dependencies:
+      conf: 15.0.2
+      idb-keyval: 6.2.2
+      kysely: 0.28.8
+
   iso-web@1.4.2:
     dependencies:
       delay: 6.0.0
       iso-kv: 3.1.0
+      p-retry: 7.1.0
+
+  iso-web@1.4.3:
+    dependencies:
+      delay: 7.0.0
+      iso-kv: 3.1.1
       p-retry: 7.1.0
 
   isomorphic-ws@4.0.1(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10)):
@@ -11034,7 +11053,7 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  magicast@0.3.5:
+  magicast@0.5.1:
     dependencies:
       '@babel/parser': 7.28.5
       '@babel/types': 7.28.5
@@ -12629,7 +12648,7 @@ snapshots:
       arg: 5.0.2
       sax: 1.4.3
 
-  smol-toml@1.4.2: {}
+  smol-toml@1.5.0: {}
 
   socket.io-client@4.8.1(bufferutil@4.0.9)(utf-8-validate@5.0.10):
     dependencies:
