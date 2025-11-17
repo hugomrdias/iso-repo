@@ -52,7 +52,7 @@
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
     "@peculiar/asn1-ecc": "^2.5.0",
-    "@peculiar/asn1-schema": "^2.5.0",
+    "@peculiar/asn1-schema": "^2.6.0",
     "cbor-x": "^1.6.0",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^"
