@@ -41,8 +41,8 @@
     ]
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.36.2",
-    "astro": "^5.15.5",
+    "@astrojs/starlight": "^0.36.3",
+    "astro": "^5.16.0",
     "github-slugger": "^2.0.0",
     "typedoc-plugin-markdown": "^4.8.1",
     "yaml": "^2.8.1"
