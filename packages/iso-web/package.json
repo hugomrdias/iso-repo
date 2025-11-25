@@ -126,7 +126,7 @@
     "@types/debug": "^4.1.12",
     "@types/node": "^24.10.1",
     "iso-base": "workspace:^",
-    "msw": "2.10.5",
+    "msw": "2.12.3",
     "playwright-test": "^14.1.12",
     "type-fest": "^5.2.0",
     "typescript": "5.9.3"

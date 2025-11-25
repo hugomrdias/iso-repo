@@ -127,9 +127,14 @@ const handlers = [
 ]
 
 const test = suite('dnslink')
-const server = setup(handlers)
+const server = setup()
 test.before(async () => {
-  await server.start({ quiet: true })
+  await server.start()
+})
+
+test.beforeEach(() => {
+  server.resetHandlers()
+  server.use(...handlers)
 })
 
 test.after(() => {

@@ -5,7 +5,9 @@ import { setup } from '../src/msw/msw.js'
 
 const test = suite('request')
 
-const server = setup([
+const server = setup()
+
+const handlers = [
   http.get('https://local.dev/error', ({ request }) => {
     const params = Object.fromEntries(new URL(request.url).searchParams)
     return HttpResponse.text(params.text, { status: Number(params.status) })
@@ -18,14 +20,15 @@ const server = setup([
     await delay(100)
     return Response.error()
   }),
-])
+]
 
 test.before(async () => {
-  await server.start({ quiet: true })
+  await server.start()
 })
 
 test.beforeEach(() => {
   server.resetHandlers()
+  server.use(...handlers)
 })
 
 test.after(() => {
@@ -62,7 +65,7 @@ test('should request 200 with URL object ', async () => {
   }
 })
 
-test.only('should retry with on response hook', async () => {
+test('should retry with on response hook', async () => {
   let count = 0
   server.use(
     http.get('https://local.dev/poll', () => {

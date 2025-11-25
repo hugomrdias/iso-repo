@@ -1,29 +1,25 @@
 import { setupServer } from 'msw/node'
 
 /**
- * @param {Array<import('msw').RequestHandler | import('msw').WebSocketHandler>} handlers
+ * @returns {import('./types.ts').BrowserNodeServer}
  */
-export function setup(handlers) {
-  const server = setupServer(...handlers)
+export function setup() {
+  if (arguments.length > 0) {
+    throw new Error(
+      'setup takes no arguments use server.use(...handlers) instead'
+    )
+  }
+  const server = setupServer()
   return {
-    /**
-     * @param {import('msw/browser').StartOptions} _options
-     */
-    start(_options) {
-      server.listen()
-      return Promise.resolve()
+    start: (options) => {
+      server.listen(options?.node)
+      return Promise.resolve(undefined)
     },
-    stop() {
-      server.close()
-    },
-    resetHandlers() {
-      server.resetHandlers()
-    },
-    /**
-     * @param {Array<import('msw').RequestHandler | import('msw').WebSocketHandler>} handlers
-     */
-    use(...handlers) {
-      server.use(...handlers)
-    },
+    stop: server.close.bind(server),
+    resetHandlers: server.resetHandlers.bind(server),
+    use: server.use.bind(server),
+    restoreHandlers: server.restoreHandlers.bind(server),
+    listHandlers: server.listHandlers.bind(server),
+    events: server.events,
   }
 }
