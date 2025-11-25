@@ -13,7 +13,8 @@ const resolver = new Resolver({
   web: didWebResolver,
 })
 
-const server = setup([
+const server = setup()
+const handlers = [
   http.get('https://localhost:3000/.well-known/did.json', () => {
     return Response.json(
       {
@@ -70,15 +71,16 @@ const server = setup([
       { status: 200 }
     )
   }),
-])
+]
 
 describe('did', () => {
   before(async () => {
-    await server.start({ quiet: true })
+    await server.start()
   })
 
   beforeEach(() => {
     server.resetHandlers()
+    server.use(...handlers)
   })
 
   after(() => {

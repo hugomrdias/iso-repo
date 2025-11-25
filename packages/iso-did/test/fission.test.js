@@ -4,7 +4,7 @@ import { http } from 'msw'
 import { didFissionResolver, format } from '../src/fission.js'
 import { DID, parse, Resolver } from '../src/index.js'
 
-const server = setup([])
+const server = setup()
 
 const resolver = new Resolver({
   fission: didFissionResolver,
@@ -12,7 +12,7 @@ const resolver = new Resolver({
 
 describe('did fission ', () => {
   before(async () => {
-    await server.start({ quiet: true })
+    await server.start()
   })
 
   beforeEach(() => {

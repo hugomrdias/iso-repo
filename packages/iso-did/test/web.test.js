@@ -4,11 +4,10 @@ import { http } from 'msw'
 import { parse } from '../src/index.js'
 import { didWebResolver } from '../src/web.js'
 
-const server = setup([])
-
+const server = setup()
 describe('did web ', () => {
   before(async () => {
-    await server.start({ quiet: true })
+    await server.start()
   })
 
   beforeEach(() => {
