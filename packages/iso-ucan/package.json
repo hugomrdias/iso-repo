@@ -114,12 +114,12 @@
     "iobuffer": "^6.0.1",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
-    "iso-kv": "^3.1.0",
+    "iso-kv": "^3.1.1",
     "iso-signatures": "workspace:^",
-    "iso-web": "^1.4.2",
+    "iso-web": "^1.4.3",
     "it-merge": "^3.0.12",
     "multiformats": "^13.4.1",
-    "zod": "^4.1.12"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
