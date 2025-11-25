@@ -12,7 +12,7 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.90.8",
+    "@tanstack/react-query": "^5.90.10",
     "filsnap-adapter": "^3.3.8",
     "iso-base": "workspace:*",
     "iso-did": "workspace:*",
@@ -21,9 +21,9 @@
     "iso-ucan": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "viem": "~2.39.0",
-    "wagmi": "^2.19.3",
-    "zod": "^4.1.12"
+    "viem": "~2.40.2",
+    "wagmi": "^3.0.1",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.14.1",
