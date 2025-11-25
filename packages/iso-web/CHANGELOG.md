@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.4.3...iso-web-v2.0.0) (2025-11-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* msw api changed
+
+### Features
+
+* msw api changed ([b85e5f7](https://github.com/hugomrdias/iso-repo/commit/b85e5f777091a60457aaa6f981c5e9b6aec56814))
+
 ## [1.4.3](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.4.2...iso-web-v1.4.3) (2025-11-12)
 
 
