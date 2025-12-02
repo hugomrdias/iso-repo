@@ -6,10 +6,14 @@ export type RequestInput = URL | string
 
 export interface RetryOptions {
   /**
-	The HTTP status codes allowed to retry.
-
-	@default [408, 413, 429, 500, 502, 503, 504]
-	*/
+   * The HTTP status codes to retry on.
+   *
+   * This includes both error status codes (4xx, 5xx) and success codes (2xx).
+   * For example, you can retry on 202 (Accepted) to poll until a resource
+   * is ready, or on 404 to wait for a resource to be created.
+   *
+   * @default [408, 413, 429, 500, 502, 503, 504]
+   */
   statusCodes?: number[]
   /**
    * The status codes to retry after
