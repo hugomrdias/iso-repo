@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.0.0...iso-web-v2.1.0) (2025-12-03)
+
+
+### Features
+
+* **iso-web:** support retrying on 2xx status codes ([#438](https://github.com/hugomrdias/iso-repo/issues/438)) ([b30218c](https://github.com/hugomrdias/iso-repo/commit/b30218c26d623886592c85ff40d0b030d2358d3f))
+
 ## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v1.4.3...iso-web-v2.0.0) (2025-11-25)
 
 
