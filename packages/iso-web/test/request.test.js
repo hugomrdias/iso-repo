@@ -357,6 +357,68 @@ test(
   { timeout: 10_000 }
 )
 
+test(
+  'should retry on 2xx status codes when specified in statusCodes',
+  async () => {
+    let count = 0
+    server.use(
+      http.get('https://local.dev/processing', () => {
+        count++
+        if (count < 3) {
+          return HttpResponse.json({ status: 'processing' }, { status: 202 })
+        }
+        return HttpResponse.json({ data: 'ready' }, { status: 200 })
+      })
+    )
+
+    const { error, result } = await request('https://local.dev/processing', {
+      retry: {
+        statusCodes: [202],
+        retries: 5,
+        minTimeout: 10,
+        factor: 1,
+      },
+    })
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.equal(result.status, 200)
+      assert.deepEqual(await result.json(), { data: 'ready' })
+      assert.equal(count, 3)
+    }
+  },
+  { timeout: 10_000 }
+)
+
+test(
+  'should fail after retries exhausted on 2xx status code',
+  async () => {
+    server.use(
+      http.get('https://local.dev/always-processing', () => {
+        return HttpResponse.json({ status: 'processing' }, { status: 202 })
+      })
+    )
+
+    const { error } = await request('https://local.dev/always-processing', {
+      retry: {
+        statusCodes: [202],
+        retries: 2,
+        minTimeout: 10,
+        factor: 1,
+      },
+    })
+
+    if (error) {
+      assert.ok(HttpError.is(error))
+      assert.equal(error.code, 202)
+    } else {
+      assert.fail('should fail')
+    }
+  },
+  { timeout: 10_000 }
+)
+
 test('should set content-type json', async () => {
   const { error } = await request('https://local.dev/error?status=500', {
     method: 'POST',

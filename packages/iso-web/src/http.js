@@ -233,7 +233,8 @@ export async function request(resource, options = {}) {
       rsp = result
     }
 
-    if (!rsp.ok) {
+    const retryStatusCodes = retry?.statusCodes ?? []
+    if (!rsp.ok || retryStatusCodes.includes(rsp.status)) {
       throw new HttpError({
         response: rsp,
         request,
