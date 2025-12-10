@@ -58,8 +58,6 @@ jobs:
       - run: pnpm install
       - run: pnpm run lint
       - run: pnpm -r publish --access=public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
   docs:
     needs: release
     if: |
