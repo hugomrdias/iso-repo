@@ -64,11 +64,11 @@
   },
   "devDependencies": {
     "@ledgerhq/hw-transport-webhid": "6.x",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "@types/w3c-web-hid": "^1.0.6",
     "@wagmi/core": "3.x",
     "typescript": "5.9.3",
-    "viem": "2.x"
+    "viem": "~2.41.2"
   },
   "publishConfig": {
     "provenance": true

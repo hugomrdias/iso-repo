@@ -116,13 +116,13 @@
     "iso-did": "workspace:^",
     "iso-kv": "^3.1.1",
     "iso-signatures": "workspace:^",
-    "iso-web": "^1.4.3",
+    "iso-web": "^2.1.0",
     "it-merge": "^3.0.12",
     "multiformats": "^13.4.1",
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "delay": "^7.0.0",
     "playwright-test": "^14.1.12",
     "typescript": "5.9.3"

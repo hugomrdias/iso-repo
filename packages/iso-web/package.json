@@ -120,15 +120,15 @@
   "dependencies": {
     "delay": "^7.0.0",
     "iso-kv": "workspace:^",
-    "p-retry": "^7.1.0"
+    "p-retry": "^7.1.1"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "iso-base": "workspace:^",
-    "msw": "2.12.3",
+    "msw": "2.12.4",
     "playwright-test": "^14.1.12",
-    "type-fest": "^5.2.0",
+    "type-fest": "^5.3.1",
     "typescript": "5.9.3"
   },
   "publishConfig": {

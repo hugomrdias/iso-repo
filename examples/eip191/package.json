@@ -12,28 +12,28 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.90.10",
+    "@tanstack/react-query": "^5.90.12",
     "filsnap-adapter": "^3.3.8",
     "iso-base": "workspace:*",
     "iso-did": "workspace:*",
     "iso-kv": "workspace:*",
     "iso-signatures": "workspace:*",
     "iso-ucan": "workspace:*",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "viem": "~2.40.2",
-    "wagmi": "^3.0.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "viem": "~2.41.2",
+    "wagmi": "^3.1.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.14.1",
-    "@types/react": "^19.2.4",
+    "@cloudflare/vite-plugin": "^1.17.0",
+    "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react": "^5.1.2",
     "globals": "^16.5.0",
-    "hono": "^4.10.5",
+    "hono": "^4.10.8",
     "typescript": "~5.9.3",
-    "vite": "^7.2.2",
-    "wrangler": "^4.47.0"
+    "vite": "^7.2.7",
+    "wrangler": "^4.53.0"
   }
 }
