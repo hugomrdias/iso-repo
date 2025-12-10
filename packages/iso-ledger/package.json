@@ -71,7 +71,7 @@
     "viem": "~2.41.2"
   },
   "publishConfig": {
-    "provenance": false
+    "provenance": true
   },
   "depcheck": {
     "specials": [
