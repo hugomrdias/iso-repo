@@ -11,6 +11,8 @@ pnpm install iso-ledger
 ## References
 
 - [node-usb](https://github.com/node-usb/node-usb)
+- [zondax-ledger](https://github.com/Zondax/ledger-js)
+- [ledgerjs](https://github.com/LedgerHQ/ledger-live/tree/develop/libs/ledgerjs)
 
 ## License
 
