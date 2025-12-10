@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.7](https://github.com/hugomrdias/iso-repo/compare/iso-ledger-v0.1.6...iso-ledger-v0.1.7) (2025-12-10)
+
+
+### Bug Fixes
+
+* enable provenance ([9592331](https://github.com/hugomrdias/iso-repo/commit/9592331d78552cc07852cc8278885d73e726d753))
+
 ## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-ledger-v0.1.5...iso-ledger-v0.1.6) (2025-12-10)
 
 
