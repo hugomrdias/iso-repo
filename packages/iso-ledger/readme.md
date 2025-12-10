@@ -8,6 +8,10 @@
 pnpm install iso-ledger
 ```
 
+## References
+
+- [node-usb](https://github.com/node-usb/node-usb)
+
 ## License
 
 MIT © [Hugo Dias](http://hugodias.me)

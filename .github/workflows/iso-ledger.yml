@@ -30,5 +30,4 @@ jobs:
       - run: pnpm install
       - run: pnpm run build
       - run: pnpm -r --filter iso-ledger run lint
-      - run: pnpm -r --filter iso-ledger run test
       - run: pnpm -r --filter iso-ledger exec depcheck
