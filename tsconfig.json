@@ -10,7 +10,8 @@
       "packages/iso-web",
       "packages/iso-kv",
       "packages/iso-websocket",
-      "packages/iso-ucan"
+      "packages/iso-ucan",
+      "packages/iso-ledger"
     ],
     "excludeExternals": true,
     "sourceLinkExternal": true,
