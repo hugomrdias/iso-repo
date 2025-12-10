@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/iso-ledger-v0.1.5...iso-ledger-v0.1.6) (2025-12-10)
+
+
+### Bug Fixes
+
+* ledger publish ([38b0ab9](https://github.com/hugomrdias/iso-repo/commit/38b0ab9e6826338ba1fe4ea3b4b093b8ed8f9c8c))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/iso-ledger-v0.0.1...iso-ledger-v0.1.5) (2025-12-10)
 
 

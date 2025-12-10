@@ -1,7 +1,7 @@
 {
   "name": "iso-ledger",
   "type": "module",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Isomorphic ledger utilities for ledger devices",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
