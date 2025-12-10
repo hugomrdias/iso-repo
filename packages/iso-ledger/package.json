@@ -1,0 +1,93 @@
+{
+  "name": "iso-ledger",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Isomorphic ledger utilities for ledger devices",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-ledger",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-ledger"
+  },
+  "bugs": {
+    "url": "https://github.com/hugomrdias/iso-repo/issues"
+  },
+  "keywords": [
+    "ledger",
+    "crypto",
+    "ledger device"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./ledger-to-account": {
+      "types": "./dist/src/ledger-to-account.d.ts",
+      "default": "./src/ledger-to-account.js"
+    },
+    "./ledger-connector": {
+      "types": "./dist/src/ledger-connector.d.ts",
+      "default": "./src/ledger-connector.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts"
+    }
+  },
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "ledger-to-account": [
+        "dist/src/ledger-to-account"
+      ],
+      "ledger-connector": [
+        "dist/src/ledger-connector"
+      ],
+      "types": [
+        "dist/src/types"
+      ]
+    }
+  },
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
+  "scripts": {
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
+    "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+  },
+  "dependencies": {
+    "@ledgerhq/hw-app-eth": "^7.0.0",
+    "@ledgerhq/hw-transport": "^6.31.13"
+  },
+  "devDependencies": {
+    "@ledgerhq/hw-transport-webhid": "6.x",
+    "@types/node": "^24.10.1",
+    "@types/w3c-web-hid": "^1.0.6",
+    "@wagmi/core": "3.x",
+    "typescript": "5.9.3",
+    "viem": "2.x"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*",
+      "assert"
+    ]
+  },
+  "peerDependencies": {
+    "@ledgerhq/hw-transport-webhid": "6.x",
+    "@wagmi/core": "3.x",
+    "viem": "2.x"
+  }
+}

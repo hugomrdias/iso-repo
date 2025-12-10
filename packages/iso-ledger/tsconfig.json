@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "outDir": "dist"
+  },
+  "include": ["src", "scripts", "test", "package.json"],
+  "exclude": ["node_modules", "dist", "out"],
+  "typedocOptions": {
+    "entryPointStrategy": "resolve",
+    "entryPoints": ["src/ledger-connector.js", "src/ledger-to-account.js"],
+    "includeVersion": true,
+    "excludeExternals": true,
+    "internalModule": "<internal>"
+  }
+}

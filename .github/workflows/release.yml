@@ -38,6 +38,7 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-websocket')  ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ucan') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ledger') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/configs') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/docs')
     runs-on: ubuntu-latest
@@ -52,7 +53,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
           cache: pnpm
       - run: pnpm install
       - run: pnpm run lint
@@ -71,5 +72,6 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-kv') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-websocket') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ucan') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ledger') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/docs')
     uses: ./.github/workflows/reusable-docs.yml

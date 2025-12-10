@@ -9,6 +9,7 @@
     "packages/iso-kv": {},
     "packages/iso-websocket": {},
     "packages/iso-ucan": {},
+    "packages/iso-ledger": {},
     "packages/configs": {},
     "packages/docs": {}
   }
