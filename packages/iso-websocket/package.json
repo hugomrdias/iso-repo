@@ -47,13 +47,13 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "@types/retry": "^0.12.5",
     "@types/ws": "^8.5.14",
     "delay": "^7.0.0",
     "p-defer": "^4.0.0",
     "playwright-test": "^14.1.12",
-    "type-fest": "^5.2.0",
+    "type-fest": "^5.3.1",
     "typescript": "5.9.3"
   },
   "publishConfig": {

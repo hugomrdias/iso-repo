@@ -56,10 +56,7 @@
     "dist/src/*.d.ts.map"
   ],
   "scripts": {
-    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
-    "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
-    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
-    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true ."
   },
   "dependencies": {
     "@ledgerhq/hw-app-eth": "^7.0.0",
@@ -67,11 +64,11 @@
   },
   "devDependencies": {
     "@ledgerhq/hw-transport-webhid": "6.x",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "@types/w3c-web-hid": "^1.0.6",
     "@wagmi/core": "3.x",
     "typescript": "5.9.3",
-    "viem": "2.x"
+    "viem": "~2.41.2"
   },
   "publishConfig": {
     "provenance": true

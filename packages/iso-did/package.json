@@ -108,12 +108,12 @@
     "@noble/hashes": "^2.0.0",
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "assert": "^2.1.0",
     "mocha": "^11.7.5",
-    "msw": "2.12.3",
+    "msw": "2.12.4",
     "playwright-test": "^14.1.12",
-    "type-fest": "^5.2.0",
+    "type-fest": "^5.3.1",
     "typescript": "5.9.3"
   },
   "publishConfig": {
