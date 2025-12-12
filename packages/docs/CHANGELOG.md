@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.5...docs-v0.1.6) (2025-12-12)
+
+
+### Bug Fixes
+
+* improve index files ([f7a2cc8](https://github.com/hugomrdias/iso-repo/commit/f7a2cc859716dd646b4e685e2d7a31aa837767a2))
+
 ## [0.1.5](https://github.com/hugomrdias/iso-repo/compare/docs-v0.0.1...docs-v0.1.5) (2025-09-02)
 
 
