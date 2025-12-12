@@ -63,6 +63,7 @@ const _defaultTypeDocOptions: TypeDocWithMarkdownPlugin = {
   hideBreadcrumbs: true,
   hidePageHeader: true,
   hidePageTitle: true,
+  entryFileName: 'index',
 }
 
 export function getUrlPath(outputDirectory: string, base = '') {
@@ -137,10 +138,9 @@ export function docsPlugin(options: DocsPluginOptions = {}): StarlightPlugin {
               editUrl: false,
             }
 
-            if (event.url.includes('README')) {
+            if (event.url.includes('index.md')) {
               frontmatter.title = 'Index'
-              // frontmatter.slug = `${slug(event.model.name)}/index`
-              frontmatter.sidebar = { order: event.url.split('/').length }
+              frontmatter.sidebar = { order: 0 }
             }
 
             if (!event.frontmatter) {
@@ -391,8 +391,7 @@ export function getRelativeURL(
   constructedUrl += fileNameSlug || filePath.name
   constructedUrl += '/'
   constructedUrl += anchor && anchor.length > 0 ? `#${anchor}` : ''
-
-  return constructedUrl
+  return constructedUrl.replace('/index/', '/')
 }
 
 export class StarlightTypeDocLogger extends Logger {
