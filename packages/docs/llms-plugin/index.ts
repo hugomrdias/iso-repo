@@ -38,19 +38,18 @@ export interface PageActionsConfig {
  * @param {string} [userConfig.baseUrl] - The base URL of your site, required for generating the `llms.txt` file.
  * @param {Actions} [userConfig.actions] - Configure which built-in actions to display and define custom actions.
  *
- * @see {@link https://starlight-page-actions.dlcastillop.com/docs/reference/configuration|Configuration Reference}
  *
  * @example
  * ```javascript
  * // astro.config.mjs
  * import starlight from '@astrojs/starlight';
- * import starlightPageActions from 'starlight-page-actions';
+ * import { llmsPlugin } from '@hugomrdias/docs/llms-plugin';
  *
  * export default defineConfig({
  *   integrations: [
  *     starlight({
  *       plugins: [
- *         starlightPageActions({
+ *         llmsPlugin({
  *           prompt: "Read {url} and explain its main points briefly.",
  *           baseUrl: "https://mydocs.example.com",
  *           actions: {
@@ -71,9 +70,7 @@ export interface PageActionsConfig {
  * ```
  *
  */
-export default function starlightPageActions(
-  userConfig?: PageActionsConfig
-): StarlightPlugin {
+export function llmsPlugin(userConfig?: PageActionsConfig): StarlightPlugin {
   const defaultConfig: PageActionsConfig = {
     prompt: 'Read {url}. I want to ask questions about it.',
     actions: {
@@ -86,7 +83,7 @@ export default function starlightPageActions(
   }
 
   return {
-    name: 'starlight-page-actions',
+    name: 'llms-plugin',
     hooks: {
       'config:setup'({
         astroConfig,
@@ -128,21 +125,21 @@ export default function starlightPageActions(
         }
 
         addIntegration({
-          name: 'starlight-page-actions-integration',
+          name: 'llms-plugin-integration',
           hooks: {
             'astro:config:setup': ({ updateConfig }) => {
               updateConfig({
                 vite: {
                   plugins: [
                     {
-                      name: 'starlight-page-actions-config',
+                      name: 'llms-plugin-config',
                       resolveId(id) {
-                        if (id === 'virtual:starlight-page-actions/config') {
+                        if (id === 'virtual:llms-plugin/config') {
                           return `\0${id}`
                         }
                       },
                       load(id) {
-                        if (id === '\0virtual:starlight-page-actions/config') {
+                        if (id === '\0virtual:llms-plugin/config') {
                           return `export default ${JSON.stringify(config)}`
                         }
                       },

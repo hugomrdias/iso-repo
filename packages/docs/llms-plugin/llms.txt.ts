@@ -2,7 +2,7 @@
 import { site } from 'astro:config/client'
 // @ts-expect-error - TODO: fix this
 import { getCollection, type InferEntrySchema } from 'astro:content'
-import config from 'virtual:starlight-page-actions/config'
+import config from 'virtual:llms-plugin/config'
 import type { APIRoute } from 'astro'
 
 /**
