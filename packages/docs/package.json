@@ -22,7 +22,7 @@
   },
   "files": [
     "docs-plugin.ts",
-    "lls-plugin"
+    "llms-plugin"
   ],
   "scripts": {
     "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true",
