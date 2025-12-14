@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.8...docs-v0.1.9) (2025-12-14)
+
+
+### Bug Fixes
+
+* fix npm files ([0e65ad3](https://github.com/hugomrdias/iso-repo/commit/0e65ad3d3459b472fa3dfc806a8201c008e3cc1c))
+
 ## [0.1.8](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.7...docs-v0.1.8) (2025-12-14)
 
 
