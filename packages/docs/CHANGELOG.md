@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.10](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.9...docs-v0.1.10) (2025-12-14)
+
+
+### Bug Fixes
+
+* md copy to lower case ([0cd845f](https://github.com/hugomrdias/iso-repo/commit/0cd845f224276125477107db63f1429e47e246be))
+
 ## [0.1.9](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.8...docs-v0.1.9) (2025-12-14)
 
 
