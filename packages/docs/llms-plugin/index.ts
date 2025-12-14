@@ -226,7 +226,7 @@ export function llmsPlugin(userConfig?: PageActionsConfig): StarlightPlugin {
                               ? `${directories}/${fileName}.md`
                               : `${fileName}.md`
 
-                            return finalPath.replace('@', '')
+                            return finalPath.replace('@', '').toLowerCase()
                           },
                         },
                       ],
