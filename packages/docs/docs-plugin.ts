@@ -63,7 +63,7 @@ const _defaultTypeDocOptions: TypeDocWithMarkdownPlugin = {
   hideBreadcrumbs: true,
   hidePageHeader: true,
   hidePageTitle: true,
-  entryFileName: 'index',
+  entryFileName: 'toc',
 }
 
 export function getUrlPath(outputDirectory: string, base = '') {
@@ -138,8 +138,7 @@ export function docsPlugin(options: DocsPluginOptions = {}): StarlightPlugin {
               editUrl: false,
             }
 
-            if (event.url.includes('index.md')) {
-              frontmatter.title = 'Index'
+            if (event.url.includes('toc.md')) {
               frontmatter.sidebar = { order: 0 }
             }
 
