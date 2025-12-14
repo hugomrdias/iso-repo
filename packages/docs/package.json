@@ -1,7 +1,7 @@
 {
   "name": "@hugomrdias/docs",
   "type": "module",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Docs for iso-repo",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
