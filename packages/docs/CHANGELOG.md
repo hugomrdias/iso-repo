@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.8](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.7...docs-v0.1.8) (2025-12-14)
+
+
+### Bug Fixes
+
+* add files to npm ([f6e1089](https://github.com/hugomrdias/iso-repo/commit/f6e1089ba93dc72c664357bbcb134f890d384820))
+* fix exports and names ([21a1394](https://github.com/hugomrdias/iso-repo/commit/21a13942dc840ac18d59829634d811f7614832df))
+
 ## [0.1.7](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.6...docs-v0.1.7) (2025-12-14)
 
 
