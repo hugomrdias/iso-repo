@@ -21,7 +21,8 @@
     "./starlight-llms": "./llms-plugin/index.ts"
   },
   "files": [
-    "docs-plugin.ts"
+    "docs-plugin.ts",
+    "lls-plugin"
   ],
   "scripts": {
     "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true",
