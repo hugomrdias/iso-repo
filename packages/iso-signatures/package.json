@@ -92,7 +92,7 @@
     "@noble/secp256k1": "^3.0.0",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
-    "ox": "^0.9.17"
+    "ox": "^0.10.2"
   },
   "devDependencies": {
     "@types/assert": "^1.5.11",
