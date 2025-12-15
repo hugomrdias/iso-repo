@@ -68,7 +68,7 @@
     "@types/w3c-web-hid": "^1.0.6",
     "@wagmi/core": "3.x",
     "typescript": "5.9.3",
-    "viem": "~2.41.2"
+    "viem": "~2.42.1"
   },
   "publishConfig": {
     "provenance": true
