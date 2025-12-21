@@ -2,7 +2,7 @@
   "name": "@hugomrdias/docs",
   "type": "module",
   "version": "0.1.10",
-  "description": "Docs for iso-repo",
+  "description": "Starlight plugins for TypeScript documentation and AI chat integration",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
   "repository": {
@@ -12,8 +12,13 @@
   "keywords": [
     "docs",
     "typescript",
-    "config",
-    "tooling"
+    "starlight",
+    "ai",
+    "chat",
+    "llms",
+    "typedoc",
+    "documentation",
+    "astro"
   ],
   "exports": {
     "./starlight-typedoc": "./docs-plugin.ts",
