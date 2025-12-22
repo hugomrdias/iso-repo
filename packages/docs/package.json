@@ -1,7 +1,7 @@
 {
   "name": "@hugomrdias/docs",
   "type": "module",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Starlight plugins for TypeScript documentation and AI chat integration",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
