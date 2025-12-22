@@ -43,7 +43,7 @@ const did2 = DIDKey.fromPublicKey('ED25519', publicKeyBytes)
 
 ## Docs
 
-Check <https://hugomrdias.github.io/iso-repo/modules/iso_did.html>
+Check <https://hugomrdias.github.io/iso-repo/modules/iso-did.html>
 
 ## License
 
