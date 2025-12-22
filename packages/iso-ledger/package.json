@@ -59,16 +59,16 @@
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true ."
   },
   "dependencies": {
-    "@ledgerhq/hw-app-eth": "^7.0.0",
-    "@ledgerhq/hw-transport": "^6.31.13"
+    "@ledgerhq/hw-app-eth": "^7.0.1",
+    "@ledgerhq/hw-transport": "^6.31.14"
   },
   "devDependencies": {
-    "@ledgerhq/hw-transport-webhid": "6.x",
+    "@ledgerhq/hw-transport-webhid": "~6.30.10",
     "@types/node": "^24.10.2",
     "@types/w3c-web-hid": "^1.0.6",
     "@wagmi/core": "3.x",
     "typescript": "5.9.3",
-    "viem": "~2.41.2"
+    "viem": "~2.43.3"
   },
   "publishConfig": {
     "provenance": true

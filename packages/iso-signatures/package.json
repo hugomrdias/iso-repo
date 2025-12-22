@@ -92,7 +92,7 @@
     "@noble/secp256k1": "^3.0.0",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
-    "ox": "^0.9.17"
+    "ox": "^0.11.1"
   },
   "devDependencies": {
     "@types/assert": "^1.5.11",
@@ -104,7 +104,7 @@
     "playwright-test": "^14.1.12",
     "type-fest": "^5.3.1",
     "typescript": "5.9.3",
-    "viem": "^2.41.2"
+    "viem": "^2.43.3"
   },
   "publishConfig": {
     "provenance": true
