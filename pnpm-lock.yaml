@@ -220,15 +220,15 @@ importers:
       assert:
         specifier: ^2.1.0
         version: 2.1.0
-      micro-bmark:
-        specifier: ^0.4.2
-        version: 0.4.2
       mocha:
         specifier: ^11.7.5
         version: 11.7.5
       playwright-test:
         specifier: ^14.1.12
         version: 14.1.12
+      tinybench:
+        specifier: ^6.0.0
+        version: 6.0.0
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -3731,10 +3731,6 @@ packages:
     resolution: {integrity: sha512-2Sug1+knBjkaMsMgf1ctR1Ujx+Ayku4EdJN4Z+C2+JzoeF7A3OZ9KM2GY0CpQS51NR61LTurMJrRKPhSs3ZRTQ==}
     engines: {node: '>=10'}
 
-  micro-bmark@0.4.2:
-    resolution: {integrity: sha512-0M16Yxj6F1t0ZJoCT7xmHuM3AWm2d4NafAZamJFV++ZDD8uMtRMk7Nsq23LjHCSy246AqIBOLDGfeIoJBpipvg==}
-    deprecated: Switch to "@paulmillr/jsbt"
-
   micro-ftch@0.3.1:
     resolution: {integrity: sha512-/0LLxhzP0tfiR5hcQebtudP56gUurs2CLkGarnCiB/OqEyUFQ6U3paQi/tgLv0hBJYt2rnr9MNpxz4fiiugstg==}
 
@@ -4673,6 +4669,10 @@ packages:
 
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
+
+  tinybench@6.0.0:
+    resolution: {integrity: sha512-BWlWpVbbZXaYjRV0twGLNQO00Zj4HA/sjLOQP2IvzQqGwRGp+2kh7UU3ijyJ3ywFRogYDRbiHDMrUOfaMnN56g==}
+    engines: {node: '>=20.0.0'}
 
   tinyexec@1.0.2:
     resolution: {integrity: sha512-W/KYk+NFhkmsYpuHq5JykngiOCnxeVL8v8dFnqxSD8qEEdRfXk1SDM6JzNqcERbcGYj9tMrDQBYV9cjgnunFIg==}
@@ -8778,8 +8778,6 @@ snapshots:
     dependencies:
       is-plain-obj: 2.1.0
 
-  micro-bmark@0.4.2: {}
-
   micro-ftch@0.3.1: {}
 
   micromark-core-commonmark@2.0.3:
@@ -10103,6 +10101,8 @@ snapshots:
       minimatch: 9.0.5
 
   tiny-inflate@1.0.3: {}
+
+  tinybench@6.0.0: {}
 
   tinyexec@1.0.2: {}
 
