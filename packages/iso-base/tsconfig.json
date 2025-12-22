@@ -12,13 +12,13 @@
     "entryPointStrategy": "resolve",
     "entryPoints": [
       "src/rfc4648.js",
-      "src/crypto.js",
       "src/utf8.js",
       "src/utils.js",
       "src/base-x.js",
       "src/varint.js",
       "src/ec-compression.js",
-      "src/leb128.js"
+      "src/leb128.js",
+      "src/buffer.js"
     ],
     "includeVersion": true,
     "excludeExternals": true,
