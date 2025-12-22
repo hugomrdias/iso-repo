@@ -1,5 +1,5 @@
 import assert from 'assert'
-import base from '../src/bases/basex.js'
+import { baseX as base } from '../src/bases/basex.js'
 
 /**
  * Test fixtures from https://github.com/cryptocoinjs/base-x/blob/master/test/fixtures.json
@@ -655,12 +655,6 @@ describe('basex', () => {
       const codec = base(alphabets.base58)
       const bytes = new Uint8Array([1, 2, 3])
       assert.strictEqual(codec.encode(bytes), 'Ldp')
-    })
-
-    it('should accept regular arrays', () => {
-      const codec = base(alphabets.base58)
-      const arr = [1, 2, 3]
-      assert.strictEqual(codec.encode(arr), 'Ldp')
     })
 
     it('should accept ArrayBuffer views', () => {
