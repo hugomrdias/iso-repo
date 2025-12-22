@@ -60,6 +60,10 @@
       "types": "./dist/src/leb128.d.ts",
       "default": "./src/leb128.js"
     },
+    "./buffer": {
+      "types": "./dist/src/buffer.d.ts",
+      "default": "./src/buffer.js"
+    },
     "./types": {
       "types": "./dist/src/types.d.ts"
     }
@@ -96,6 +100,9 @@
       ],
       "leb128": [
         "dist/src/leb128"
+      ],
+      "buffer": [
+        "dist/src/buffer"
       ],
       "types": [
         "dist/src/types"

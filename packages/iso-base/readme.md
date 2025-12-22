@@ -1,6 +1,6 @@
 # iso-base [![NPM Version](https://img.shields.io/npm/v/iso-base.svg)](https://www.npmjs.com/package/iso-base) [![License](https://img.shields.io/npm/l/iso-base.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-base](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-base.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-base.yml)
 
-> Isomorphic utilities for webcrypto, RFC4648 encoding, LEB128 encoding, UTF-8 encoding, base-x encoding, varint encoding, elliptic curve compression, and buffer manipulation.
+> Isomorphic utilities for webcrypto, RFC4648 encoding, LEB128 encoding, UTF-8 encoding, base-x encoding, varint encoding, elliptic curve compression, binary buffer I/O, and buffer manipulation.
 
 ## Features
 
@@ -12,6 +12,7 @@
 - **Crypto**: Isomorphic WebCrypto API and secure random bytes
 - **EC Compression**: Elliptic curve point compression/decompression (P-256, P-384, P-521, secp256k1)
 - **Utils**: TypedArray and BufferSource utilities (concatenation, equality checks, type guards, conversions)
+- **Buffer**: Cross-platform binary buffer with cursor-based I/O, auto-growth, and varint/LEB128 support
 
 ## Install
 
@@ -30,6 +31,7 @@ pnpm install iso-base
 - `iso-base/varint` - Varint encoding/decoding
 - `iso-base/leb128` - LEB128 encoding/decoding
 - `iso-base/ec-compression` - Elliptic curve compression utilities
+- `iso-base/buffer` - Binary buffer with cursor-based I/O
 - `iso-base/types` - TypeScript type definitions
 
 ## Usage
@@ -225,6 +227,75 @@ isTypedArray(new Int16Array([1]))
 // Assertions
 assertUint8Array(new Uint8Array([1]))
 // void (throws if not Uint8Array)
+```
+
+### Binary Buffer I/O
+
+```ts twoslash
+import { ISOBuffer } from 'iso-base/buffer'
+
+// Create buffer (default 8KB, or specify size)
+const buf = new ISOBuffer(64)
+
+// Write data - cursor auto-advances
+buf.writeUint32(0xdeadbeef)
+buf.writeVarint(300)
+buf.writeUtf8('hello')
+
+// Rewind and read back
+buf.rewind()
+console.log(buf.readUint32().toString(16)) // 'deadbeef'
+console.log(buf.readVarint()) // 300
+console.log(buf.readUtf8(5)) // 'hello'
+
+// Export written portion
+const bytes = buf.toArray()
+// Uint8Array [239, 190, 173, 222, 172, 2, 104, 101, 108, 108, 111]
+```
+
+```ts twoslash
+import { ISOBuffer } from 'iso-base/buffer'
+
+// Wrap existing data (zero-copy)
+const data = new Uint8Array([0x01, 0x02, 0x03, 0x04])
+const buf = new ISOBuffer(data)
+
+// Cursor navigation
+buf.skip(2)           // Move forward 2 bytes
+buf.back(1)           // Move back 1 byte
+buf.seek(0)           // Jump to offset 0
+buf.rewind()          // Same as seek(0)
+
+// Bookmarking with mark stack
+buf.pushMark()        // Save current position
+buf.skip(3)
+buf.popMark()         // Restore saved position
+
+// Endianness control (default: little-endian)
+buf.setBigEndian()
+const be = buf.readUint16() // Read as big-endian
+buf.setLittleEndian()
+const le = buf.readUint16() // Read as little-endian
+```
+
+```ts twoslash
+import { ISOBuffer } from 'iso-base/buffer'
+
+// Auto-growing buffer
+const buf = new ISOBuffer(4)
+buf.writeUint32(1)
+buf.writeUint32(2) // Buffer automatically grows
+buf.writeUint32(3)
+
+// LEB128 for large integers (BigInt)
+buf.rewind()
+buf.writeLeb128(123456789012345678901234567890n)
+buf.rewind()
+const big = buf.readLeb128() // 123456789012345678901234567890n
+
+// Clone and deep clone
+const shallow = buf.clone()     // Shares underlying ArrayBuffer
+const deep = buf.deepClone()    // Independent copy
 ```
 
 ### Main Entrypoint

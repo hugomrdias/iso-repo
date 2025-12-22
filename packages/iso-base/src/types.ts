@@ -30,3 +30,38 @@ export interface Codec {
 export type IsAny<T> = unknown extends T ? (T extends {} ? T : never) : never
 
 export type NotAny<T> = T extends IsAny<T> ? never : T
+
+/**
+ * ISOBuffer
+ */
+
+// Forward reference for ISOBuffer class
+interface ISOBufferLike {
+  buffer: ArrayBufferLike
+  byteLength: number
+  byteOffset: number
+}
+
+/**
+ * Valid input types for ISOBuffer constructor
+ */
+export type ISOBufferInput =
+  | number
+  | ArrayBufferLike
+  | ArrayBufferView
+  | ISOBufferLike
+
+/**
+ * Options for ISOBuffer constructor
+ */
+export interface ISOBufferOptions {
+  /**
+   * Byte offset to start from within the buffer
+   */
+  offset?: number
+  /**
+   * Use little-endian byte order for multi-byte operations.
+   * Defaults to true.
+   */
+  littleEndian?: boolean
+}
