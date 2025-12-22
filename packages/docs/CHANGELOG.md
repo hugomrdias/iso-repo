@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.11](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.10...docs-v0.1.11) (2025-12-22)
+
+
+### Bug Fixes
+
+* **docs:** update package description and keywords for Starlight plugins and AI integration ([c731894](https://github.com/hugomrdias/iso-repo/commit/c731894f8f5ade0efda6449535cd0a54a3213c38))
+
 ## [0.1.10](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.9...docs-v0.1.10) (2025-12-14)
 
 
