@@ -198,9 +198,6 @@ importers:
 
   packages/iso-base:
     dependencies:
-      base-x:
-        specifier: ^5.0.0
-        version: 5.0.1
       bigint-mod-arith:
         specifier: ^3.3.1
         version: 3.3.1
