@@ -6,18 +6,12 @@
  * @module
  */
 
-import _baseX from 'base-x'
+import { baseX as _baseX } from './bases/basex.js'
+import { bases } from './bases/lookup.js'
 import { utf8 } from './utf8.js'
 import { isUint8Array, u8 } from './utils.js'
 
 /** @typedef {import('./types.js').Codec} Codec */
-
-/** @type {Record<string, string>} */
-const bases = {
-  base10: '0123456789',
-  base36: '0123456789abcdefghijklmnopqrstuvwxyz',
-  base58btc: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
-}
 
 /**
  * Base X Factory
@@ -26,7 +20,7 @@ const bases = {
  * @returns {Codec}
  */
 export function baseX(base) {
-  const alphabet = bases[base]
+  const [, alphabet] = bases[base]
   return {
     encode(input, _pad) {
       if (typeof input === 'string') {
@@ -39,7 +33,7 @@ export function baseX(base) {
         input = utf8.encode(input)
       }
 
-      return /** @type {Uint8Array} */ (_baseX(alphabet).decode(input))
+      return _baseX(alphabet).decode(input)
     },
   }
 }

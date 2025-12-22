@@ -3,174 +3,46 @@
  *
  * @module
  */
-/* eslint-disable unicorn/prefer-math-trunc */
+
+import {
+  HAS_NATIVE_BASE64_SUPPORT,
+  HAS_NATIVE_HEX_SUPPORT,
+  nativeBase64,
+  nativeHex,
+  rfc4648,
+} from './bases/rfc4648.js'
 
 /** @typedef {import('./types').Codec} Codec */
-
-import { utf8 } from './utf8.js'
-import { isUint8Array, u8 } from './utils.js'
-
-/**
- * Decode
- *
- * @param {string} string - Encoded string
- * @param {string} alphabet - Alphabet
- * @param {number} bitsPerChar - Bits per character
- */
-const decode = (string, alphabet, bitsPerChar) => {
-  // Build the character lookup table:
-  /** @type {Record<string, number>} */
-  const codes = {}
-  for (let i = 0; i < alphabet.length; ++i) {
-    codes[alphabet[i]] = i
-  }
-
-  // Count the padding bytes:
-  let end = string.length
-  while (string[end - 1] === '=') {
-    --end
-  }
-
-  // Allocate the output:
-  const out = new Uint8Array(((end * bitsPerChar) / 8) | 0)
-
-  // Parse the data:
-  let bits = 0 // Number of bits currently in the buffer
-  let buffer = 0 // Bits waiting to be written out, MSB first
-  let written = 0 // Next byte to write
-  for (let i = 0; i < end; ++i) {
-    // Read one character from the string:
-    const value = codes[string[i]]
-    if (value === undefined) {
-      throw new SyntaxError(`Invalid character ${string[i]}`)
-    }
-
-    // Append the bits to the buffer:
-    buffer = (buffer << bitsPerChar) | value
-    bits += bitsPerChar
-
-    // Write out some bits if the buffer has a byte's worth:
-    if (bits >= 8) {
-      bits -= 8
-      out[written++] = 0xff & (buffer >> bits)
-    }
-  }
-
-  // Verify that we have received just enough bits:
-  if (bits >= bitsPerChar || 0xff & (buffer << (8 - bits))) {
-    throw new SyntaxError('Unexpected end of data')
-  }
-
-  return out
-}
-
-/**
- * Encode
- *
- * @param {Uint8Array} data - Data to encode
- * @param {string} alphabet - Alphabet
- * @param {number} bitsPerChar - Bits per character
- * @param {boolean} pad - Pad
- */
-const encode = (data, alphabet, bitsPerChar, pad) => {
-  const mask = (1 << bitsPerChar) - 1
-  let out = ''
-
-  let bits = 0 // Number of bits currently in the buffer
-  let buffer = 0 // Bits waiting to be written out, MSB first
-  for (const datum of data) {
-    // Slurp data into the buffer:
-    buffer = (buffer << 8) | datum
-    bits += 8
-
-    // Write out as much as we can:
-    while (bits > bitsPerChar) {
-      bits -= bitsPerChar
-      out += alphabet[mask & (buffer >> bits)]
-    }
-  }
-
-  // Partial character:
-  if (bits) {
-    out += alphabet[mask & (buffer << (bitsPerChar - bits))]
-  }
-
-  // Add padding characters until we hit a byte boundary:
-  if (pad) {
-    while ((out.length * bitsPerChar) & 7) {
-      out += '='
-    }
-  }
-
-  return out
-}
-
-/** @type {Record<string, [number, string]>} */
-const bases = {
-  base2: [1, '01'],
-  base8: [3, '01234567'],
-  hex: [4, '0123456789abcdef'],
-  base16: [4, '0123456789ABCDEF'],
-  base32: [5, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'],
-  base32hex: [5, '0123456789abcdefghijklmnopqrstuv'],
-  base64: [
-    6,
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
-  ],
-  base64url: [
-    6,
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',
-  ],
-}
-
-/**
- * RFC4648 Factory
- *
- * @param {string} base - Base
- * @param {boolean} [padding] - Padding
- * @param {((str: string) => string)} [normalize] - Normalize
- * @returns {Codec} - Codec
- */
-
-// biome-ignore lint/style/useDefaultParameterLast: needed
-export function rfc4648(base, padding = false, normalize) {
-  const [bits, alphabet] = bases[base]
-  return {
-    encode(input, pad) {
-      if (typeof input === 'string') {
-        input = utf8.decode(input)
-      }
-
-      return encode(u8(input), alphabet, bits, pad ?? padding)
-    },
-    decode(input) {
-      if (isUint8Array(input)) {
-        input = utf8.encode(input)
-      }
-
-      if (normalize) {
-        input = normalize(input)
-      }
-
-      return decode(input, alphabet, bits)
-    },
-  }
-}
 
 /**
  * Matches node
  */
-export const hex = rfc4648('hex', true, (str) => str.toLowerCase())
+export const hex = HAS_NATIVE_HEX_SUPPORT
+  ? nativeHex
+  : rfc4648('hex', true, (str) => str.toLowerCase())
 export const base2 = rfc4648('base2')
 export const base8 = rfc4648('base8')
 export const base16 = rfc4648('base16')
 export const base32 = rfc4648('base32')
 export const base32hex = rfc4648('base32hex', true)
-export const base64 = rfc4648('base64')
-export const base64pad = rfc4648('base64', true)
+export const base64 = HAS_NATIVE_BASE64_SUPPORT
+  ? nativeBase64('base64', false)
+  : rfc4648('base64', false)
+export const base64pad = HAS_NATIVE_BASE64_SUPPORT
+  ? nativeBase64('base64', true)
+  : rfc4648('base64', true)
 /**
  * Base 64 URL
  *
  * Padding is skipped by default
  */
-export const base64url = rfc4648('base64url', false)
+export const base64url = HAS_NATIVE_BASE64_SUPPORT
+  ? nativeBase64('base64url', false)
+  : rfc4648('base64url', false)
+
+/**
+ * Base 64 URL Padded
+ */
+export const base64urlpad = HAS_NATIVE_BASE64_SUPPORT
+  ? nativeBase64('base64url', true)
+  : rfc4648('base64url', true)

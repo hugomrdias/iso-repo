@@ -124,6 +124,8 @@ export function isBufferSource(value) {
 }
 
 /**
+ * Check if value is Uint8Array
+ *
  * @param {unknown} value
  * @returns {value is Uint8Array}
  */
@@ -132,6 +134,19 @@ export function isUint8Array(value) {
     value instanceof Uint8Array ||
     (ArrayBuffer.isView(value) && value.constructor.name === 'Uint8Array')
   )
+}
+
+/**
+ * Assert that the input is a Uint8Array.
+ *
+ * @param {unknown} value The value to check.
+ * @throws {TypeError} If value is not a Uint8Array.
+ * @returns {void}
+ */
+export function assertUint8Array(value) {
+  if (!isUint8Array(value)) {
+    throw new TypeError('Value is not a Uint8Array')
+  }
 }
 
 /**
@@ -205,5 +220,20 @@ export function equals(aa, bb) {
     }
   }
 
+  return true
+}
+
+/**
+ * Assert that the input is a string.
+ *
+ * @param {string} label The label to use in the error message.
+ * @param {unknown} input The value to check.
+ * @throws {TypeError} If input is not a string.
+ * @returns {input is string}
+ */
+export function assertString(label, input) {
+  if (typeof input !== 'string') {
+    throw new TypeError(`${label}: string expected, got ${typeof input}`)
+  }
   return true
 }

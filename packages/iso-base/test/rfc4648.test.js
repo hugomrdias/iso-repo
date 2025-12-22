@@ -1,5 +1,5 @@
 import assert from 'assert'
-import * as BASES from '../src/rfc4648.js'
+import * as BASES from '../src/bases/rfc4648.js'
 import { utf8 } from '../src/utf8.js'
 
 const VECTORS = [
