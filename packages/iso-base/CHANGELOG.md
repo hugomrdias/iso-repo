@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.2.1...iso-base-v4.3.0) (2025-12-22)
+
+
+### Features
+
+* add ISOBuffer class for binary buffer manipulation with cursor-based I/O, update README with usage examples and new features ([8a4c584](https://github.com/hugomrdias/iso-repo/commit/8a4c584ed7f07b7ad12cf30f5ce3e0eb56c366d4))
+
+
+### Bug Fixes
+
+* replace micro-bmark with tinybench for benchmarking, enhance codec implementations, and update README with new features and usage examples ([1ae5838](https://github.com/hugomrdias/iso-repo/commit/1ae5838de076d41e71dd93a12cca5d918b3b0df1))
+
 ## [4.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.2.0...iso-base-v4.2.1) (2025-09-29)
 
 
