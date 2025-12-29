@@ -41,7 +41,7 @@
   "dependencies": {
     "debug": "^4.4.3",
     "retry": "^0.13.1",
-    "typescript-event-target": "^1.1.0",
+    "typescript-event-target": "^1.1.2",
     "unws": "^0.3.2",
     "ws": "^8.18.3"
   },

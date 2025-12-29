@@ -534,8 +534,8 @@ importers:
         specifier: ^0.13.1
         version: 0.13.1
       typescript-event-target:
-        specifier: ^1.1.0
-        version: 1.1.1
+        specifier: ^1.1.2
+        version: 1.1.2
       unws:
         specifier: ^0.3.2
         version: 0.3.2(ws@8.18.3)
@@ -1927,6 +1927,9 @@ packages:
 
   '@ledgerhq/errors@6.27.1':
     resolution: {integrity: sha512-Q6nXkg63kSjxa8DDBtjSGAuiOP/jQVQM/0f+0R/ovilQKuxMIxEMXPfonvhQ2AIP4bqKOzGV1c9Iqnow22w/Zg==}
+
+  '@ledgerhq/errors@6.28.0':
+    resolution: {integrity: sha512-Rx6GN801GP/3gCfVmmiXFVZWmiaEGMuXVwjM6WOCX0dzw4v7KcB1nj4vrNC1plDI/xkPt/clYJPG7LgSt0mxlw==}
 
   '@ledgerhq/evm-tools@1.8.2':
     resolution: {integrity: sha512-6CSPwyeDXkhoaxZ/Fn/XgNn6yXmEzbhUQu9o1WJi+wAG2r5m+CwlUznYeA46r9AccqQ13UuM4cXWZQvrwzlSuA==}
@@ -3703,6 +3706,9 @@ packages:
   iso-base@4.2.1:
     resolution: {integrity: sha512-D73C0m12lNYCDwSye1UrkM2dp+ODioCXB8EGLSBGLfuIs7b2w+EV1c+pmeC0qz7nntdwtatN+GdfxyKpElZSbw==}
 
+  iso-base@4.3.0:
+    resolution: {integrity: sha512-t6n4Wc8YsfDgiYcNa2+QWskqsVMlIipOMP7Lae32Ut+nvPnU0QdE/WiroNOZpqDzxPmM5vDKfu66kKxjiBOxUA==}
+
   iso-filecoin@7.4.7:
     resolution: {integrity: sha512-whLO1m0OskzOFGc+CB8WPr2gsR/asj/8MA7pQXYOtB9mPGay4askXLTJfIBY1AJh4/RaBUeIeGDMX6lpaj5TtA==}
 
@@ -4957,8 +4963,8 @@ packages:
     peerDependencies:
       typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x
 
-  typescript-event-target@1.1.1:
-    resolution: {integrity: sha512-dFSOFBKV6uwaloBCCUhxlD3Pr/P1a/tJdcmPrTXCHlEFD3faj0mztjcGn6VBAhQ0/Bdy8K3VWrrqwbt/ffsYsg==}
+  typescript-event-target@1.1.2:
+    resolution: {integrity: sha512-TvkrTUpv7gCPlcnSoEwUVUBwsdheKm+HF5u2tPAKubkIGMfovdSizCTaZRY/NhR8+Ijy8iZZUapbVQAsNrkFrw==}
 
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
@@ -5308,6 +5314,7 @@ packages:
   wrangler@4.56.0:
     resolution: {integrity: sha512-Nqi8duQeRbA+31QrD6QlWHW3IZVnuuRxMy7DEg46deUzywivmaRV/euBN5KKXDPtA24VyhYsK7I0tkb7P5DM2w==}
     engines: {node: '>=20.0.0'}
+    deprecated: Version 4.55.0 and 4.56.0 can incorrectly automatically delegate 'wrangler deploy' to 'opennextjs-cloudflare'. Use an older or newer version.
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^4.20251217.0
@@ -6585,6 +6592,8 @@ snapshots:
       - debug
 
   '@ledgerhq/errors@6.27.1': {}
+
+  '@ledgerhq/errors@6.28.0': {}
 
   '@ledgerhq/evm-tools@1.8.2':
     dependencies:
@@ -8742,17 +8751,21 @@ snapshots:
       base-x: 5.0.1
       bigint-mod-arith: 3.3.1
 
+  iso-base@4.3.0:
+    dependencies:
+      bigint-mod-arith: 3.3.1
+
   iso-filecoin@7.4.7(typescript@5.9.3):
     dependencies:
       '@ipld/dag-cbor': 9.2.5
-      '@ledgerhq/errors': 6.27.1
+      '@ledgerhq/errors': 6.28.0
       '@noble/curves': 1.9.7
       '@noble/hashes': 2.0.1
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
       abitype: 1.2.3(typescript@5.9.3)(zod@4.2.1)
       bignumber.js: 9.3.1
-      iso-base: 4.2.1
+      iso-base: 4.3.0
       iso-kv: 3.1.1
       iso-web: 1.4.3
       zod: 4.2.1
@@ -10492,7 +10505,7 @@ snapshots:
       typescript: 5.9.3
       yaml: 2.8.2
 
-  typescript-event-target@1.1.1: {}
+  typescript-event-target@1.1.2: {}
 
   typescript@5.9.3: {}
 
