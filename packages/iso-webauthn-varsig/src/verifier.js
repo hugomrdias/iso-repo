@@ -150,9 +150,10 @@ export async function reconstructSignedData(decoded) {
     throw new Error('WebCrypto subtle API not available')
   }
 
+  const clientDataJSON = new Uint8Array(decoded.clientDataJSON)
   const clientDataHash = await webcrypto.subtle.digest(
     'SHA-256',
-    decoded.clientDataJSON
+    clientDataJSON
   )
 
   const signedData = new Uint8Array(
@@ -177,9 +178,12 @@ export async function verifyEd25519Signature(signedData, signature, publicKey) {
       return false
     }
 
+    const publicKeyBytes = new Uint8Array(publicKey)
+    const signatureBytes = new Uint8Array(signature)
+    const signedDataBytes = new Uint8Array(signedData)
     const cryptoKey = await webcrypto.subtle.importKey(
       'raw',
-      publicKey,
+      publicKeyBytes,
       { name: 'Ed25519' },
       false,
       ['verify']
@@ -188,8 +192,8 @@ export async function verifyEd25519Signature(signedData, signature, publicKey) {
     return await webcrypto.subtle.verify(
       'Ed25519',
       cryptoKey,
-      signature,
-      signedData
+      signatureBytes,
+      signedDataBytes
     )
   } catch {
     return false
@@ -209,9 +213,12 @@ export async function verifyP256Signature(signedData, signature, publicKey) {
       return false
     }
 
+    const publicKeyBytes = new Uint8Array(publicKey)
+    const signatureBytes = new Uint8Array(signature)
+    const signedDataBytes = new Uint8Array(signedData)
     const cryptoKey = await webcrypto.subtle.importKey(
       'raw',
-      publicKey,
+      publicKeyBytes,
       { name: 'ECDSA', namedCurve: 'P-256' },
       false,
       ['verify']
@@ -220,8 +227,8 @@ export async function verifyP256Signature(signedData, signature, publicKey) {
     return await webcrypto.subtle.verify(
       { name: 'ECDSA', hash: 'SHA-256' },
       cryptoKey,
-      signature,
-      signedData
+      signatureBytes,
+      signedDataBytes
     )
   } catch {
     return false

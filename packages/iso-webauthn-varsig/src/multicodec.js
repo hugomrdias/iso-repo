@@ -65,6 +65,7 @@ export const WEBAUTHN_WRAPPER = 0x300001
 /**
  * Map of algorithm names to multicodecs.
  */
+/** @type {Record<'Ed25519' | 'P-256', number>} */
 export const ALGORITHM_TO_MULTICODEC = {
   Ed25519: WEBAUTHN_ED25519,
   'P-256': WEBAUTHN_P256,
@@ -73,6 +74,7 @@ export const ALGORITHM_TO_MULTICODEC = {
 /**
  * Map of multicodecs to algorithm names.
  */
+/** @type {Record<number, 'Ed25519' | 'P-256'>} */
 export const MULTICODEC_TO_ALGORITHM = {
   [WEBAUTHN_ED25519]: 'Ed25519',
   [WEBAUTHN_P256]: 'P-256',
