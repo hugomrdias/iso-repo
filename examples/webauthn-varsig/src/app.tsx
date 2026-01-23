@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react'
 import { DIDKey } from 'iso-did'
-import { parseAttestationObject } from 'iso-passkeys'
+import { parseAttestationObject, unwrapEC2Signature } from 'iso-passkeys'
 import {
   CURVE_ED25519,
+  CURVE_P256,
   INNER_EDDSA,
+  INNER_ECDSA,
   MULTIHASH_SHA256,
   MULTIHASH_SHA256_LEN,
   PAYLOAD_ENCODING_RAW,
@@ -19,6 +21,7 @@ import {
   reconstructSignedData,
   varintEncode,
   verifyEd25519Signature,
+  verifyP256Signature,
   verifyWebAuthnAssertion,
 } from 'iso-webauthn-varsig'
 
@@ -26,6 +29,7 @@ const encoder = new TextEncoder()
 const STORAGE_KEY = 'webauthn-varsig-demo-credential'
 const STORAGE_KEY_PUBLIC = 'webauthn-varsig-demo-public-key'
 const STORAGE_KEY_DID = 'webauthn-varsig-demo-did'
+const STORAGE_KEY_META = 'webauthn-varsig-demo-meta'
 
 function toHex(bytes: Uint8Array): string {
   return Array.from(bytes)
@@ -94,9 +98,47 @@ async function createMockAssertion() {
   }
 }
 
-async function extractEd25519PublicKey(
+function createMockP256Signature(): Uint8Array {
+  const r = new Uint8Array(32)
+  const s = new Uint8Array(32)
+
+  for (let i = 0; i < 32; i++) {
+    r[i] = (i * 5 + 11) % 256
+    s[i] = (i * 7 + 13) % 256
+  }
+
+  const signature = new Uint8Array(6 + 32 + 32)
+  signature[0] = 0x30
+  signature[1] = 68
+  signature[2] = 0x02
+  signature[3] = 32
+  signature.set(r, 4)
+  signature[36] = 0x02
+  signature[37] = 32
+  signature.set(s, 38)
+
+  return signature
+}
+
+async function createMockAssertionForAlgorithm(algorithm: 'Ed25519' | 'P-256') {
+  const base = await createMockAssertion()
+  if (algorithm === 'Ed25519') {
+    return base
+  }
+
+  return {
+    ...base,
+    assertion: {
+      ...base.assertion,
+      signature: createMockP256Signature(),
+    },
+  }
+}
+
+async function extractCredentialInfo(
   attestationObject: Uint8Array
 ): Promise<{
+  algorithm: 'Ed25519' | 'P-256' | null
   publicKey: Uint8Array | null
   kty?: number
   alg?: number
@@ -116,28 +158,54 @@ async function extractEd25519PublicKey(
   const alg = getValue(3)
   const crv = getValue(-1)
 
-  if (kty !== 1 || (alg !== -50 && alg !== -8) || crv !== 6) {
-    return { publicKey: null, kty, alg, crv }
+  if (kty === 1 && (alg === -50 || alg === -8) && crv === 6) {
+    const publicKeyBytes = new Uint8Array(getValue(-2))
+    if (publicKeyBytes.length !== 32) {
+      throw new Error(
+        `Invalid Ed25519 public key length: ${publicKeyBytes.length}`
+      )
+    }
+
+    return { algorithm: 'Ed25519', publicKey: publicKeyBytes, kty, alg, crv }
   }
 
-  const publicKeyBytes = new Uint8Array(getValue(-2))
-  if (publicKeyBytes.length !== 32) {
-    throw new Error(`Invalid Ed25519 public key length: ${publicKeyBytes.length}`)
+  if (kty === 2 && alg === -7 && crv === 1) {
+    const x = new Uint8Array(getValue(-2))
+    const y = new Uint8Array(getValue(-3))
+    if (x.length !== 32 || y.length !== 32) {
+      throw new Error(
+        `Invalid P-256 coordinate length: x=${x.length} y=${y.length}`
+      )
+    }
+
+    const publicKeyBytes = new Uint8Array(65)
+    publicKeyBytes[0] = 0x04
+    publicKeyBytes.set(x, 1)
+    publicKeyBytes.set(y, 33)
+    return { algorithm: 'P-256', publicKey: publicKeyBytes, kty, alg, crv }
   }
 
-  return { publicKey: publicKeyBytes, kty, alg, crv }
+  return { algorithm: null, publicKey: null, kty, alg, crv }
 }
 
 function loadStoredCredential() {
   const stored = localStorage.getItem(STORAGE_KEY)
   const storedPublicKey = localStorage.getItem(STORAGE_KEY_PUBLIC)
   const storedDid = localStorage.getItem(STORAGE_KEY_DID)
-  if (stored && storedPublicKey && storedDid) {
+  const storedMeta = localStorage.getItem(STORAGE_KEY_META)
+  if (stored && storedPublicKey && storedDid && storedMeta) {
+    const meta = JSON.parse(storedMeta) as {
+      algorithm: 'Ed25519' | 'P-256'
+      kty?: number
+      alg?: number
+      crv?: number
+    }
     return {
       credentialId: base64urlToBytes(stored),
       publicKey: base64urlToBytes(storedPublicKey),
       did: storedDid,
-      cose: { kty: 1, alg: -50, crv: 6 },
+      cose: { kty: meta.kty, alg: meta.alg, crv: meta.crv },
+      algorithm: meta.algorithm,
     }
   }
   return null
@@ -178,29 +246,34 @@ async function registerCredential() {
   }
 
   const response = credential.response as AuthenticatorAttestationResponse
-  const { publicKey: publicKeyBytes, kty, alg, crv } =
-    await extractEd25519PublicKey(
+  const { algorithm, publicKey: publicKeyBytes, kty, alg, crv } =
+    await extractCredentialInfo(
       new Uint8Array(response.attestationObject)
     )
 
-  if (!publicKeyBytes) {
+  if (!publicKeyBytes || !algorithm) {
     throw new Error(
-      'Ed25519 not supported by this authenticator (kty/alg/crv mismatch)'
+      'No supported credential returned (expected Ed25519 or P-256)'
     )
   }
 
   const rawId = new Uint8Array(credential.rawId)
   const encoded = bytesToBase64url(rawId)
   const encodedPublicKey = bytesToBase64url(publicKeyBytes)
-  const did = DIDKey.fromPublicKey('Ed25519', publicKeyBytes).did
+  const did = DIDKey.fromPublicKey(algorithm, publicKeyBytes).did
   localStorage.setItem(STORAGE_KEY, encoded)
   localStorage.setItem(STORAGE_KEY_PUBLIC, encodedPublicKey)
   localStorage.setItem(STORAGE_KEY_DID, did)
+  localStorage.setItem(
+    STORAGE_KEY_META,
+    JSON.stringify({ algorithm, kty, alg, crv })
+  )
   return {
     credentialId: rawId,
     publicKey: publicKeyBytes,
     did,
     cose: { kty, alg, crv },
+    algorithm,
   }
 }
 
@@ -221,7 +294,7 @@ async function runWebAuthnAssertion() {
   if (!stored) {
     throw new Error('No stored passkey. Register first.')
   }
-  const { credentialId, publicKey, did, cose } = stored
+  const { credentialId, publicKey, did, cose, algorithm } = stored
   const assertion = (await navigator.credentials.get({
     publicKey: {
       rpId,
@@ -250,6 +323,7 @@ async function runWebAuthnAssertion() {
     publicKey,
     did,
     cose,
+    algorithm,
     payloadBytes,
     payloadText,
     payloadTs: payload.ts,
@@ -261,11 +335,14 @@ async function runWebAuthnAssertion() {
   }
 }
 
-function buildEd25519Header(): Uint8Array {
+function buildVarsigHeader(algorithm: 'Ed25519' | 'P-256'): Uint8Array {
+  const innerAlgorithm = algorithm === 'Ed25519' ? INNER_EDDSA : INNER_ECDSA
+  const curve = algorithm === 'Ed25519' ? CURVE_ED25519 : CURVE_P256
+
   return concat([
     new Uint8Array([VARSIG_PREFIX, VARSIG_VERSION]),
-    varintEncode(INNER_EDDSA),
-    varintEncode(CURVE_ED25519),
+    varintEncode(innerAlgorithm),
+    varintEncode(curve),
     varintEncode(MULTIHASH_SHA256),
     varintEncode(MULTIHASH_SHA256_LEN),
     varintEncode(WEBAUTHN_WRAPPER),
@@ -273,7 +350,10 @@ function buildEd25519Header(): Uint8Array {
   ])
 }
 
-function buildHeaderParts() {
+function buildHeaderParts(algorithm: 'Ed25519' | 'P-256') {
+  const innerAlgorithm = algorithm === 'Ed25519' ? INNER_EDDSA : INNER_ECDSA
+  const curve = algorithm === 'Ed25519' ? CURVE_ED25519 : CURVE_P256
+
   return [
     {
       label: 'Varsig prefix + version',
@@ -281,14 +361,14 @@ function buildHeaderParts() {
       detail: '0x34 0x01',
     },
     {
-      label: 'Inner algorithm (EdDSA)',
-      value: toHexSpaced(varintEncode(INNER_EDDSA)),
-      detail: `0x${INNER_EDDSA.toString(16)}`,
+      label: `Inner algorithm (${algorithm === 'Ed25519' ? 'EdDSA' : 'ECDSA'})`,
+      value: toHexSpaced(varintEncode(innerAlgorithm)),
+      detail: `0x${innerAlgorithm.toString(16)}`,
     },
     {
-      label: 'Curve (Ed25519)',
-      value: toHexSpaced(varintEncode(CURVE_ED25519)),
-      detail: `0x${CURVE_ED25519.toString(16)}`,
+      label: `Curve (${algorithm === 'Ed25519' ? 'Ed25519' : 'P-256'})`,
+      value: toHexSpaced(varintEncode(curve)),
+      detail: `0x${curve.toString(16)}`,
     },
     {
       label: 'Multihash (SHA-256)',
@@ -324,6 +404,7 @@ export default function App() {
   const [signAttempt, setSignAttempt] = useState(0)
   const [output, setOutput] = useState<null | {
     mode: 'mock' | 'webauthn'
+    algorithm: 'Ed25519' | 'P-256'
     headerHex: string
     varsigHex: string
     decoded: ReturnType<typeof decodeWebAuthnVarsigV1>
@@ -350,7 +431,7 @@ export default function App() {
 
     try {
       const { assertion, challengeBytes, rpId, origin, challenge } =
-        await createMockAssertion()
+        await createMockAssertionForAlgorithm('Ed25519')
 
       const varsig = encodeWebAuthnVarsigV1(assertion, 'Ed25519')
       const decoded = decodeWebAuthnVarsigV1(varsig)
@@ -363,10 +444,57 @@ export default function App() {
       })
 
       const signedData = await reconstructSignedData(decoded)
-      const headerHex = toHex(buildEd25519Header())
+      const headerHex = toHex(buildVarsigHeader('Ed25519'))
 
       setOutput({
         mode: 'mock',
+        algorithm: 'Ed25519',
+        headerHex,
+        varsigHex: toHex(varsig),
+        decoded,
+        clientData,
+        verification,
+        signatureValid: null,
+        signedDataHex: toHex(signedData),
+        rpId,
+        origin,
+        challenge,
+        challengeHex: toHex(challengeBytes),
+        challengeOrigin: 'Random (mock)',
+        payloadText: undefined,
+        payloadTs: undefined,
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const runDemoP256 = async () => {
+    setBusy(true)
+    setError(null)
+
+    try {
+      const { assertion, challengeBytes, rpId, origin, challenge } =
+        await createMockAssertionForAlgorithm('P-256')
+
+      const varsig = encodeWebAuthnVarsigV1(assertion, 'P-256')
+      const decoded = decodeWebAuthnVarsigV1(varsig)
+      const clientData = parseClientDataJSON(decoded.clientDataJSON)
+
+      const verification = await verifyWebAuthnAssertion(decoded, {
+        expectedOrigin: origin,
+        expectedRpId: rpId,
+        expectedChallenge: challengeBytes,
+      })
+
+      const signedData = await reconstructSignedData(decoded)
+      const headerHex = toHex(buildVarsigHeader('P-256'))
+
+      setOutput({
+        mode: 'mock',
+        algorithm: 'P-256',
         headerHex,
         varsigHex: toHex(varsig),
         decoded,
@@ -424,13 +552,13 @@ export default function App() {
         publicKey,
         did,
         cose,
+        algorithm,
         payloadBytes,
         payloadText,
         payloadTs,
       } = await runWebAuthnAssertion()
-        await runWebAuthnAssertion()
 
-      const varsig = encodeWebAuthnVarsigV1(assertion, 'Ed25519')
+      const varsig = encodeWebAuthnVarsigV1(assertion, algorithm)
       const decoded = decodeWebAuthnVarsigV1(varsig)
       const clientData = parseClientDataJSON(decoded.clientDataJSON)
 
@@ -441,15 +569,23 @@ export default function App() {
       })
 
       const signedData = await reconstructSignedData(decoded)
-      const signatureValid = await verifyEd25519Signature(
-        signedData,
-        decoded.signature,
-        publicKey
-      )
-      const headerHex = toHex(buildEd25519Header())
+      const signatureValid =
+        algorithm === 'Ed25519'
+          ? await verifyEd25519Signature(
+              signedData,
+              decoded.signature,
+              publicKey
+            )
+          : await verifyP256Signature(
+              signedData,
+              unwrapEC2Signature(decoded.signature),
+              publicKey
+            )
+      const headerHex = toHex(buildVarsigHeader(algorithm))
 
       setOutput({
         mode: 'webauthn',
+        algorithm,
         headerHex,
         varsigHex: toHex(varsig),
         decoded,
@@ -501,7 +637,7 @@ export default function App() {
             </li>
             <li>authenticatorData length + bytes.</li>
             <li>clientDataJSON length + bytes.</li>
-            <li>signature bytes (Ed25519 = 64 bytes).</li>
+            <li>signature bytes (Ed25519 = 64 bytes, P-256 = DER).</li>
           </ol>
         </div>
         <div className="card">
@@ -518,26 +654,34 @@ export default function App() {
       <section className="controls">
         <div className="button-row">
           <button type="button" onClick={runDemo} disabled={busy}>
-            {busy ? 'Running…' : 'Run Demo'}
+            {busy ? 'Running…' : 'Run Ed25519 Demo'}
+          </button>
+          <button type="button" onClick={runDemoP256} disabled={busy}>
+            {busy ? 'Running…' : 'Run P-256 Demo'}
           </button>
           <button type="button" onClick={runRegister} disabled={busy}>
-            {busy ? 'Waiting…' : registered ? 'Passkey registered' : 'Register passkey'}
+            {busy
+              ? 'Waiting…'
+              : registered
+                ? 'Passkey registered'
+                : 'Register passkey (Ed25519/P-256)'}
           </button>
           <button
             type="button"
             onClick={runWebAuthn}
             disabled={busy || !registered}
           >
-            {busy ? 'Waiting…' : 'Sign with WebAuthn Ed25519'}
+            {busy ? 'Waiting…' : 'Sign with WebAuthn'}
           </button>
         </div>
         <p className="hint">Sign attempt: {signAttempt}</p>
         <p className="hint">
-          Run Demo uses mock data. Register passkey creates a WebAuthn
-          credential. Sign with WebAuthn uses that credential to sign.
+          The demo buttons use mock data for Ed25519 or P-256. Register passkey
+          creates a WebAuthn credential. Sign with WebAuthn uses that credential
+          to sign (Ed25519 preferred, P-256 fallback).
         </p>
         <p className="hint">
-          The WebAuthn path also verifies the Ed25519 signature using the
+          The WebAuthn path verifies Ed25519 or P-256 signatures using the
           extracted public key when supported by your authenticator.
         </p>
       </section>
@@ -552,6 +696,10 @@ export default function App() {
               <div>
                 <dt>Mode</dt>
                 <dd>{output.mode === 'webauthn' ? 'WebAuthn' : 'Mock'}</dd>
+              </div>
+              <div>
+                <dt>Algorithm</dt>
+                <dd>{output.algorithm}</dd>
               </div>
               {output.signAttempt ? (
                 <div>
@@ -680,7 +828,7 @@ export default function App() {
               </div>
             </dl>
             <div className="header-grid">
-              {buildHeaderParts().map((part) => (
+              {buildHeaderParts(output.algorithm).map((part) => (
                 <div key={part.label} className="header-item">
                   <div className="header-label">{part.label}</div>
                   <div className="mono header-bytes">{part.value}</div>
