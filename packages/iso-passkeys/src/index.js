@@ -4,10 +4,14 @@ import {
   parseCreationOptionsFromJSON,
   parseRegistrationCredential,
   parseRequestOptionsFromJSON,
+  parseAttestationObject,
 } from './parsing.js'
+import { unwrapEC2Signature } from './validation.js'
 import { supports } from './utils.js'
 
 export { supports } from './utils.js'
+export { parseAttestationObject } from './parsing.js'
+export { unwrapEC2Signature } from './validation.js'
 
 const credentials =
   /** @type {import('./types.js').PublicKeyCredentialsContainer} */ (
