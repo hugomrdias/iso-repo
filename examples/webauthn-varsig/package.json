@@ -1,0 +1,27 @@
+{
+  "name": "webauthn-varsig",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
+    "preview": "pnpm run build && vite preview"
+  },
+  "dependencies": {
+    "iso-did": "workspace:*",
+    "iso-passkeys": "workspace:*",
+    "iso-webauthn-varsig": "workspace:*",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "globals": "^16.5.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.0"
+  }
+}

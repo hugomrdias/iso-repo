@@ -4,10 +4,12 @@ import {
   parseCreationOptionsFromJSON,
   parseRegistrationCredential,
   parseRequestOptionsFromJSON,
+  parseAttestationObject,
 } from './parsing.js'
 import { supports } from './utils.js'
 
 export { supports } from './utils.js'
+export { parseAttestationObject } from './parsing.js'
 
 const credentials =
   /** @type {import('./types.js').PublicKeyCredentialsContainer} */ (

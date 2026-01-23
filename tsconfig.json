@@ -7,6 +7,7 @@
       "packages/iso-passkeys",
       "packages/iso-did",
       "packages/iso-signatures",
+      "packages/iso-webauthn-varsig",
       "packages/iso-web",
       "packages/iso-kv",
       "packages/iso-websocket",

@@ -9,6 +9,7 @@
 - [iso-kv](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-kv) - `iso-kv` is a simple key-value storage with support for multiple backend adapters (web storage, indexeddb, memory, sql, json file, etc)
 - [iso-passkeys](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-passkeys) - Isomorphic passkeys tooling
 - [iso-signatures](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-signatures) - Isomorphic signatures tooling
+- [iso-webauthn-varsig](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-webauthn-varsig) - WebAuthn varsig helpers for Ed25519/P-256
 - [iso-web](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-signatures) - Isomorphic web apis utilities for fetch, signals, crypto and doh.
 - [iso-websocket](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-websocket) - `iso-websocket` implements the [Websocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) interface and is compatible with the browser, node.js and any other engine that implements basic Web APIs.
 - [iso-ledger](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-ledger) - Isomorphic ledger utilities for ledger devices

@@ -149,6 +149,43 @@ importers:
         specifier: ^4.56.0
         version: 4.56.0
 
+  examples/webauthn-varsig:
+    dependencies:
+      iso-did:
+        specifier: workspace:*
+        version: link:../../packages/iso-did
+      iso-passkeys:
+        specifier: workspace:*
+        version: link:../../packages/iso-passkeys
+      iso-webauthn-varsig:
+        specifier: workspace:*
+        version: link:../../packages/iso-webauthn-varsig
+      react:
+        specifier: ^19.2.1
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.1
+        version: 19.2.3(react@19.2.3)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.2.7
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react':
+        specifier: ^5.1.2
+        version: 5.1.2(vite@7.3.0(@types/node@24.10.4)(yaml@2.8.2))
+      globals:
+        specifier: ^16.5.0
+        version: 16.5.0
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.3.0
+        version: 7.3.0(@types/node@24.10.4)(yaml@2.8.2)
+
   packages/configs:
     dependencies:
       '@biomejs/biome':
@@ -521,6 +558,28 @@ importers:
       type-fest:
         specifier: ^5.3.1
         version: 5.3.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
+  packages/iso-webauthn-varsig:
+    dependencies:
+      iso-base:
+        specifier: workspace:^
+        version: link:../iso-base
+    devDependencies:
+      '@types/mocha':
+        specifier: ^10.0.10
+        version: 10.0.10
+      '@types/node':
+        specifier: ^24.10.2
+        version: 24.10.4
+      mocha:
+        specifier: ^11.7.5
+        version: 11.7.5
+      playwright-test:
+        specifier: ^14.1.12
+        version: 14.1.12
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -5308,6 +5367,7 @@ packages:
   wrangler@4.56.0:
     resolution: {integrity: sha512-Nqi8duQeRbA+31QrD6QlWHW3IZVnuuRxMy7DEg46deUzywivmaRV/euBN5KKXDPtA24VyhYsK7I0tkb7P5DM2w==}
     engines: {node: '>=20.0.0'}
+    deprecated: Version 4.55.0 and 4.56.0 can incorrectly automatically delegate 'wrangler deploy' to 'opennextjs-cloudflare'. Use an older or newer version.
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^4.20251217.0

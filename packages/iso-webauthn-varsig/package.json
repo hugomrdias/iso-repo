@@ -1,0 +1,74 @@
+{
+  "name": "iso-webauthn-varsig",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "WebAuthn varsig encoding/decoding helpers.",
+  "author": "Nico Krause <post@nicokrause.com> (nicokrause.com)",
+  "license": "MIT",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-webauthn-varsig"
+  },
+  "keywords": [
+    "webauthn",
+    "varsig",
+    "ed25519",
+    "passkeys",
+    "ucan",
+    "isomorphic"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts",
+      "import": "./src/types.ts"
+    }
+  },
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "dist/src/index"
+      ],
+      "types": [
+        "dist/src/types"
+      ]
+    }
+  },
+  "files": [
+    "src",
+    "dist/src/*.d.ts",
+    "dist/src/*.d.ts.map"
+  ],
+  "scripts": {
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
+    "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
+    "test:node": "mocha 'test/**/!(*.browser).test.js'",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+  },
+  "dependencies": {
+    "iso-base": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.10.2",
+    "mocha": "^11.7.5",
+    "playwright-test": "^14.1.12",
+    "typescript": "5.9.3"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*"
+    ]
+  }
+}

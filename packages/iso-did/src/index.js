@@ -10,6 +10,7 @@ import * as DidPkh from './pkh.js'
 import * as T from './types.js'
 
 export { Resolver } from 'did-resolver'
+export { DIDKey } from './key.js'
 
 /**
  * Default resolver for DID resolution.
