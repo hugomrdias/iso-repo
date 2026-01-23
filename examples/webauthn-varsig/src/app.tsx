@@ -618,8 +618,8 @@ export default function App() {
         <p className="eyebrow">iso-webauthn-varsig</p>
         <h1>WebAuthn Varsig Demo</h1>
         <p className="lede">
-          This example creates a mock WebAuthn assertion in the browser, encodes
-          it with varsig v1, then decodes and validates the metadata.
+          This demo has two modes: mock data to visualize the varsig envelope,
+          and real passkey flows that register and sign with WebAuthn.
         </p>
       </header>
 
@@ -646,39 +646,64 @@ export default function App() {
             <li>Parse header and verify constants.</li>
             <li>Extract auth data + client data lengths.</li>
             <li>Recover assertion bytes and check WebAuthn metadata.</li>
-            <li>Rebuild signed data and verify signature.</li>
+            <li>Rebuild signed data and verify signature (real passkeys).</li>
           </ol>
         </div>
       </section>
 
       <section className="controls">
-        <div className="button-row">
-          <button type="button" onClick={runDemo} disabled={busy}>
-            {busy ? 'Running…' : 'Run Ed25519 Demo'}
-          </button>
-          <button type="button" onClick={runDemoP256} disabled={busy}>
-            {busy ? 'Running…' : 'Run P-256 Demo'}
-          </button>
-          <button type="button" onClick={runRegister} disabled={busy}>
-            {busy
-              ? 'Waiting…'
-              : registered
-                ? 'Passkey registered'
-                : 'Register passkey (Ed25519/P-256)'}
-          </button>
-          <button
-            type="button"
-            onClick={runWebAuthn}
-            disabled={busy || !registered}
-          >
-            {busy ? 'Waiting…' : 'Sign with WebAuthn'}
-          </button>
+        <div className="control-group">
+          <div className="group-label">Mock data (no passkey required)</div>
+          <div className="button-row">
+            <button
+              type="button"
+              onClick={runDemo}
+              disabled={busy}
+              className="button-mock"
+            >
+              {busy ? 'Running…' : 'Run mock Ed25519'}
+            </button>
+            <button
+              type="button"
+              onClick={runDemoP256}
+              disabled={busy}
+              className="button-mock"
+            >
+              {busy ? 'Running…' : 'Run mock P-256'}
+            </button>
+          </div>
+        </div>
+        <div className="control-group">
+          <div className="group-label">Real passkey flow</div>
+          <div className="button-row">
+            <button
+              type="button"
+              onClick={runRegister}
+              disabled={busy}
+              className="button-real"
+            >
+              {busy
+                ? 'Waiting…'
+                : registered
+                  ? 'Passkey registered'
+                  : 'Register passkey (real device)'}
+            </button>
+            <button
+              type="button"
+              onClick={runWebAuthn}
+              disabled={busy || !registered}
+              className="button-real"
+            >
+              {busy ? 'Waiting…' : 'Sign with WebAuthn (real)'}
+            </button>
+          </div>
         </div>
         <p className="hint">Sign attempt: {signAttempt}</p>
         <p className="hint">
-          The demo buttons use mock data for Ed25519 or P-256. Register passkey
-          creates a WebAuthn credential. Sign with WebAuthn uses that credential
-          to sign (Ed25519 preferred, P-256 fallback).
+          The mock buttons generate fake WebAuthn data for Ed25519 or P-256.
+          Register passkey uses the real WebAuthn API to create a credential on
+          your device. Sign with WebAuthn uses that credential to sign
+          (Ed25519 preferred, P-256 fallback).
         </p>
         <p className="hint">
           The WebAuthn path verifies Ed25519 or P-256 signatures using the

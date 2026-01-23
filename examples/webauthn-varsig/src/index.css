@@ -7,6 +7,8 @@
   --ink: #1b1b1f;
   --muted: #5d5f66;
   --accent: #0d7c66;
+  --accent-mock: #1a8d73;
+  --accent-real: #0b6a56;
   --accent-soft: #e2f3ee;
   --warn: #b64b1b;
   --border: #e0ded9;
@@ -59,8 +61,20 @@ h1 {
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 24px;
+}
+
+.control-group {
+  display: grid;
+  gap: 10px;
+}
+
+.group-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
 }
 
 .button-row {
@@ -80,6 +94,14 @@ button {
   color: white;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button-mock {
+  background: linear-gradient(135deg, var(--accent-mock), #0f7b63);
+}
+
+.button-real {
+  background: linear-gradient(135deg, var(--accent-real), #085746);
 }
 
 button:disabled {
