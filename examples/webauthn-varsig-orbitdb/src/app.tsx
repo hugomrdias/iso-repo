@@ -1,36 +1,39 @@
 import { useRef, useState } from 'react'
-import { DIDKey } from 'iso-did'
-import { parseAttestationObject, unwrapEC2Signature } from 'iso-passkeys'
+import { createHelia } from 'helia'
+import { createOrbitDB, IPFSAccessController } from '@orbitdb/core'
 import {
   CURVE_ED25519,
   CURVE_P256,
-  INNER_EDDSA,
   INNER_ECDSA,
+  INNER_EDDSA,
   MULTIHASH_SHA256,
   MULTIHASH_SHA256_LEN,
   PAYLOAD_ENCODING_RAW,
   VARSIG_PREFIX,
   VARSIG_VERSION,
   WEBAUTHN_WRAPPER,
-  base64urlToBytes,
-  bytesToBase64url,
-  concat,
-  decodeWebAuthnVarsigV1,
-  encodeWebAuthnVarsigV1,
-  parseClientDataJSON,
-  reconstructSignedData,
   varintEncode,
-  verifyEd25519Signature,
-  verifyP256Signature,
-  verifyWebAuthnAssertion,
 } from 'iso-webauthn-varsig'
-
-const encoder = new TextEncoder()
-const STORAGE_KEY = 'webauthn-varsig-demo-credential'
-const STORAGE_KEY_PUBLIC = 'webauthn-varsig-demo-public-key'
-const STORAGE_KEY_DID = 'webauthn-varsig-demo-did'
-const STORAGE_KEY_META = 'webauthn-varsig-demo-meta'
-const STORAGE_KEY_ORBITDB_IDENTITY = 'webauthn-varsig-orbitdb-identity'
+import {
+  buildVarsigHeader,
+  buildVarsigOutput,
+  decodeWebAuthnVarsigV1,
+  parseClientDataJSON,
+  runWebAuthnAssertion,
+  verifyWebAuthnAssertion,
+} from './webauthn/varsig'
+import { loadStoredCredential, registerCredential } from './webauthn/credential'
+import {
+  createWebAuthnIdentities,
+  createOrbitDbIdentity,
+  loadStoredIdentity,
+  type OrbitDbIdentity,
+  type WebAuthnIdentities,
+  type WebAuthnOrbitIdentity,
+} from './orbitdb/identity'
+import { createLibp2pNode } from './orbitdb/libp2p'
+import { loadDbList, storeDbList } from './orbitdb/storage'
+import { createIpfsIdentityStorage } from './orbitdb/identity-storage'
 
 function toHex(bytes: Uint8Array): string {
   return Array.from(bytes)
@@ -42,465 +45,6 @@ function toHexSpaced(bytes: Uint8Array): string {
   return Array.from(bytes)
     .map((value) => value.toString(16).padStart(2, '0'))
     .join(' ')
-}
-
-function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
-}
-
-function buildChallengeBytes(domainLabel: string, payloadBytes: Uint8Array) {
-  const domain = encoder.encode(domainLabel)
-  return crypto.subtle
-    .digest('SHA-256', concat([domain, payloadBytes]))
-    .then((hash) => new Uint8Array(hash))
-}
-
-async function runWebAuthnAssertionForPayload(
-  payloadBytes: Uint8Array,
-  domainLabel: string
-) {
-  const rpId = window.location.hostname
-  const origin = window.location.origin
-  const challengeBytes = await buildChallengeBytes(domainLabel, payloadBytes)
-  const challenge = bytesToBase64url(challengeBytes)
-
-  const stored = loadStoredCredential()
-  if (!stored) {
-    throw new Error('No stored passkey. Register first.')
-  }
-  const { credentialId, publicKey, did, cose, algorithm } = stored
-  const assertion = (await navigator.credentials.get({
-    publicKey: {
-      rpId,
-      challenge: challengeBytes,
-      allowCredentials: [
-        {
-          type: 'public-key',
-          id: toArrayBuffer(credentialId),
-        },
-      ],
-      userVerification: 'preferred',
-    },
-  })) as PublicKeyCredential | null
-
-  if (!assertion) {
-    throw new Error('Passkey authentication failed.')
-  }
-
-  const response = assertion.response as AuthenticatorAssertionResponse
-
-  return {
-    rpId,
-    origin,
-    challenge,
-    challengeBytes,
-    publicKey,
-    did,
-    cose,
-    algorithm,
-    assertion: {
-      authenticatorData: new Uint8Array(response.authenticatorData),
-      clientDataJSON: new Uint8Array(response.clientDataJSON),
-      signature: new Uint8Array(response.signature),
-    },
-  }
-}
-
-async function buildVarsigOutput(
-  assertionData: Awaited<ReturnType<typeof runWebAuthnAssertionForPayload>>
-) {
-  const { assertion, algorithm, origin, rpId, challengeBytes, publicKey } =
-    assertionData
-  const varsig = encodeWebAuthnVarsigV1(assertion, algorithm)
-  const decoded = decodeWebAuthnVarsigV1(varsig)
-  const clientData = parseClientDataJSON(decoded.clientDataJSON)
-
-  const verification = await verifyWebAuthnAssertion(decoded, {
-    expectedOrigin: origin,
-    expectedRpId: rpId,
-    expectedChallenge: challengeBytes,
-  })
-
-  const signedData = await reconstructSignedData(decoded)
-  const signatureValid =
-    algorithm === 'Ed25519'
-      ? await verifyEd25519Signature(signedData, decoded.signature, publicKey)
-      : await verifyP256Signature(
-          signedData,
-          unwrapEC2Signature(decoded.signature),
-          publicKey
-        )
-
-  return {
-    varsig,
-    decoded,
-    clientData,
-    verification,
-    signedData,
-    signatureValid,
-  }
-}
-
-async function createMockAssertion() {
-  const rpId = window.location.hostname
-  const origin = window.location.origin
-
-  const challengeBytes = crypto.getRandomValues(new Uint8Array(32))
-  const challenge = bytesToBase64url(challengeBytes)
-  const payloadBytes = encoder.encode('demo-payload')
-
-  const clientDataJSON = encoder.encode(
-    JSON.stringify({
-      type: 'webauthn.get',
-      challenge,
-      origin,
-      crossOrigin: false,
-    })
-  )
-
-  const rpIdHash = new Uint8Array(
-    await crypto.subtle.digest('SHA-256', encoder.encode(rpId))
-  )
-
-  const flags = 0x01 | 0x04
-  const signCount = 1
-  const signCountBytes = new Uint8Array([
-    (signCount >> 24) & 0xff,
-    (signCount >> 16) & 0xff,
-    (signCount >> 8) & 0xff,
-    signCount & 0xff,
-  ])
-
-  const authenticatorData = new Uint8Array(37)
-  authenticatorData.set(rpIdHash, 0)
-  authenticatorData[32] = flags
-  authenticatorData.set(signCountBytes, 33)
-
-  const signature = crypto.getRandomValues(new Uint8Array(64))
-
-  return {
-    rpId,
-    origin,
-    challenge,
-    challengeBytes,
-    payloadBytes,
-    assertion: {
-      authenticatorData,
-      clientDataJSON,
-      signature,
-    },
-  }
-}
-
-function createMockP256Signature(): Uint8Array {
-  const r = new Uint8Array(32)
-  const s = new Uint8Array(32)
-
-  for (let i = 0; i < 32; i++) {
-    r[i] = (i * 5 + 11) % 256
-    s[i] = (i * 7 + 13) % 256
-  }
-
-  const signature = new Uint8Array(6 + 32 + 32)
-  signature[0] = 0x30
-  signature[1] = 68
-  signature[2] = 0x02
-  signature[3] = 32
-  signature.set(r, 4)
-  signature[36] = 0x02
-  signature[37] = 32
-  signature.set(s, 38)
-
-  return signature
-}
-
-async function createMockAssertionForAlgorithm(algorithm: 'Ed25519' | 'P-256') {
-  const base = await createMockAssertion()
-  if (algorithm === 'Ed25519') {
-    return base
-  }
-
-  return {
-    ...base,
-    assertion: {
-      ...base.assertion,
-      signature: createMockP256Signature(),
-    },
-  }
-}
-
-async function extractCredentialInfo(
-  attestationObject: Uint8Array
-): Promise<{
-  algorithm: 'Ed25519' | 'P-256' | null
-  publicKey: Uint8Array | null
-  kty?: number
-  alg?: number
-  crv?: number
-}> {
-  const parsed = parseAttestationObject(attestationObject.buffer as ArrayBuffer)
-  const coseKey = parsed.authData.credentialPublicKey
-
-  if (!coseKey) {
-    throw new Error('Credential public key missing from attestation')
-  }
-
-  const getValue = (key: number) =>
-    coseKey instanceof Map ? coseKey.get(key) : coseKey[key]
-
-  const kty = getValue(1)
-  const alg = getValue(3)
-  const crv = getValue(-1)
-
-  if (kty === 1 && (alg === -50 || alg === -8) && crv === 6) {
-    const publicKeyBytes = new Uint8Array(getValue(-2))
-    if (publicKeyBytes.length !== 32) {
-      throw new Error(
-        `Invalid Ed25519 public key length: ${publicKeyBytes.length}`
-      )
-    }
-
-    return { algorithm: 'Ed25519', publicKey: publicKeyBytes, kty, alg, crv }
-  }
-
-  if (kty === 2 && alg === -7 && crv === 1) {
-    const x = new Uint8Array(getValue(-2))
-    const y = new Uint8Array(getValue(-3))
-    if (x.length !== 32 || y.length !== 32) {
-      throw new Error(
-        `Invalid P-256 coordinate length: x=${x.length} y=${y.length}`
-      )
-    }
-
-    const publicKeyBytes = new Uint8Array(65)
-    publicKeyBytes[0] = 0x04
-    publicKeyBytes.set(x, 1)
-    publicKeyBytes.set(y, 33)
-    return { algorithm: 'P-256', publicKey: publicKeyBytes, kty, alg, crv }
-  }
-
-  return { algorithm: null, publicKey: null, kty, alg, crv }
-}
-
-function loadStoredCredential() {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  const storedPublicKey = localStorage.getItem(STORAGE_KEY_PUBLIC)
-  const storedDid = localStorage.getItem(STORAGE_KEY_DID)
-  const storedMeta = localStorage.getItem(STORAGE_KEY_META)
-  if (stored && storedPublicKey && storedDid && storedMeta) {
-    const meta = JSON.parse(storedMeta) as {
-      algorithm: 'Ed25519' | 'P-256'
-      kty?: number
-      alg?: number
-      crv?: number
-    }
-    return {
-      credentialId: base64urlToBytes(stored),
-      publicKey: base64urlToBytes(storedPublicKey),
-      did: storedDid,
-      cose: { kty: meta.kty, alg: meta.alg, crv: meta.crv },
-      algorithm: meta.algorithm,
-    }
-  }
-  return null
-}
-
-type OrbitDbIdentity = {
-  id: string
-  did: string
-  publicKey: Uint8Array
-  algorithm: 'Ed25519' | 'P-256'
-  signatures: {
-    id: Uint8Array
-    publicKey: Uint8Array
-  }
-}
-
-function loadStoredIdentity(): OrbitDbIdentity | null {
-  const stored = localStorage.getItem(STORAGE_KEY_ORBITDB_IDENTITY)
-  if (!stored) {
-    return null
-  }
-  const parsed = JSON.parse(stored) as {
-    id: string
-    did: string
-    publicKey: string
-    algorithm: 'Ed25519' | 'P-256'
-    signatures: { id: string; publicKey: string }
-  }
-  return {
-    id: parsed.id,
-    did: parsed.did,
-    publicKey: base64urlToBytes(parsed.publicKey),
-    algorithm: parsed.algorithm,
-    signatures: {
-      id: base64urlToBytes(parsed.signatures.id),
-      publicKey: base64urlToBytes(parsed.signatures.publicKey),
-    },
-  }
-}
-
-function storeIdentity(identity: OrbitDbIdentity) {
-  localStorage.setItem(
-    STORAGE_KEY_ORBITDB_IDENTITY,
-    JSON.stringify({
-      id: identity.id,
-      did: identity.did,
-      publicKey: bytesToBase64url(identity.publicKey),
-      algorithm: identity.algorithm,
-      signatures: {
-        id: bytesToBase64url(identity.signatures.id),
-        publicKey: bytesToBase64url(identity.signatures.publicKey),
-      },
-    })
-  )
-}
-
-async function registerCredential() {
-  const cached = loadStoredCredential()
-  if (cached) {
-    return cached
-  }
-
-  const publicKey: PublicKeyCredentialCreationOptions['publicKey'] = {
-    rp: { name: 'iso-webauthn-varsig', id: window.location.hostname },
-    user: {
-      id: crypto.getRandomValues(new Uint8Array(16)),
-      name: 'demo@example.com',
-      displayName: 'Varsig Demo',
-    },
-    challenge: crypto.getRandomValues(new Uint8Array(32)),
-    pubKeyCredParams: [
-      { type: 'public-key', alg: -50 },
-      { type: 'public-key', alg: -8 },
-      { type: 'public-key', alg: -7 },
-    ],
-    attestation: 'none',
-    authenticatorSelection: {
-      residentKey: 'preferred',
-      userVerification: 'preferred',
-    },
-  }
-
-  const credential = (await navigator.credentials.create({
-    publicKey,
-  })) as PublicKeyCredential | null
-
-  if (!credential) {
-    throw new Error('Passkey registration failed.')
-  }
-
-  const response = credential.response as AuthenticatorAttestationResponse
-  const { algorithm, publicKey: publicKeyBytes, kty, alg, crv } =
-    await extractCredentialInfo(
-      new Uint8Array(response.attestationObject)
-    )
-
-  if (!publicKeyBytes || !algorithm) {
-    throw new Error(
-      'No supported credential returned (expected Ed25519 or P-256)'
-    )
-  }
-
-  const rawId = new Uint8Array(credential.rawId)
-  const encoded = bytesToBase64url(rawId)
-  const encodedPublicKey = bytesToBase64url(publicKeyBytes)
-  const did = DIDKey.fromPublicKey(algorithm, publicKeyBytes).did
-  localStorage.setItem(STORAGE_KEY, encoded)
-  localStorage.setItem(STORAGE_KEY_PUBLIC, encodedPublicKey)
-  localStorage.setItem(STORAGE_KEY_DID, did)
-  localStorage.setItem(
-    STORAGE_KEY_META,
-    JSON.stringify({ algorithm, kty, alg, crv })
-  )
-  return {
-    credentialId: rawId,
-    publicKey: publicKeyBytes,
-    did,
-    cose: { kty, alg, crv },
-    algorithm,
-  }
-}
-
-async function runWebAuthnAssertion() {
-  const payload = { scope: 'webauthn-varsig-demo', ts: Date.now() }
-  const payloadText = JSON.stringify(payload)
-  const payloadBytes = encoder.encode(payloadText)
-
-  const assertionData = await runWebAuthnAssertionForPayload(
-    payloadBytes,
-    'ucan-webauthn-v1:'
-  )
-
-  return {
-    ...assertionData,
-    payloadBytes,
-    payloadText,
-    payloadTs: payload.ts,
-  }
-}
-
-async function createOrbitDbIdentity() {
-  const stored = loadStoredCredential() ?? (await registerCredential())
-  const id = stored.did
-  const idBytes = encoder.encode(id)
-
-  const idAssertion = await runWebAuthnAssertionForPayload(
-    idBytes,
-    'orbitdb-id:'
-  )
-  const idOutput = await buildVarsigOutput(idAssertion)
-
-  const pubkeyPayload = concat([stored.publicKey, idOutput.varsig])
-  const pubKeyAssertion = await runWebAuthnAssertionForPayload(
-    pubkeyPayload,
-    'orbitdb-pubkey:'
-  )
-  const pubKeyOutput = await buildVarsigOutput(pubKeyAssertion)
-
-  const identity: OrbitDbIdentity = {
-    id,
-    did: stored.did,
-    publicKey: stored.publicKey,
-    algorithm: stored.algorithm,
-    signatures: {
-      id: idOutput.varsig,
-      publicKey: pubKeyOutput.varsig,
-    },
-  }
-
-  storeIdentity(identity)
-
-  return { identity, idOutput, pubKeyOutput }
-}
-
-async function signOrbitDbRecord(payloadText: string) {
-  const payloadBytes = encoder.encode(payloadText)
-  const assertion = await runWebAuthnAssertionForPayload(
-    payloadBytes,
-    'orbitdb-record:'
-  )
-  const output = await buildVarsigOutput(assertion)
-
-  return {
-    payloadText,
-    output,
-  }
-}
-
-function buildVarsigHeader(algorithm: 'Ed25519' | 'P-256'): Uint8Array {
-  const innerAlgorithm = algorithm === 'Ed25519' ? INNER_EDDSA : INNER_ECDSA
-  const curve = algorithm === 'Ed25519' ? CURVE_ED25519 : CURVE_P256
-
-  return concat([
-    new Uint8Array([VARSIG_PREFIX, VARSIG_VERSION]),
-    varintEncode(innerAlgorithm),
-    varintEncode(curve),
-    varintEncode(MULTIHASH_SHA256),
-    varintEncode(MULTIHASH_SHA256_LEN),
-    varintEncode(WEBAUTHN_WRAPPER),
-    varintEncode(PAYLOAD_ENCODING_RAW),
-  ])
 }
 
 function buildHeaderParts(algorithm: 'Ed25519' | 'P-256') {
@@ -545,15 +89,25 @@ function buildHeaderParts(algorithm: 'Ed25519' | 'P-256') {
     },
   ]
 }
-
 export default function App() {
   const [busy, setBusy] = useState(false)
-  const [registered, setRegistered] = useState(
-    Boolean(loadStoredCredential())
-  )
-  const [orbitdbIdentity, setOrbitdbIdentity] = useState<OrbitDbIdentity | null>(
-    loadStoredIdentity()
-  )
+  const [registered, setRegistered] = useState(Boolean(loadStoredCredential()))
+  const [orbitdbIdentity, setOrbitdbIdentity] =
+    useState<OrbitDbIdentity | null>(loadStoredIdentity())
+  const [orbitdbIdentityObj, setOrbitdbIdentityObj] = useState<null | {
+    id: string
+    publicKey: Uint8Array
+    signatures: { id: Uint8Array; publicKey: Uint8Array }
+    type: string
+    sign: (identity: unknown, data: Uint8Array | string) => Promise<Uint8Array>
+    verify: (
+      signature: Uint8Array,
+      publicKey: Uint8Array,
+      data: Uint8Array | string
+    ) => Promise<boolean>
+    hash: string
+    bytes: Uint8Array
+  }>(null)
   const [identityChecks, setIdentityChecks] = useState<null | {
     idValid: boolean
     publicKeyValid: boolean
@@ -563,20 +117,41 @@ export default function App() {
   const [recordText, setRecordText] = useState(
     'Hello OrbitDB! Signed with WebAuthn.'
   )
-  const [records, setRecords] = useState<
-    Array<{
-      payloadText: string
-      varsigHex: string
-      verificationValid: boolean
-      signatureValid: boolean
-    }>
+  const [orbitdbName, setOrbitdbName] = useState('webauthn-demo')
+  const [orbitdbRemoteAddress, setOrbitdbRemoteAddress] = useState('')
+  const [orbitdbStatus, setOrbitdbStatus] = useState('idle')
+  const [orbitdbAddress, setOrbitdbAddress] = useState<string | null>(null)
+  const [orbitdbEntries, setOrbitdbEntries] = useState<
+    Array<{ hash: string; value: string }>
   >([])
+  const [orbitdbDbList, setOrbitdbDbList] = useState<string[]>(loadDbList())
+  const [dbJoinActive, setDbJoinActive] = useState(false)
+  const [dbUpdateActive, setDbUpdateActive] = useState(false)
+  const [orbitdbPeerId, setOrbitdbPeerId] = useState<string | null>(null)
+  const [orbitdbPeerCount, setOrbitdbPeerCount] = useState(0)
+  const joinTimeoutRef = useRef<number | null>(null)
+  const updateTimeoutRef = useRef<number | null>(null)
+  const orbitdbRef = useRef<{
+    libp2p?: Awaited<ReturnType<typeof createLibp2pNode>>
+    helia?: Awaited<ReturnType<typeof createHelia>>
+    orbitdb?: Awaited<ReturnType<typeof createOrbitDB>>
+    db?: { add: (value: string) => Promise<string>; all: () => Promise<any[]>; address?: string }
+    identities?: WebAuthnIdentities
+    peerHandlers?: {
+      onPeerConnect: () => void
+      onPeerDisconnect: () => void
+      onPeerDiscovery: (event: Event) => void
+    }
+    dbHandlers?: {
+      onJoin: (peerId: unknown) => void
+      onUpdate: (entry: unknown) => void
+    }
+  }>({})
   const [tsHover, setTsHover] = useState(false)
   const webauthnInFlight = useRef(false)
   const signAttemptRef = useRef(0)
   const [signAttempt, setSignAttempt] = useState(0)
   const [output, setOutput] = useState<null | {
-    mode: 'mock' | 'webauthn'
     algorithm: 'Ed25519' | 'P-256'
     headerHex: string
     varsigHex: string
@@ -598,98 +173,6 @@ export default function App() {
   }>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const runDemo = async () => {
-    setBusy(true)
-    setError(null)
-
-    try {
-      const { assertion, challengeBytes, rpId, origin, challenge } =
-        await createMockAssertionForAlgorithm('Ed25519')
-
-      const varsig = encodeWebAuthnVarsigV1(assertion, 'Ed25519')
-      const decoded = decodeWebAuthnVarsigV1(varsig)
-      const clientData = parseClientDataJSON(decoded.clientDataJSON)
-
-      const verification = await verifyWebAuthnAssertion(decoded, {
-        expectedOrigin: origin,
-        expectedRpId: rpId,
-        expectedChallenge: challengeBytes,
-      })
-
-      const signedData = await reconstructSignedData(decoded)
-      const headerHex = toHex(buildVarsigHeader('Ed25519'))
-
-      setOutput({
-        mode: 'mock',
-        algorithm: 'Ed25519',
-        headerHex,
-        varsigHex: toHex(varsig),
-        decoded,
-        clientData,
-        verification,
-        signatureValid: null,
-        signedDataHex: toHex(signedData),
-        rpId,
-        origin,
-        challenge,
-        challengeHex: toHex(challengeBytes),
-        challengeOrigin: 'Random (mock)',
-        payloadText: undefined,
-        payloadTs: undefined,
-      })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const runDemoP256 = async () => {
-    setBusy(true)
-    setError(null)
-
-    try {
-      const { assertion, challengeBytes, rpId, origin, challenge } =
-        await createMockAssertionForAlgorithm('P-256')
-
-      const varsig = encodeWebAuthnVarsigV1(assertion, 'P-256')
-      const decoded = decodeWebAuthnVarsigV1(varsig)
-      const clientData = parseClientDataJSON(decoded.clientDataJSON)
-
-      const verification = await verifyWebAuthnAssertion(decoded, {
-        expectedOrigin: origin,
-        expectedRpId: rpId,
-        expectedChallenge: challengeBytes,
-      })
-
-      const signedData = await reconstructSignedData(decoded)
-      const headerHex = toHex(buildVarsigHeader('P-256'))
-
-      setOutput({
-        mode: 'mock',
-        algorithm: 'P-256',
-        headerHex,
-        varsigHex: toHex(varsig),
-        decoded,
-        clientData,
-        verification,
-        signatureValid: null,
-        signedDataHex: toHex(signedData),
-        rpId,
-        origin,
-        challenge,
-        challengeHex: toHex(challengeBytes),
-        challengeOrigin: 'Random (mock)',
-        payloadText: undefined,
-        payloadTs: undefined,
-      })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
-    } finally {
-      setBusy(false)
-    }
-  }
-
   const runRegister = async () => {
     setBusy(true)
     setError(null)
@@ -709,12 +192,19 @@ export default function App() {
     setError(null)
 
     try {
-      const { identity, idOutput, pubKeyOutput } =
-        await createOrbitDbIdentity()
-      setOrbitdbIdentity(identity)
+      const {
+        identityData,
+        orbitdbIdentity,
+        idOutput,
+        pubKeyOutput,
+      } = await createOrbitDbIdentity()
+      setOrbitdbIdentity(identityData)
+      setOrbitdbIdentityObj(orbitdbIdentity)
       setRegistered(true)
       setIdentityChecks({
-        idValid: Boolean(idOutput.verification.valid && idOutput.signatureValid),
+        idValid: Boolean(
+          idOutput.verification.valid && idOutput.signatureValid
+        ),
         publicKeyValid: Boolean(
           pubKeyOutput.verification.valid && pubKeyOutput.signatureValid
         ),
@@ -728,24 +218,270 @@ export default function App() {
     }
   }
 
-  const runAddRecord = async () => {
+  const refreshOrbitDbEntries = async () => {
+    if (!orbitdbRef.current.db) return
+    const entries = await orbitdbRef.current.db.all()
+    const normalized = entries.map((entry: { hash: string; value: string }) => ({
+      hash: entry.hash,
+      value: entry.value,
+    }))
+    console.info('[orbitdb] entries refreshed', {
+      count: normalized.length,
+      address: orbitdbRef.current.db?.address?.toString?.(),
+    })
+    setOrbitdbEntries(normalized)
+  }
+
+  const triggerLed = (
+    setActive: (value: boolean) => void,
+    timeoutRef: React.MutableRefObject<number | null>
+  ) => {
+    setActive(true)
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+    }
+    timeoutRef.current = window.setTimeout(() => {
+      setActive(false)
+    }, 1500)
+  }
+
+  const attachDbEvents = (db: { events?: { on: Function; off?: Function } }) => {
+    if (orbitdbRef.current.dbHandlers && orbitdbRef.current.db?.events?.off) {
+      const { onJoin, onUpdate } = orbitdbRef.current.dbHandlers
+      orbitdbRef.current.db.events.off('join', onJoin)
+      orbitdbRef.current.db.events.off('update', onUpdate)
+    }
+
+    const onJoin = async (peerId?: unknown) => {
+      console.info('[orbitdb] db join', {
+        peerId,
+        address: orbitdbRef.current.db?.address?.toString?.(),
+      })
+      triggerLed(setDbJoinActive, joinTimeoutRef)
+      await refreshOrbitDbEntries()
+    }
+    const onUpdate = async (entry?: unknown) => {
+      console.info('[orbitdb] db update', {
+        entry,
+        address: orbitdbRef.current.db?.address?.toString?.(),
+      })
+      triggerLed(setDbUpdateActive, updateTimeoutRef)
+      await refreshOrbitDbEntries()
+    }
+    db.events?.on('join', onJoin)
+    db.events?.on('update', onUpdate)
+    orbitdbRef.current.dbHandlers = { onJoin, onUpdate }
+  }
+
+  const runStartOrbitDb = async () => {
+    setBusy(true)
+    setError(null)
+    setOrbitdbStatus('starting')
+
+    try {
+      if (!orbitdbIdentityObj) {
+        throw new Error('Create a WebAuthn identity before starting OrbitDB.')
+      }
+
+      const libp2p = await createLibp2pNode()
+      const helia = await createHelia({ libp2p })
+      const identityStorage = createIpfsIdentityStorage(helia)
+      const identities = createWebAuthnIdentities(
+        orbitdbIdentityObj as WebAuthnOrbitIdentity,
+        identityStorage
+      )
+      const orbitdb = await createOrbitDB({
+        ipfs: helia,
+        identity: orbitdbIdentityObj,
+        identities,
+      })
+
+      const updatePeerCount = () => {
+        const connections = libp2p.getConnections?.() ?? []
+        const peerIds = new Set(
+          connections.map((connection) => connection.remotePeer?.toString?.())
+        )
+        peerIds.delete(undefined as unknown as string)
+        setOrbitdbPeerCount(peerIds.size)
+      }
+
+      const onPeerConnect = (event?: Event) => {
+        updatePeerCount()
+        const connection = (event as CustomEvent)?.detail?.connection
+        const peerId = connection?.remotePeer ?? (event as CustomEvent)?.detail?.remotePeer
+        if (peerId) {
+          console.info('[orbitdb] peer connected', peerId.toString?.())
+        }
+      }
+      const onPeerDisconnect = () => updatePeerCount()
+      const onPeerDiscovery = (event: Event) => {
+        const detail = (event as CustomEvent).detail as
+          | { id?: { toString?: () => string }; multiaddrs?: Array<{ toString: () => string }> }
+          | undefined
+        const peerId = detail?.id
+        const multiaddrs = detail?.multiaddrs ?? []
+        if (!peerId || multiaddrs.length === 0) return
+        console.info('[orbitdb] peer discovered', peerId.toString?.(), multiaddrs.length)
+
+        const dialableAddrs = multiaddrs.filter((addr) => {
+          const addrStr = addr.toString()
+          return (
+            addrStr.includes('/webrtc') ||
+            addrStr.includes('/webtransport') ||
+            addrStr.includes('/ws')
+          )
+        })
+        if (dialableAddrs.length === 0) return
+
+        const existingConnections = libp2p.getConnections?.(peerId) ?? []
+        const hasDirectConnection = existingConnections.some((conn) => {
+          const addrStr = conn.remoteAddr?.toString?.() ?? ''
+          return !addrStr.includes('/p2p-circuit')
+        })
+        if (hasDirectConnection) return
+
+        console.info('[orbitdb] auto-dialing peer', peerId.toString?.())
+        libp2p
+          .dial?.(peerId)
+          .then(() => {
+            console.info('[orbitdb] dial succeeded', peerId.toString?.())
+          })
+          .catch((err) => {
+            console.warn(
+              '[orbitdb] dial failed',
+              peerId.toString?.(),
+              err instanceof Error ? err.message : String(err)
+            )
+          })
+      }
+
+      libp2p.addEventListener?.('peer:connect', onPeerConnect)
+      libp2p.addEventListener?.('peer:disconnect', onPeerDisconnect)
+      libp2p.addEventListener?.('peer:discovery', onPeerDiscovery)
+      libp2p.addEventListener?.('connection:open', (event: Event) => {
+        const connection = (event as CustomEvent).detail
+        const addrStr = connection?.remoteAddr?.toString?.() ?? ''
+        const isRelay = addrStr.includes('/p2p-circuit')
+        const isWebrtc = addrStr.includes('/webrtc')
+        console.info('[orbitdb] connection opened', {
+          peerId: connection?.remotePeer?.toString?.(),
+          address: addrStr,
+          transport: isWebrtc ? 'webrtc' : 'relay',
+        })
+      })
+      libp2p.addEventListener?.('connection:close', (event: Event) => {
+        const connection = (event as CustomEvent).detail
+        const addrStr = connection?.remoteAddr?.toString?.() ?? ''
+        console.info('[orbitdb] connection closed', {
+          peerId: connection?.remotePeer?.toString?.(),
+          address: addrStr,
+          transport: addrStr.includes('/webrtc') ? 'webrtc' : 'relay',
+        })
+      })
+      updatePeerCount()
+      const existingConnections = libp2p.getConnections?.() ?? []
+      if (existingConnections.length > 0) {
+        updatePeerCount()
+      }
+
+      orbitdbRef.current = {
+        ...orbitdbRef.current,
+        libp2p,
+        helia,
+        orbitdb,
+        identities,
+        peerHandlers: { onPeerConnect, onPeerDisconnect, onPeerDiscovery },
+      }
+      setOrbitdbPeerId(libp2p.peerId?.toString() ?? null)
+      setOrbitdbStatus('ready')
+    } catch (err) {
+      setOrbitdbStatus('error')
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const runOpenOrbitDb = async () => {
     setBusy(true)
     setError(null)
 
     try {
-      if (!orbitdbIdentity) {
-        throw new Error('Create an OrbitDB identity first.')
+      if (!orbitdbRef.current.orbitdb) {
+        await runStartOrbitDb()
       }
-      const result = await signOrbitDbRecord(recordText)
-      setRecords((prev) => [
-        {
-          payloadText: result.payloadText,
-          varsigHex: toHex(result.output.varsig),
-          verificationValid: result.output.verification.valid,
-          signatureValid: Boolean(result.output.signatureValid),
-        },
-        ...prev,
-      ])
+      if (!orbitdbRef.current.orbitdb || !orbitdbIdentityObj) {
+        throw new Error('OrbitDB is not ready yet.')
+      }
+
+      const db = await orbitdbRef.current.orbitdb.open(orbitdbName, {
+        type: 'events',
+        AccessController: IPFSAccessController({
+          write: ['*'],
+        }),
+      })
+      orbitdbRef.current.db = db
+      attachDbEvents(db)
+      const address = db.address?.toString?.() ?? String(db.address)
+      setOrbitdbAddress(address)
+      if (!orbitdbDbList.includes(address)) {
+        const updated = [address, ...orbitdbDbList]
+        setOrbitdbDbList(updated)
+        storeDbList(updated)
+      }
+      await refreshOrbitDbEntries()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const runOpenOrbitDbByAddress = async () => {
+    setBusy(true)
+    setError(null)
+
+    try {
+      if (!orbitdbRef.current.orbitdb) {
+        await runStartOrbitDb()
+      }
+      if (!orbitdbRef.current.orbitdb) {
+        throw new Error('OrbitDB is not ready yet.')
+      }
+      if (!orbitdbRemoteAddress.trim()) {
+        throw new Error('Enter a database address to open.')
+      }
+
+      const db = await orbitdbRef.current.orbitdb.open(
+        orbitdbRemoteAddress.trim()
+      )
+      orbitdbRef.current.db = db
+      attachDbEvents(db)
+      const address = db.address?.toString?.() ?? String(db.address)
+      setOrbitdbAddress(address)
+      if (!orbitdbDbList.includes(address)) {
+        const updated = [address, ...orbitdbDbList]
+        setOrbitdbDbList(updated)
+        storeDbList(updated)
+      }
+      await refreshOrbitDbEntries()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const runAddOrbitDbEntry = async () => {
+    setBusy(true)
+    setError(null)
+
+    try {
+      if (!orbitdbRef.current.db) {
+        throw new Error('Open an OrbitDB database first.')
+      }
+      await orbitdbRef.current.db.add(recordText)
+      await refreshOrbitDbEntries()
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
@@ -760,7 +496,6 @@ export default function App() {
     webauthnInFlight.current = true
     signAttemptRef.current += 1
     setSignAttempt(signAttemptRef.current)
-    console.log('[webauthn-demo] sign attempt', signAttemptRef.current)
     setBusy(true)
     setError(null)
 
@@ -782,7 +517,6 @@ export default function App() {
       const headerHex = toHex(buildVarsigHeader(algorithm))
 
       setOutput({
-        mode: 'webauthn',
         algorithm,
         headerHex,
         varsigHex: toHex(outputDetails.varsig),
@@ -816,9 +550,8 @@ export default function App() {
         <p className="eyebrow">iso-webauthn-varsig</p>
         <h1>WebAuthn Varsig + OrbitDB Identity Demo</h1>
         <p className="lede">
-          This demo has two modes: mock data to visualize the varsig envelope,
-          and real passkey flows that register, sign, and build a WebAuthn-backed
-          OrbitDB identity without a separate browser keypair.
+          This demo uses real passkey flows to register, sign, and build a
+          WebAuthn-backed OrbitDB identity without a separate browser keypair.
         </p>
       </header>
 
@@ -852,34 +585,13 @@ export default function App() {
 
       <section className="controls">
         <div className="control-group">
-          <div className="group-label">Mock data (no passkey required)</div>
-          <div className="button-row">
-            <button
-              type="button"
-              onClick={runDemo}
-              disabled={busy}
-              className="button-mock"
-            >
-              {busy ? 'Running…' : 'Run mock Ed25519'}
-            </button>
-            <button
-              type="button"
-              onClick={runDemoP256}
-              disabled={busy}
-              className="button-mock"
-            >
-              {busy ? 'Running…' : 'Run mock P-256'}
-            </button>
-          </div>
-        </div>
-        <div className="control-group">
           <div className="group-label">Real passkey flow</div>
           <div className="button-row">
             <button
-              type="button"
-              onClick={runRegister}
-              disabled={busy}
               className="button-real"
+              disabled={busy}
+              onClick={runRegister}
+              type="button"
             >
               {busy
                 ? 'Waiting…'
@@ -888,10 +600,10 @@ export default function App() {
                   : 'Register passkey (real device)'}
             </button>
             <button
-              type="button"
-              onClick={runWebAuthn}
-              disabled={busy || !registered}
               className="button-real"
+              disabled={busy || !registered}
+              onClick={runWebAuthn}
+              type="button"
             >
               {busy ? 'Waiting…' : 'Sign with WebAuthn (real)'}
             </button>
@@ -899,10 +611,9 @@ export default function App() {
         </div>
         <p className="hint">Sign attempt: {signAttempt}</p>
         <p className="hint">
-          The mock buttons generate fake WebAuthn data for Ed25519 or P-256.
           Register passkey uses the real WebAuthn API to create a credential on
-          your device. Sign with WebAuthn uses that credential to sign
-          (Ed25519 preferred, P-256 fallback).
+          your device. Sign with WebAuthn uses that credential to sign (Ed25519
+          preferred, P-256 fallback).
         </p>
         <p className="hint">
           The WebAuthn path verifies Ed25519 or P-256 signatures using the
@@ -919,38 +630,140 @@ export default function App() {
           </p>
           <div className="button-row">
             <button
-              type="button"
-              onClick={runOrbitDbIdentity}
-              disabled={busy || !registered}
               className="button-real"
+              disabled={busy || !registered}
+              onClick={runOrbitDbIdentity}
+              type="button"
             >
               {busy ? 'Working…' : 'Create OrbitDB identity'}
-            </button>
-          </div>
-          <label className="input-label" htmlFor="record-input">
-            Record payload
-          </label>
-          <textarea
-            id="record-input"
-            className="record-input"
-            rows={3}
-            value={recordText}
-            onChange={(event) => setRecordText(event.target.value)}
-          />
-          <div className="button-row">
-            <button
-              type="button"
-              onClick={runAddRecord}
-              disabled={busy || !orbitdbIdentity}
-              className="button-real"
-            >
-              {busy ? 'Working…' : 'Sign record with WebAuthn'}
             </button>
           </div>
           <p className="hint">
             Identity signatures use passkey assertions over the DID and
             public-key binding payloads.
           </p>
+        </div>
+
+        <div className="card">
+          <h2>OrbitDB Database</h2>
+          <p>
+            Start OrbitDB with the WebAuthn identity, then open a database and
+            add entries. Open the same address in another tab to see replication.
+          </p>
+          <div className="button-row">
+            <button
+              className="button-real"
+              disabled={busy || !orbitdbIdentityObj}
+              onClick={runStartOrbitDb}
+              type="button"
+            >
+              {busy ? 'Working…' : 'Start OrbitDB'}
+            </button>
+            <button
+              className="button-real"
+              disabled={busy || !orbitdbIdentityObj}
+              onClick={runOpenOrbitDb}
+              type="button"
+            >
+              {busy ? 'Working…' : 'Open DB'}
+            </button>
+          </div>
+          <label className="input-label" htmlFor="orbitdb-entry">
+            Entry payload
+          </label>
+          <textarea
+            className="record-input"
+            id="orbitdb-entry"
+            onChange={(event) => setRecordText(event.target.value)}
+            rows={3}
+            value={recordText}
+          />
+          <div className="button-row">
+            <button
+              className="button-real"
+              disabled={busy || !orbitdbIdentityObj || !orbitdbAddress}
+              onClick={runAddOrbitDbEntry}
+              type="button"
+            >
+              {busy ? 'Working…' : 'Add entry to DB'}
+            </button>
+          </div>
+          <label className="input-label" htmlFor="orbitdb-name">
+            Database name
+          </label>
+          <input
+            className="record-input"
+            id="orbitdb-name"
+            onChange={(event) => setOrbitdbName(event.target.value)}
+            value={orbitdbName}
+          />
+          <label className="input-label" htmlFor="orbitdb-address">
+            Open by address
+          </label>
+          <input
+            className="record-input"
+            id="orbitdb-address"
+            onChange={(event) => setOrbitdbRemoteAddress(event.target.value)}
+            value={orbitdbRemoteAddress}
+            placeholder="Copy address from another tab"
+          />
+          <div className="button-row">
+            <button
+              className="button-real"
+              disabled={busy || !orbitdbIdentityObj}
+              onClick={runOpenOrbitDbByAddress}
+              type="button"
+            >
+              {busy ? 'Working…' : 'Open remote DB'}
+            </button>
+          </div>
+          <p className="hint">
+            Status: {orbitdbStatus} · Peers: {orbitdbPeerCount}
+          </p>
+          <div className="led-row">
+            <span className={`led ${dbJoinActive ? 'led-on' : ''}`} />
+            <span className="hint">Join</span>
+            <span className={`led ${dbUpdateActive ? 'led-on' : ''}`} />
+            <span className="hint">Update</span>
+          </div>
+          <label className="input-label" htmlFor="orbitdb-peerid">
+            Peer ID
+          </label>
+          <input
+            className="record-input"
+            id="orbitdb-peerid"
+            readOnly
+            value={orbitdbPeerId ?? ''}
+          />
+          <label className="input-label" htmlFor="orbitdb-address-display">
+            Database address
+          </label>
+          <input
+            className="record-input"
+            id="orbitdb-address-display"
+            readOnly
+            value={orbitdbAddress ?? ''}
+          />
+          <p className="hint">
+            Outcome: new entries appear in the list, and another tab opened with
+            the same address should replicate them over libp2p.
+          </p>
+        </div>
+
+        <div className="card">
+          <h2>OrbitDB Entries</h2>
+          {orbitdbEntries.length === 0 ? (
+            <p className="hint">Open a database and add an entry.</p>
+          ) : (
+            <dl>
+              {orbitdbEntries.slice(0, 5).map((entry) => (
+                <div key={entry.hash}>
+                  <dt>{entry.hash.slice(0, 10)}…</dt>
+                  <dd className="mono">{entry.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
 
         <div className="card">
@@ -988,28 +801,6 @@ export default function App() {
             </p>
           )}
         </div>
-
-        <div className="card">
-          <h2>Signed Records</h2>
-          {records.length === 0 ? (
-            <p className="hint">Sign a record to see varsig output.</p>
-          ) : (
-            <dl>
-              {records.slice(0, 3).map((record, index) => (
-                <div key={`${record.payloadText}-${index}`}>
-                  <dt>Record {records.length - index}</dt>
-                  <dd className="mono">{record.payloadText}</dd>
-                  <dd className={record.signatureValid ? 'ok' : 'bad'}>
-                    {record.signatureValid ? 'signature valid' : 'signature invalid'}
-                  </dd>
-                  <dd className="mono">
-                    varsig: {record.varsigHex.slice(0, 64)}…
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          )}
-        </div>
       </section>
 
       {error ? <div className="error">{error}</div> : null}
@@ -1019,10 +810,6 @@ export default function App() {
           <div className="card">
             <h2>Inputs</h2>
             <dl>
-              <div>
-                <dt>Mode</dt>
-                <dd>{output.mode === 'webauthn' ? 'WebAuthn' : 'Mock'}</dd>
-              </div>
               <div>
                 <dt>Algorithm</dt>
                 <dd>{output.algorithm}</dd>
@@ -1072,7 +859,9 @@ export default function App() {
                 </div>
               </dl>
             ) : (
-              <p className="hint">COSE metadata is captured during registration.</p>
+              <p className="hint">
+                COSE metadata is captured during registration.
+              </p>
             )}
           </div>
 
@@ -1091,24 +880,30 @@ export default function App() {
                 <div>
                   <dt>Payload JSON</dt>
                   <dd className="mono">
-                    {output.payloadText.split(`${output.payloadTs}`).map((part, index, parts) =>
-                      index === parts.length - 1 ? (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <span key={`${part}-${index}`}>{part}</span>
-                      ) : (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <span key={`${part}-${index}`}>
-                          {part}
-                          <span
-                            className="ts-token"
-                            onMouseEnter={() => setTsHover(true)}
-                            onMouseLeave={() => setTsHover(false)}
-                          >
-                            {output.payloadTs}
+                    {output.payloadText
+                      .split(`${output.payloadTs}`)
+                      .map((part, index, parts) =>
+                        index === parts.length - 1 ? (
+                          // eslint-disable-next-line react/no-array-index-key
+                          <span key={`${part}-${index}`}>{part}</span>
+                        ) : (
+                          // eslint-disable-next-line react/no-array-index-key
+                          <span key={`${part}-${index}`}>
+                            {part}
+                            <button
+                              aria-label="Show ts source"
+                              className="ts-token"
+                              onBlur={() => setTsHover(false)}
+                              onFocus={() => setTsHover(true)}
+                              onMouseEnter={() => setTsHover(true)}
+                              onMouseLeave={() => setTsHover(false)}
+                              type="button"
+                            >
+                              {output.payloadTs}
+                            </button>
                           </span>
-                        </span>
-                      )
-                    )}
+                        )
+                      )}
                   </dd>
                 </div>
               ) : null}
@@ -1155,7 +950,7 @@ export default function App() {
             </dl>
             <div className="header-grid">
               {buildHeaderParts(output.algorithm).map((part) => (
-                <div key={part.label} className="header-item">
+                <div className="header-item" key={part.label}>
                   <div className="header-label">{part.label}</div>
                   <div className="mono header-bytes">{part.value}</div>
                   <div className="header-detail">{part.detail}</div>

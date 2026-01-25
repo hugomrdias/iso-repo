@@ -2,8 +2,8 @@
 
 This example demonstrates a WebAuthn-backed, OrbitDB-style identity that signs
 directly with passkeys using varsig, without creating a separate browser
-keystore keypair. The demo mirrors the OrbitDB identity shape but uses WebAuthn
-assertions end-to-end in the browser.
+keystore keypair. The demo mirrors the OrbitDB identity shape, then uses that
+identity with a real OrbitDB events database in the browser.
 
 ## Scope
 
@@ -19,7 +19,6 @@ assertions end-to-end in the browser.
 
 - No OrbitDB keystore or default identity flow.
 - No server-side verification or attestation checks.
-- No persistence to a real OrbitDB database.
 
 ## Run
 
