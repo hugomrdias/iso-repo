@@ -1,7 +1,7 @@
 {
   "name": "@le-space/iso-did",
   "type": "module",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Isomorphic did core and did key tooling",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
@@ -101,7 +101,7 @@
   "dependencies": {
     "did-resolver": "^4.1.0",
     "iso-base": "npm:@le-space/iso-base@dev",
-    "iso-web": "workspace:^",
+    "iso-web": "^2.1.0",
     "multiformats": "^13.4.1",
     "p-race": "^3.1.0"
   },
