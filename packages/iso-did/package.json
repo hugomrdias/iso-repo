@@ -1,5 +1,5 @@
 {
-  "name": "iso-did",
+  "name": "@le-space/iso-did",
   "type": "module",
   "version": "2.1.1",
   "description": "Isomorphic did core and did key tooling",
@@ -92,6 +92,7 @@
   ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true",
+    "publish:dev": "pnpm publish --tag dev",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
     "test:node": "mocha 'test/**/!(*.browser).test.js'",
     "update-msw": "msw init test/mocks/ --save",
@@ -99,7 +100,7 @@
   },
   "dependencies": {
     "did-resolver": "^4.1.0",
-    "iso-base": "workspace:^",
+    "iso-base": "npm:@le-space/iso-base@dev",
     "iso-web": "workspace:^",
     "multiformats": "^13.4.1",
     "p-race": "^3.1.0"

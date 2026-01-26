@@ -14,8 +14,8 @@
   "dependencies": {
     "@tanstack/react-query": "^5.90.12",
     "filsnap-adapter": "^3.3.8",
-    "iso-base": "workspace:*",
-    "iso-did": "workspace:*",
+    "iso-base": "npm:@le-space/iso-base@dev",
+    "iso-did": "npm:@le-space/iso-did@dev",
     "iso-kv": "workspace:*",
     "iso-signatures": "workspace:*",
     "iso-ucan": "workspace:*",

@@ -1,5 +1,5 @@
 {
-  "name": "iso-webauthn-varsig",
+  "name": "@le-space/iso-webauthn-varsig",
   "type": "module",
   "version": "0.1.0",
   "description": "WebAuthn varsig encoding/decoding helpers.",
@@ -46,12 +46,13 @@
   ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
+    "publish:dev": "pnpm publish --tag dev",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
     "test:node": "mocha 'test/**/!(*.browser).test.js'",
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "iso-base": "workspace:^"
+    "iso-base": "npm:@le-space/iso-base@dev"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

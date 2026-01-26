@@ -10,9 +10,9 @@
     "preview": "pnpm run build && vite preview"
   },
   "dependencies": {
-    "iso-did": "workspace:*",
+    "iso-did": "npm:@le-space/iso-did@dev",
     "iso-passkeys": "workspace:*",
-    "iso-webauthn-varsig": "workspace:*",
+    "iso-webauthn-varsig": "npm:@le-space/iso-webauthn-varsig@dev",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },

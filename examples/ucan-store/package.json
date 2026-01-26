@@ -12,7 +12,7 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "iso-base": "workspace:*",
+    "iso-base": "npm:@le-space/iso-base@dev",
     "iso-kv": "workspace:*",
     "iso-signatures": "workspace:*",
     "iso-ucan": "workspace:*",

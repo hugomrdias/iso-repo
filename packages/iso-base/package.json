@@ -1,5 +1,5 @@
 {
-  "name": "iso-base",
+  "name": "@le-space/iso-base",
   "type": "module",
   "version": "4.3.0",
   "description": "Isomorphic Utils",
@@ -116,6 +116,7 @@
   ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
+    "publish:dev": "pnpm publish --tag dev",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
     "test:node": "mocha 'test/**/!(*.browser).test.js'",
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"

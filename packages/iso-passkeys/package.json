@@ -54,8 +54,8 @@
     "@peculiar/asn1-ecc": "^2.6.0",
     "@peculiar/asn1-schema": "^2.6.0",
     "cbor-x": "^1.6.0",
-    "iso-base": "workspace:^",
-    "iso-did": "workspace:^"
+    "iso-base": "npm:@le-space/iso-base@dev",
+    "iso-did": "npm:@le-space/iso-did@dev"
   },
   "devDependencies": {
     "@types/assert": "^1.5.11",
