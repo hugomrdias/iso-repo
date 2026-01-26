@@ -5,6 +5,9 @@
   "workspaces": [
     "packages/*"
   ],
+  "dependencies": {
+    "iso-passkeys": "workspace:*"
+  },
   "engines": {
     "node": ">=22"
   },
@@ -31,6 +34,13 @@
     "pre-commit": "pnpm exec biome check --no-errors-on-unmatched --files-ignore-unknown=true --staged"
   },
   "pnpm": {
+    "packageExtensions": {
+      "@le-space/orbitdb-identity-provider-webauthn-did@*": {
+        "dependencies": {
+          "iso-passkeys": "workspace:*"
+        }
+      }
+    },
     "onlyBuiltDependencies": [
       "@biomejs/biome",
       "better-sqlite3",

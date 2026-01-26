@@ -4,9 +4,15 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+packageExtensionsChecksum: sha256-0yI97lTigC5chqTQsJtRw4qERBHpffdotErxmaUWknY=
+
 importers:
 
   .:
+    dependencies:
+      iso-passkeys:
+        specifier: workspace:*
+        version: link:packages/iso-passkeys
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.3.10
@@ -39,11 +45,11 @@ importers:
         specifier: ^3.3.8
         version: 3.3.8(iso-filecoin@7.4.7(typescript@5.9.3))(webextension-polyfill@0.12.0)
       iso-base:
-        specifier: workspace:*
-        version: link:../../packages/iso-base
+        specifier: npm:@le-space/iso-base@dev
+        version: '@le-space/iso-base@4.3.0'
       iso-did:
-        specifier: workspace:*
-        version: link:../../packages/iso-did
+        specifier: npm:@le-space/iso-did@dev
+        version: '@le-space/iso-did@2.1.2'
       iso-kv:
         specifier: workspace:*
         version: link:../../packages/iso-kv
@@ -100,8 +106,8 @@ importers:
   examples/ucan-store:
     dependencies:
       iso-base:
-        specifier: workspace:*
-        version: link:../../packages/iso-base
+        specifier: npm:@le-space/iso-base@dev
+        version: '@le-space/iso-base@4.3.0'
       iso-kv:
         specifier: workspace:*
         version: link:../../packages/iso-kv
@@ -152,14 +158,14 @@ importers:
   examples/webauthn-varsig:
     dependencies:
       iso-did:
-        specifier: workspace:*
-        version: link:../../packages/iso-did
+        specifier: npm:@le-space/iso-did@dev
+        version: '@le-space/iso-did@2.1.2'
       iso-passkeys:
         specifier: workspace:*
         version: link:../../packages/iso-passkeys
       iso-webauthn-varsig:
-        specifier: workspace:*
-        version: link:../../packages/iso-webauthn-varsig
+        specifier: npm:@le-space/iso-webauthn-varsig@dev
+        version: '@le-space/iso-webauthn-varsig@0.1.0'
       react:
         specifier: ^19.2.1
         version: 19.2.3
@@ -202,7 +208,7 @@ importers:
         version: 9.2.5
       '@le-space/orbitdb-identity-provider-webauthn-did':
         specifier: github:Le-Space/orbitdb-identity-provider-webauthn-did#varsic
-        version: https://codeload.github.com/Le-Space/orbitdb-identity-provider-webauthn-did/tar.gz/46ec081cc256cbb4d023797d4f155f4ad76030a6(@orbitdb/core@3.0.2)(rollup@4.54.0)(vite@7.3.0(@types/node@24.10.4)(terser@5.46.0)(yaml@2.8.2))
+        version: https://codeload.github.com/Le-Space/orbitdb-identity-provider-webauthn-did/tar.gz/39ec29b855b6a569e6be98e99d72db33c00e0e79(@orbitdb/core@3.0.2)(rollup@4.54.0)(vite@7.3.0(@types/node@24.10.4)(terser@5.46.0)(yaml@2.8.2))
       '@libp2p/autonat':
         specifier: ^2.0.38
         version: 2.0.38
@@ -237,14 +243,14 @@ importers:
         specifier: ^5.5.1
         version: 5.5.1(react-native@0.83.1(@babel/core@7.28.5)(@types/react@19.2.7)(react@19.2.3))
       iso-did:
-        specifier: workspace:*
-        version: link:../../packages/iso-did
+        specifier: npm:@le-space/iso-did@dev
+        version: '@le-space/iso-did@2.1.2'
       iso-passkeys:
         specifier: workspace:*
         version: link:../../packages/iso-passkeys
       iso-webauthn-varsig:
-        specifier: workspace:*
-        version: link:../../packages/iso-webauthn-varsig
+        specifier: npm:@le-space/iso-webauthn-varsig@dev
+        version: '@le-space/iso-webauthn-varsig@0.1.0'
       libp2p:
         specifier: ^2.10.0
         version: 2.10.0
@@ -364,11 +370,11 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       iso-base:
-        specifier: workspace:^
-        version: link:../iso-base
+        specifier: npm:@le-space/iso-base@dev
+        version: '@le-space/iso-base@4.3.0'
       iso-web:
-        specifier: workspace:^
-        version: link:../iso-web
+        specifier: ^2.1.0
+        version: 2.1.0
       multiformats:
         specifier: ^13.4.1
         version: 13.4.2
@@ -487,11 +493,11 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0
       iso-base:
-        specifier: workspace:^
-        version: link:../iso-base
+        specifier: npm:@le-space/iso-base@dev
+        version: '@le-space/iso-base@4.3.0'
       iso-did:
-        specifier: workspace:^
-        version: link:../iso-did
+        specifier: npm:@le-space/iso-did@dev
+        version: '@le-space/iso-did@2.1.2'
     devDependencies:
       '@types/assert':
         specifier: ^1.5.11
@@ -527,11 +533,11 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
       iso-base:
-        specifier: workspace:^
-        version: link:../iso-base
+        specifier: npm:@le-space/iso-base@dev
+        version: '@le-space/iso-base@4.3.0'
       iso-did:
-        specifier: workspace:^
-        version: link:../iso-did
+        specifier: npm:@le-space/iso-did@dev
+        version: '@le-space/iso-did@2.1.2'
       ox:
         specifier: ^0.11.1
         version: 0.11.1(typescript@5.9.3)(zod@4.2.1)
@@ -582,11 +588,11 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       iso-base:
-        specifier: workspace:^
-        version: link:../iso-base
+        specifier: npm:@le-space/iso-base@dev
+        version: '@le-space/iso-base@4.3.0'
       iso-did:
-        specifier: workspace:^
-        version: link:../iso-did
+        specifier: npm:@le-space/iso-did@dev
+        version: '@le-space/iso-did@2.1.2'
       iso-kv:
         specifier: ^3.1.1
         version: 3.1.1
@@ -638,8 +644,8 @@ importers:
         specifier: ^24.10.2
         version: 24.10.4
       iso-base:
-        specifier: workspace:^
-        version: link:../iso-base
+        specifier: npm:@le-space/iso-base@dev
+        version: '@le-space/iso-base@4.3.0'
       msw:
         specifier: 2.12.4
         version: 2.12.4(@types/node@24.10.4)(typescript@5.9.3)
@@ -656,8 +662,8 @@ importers:
   packages/iso-webauthn-varsig:
     dependencies:
       iso-base:
-        specifier: workspace:^
-        version: link:../iso-base
+        specifier: npm:@le-space/iso-base@dev
+        version: '@le-space/iso-base@4.3.0'
     devDependencies:
       '@types/mocha':
         specifier: ^10.0.10
@@ -2255,9 +2261,18 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@le-space/orbitdb-identity-provider-webauthn-did@https://codeload.github.com/Le-Space/orbitdb-identity-provider-webauthn-did/tar.gz/46ec081cc256cbb4d023797d4f155f4ad76030a6':
-    resolution: {tarball: https://codeload.github.com/Le-Space/orbitdb-identity-provider-webauthn-did/tar.gz/46ec081cc256cbb4d023797d4f155f4ad76030a6}
-    version: 0.1.0
+  '@le-space/iso-base@4.3.0':
+    resolution: {integrity: sha512-aZerTomLgkGAAh6zAa8PWQu2rfMzrA5tiBIe4PWI8LDBJHwlgFwRsiDpdM/3eRjE7ocHi4rrPXdVfy+FH7knFA==}
+
+  '@le-space/iso-did@2.1.2':
+    resolution: {integrity: sha512-LosvXjZFdkcq883UzLUUoo+kBeRuSndKe+17ckuPbJSRKUj/BlSmRatmOuN6DgTkw1YHc9aOwxrdU4ojH3hQHw==}
+
+  '@le-space/iso-webauthn-varsig@0.1.0':
+    resolution: {integrity: sha512-8gAM+pGZCnt/14IbjEpklFhCoy2WhPuoCI4En9fD85tRuG+s83ILR7XVb/FQk86vX/yFl5/fMlB3qjFkL9Dpag==}
+
+  '@le-space/orbitdb-identity-provider-webauthn-did@https://codeload.github.com/Le-Space/orbitdb-identity-provider-webauthn-did/tar.gz/39ec29b855b6a569e6be98e99d72db33c00e0e79':
+    resolution: {tarball: https://codeload.github.com/Le-Space/orbitdb-identity-provider-webauthn-did/tar.gz/39ec29b855b6a569e6be98e99d72db33c00e0e79}
+    version: 0.2.0
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@orbitdb/core': ^3.0.0
@@ -3318,9 +3333,6 @@ packages:
 
   base-64@1.0.0:
     resolution: {integrity: sha512-kwDPIFCGx0NZHog36dj+tHiwP4QMzsZ3AgMViUBKI0+V5n4U0ufTCUMhnQ04diaRI8EX/QcPfql7zlhZ7j4zgg==}
-
-  base-x@5.0.1:
-    resolution: {integrity: sha512-M7uio8Zt++eg3jPj+rHMfCC+IuygQHHCOU+IYsVtik6FWjuYpVt/+MRKcgsAMHh8mMFAwnB+Bs+mTrFiXjMzKg==}
 
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
@@ -4774,22 +4786,8 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  iso-base@4.2.1:
-    resolution: {integrity: sha512-D73C0m12lNYCDwSye1UrkM2dp+ODioCXB8EGLSBGLfuIs7b2w+EV1c+pmeC0qz7nntdwtatN+GdfxyKpElZSbw==}
-
   iso-base@4.3.0:
     resolution: {integrity: sha512-t6n4Wc8YsfDgiYcNa2+QWskqsVMlIipOMP7Lae32Ut+nvPnU0QdE/WiroNOZpqDzxPmM5vDKfu66kKxjiBOxUA==}
-
-  iso-base@file:packages/iso-base/iso-base-4.3.0.tgz:
-    resolution: {integrity: sha512-efXwm8gfaNSPbVoKyxm5GOcvbWibCsucHYYHpOeRErgdx5hK9Fq8c5ya9NgBLp6TnbaoB5rNnRgzPGcH1J9Ydw==, tarball: file:packages/iso-base/iso-base-4.3.0.tgz}
-    version: 4.3.0
-
-  iso-did@2.1.1:
-    resolution: {integrity: sha512-osHaZWcBY2aSi1InDmjI99O5IAn5BfFXQ3+vI4wNBucPtH+31cxHvDczRp9T+rcoegBAgWcavlMuRgbnJEERzg==}
-
-  iso-did@file:packages/iso-did/iso-did-2.1.1.local.tgz:
-    resolution: {integrity: sha512-bES3loIOj+P7nJZU8RMpf1iyHnA7cDE0dyEPOJUFruu+LiRT0kzogYSe5fpeUz0dCSPOQsO67gX6YsCZs9V4nA==, tarball: file:packages/iso-did/iso-did-2.1.1.local.tgz}
-    version: 2.1.1
 
   iso-filecoin@7.4.7:
     resolution: {integrity: sha512-whLO1m0OskzOFGc+CB8WPr2gsR/asj/8MA7pQXYOtB9mPGay4askXLTJfIBY1AJh4/RaBUeIeGDMX6lpaj5TtA==}
@@ -4797,23 +4795,11 @@ packages:
   iso-kv@3.1.1:
     resolution: {integrity: sha512-yKTLmUCc8gl0MXJs3ZaTaNDgfG/2ROasZERKPa5aYY7Ks/eb8BvGfLHrC+t1cHxiRkogvaXulDP77ovwLKgLPg==}
 
-  iso-passkeys@file:packages/iso-passkeys/iso-passkeys-0.3.1.local.tgz:
-    resolution: {integrity: sha512-d6Haq0LEAXXEHSaOW+ADQuG0wf/I6BTTQyUKn2JJFtObti7rSoxYZqwEKxPSxNvRTubFy0nwn/yU5F3uPy+TDg==, tarball: file:packages/iso-passkeys/iso-passkeys-0.3.1.local.tgz}
-    version: 0.3.1
-
   iso-web@1.4.3:
     resolution: {integrity: sha512-8XWpz+9WqAk1obMwajwv0waMBy7uCFFGDwW2SGI3fbFO/wt+FRxf2o6DvHoadPuV+wquvz+BAq3sX+oOW+fckQ==}
 
   iso-web@2.1.0:
     resolution: {integrity: sha512-8l+JF8vtcr1CGRU4yXiltoZzT5HTYQkXNfXSs8n64VqbjCnTBW/yv1xEP5G7VTes7DTQJfbIwt/cLoMOSIAWng==}
-
-  iso-web@file:packages/iso-web/iso-web-2.1.0.local.tgz:
-    resolution: {integrity: sha512-s6QpsFkTkinUd4N4u9UE0m3889C7+yBIqu7PHSng/u/npyOE4XISIm0yyccoYGPLiyBQ20mVnTyZFiWWy4OY/Q==, tarball: file:packages/iso-web/iso-web-2.1.0.local.tgz}
-    version: 2.1.0
-
-  iso-webauthn-varsig@file:packages/iso-webauthn-varsig/iso-webauthn-varsig-0.1.0.local.tgz:
-    resolution: {integrity: sha512-oeIGnvHIkgN5ysObQnjsf1iJpUm9Za2fPNVnA6z+18Z2IbN7CUcV/qmVnei6jSpN9p1UOPtNkZtMjrtdeRZoDQ==, tarball: file:packages/iso-webauthn-varsig/iso-webauthn-varsig-0.1.0.local.tgz}
-    version: 0.1.0
 
   isomorphic-timers-promises@1.0.1:
     resolution: {integrity: sha512-u4sej9B1LPSxTGKB/HiuzvEQnXH0ECYkSVQU39koSwmFAxhlEAFl9RdTvLv4TOTQUgBS5O3O5fwUxk6byBZ+IQ==}
@@ -8776,18 +8762,34 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@le-space/orbitdb-identity-provider-webauthn-did@https://codeload.github.com/Le-Space/orbitdb-identity-provider-webauthn-did/tar.gz/46ec081cc256cbb4d023797d4f155f4ad76030a6(@orbitdb/core@3.0.2)(rollup@4.54.0)(vite@7.3.0(@types/node@24.10.4)(terser@5.46.0)(yaml@2.8.2))':
+  '@le-space/iso-base@4.3.0':
+    dependencies:
+      bigint-mod-arith: 3.3.1
+
+  '@le-space/iso-did@2.1.2':
+    dependencies:
+      did-resolver: 4.1.0
+      iso-base: '@le-space/iso-base@4.3.0'
+      iso-web: 2.1.0
+      multiformats: 13.4.2
+      p-race: 3.1.0
+
+  '@le-space/iso-webauthn-varsig@0.1.0':
+    dependencies:
+      iso-base: '@le-space/iso-base@4.3.0'
+
+  '@le-space/orbitdb-identity-provider-webauthn-did@https://codeload.github.com/Le-Space/orbitdb-identity-provider-webauthn-did/tar.gz/39ec29b855b6a569e6be98e99d72db33c00e0e79(@orbitdb/core@3.0.2)(rollup@4.54.0)(vite@7.3.0(@types/node@24.10.4)(terser@5.46.0)(yaml@2.8.2))':
     dependencies:
       '@ipld/dag-cbor': 9.2.5
       '@libp2p/logger': 5.2.0
       '@orbitdb/core': 3.0.2
       '@simplewebauthn/browser': 13.2.2
       cbor-web: 9.0.2
-      iso-base: file:packages/iso-base/iso-base-4.3.0.tgz
-      iso-did: file:packages/iso-did/iso-did-2.1.1.local.tgz
-      iso-passkeys: file:packages/iso-passkeys/iso-passkeys-0.3.1.local.tgz
-      iso-web: file:packages/iso-web/iso-web-2.1.0.local.tgz
-      iso-webauthn-varsig: file:packages/iso-webauthn-varsig/iso-webauthn-varsig-0.1.0.local.tgz
+      iso-base: '@le-space/iso-base@4.3.0'
+      iso-did: '@le-space/iso-did@2.1.2'
+      iso-passkeys: link:packages/iso-passkeys
+      iso-web: 2.1.0
+      iso-webauthn-varsig: '@le-space/iso-webauthn-varsig@0.1.0'
       multiformats: 13.4.2
       vite-plugin-node-polyfills: 0.24.0(rollup@4.54.0)(vite@7.3.0(@types/node@24.10.4)(terser@5.46.0)(yaml@2.8.2))
     transitivePeerDependencies:
@@ -10514,8 +10516,6 @@ snapshots:
 
   base-64@1.0.0: {}
 
-  base-x@5.0.1: {}
-
   base64-js@1.5.1: {}
 
   baseline-browser-mapping@2.9.7: {}
@@ -11546,7 +11546,7 @@ snapshots:
   filsnap-adapter@3.3.8(iso-filecoin@7.4.7(typescript@5.9.3))(webextension-polyfill@0.12.0):
     dependencies:
       filsnap: 1.10.2(iso-filecoin@7.4.7(typescript@5.9.3))(webextension-polyfill@0.12.0)
-      iso-base: 4.2.1
+      iso-base: 4.3.0
       iso-filecoin: 7.4.7(typescript@5.9.3)
       semver: 7.7.3
     transitivePeerDependencies:
@@ -11558,7 +11558,7 @@ snapshots:
       '@metamask/key-tree': 10.1.1
       '@metamask/snaps-sdk': 10.0.0(webextension-polyfill@0.12.0)
       dequal: 2.0.3
-      iso-base: 4.2.1
+      iso-base: 4.3.0
       iso-filecoin: 7.4.7(typescript@5.9.3)
       merge-options: 3.0.4
     transitivePeerDependencies:
@@ -12279,34 +12279,9 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  iso-base@4.2.1:
-    dependencies:
-      base-x: 5.0.1
-      bigint-mod-arith: 3.3.1
-
   iso-base@4.3.0:
     dependencies:
       bigint-mod-arith: 3.3.1
-
-  iso-base@file:packages/iso-base/iso-base-4.3.0.tgz:
-    dependencies:
-      bigint-mod-arith: 3.3.1
-
-  iso-did@2.1.1:
-    dependencies:
-      did-resolver: 4.1.0
-      iso-base: 4.3.0
-      iso-web: 1.4.3
-      multiformats: 13.4.2
-      p-race: 3.1.0
-
-  iso-did@file:packages/iso-did/iso-did-2.1.1.local.tgz:
-    dependencies:
-      did-resolver: 4.1.0
-      iso-base: 4.3.0
-      iso-web: 2.1.0
-      multiformats: 13.4.2
-      p-race: 3.1.0
 
   iso-filecoin@7.4.7(typescript@5.9.3):
     dependencies:
@@ -12318,7 +12293,7 @@ snapshots:
       '@scure/bip39': 1.6.0
       abitype: 1.2.3(typescript@5.9.3)(zod@4.2.1)
       bignumber.js: 9.3.1
-      iso-base: 4.2.1
+      iso-base: 4.3.0
       iso-kv: 3.1.1
       iso-web: 1.4.3
       zod: 4.2.1
@@ -12331,15 +12306,6 @@ snapshots:
       idb-keyval: 6.2.2
       kysely: 0.28.9
 
-  iso-passkeys@file:packages/iso-passkeys/iso-passkeys-0.3.1.local.tgz:
-    dependencies:
-      '@noble/ed25519': 3.0.0
-      '@peculiar/asn1-ecc': 2.6.0
-      '@peculiar/asn1-schema': 2.6.0
-      cbor-x: 1.6.0
-      iso-base: 4.3.0
-      iso-did: 2.1.1
-
   iso-web@1.4.3:
     dependencies:
       delay: 7.0.0
@@ -12351,16 +12317,6 @@ snapshots:
       delay: 7.0.0
       iso-kv: 3.1.1
       p-retry: 7.1.1
-
-  iso-web@file:packages/iso-web/iso-web-2.1.0.local.tgz:
-    dependencies:
-      delay: 7.0.0
-      iso-kv: 3.1.1
-      p-retry: 7.1.1
-
-  iso-webauthn-varsig@file:packages/iso-webauthn-varsig/iso-webauthn-varsig-0.1.0.local.tgz:
-    dependencies:
-      iso-base: 4.3.0
 
   isomorphic-timers-promises@1.0.1: {}
 
