@@ -1,9 +1,12 @@
-import { base64urlToBytes, bytesToBase64url, concat } from 'iso-webauthn-varsig'
-import * as Block from 'multiformats/block'
 import * as dagCbor from '@ipld/dag-cbor'
-import { sha256 } from 'multiformats/hashes/sha2'
+import { base64urlToBytes, bytesToBase64url, concat } from 'iso-webauthn-varsig'
 import { base58btc } from 'multiformats/bases/base58'
-import { registerCredential, loadStoredCredential } from '../webauthn/credential'
+import * as Block from 'multiformats/block'
+import { sha256 } from 'multiformats/hashes/sha2'
+import {
+  loadStoredCredential,
+  registerCredential,
+} from '../webauthn/credential'
 import {
   buildVarsigOutput,
   runWebAuthnAssertionForPayload,
@@ -45,7 +48,11 @@ export type WebAuthnOrbitIdentity = {
 }
 
 export type WebAuthnIdentities = {
-  verify: (signature: Uint8Array, publicKey: Uint8Array, data: Uint8Array) => Promise<boolean>
+  verify: (
+    signature: Uint8Array,
+    publicKey: Uint8Array,
+    data: Uint8Array
+  ) => Promise<boolean>
   verifyIdentity: (identity: WebAuthnOrbitIdentity) => Promise<boolean>
   getIdentity: (hash: string) => Promise<WebAuthnOrbitIdentity | null>
   addIdentity: (identity: WebAuthnOrbitIdentity) => void
@@ -65,7 +72,9 @@ export type IdentityPayload = {
   bytes: string
 }
 
-async function decodeIdentityFromBytes(bytes: Uint8Array): Promise<WebAuthnOrbitIdentity> {
+async function decodeIdentityFromBytes(
+  bytes: Uint8Array
+): Promise<WebAuthnOrbitIdentity> {
   const { value } = await Block.decode({
     bytes,
     codec: IDENTITY_CODEC,
@@ -90,11 +99,16 @@ async function decodeIdentityFromBytes(bytes: Uint8Array): Promise<WebAuthnOrbit
     type: decoded.type,
     hash,
     bytes,
-    sign: async () => {
+    sign: () => {
       throw new Error('Remote identity cannot sign')
     },
     verify: async (signature, publicKey, data) =>
-      verifyVarsigForPayload(signature, publicKey, data, 'orbitdb-entry:'),
+      verifyVarsigForPayload(
+        signature,
+        publicKey,
+        toBytes(data),
+        'orbitdb-entry:'
+      ),
   }
 }
 
@@ -161,7 +175,9 @@ function createWebAuthnIdentities(
   }
 }
 
-export function serializeIdentity(identity: WebAuthnOrbitIdentity): IdentityPayload {
+export function serializeIdentity(
+  identity: WebAuthnOrbitIdentity
+): IdentityPayload {
   return {
     id: identity.id,
     publicKey: bytesToBase64url(identity.publicKey),
@@ -175,7 +191,9 @@ export function serializeIdentity(identity: WebAuthnOrbitIdentity): IdentityPayl
   }
 }
 
-export function deserializeIdentity(payload: IdentityPayload): WebAuthnOrbitIdentity {
+export function deserializeIdentity(
+  payload: IdentityPayload
+): WebAuthnOrbitIdentity {
   return {
     id: payload.id,
     publicKey: base64urlToBytes(payload.publicKey),
@@ -186,11 +204,16 @@ export function deserializeIdentity(payload: IdentityPayload): WebAuthnOrbitIden
     type: payload.type,
     hash: payload.hash,
     bytes: base64urlToBytes(payload.bytes),
-    sign: async () => {
+    sign: () => {
       throw new Error('Remote identity cannot sign')
     },
     verify: async (signature, publicKey, data) =>
-      verifyVarsigForPayload(signature, publicKey, data, 'orbitdb-entry:'),
+      verifyVarsigForPayload(
+        signature,
+        publicKey,
+        toBytes(data),
+        'orbitdb-entry:'
+      ),
   }
 }
 
@@ -256,8 +279,16 @@ export async function createOrbitDbIdentity() {
   const stored = loadStoredCredential() ?? (await registerCredential())
 
   let identityData: OrbitDbIdentity
-  let idOutput: { varsig: Uint8Array; verification: { valid: boolean }; signatureValid: boolean }
-  let pubKeyOutput: { varsig: Uint8Array; verification: { valid: boolean }; signatureValid: boolean }
+  let idOutput: {
+    varsig: Uint8Array
+    verification: { valid: boolean }
+    signatureValid: boolean
+  }
+  let pubKeyOutput: {
+    varsig: Uint8Array
+    verification: { valid: boolean }
+    signatureValid: boolean
+  }
 
   if (cachedIdentity) {
     identityData = cachedIdentity
@@ -340,7 +371,7 @@ export async function createOrbitDbIdentity() {
     return output.varsig
   }
 
-  const verify = async (
+  const verify = (
     signature: Uint8Array,
     publicKey: Uint8Array,
     data: Uint8Array | string

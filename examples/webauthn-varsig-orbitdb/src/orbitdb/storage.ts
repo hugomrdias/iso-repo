@@ -5,7 +5,9 @@ export function loadDbList(): string[] {
   if (!stored) return []
   try {
     const parsed = JSON.parse(stored)
-    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : []
+    return Array.isArray(parsed)
+      ? parsed.filter((item) => typeof item === 'string')
+      : []
   } catch {
     return []
   }

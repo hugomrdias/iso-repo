@@ -1,29 +1,29 @@
-import { useRef, useState } from 'react'
 import { DIDKey } from 'iso-did'
 import { parseAttestationObject, unwrapEC2Signature } from 'iso-passkeys'
 import {
-  CURVE_ED25519,
-  CURVE_P256,
-  INNER_EDDSA,
-  INNER_ECDSA,
-  MULTIHASH_SHA256,
-  MULTIHASH_SHA256_LEN,
-  PAYLOAD_ENCODING_RAW,
-  VARSIG_PREFIX,
-  VARSIG_VERSION,
-  WEBAUTHN_WRAPPER,
   base64urlToBytes,
   bytesToBase64url,
+  CURVE_ED25519,
+  CURVE_P256,
   concat,
   decodeWebAuthnVarsigV1,
   encodeWebAuthnVarsigV1,
+  INNER_ECDSA,
+  INNER_EDDSA,
+  MULTIHASH_SHA256,
+  MULTIHASH_SHA256_LEN,
+  PAYLOAD_ENCODING_RAW,
   parseClientDataJSON,
   reconstructSignedData,
+  VARSIG_PREFIX,
+  VARSIG_VERSION,
   varintEncode,
   verifyEd25519Signature,
   verifyP256Signature,
   verifyWebAuthnAssertion,
+  WEBAUTHN_WRAPPER,
 } from 'iso-webauthn-varsig'
+import { useRef, useState } from 'react'
 
 const encoder = new TextEncoder()
 const STORAGE_KEY = 'webauthn-varsig-demo-credential'
@@ -44,7 +44,13 @@ function toHexSpaced(bytes: Uint8Array): string {
 }
 
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+  return bytes.slice().buffer
+}
+
+function toUint8Array(bytes: Uint8Array): Uint8Array<ArrayBuffer> {
+  const copy = new Uint8Array(bytes.length)
+  copy.set(bytes)
+  return copy
 }
 
 async function createMockAssertion() {
@@ -135,15 +141,13 @@ async function createMockAssertionForAlgorithm(algorithm: 'Ed25519' | 'P-256') {
   }
 }
 
-async function extractCredentialInfo(
-  attestationObject: Uint8Array
-): Promise<{
+function extractCredentialInfo(attestationObject: Uint8Array): {
   algorithm: 'Ed25519' | 'P-256' | null
   publicKey: Uint8Array | null
   kty?: number
   alg?: number
   crv?: number
-}> {
+} {
   const parsed = parseAttestationObject(attestationObject.buffer as ArrayBuffer)
   const coseKey = parsed.authData.credentialPublicKey
 
@@ -151,15 +155,17 @@ async function extractCredentialInfo(
     throw new Error('Credential public key missing from attestation')
   }
 
-  const getValue = (key: number) =>
-    coseKey instanceof Map ? coseKey.get(key) : coseKey[key]
+  const getValue = (key: number): unknown =>
+    coseKey instanceof Map
+      ? coseKey.get(key)
+      : (coseKey as unknown as Record<number, unknown>)[key]
 
-  const kty = getValue(1)
-  const alg = getValue(3)
-  const crv = getValue(-1)
+  const kty = getValue(1) as number | undefined
+  const alg = getValue(3) as number | undefined
+  const crv = getValue(-1) as number | undefined
 
   if (kty === 1 && (alg === -50 || alg === -8) && crv === 6) {
-    const publicKeyBytes = new Uint8Array(getValue(-2))
+    const publicKeyBytes = new Uint8Array(getValue(-2) as ArrayBufferLike)
     if (publicKeyBytes.length !== 32) {
       throw new Error(
         `Invalid Ed25519 public key length: ${publicKeyBytes.length}`
@@ -170,8 +176,8 @@ async function extractCredentialInfo(
   }
 
   if (kty === 2 && alg === -7 && crv === 1) {
-    const x = new Uint8Array(getValue(-2))
-    const y = new Uint8Array(getValue(-3))
+    const x = new Uint8Array(getValue(-2) as ArrayBufferLike)
+    const y = new Uint8Array(getValue(-3) as ArrayBufferLike)
     if (x.length !== 32 || y.length !== 32) {
       throw new Error(
         `Invalid P-256 coordinate length: x=${x.length} y=${y.length}`
@@ -217,7 +223,7 @@ async function registerCredential() {
     return cached
   }
 
-  const publicKey: PublicKeyCredentialCreationOptions['publicKey'] = {
+  const publicKey: PublicKeyCredentialCreationOptions = {
     rp: { name: 'iso-webauthn-varsig', id: window.location.hostname },
     user: {
       id: crypto.getRandomValues(new Uint8Array(16)),
@@ -246,10 +252,13 @@ async function registerCredential() {
   }
 
   const response = credential.response as AuthenticatorAttestationResponse
-  const { algorithm, publicKey: publicKeyBytes, kty, alg, crv } =
-    await extractCredentialInfo(
-      new Uint8Array(response.attestationObject)
-    )
+  const {
+    algorithm,
+    publicKey: publicKeyBytes,
+    kty,
+    alg,
+    crv,
+  } = extractCredentialInfo(new Uint8Array(response.attestationObject))
 
   if (!publicKeyBytes || !algorithm) {
     throw new Error(
@@ -395,9 +404,7 @@ function buildHeaderParts(algorithm: 'Ed25519' | 'P-256') {
 
 export default function App() {
   const [busy, setBusy] = useState(false)
-  const [registered, setRegistered] = useState(
-    Boolean(loadStoredCredential())
-  )
+  const [registered, setRegistered] = useState(Boolean(loadStoredCredential()))
   const [tsHover, setTsHover] = useState(false)
   const webauthnInFlight = useRef(false)
   const signAttemptRef = useRef(0)
@@ -538,7 +545,6 @@ export default function App() {
     webauthnInFlight.current = true
     signAttemptRef.current += 1
     setSignAttempt(signAttemptRef.current)
-    console.log('[webauthn-demo] sign attempt', signAttemptRef.current)
     setBusy(true)
     setError(null)
 
@@ -553,7 +559,6 @@ export default function App() {
         did,
         cose,
         algorithm,
-        payloadBytes,
         payloadText,
         payloadTs,
       } = await runWebAuthnAssertion()
@@ -573,12 +578,12 @@ export default function App() {
         algorithm === 'Ed25519'
           ? await verifyEd25519Signature(
               signedData,
-              decoded.signature,
+              toUint8Array(decoded.signature),
               publicKey
             )
           : await verifyP256Signature(
               signedData,
-              unwrapEC2Signature(decoded.signature),
+              unwrapEC2Signature(toUint8Array(decoded.signature)),
               publicKey
             )
       const headerHex = toHex(buildVarsigHeader(algorithm))
@@ -656,18 +661,18 @@ export default function App() {
           <div className="group-label">Mock data (no passkey required)</div>
           <div className="button-row">
             <button
-              type="button"
-              onClick={runDemo}
-              disabled={busy}
               className="button-mock"
+              disabled={busy}
+              onClick={runDemo}
+              type="button"
             >
               {busy ? 'Running…' : 'Run mock Ed25519'}
             </button>
             <button
-              type="button"
-              onClick={runDemoP256}
-              disabled={busy}
               className="button-mock"
+              disabled={busy}
+              onClick={runDemoP256}
+              type="button"
             >
               {busy ? 'Running…' : 'Run mock P-256'}
             </button>
@@ -677,10 +682,10 @@ export default function App() {
           <div className="group-label">Real passkey flow</div>
           <div className="button-row">
             <button
-              type="button"
-              onClick={runRegister}
-              disabled={busy}
               className="button-real"
+              disabled={busy}
+              onClick={runRegister}
+              type="button"
             >
               {busy
                 ? 'Waiting…'
@@ -689,10 +694,10 @@ export default function App() {
                   : 'Register passkey (real device)'}
             </button>
             <button
-              type="button"
-              onClick={runWebAuthn}
-              disabled={busy || !registered}
               className="button-real"
+              disabled={busy || !registered}
+              onClick={runWebAuthn}
+              type="button"
             >
               {busy ? 'Waiting…' : 'Sign with WebAuthn (real)'}
             </button>
@@ -702,8 +707,8 @@ export default function App() {
         <p className="hint">
           The mock buttons generate fake WebAuthn data for Ed25519 or P-256.
           Register passkey uses the real WebAuthn API to create a credential on
-          your device. Sign with WebAuthn uses that credential to sign
-          (Ed25519 preferred, P-256 fallback).
+          your device. Sign with WebAuthn uses that credential to sign (Ed25519
+          preferred, P-256 fallback).
         </p>
         <p className="hint">
           The WebAuthn path verifies Ed25519 or P-256 signatures using the
@@ -771,7 +776,9 @@ export default function App() {
                 </div>
               </dl>
             ) : (
-              <p className="hint">COSE metadata is captured during registration.</p>
+              <p className="hint">
+                COSE metadata is captured during registration.
+              </p>
             )}
           </div>
 
@@ -790,24 +797,31 @@ export default function App() {
                 <div>
                   <dt>Payload JSON</dt>
                   <dd className="mono">
-                    {output.payloadText.split(`${output.payloadTs}`).map((part, index, parts) =>
-                      index === parts.length - 1 ? (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <span key={`${part}-${index}`}>{part}</span>
-                      ) : (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <span key={`${part}-${index}`}>
-                          {part}
-                          <span
-                            className="ts-token"
-                            onMouseEnter={() => setTsHover(true)}
-                            onMouseLeave={() => setTsHover(false)}
-                          >
-                            {output.payloadTs}
+                    {output.payloadText
+                      .split(`${output.payloadTs}`)
+                      .map((part, index, parts) =>
+                        index === parts.length - 1 ? (
+                          // eslint-disable-next-line react/no-array-index-key
+                          <span key={`${part}-${index}`}>{part}</span>
+                        ) : (
+                          // eslint-disable-next-line react/no-array-index-key
+                          <span key={`${part}-${index}`}>
+                            {part}
+                            <button
+                              className="ts-token"
+                              onBlur={() => setTsHover(false)}
+                              onFocus={() => setTsHover(true)}
+                              onKeyDown={() => setTsHover(true)}
+                              onKeyUp={() => setTsHover(false)}
+                              onMouseEnter={() => setTsHover(true)}
+                              onMouseLeave={() => setTsHover(false)}
+                              type="button"
+                            >
+                              {output.payloadTs}
+                            </button>
                           </span>
-                        </span>
-                      )
-                    )}
+                        )
+                      )}
                   </dd>
                 </div>
               ) : null}
@@ -854,7 +868,7 @@ export default function App() {
             </dl>
             <div className="header-grid">
               {buildHeaderParts(output.algorithm).map((part) => (
-                <div key={part.label} className="header-item">
+                <div className="header-item" key={part.label}>
                   <div className="header-label">{part.label}</div>
                   <div className="mono header-bytes">{part.value}</div>
                   <div className="header-detail">{part.detail}</div>

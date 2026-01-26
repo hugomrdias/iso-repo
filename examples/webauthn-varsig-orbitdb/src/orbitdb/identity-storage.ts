@@ -1,6 +1,11 @@
 import { CID } from 'multiformats/cid'
 
-export function createIpfsIdentityStorage(ipfs: { blockstore: { get: (cid: CID) => Promise<Uint8Array>; put: (cid: CID, bytes: Uint8Array) => Promise<void> } }) {
+type Blockstore = {
+  get: (cid: CID) => Uint8Array | Promise<Uint8Array>
+  put: (cid: CID, bytes: Uint8Array) => CID | Promise<CID> | undefined
+}
+
+export function createIpfsIdentityStorage(ipfs: { blockstore: Blockstore }) {
   return {
     get: async (hash: string) => {
       try {

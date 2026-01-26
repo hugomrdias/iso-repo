@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react'
-import { createHelia } from 'helia'
+import type { PeerId } from '@libp2p/interface'
+import type { Multiaddr } from '@multiformats/multiaddr'
 import { createOrbitDB, IPFSAccessController } from '@orbitdb/core'
+import { createHelia } from 'helia'
 import {
   CURVE_ED25519,
   CURVE_P256,
@@ -11,29 +12,30 @@ import {
   PAYLOAD_ENCODING_RAW,
   VARSIG_PREFIX,
   VARSIG_VERSION,
-  WEBAUTHN_WRAPPER,
   varintEncode,
+  WEBAUTHN_WRAPPER,
 } from 'iso-webauthn-varsig'
+import { useRef, useState } from 'react'
 import {
-  buildVarsigHeader,
-  buildVarsigOutput,
-  decodeWebAuthnVarsigV1,
-  parseClientDataJSON,
-  runWebAuthnAssertion,
-  verifyWebAuthnAssertion,
-} from './webauthn/varsig'
-import { loadStoredCredential, registerCredential } from './webauthn/credential'
-import {
-  createWebAuthnIdentities,
   createOrbitDbIdentity,
+  createWebAuthnIdentities,
   loadStoredIdentity,
   type OrbitDbIdentity,
   type WebAuthnIdentities,
   type WebAuthnOrbitIdentity,
 } from './orbitdb/identity'
+import { createIpfsIdentityStorage } from './orbitdb/identity-storage'
 import { createLibp2pNode } from './orbitdb/libp2p'
 import { loadDbList, storeDbList } from './orbitdb/storage'
-import { createIpfsIdentityStorage } from './orbitdb/identity-storage'
+import { loadStoredCredential, registerCredential } from './webauthn/credential'
+import {
+  buildVarsigHeader,
+  buildVarsigOutput,
+  type decodeWebAuthnVarsigV1,
+  type parseClientDataJSON,
+  runWebAuthnAssertion,
+  type verifyWebAuthnAssertion,
+} from './webauthn/varsig'
 
 function toHex(bytes: Uint8Array): string {
   return Array.from(bytes)
@@ -89,6 +91,45 @@ function buildHeaderParts(algorithm: 'Ed25519' | 'P-256') {
     },
   ]
 }
+
+type OrbitDbEventsDb = {
+  add: (value: string) => Promise<string>
+  all: () => Promise<Array<{ hash: string; value: string }>>
+  address?: { toString?: () => string } | string
+  events?: {
+    on: (
+      event: 'join' | 'update',
+      handler: (...args: unknown[]) => void
+    ) => void
+    off?: (
+      event: 'join' | 'update',
+      handler: (...args: unknown[]) => void
+    ) => void
+  }
+}
+
+type OrbitDbPeerDiscoveryDetail = {
+  id?: PeerId
+  multiaddrs?: Multiaddr[]
+}
+
+type OrbitDbInstance = {
+  open: (
+    name: string,
+    options?: Record<string, unknown>
+  ) => Promise<OrbitDbEventsDb>
+}
+
+const logInfo = (...args: unknown[]) => {
+  // biome-ignore lint/suspicious/noConsole: demo logging
+  console.info(...args)
+}
+
+const logWarn = (...args: unknown[]) => {
+  // biome-ignore lint/suspicious/noConsole: demo logging
+  console.warn(...args)
+}
+
 export default function App() {
   const [busy, setBusy] = useState(false)
   const [registered, setRegistered] = useState(Boolean(loadStoredCredential()))
@@ -133,9 +174,9 @@ export default function App() {
   const updateTimeoutRef = useRef<number | null>(null)
   const orbitdbRef = useRef<{
     libp2p?: Awaited<ReturnType<typeof createLibp2pNode>>
-    helia?: Awaited<ReturnType<typeof createHelia>>
-    orbitdb?: Awaited<ReturnType<typeof createOrbitDB>>
-    db?: { add: (value: string) => Promise<string>; all: () => Promise<any[]>; address?: string }
+    helia?: unknown
+    orbitdb?: OrbitDbInstance
+    db?: OrbitDbEventsDb
     identities?: WebAuthnIdentities
     peerHandlers?: {
       onPeerConnect: () => void
@@ -192,12 +233,8 @@ export default function App() {
     setError(null)
 
     try {
-      const {
-        identityData,
-        orbitdbIdentity,
-        idOutput,
-        pubKeyOutput,
-      } = await createOrbitDbIdentity()
+      const { identityData, orbitdbIdentity, idOutput, pubKeyOutput } =
+        await createOrbitDbIdentity()
       setOrbitdbIdentity(identityData)
       setOrbitdbIdentityObj(orbitdbIdentity)
       setRegistered(true)
@@ -221,11 +258,13 @@ export default function App() {
   const refreshOrbitDbEntries = async () => {
     if (!orbitdbRef.current.db) return
     const entries = await orbitdbRef.current.db.all()
-    const normalized = entries.map((entry: { hash: string; value: string }) => ({
-      hash: entry.hash,
-      value: entry.value,
-    }))
-    console.info('[orbitdb] entries refreshed', {
+    const normalized = entries.map(
+      (entry: { hash: string; value: string }) => ({
+        hash: entry.hash,
+        value: entry.value,
+      })
+    )
+    logInfo('[orbitdb] entries refreshed', {
       count: normalized.length,
       address: orbitdbRef.current.db?.address?.toString?.(),
     })
@@ -245,7 +284,7 @@ export default function App() {
     }, 1500)
   }
 
-  const attachDbEvents = (db: { events?: { on: Function; off?: Function } }) => {
+  const attachDbEvents = (db: OrbitDbEventsDb) => {
     if (orbitdbRef.current.dbHandlers && orbitdbRef.current.db?.events?.off) {
       const { onJoin, onUpdate } = orbitdbRef.current.dbHandlers
       orbitdbRef.current.db.events.off('join', onJoin)
@@ -253,7 +292,7 @@ export default function App() {
     }
 
     const onJoin = async (peerId?: unknown) => {
-      console.info('[orbitdb] db join', {
+      logInfo('[orbitdb] db join', {
         peerId,
         address: orbitdbRef.current.db?.address?.toString?.(),
       })
@@ -261,7 +300,7 @@ export default function App() {
       await refreshOrbitDbEntries()
     }
     const onUpdate = async (entry?: unknown) => {
-      console.info('[orbitdb] db update', {
+      logInfo('[orbitdb] db update', {
         entry,
         address: orbitdbRef.current.db?.address?.toString?.(),
       })
@@ -290,11 +329,11 @@ export default function App() {
         orbitdbIdentityObj as WebAuthnOrbitIdentity,
         identityStorage
       )
-      const orbitdb = await createOrbitDB({
+      const orbitdb = (await createOrbitDB({
         ipfs: helia,
         identity: orbitdbIdentityObj,
         identities,
-      })
+      })) as OrbitDbInstance
 
       const updatePeerCount = () => {
         const connections = libp2p.getConnections?.() ?? []
@@ -308,20 +347,25 @@ export default function App() {
       const onPeerConnect = (event?: Event) => {
         updatePeerCount()
         const connection = (event as CustomEvent)?.detail?.connection
-        const peerId = connection?.remotePeer ?? (event as CustomEvent)?.detail?.remotePeer
+        const peerId =
+          connection?.remotePeer ?? (event as CustomEvent)?.detail?.remotePeer
         if (peerId) {
-          console.info('[orbitdb] peer connected', peerId.toString?.())
+          logInfo('[orbitdb] peer connected', peerId.toString?.())
         }
       }
       const onPeerDisconnect = () => updatePeerCount()
       const onPeerDiscovery = (event: Event) => {
         const detail = (event as CustomEvent).detail as
-          | { id?: { toString?: () => string }; multiaddrs?: Array<{ toString: () => string }> }
+          | OrbitDbPeerDiscoveryDetail
           | undefined
         const peerId = detail?.id
         const multiaddrs = detail?.multiaddrs ?? []
         if (!peerId || multiaddrs.length === 0) return
-        console.info('[orbitdb] peer discovered', peerId.toString?.(), multiaddrs.length)
+        logInfo(
+          '[orbitdb] peer discovered',
+          peerId.toString?.(),
+          multiaddrs.length
+        )
 
         const dialableAddrs = multiaddrs.filter((addr) => {
           const addrStr = addr.toString()
@@ -340,14 +384,14 @@ export default function App() {
         })
         if (hasDirectConnection) return
 
-        console.info('[orbitdb] auto-dialing peer', peerId.toString?.())
+        logInfo('[orbitdb] auto-dialing peer', peerId.toString?.())
         libp2p
           .dial?.(peerId)
           .then(() => {
-            console.info('[orbitdb] dial succeeded', peerId.toString?.())
+            logInfo('[orbitdb] dial succeeded', peerId.toString?.())
           })
           .catch((err) => {
-            console.warn(
+            logWarn(
               '[orbitdb] dial failed',
               peerId.toString?.(),
               err instanceof Error ? err.message : String(err)
@@ -361,9 +405,8 @@ export default function App() {
       libp2p.addEventListener?.('connection:open', (event: Event) => {
         const connection = (event as CustomEvent).detail
         const addrStr = connection?.remoteAddr?.toString?.() ?? ''
-        const isRelay = addrStr.includes('/p2p-circuit')
         const isWebrtc = addrStr.includes('/webrtc')
-        console.info('[orbitdb] connection opened', {
+        logInfo('[orbitdb] connection opened', {
           peerId: connection?.remotePeer?.toString?.(),
           address: addrStr,
           transport: isWebrtc ? 'webrtc' : 'relay',
@@ -372,7 +415,7 @@ export default function App() {
       libp2p.addEventListener?.('connection:close', (event: Event) => {
         const connection = (event as CustomEvent).detail
         const addrStr = connection?.remoteAddr?.toString?.() ?? ''
-        console.info('[orbitdb] connection closed', {
+        logInfo('[orbitdb] connection closed', {
           peerId: connection?.remotePeer?.toString?.(),
           address: addrStr,
           transport: addrStr.includes('/webrtc') ? 'webrtc' : 'relay',
@@ -414,12 +457,12 @@ export default function App() {
         throw new Error('OrbitDB is not ready yet.')
       }
 
-      const db = await orbitdbRef.current.orbitdb.open(orbitdbName, {
+      const db = (await orbitdbRef.current.orbitdb.open(orbitdbName, {
         type: 'events',
         AccessController: IPFSAccessController({
           write: ['*'],
         }),
-      })
+      })) as OrbitDbEventsDb
       orbitdbRef.current.db = db
       attachDbEvents(db)
       const address = db.address?.toString?.() ?? String(db.address)
@@ -452,9 +495,9 @@ export default function App() {
         throw new Error('Enter a database address to open.')
       }
 
-      const db = await orbitdbRef.current.orbitdb.open(
+      const db = (await orbitdbRef.current.orbitdb.open(
         orbitdbRemoteAddress.trim()
-      )
+      )) as OrbitDbEventsDb
       orbitdbRef.current.db = db
       attachDbEvents(db)
       const address = db.address?.toString?.() ?? String(db.address)
@@ -648,7 +691,8 @@ export default function App() {
           <h2>OrbitDB Database</h2>
           <p>
             Start OrbitDB with the WebAuthn identity, then open a database and
-            add entries. Open the same address in another tab to see replication.
+            add entries. Open the same address in another tab to see
+            replication.
           </p>
           <div className="button-row">
             <button
@@ -704,8 +748,8 @@ export default function App() {
             className="record-input"
             id="orbitdb-address"
             onChange={(event) => setOrbitdbRemoteAddress(event.target.value)}
-            value={orbitdbRemoteAddress}
             placeholder="Copy address from another tab"
+            value={orbitdbRemoteAddress}
           />
           <div className="button-row">
             <button

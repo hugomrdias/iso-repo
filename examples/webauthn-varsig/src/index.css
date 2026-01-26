@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Space+Grotesk:wght@400;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Space+Grotesk:wght@400;600&display=swap");
 
 :root {
   color-scheme: light;
@@ -20,9 +20,14 @@
 
 body {
   margin: 0;
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: "Space Grotesk", system-ui, sans-serif;
   color: var(--ink);
-  background: radial-gradient(circle at top, #fffdf9 0%, var(--bg) 50%, #e7ece9 100%);
+  background: radial-gradient(
+    circle at top,
+    #fffdf9 0%,
+    var(--bg) 50%,
+    #e7ece9 100%
+  );
 }
 
 #root {
@@ -88,12 +93,14 @@ button {
   border: none;
   border-radius: 999px;
   padding: 12px 24px;
-  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-family: "Space Grotesk", system-ui, sans-serif;
   font-weight: 600;
   background: var(--accent);
   color: white;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .button-mock {
@@ -254,7 +261,7 @@ dd {
 }
 
 .mono {
-  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.85rem;
 }
 
