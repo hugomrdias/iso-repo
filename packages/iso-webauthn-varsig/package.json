@@ -1,7 +1,7 @@
 {
   "name": "@le-space/iso-webauthn-varsig",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "WebAuthn varsig encoding/decoding helpers.",
   "author": "Nico Krause <post@nicokrause.com> (nicokrause.com)",
   "license": "MIT",

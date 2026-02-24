@@ -11,11 +11,7 @@
  * @param {{ userPresent?: boolean, userVerified?: boolean, signCount?: number }} [options]
  */
 export function createMockAuthenticatorData(options = {}) {
-  const {
-    userPresent = true,
-    userVerified = true,
-    signCount = 1,
-  } = options
+  const { userPresent = true, userVerified = true, signCount = 1 } = options
 
   const rpIdHash = new Uint8Array(32)
   for (let i = 0; i < 32; i++) {

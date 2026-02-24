@@ -111,7 +111,10 @@ export async function verifyWebAuthnAssertion(decoded, options) {
       }
     }
 
-    if (options.previousSignCount !== undefined && signCount <= options.previousSignCount) {
+    if (
+      options.previousSignCount !== undefined &&
+      signCount <= options.previousSignCount
+    ) {
       return {
         valid: false,
         error: 'signCount is not monotonic',
@@ -160,7 +163,10 @@ export async function reconstructSignedData(decoded) {
     decoded.authenticatorData.length + clientDataHash.byteLength
   )
   signedData.set(decoded.authenticatorData, 0)
-  signedData.set(new Uint8Array(clientDataHash), decoded.authenticatorData.length)
+  signedData.set(
+    new Uint8Array(clientDataHash),
+    decoded.authenticatorData.length
+  )
 
   return signedData
 }

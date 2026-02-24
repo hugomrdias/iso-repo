@@ -1,13 +1,12 @@
 import {
-  VARSIG_PREFIX,
-  VARSIG_VERSION,
-  INNER_EDDSA,
-  INNER_ECDSA,
   CURVE_ED25519,
   CURVE_P256,
+  INNER_ECDSA,
+  INNER_EDDSA,
   MULTIHASH_SHA256,
-  MULTIHASH_SHA256_LEN,
   PAYLOAD_ENCODING_RAW,
+  VARSIG_PREFIX,
+  VARSIG_VERSION,
   WEBAUTHN_WRAPPER,
 } from './multicodec.js'
 import { concat, varintEncode } from './utils.js'
@@ -15,45 +14,50 @@ import { concat, varintEncode } from './utils.js'
 /**
  * @typedef {import('./types').WebAuthnAssertion} WebAuthnAssertion
  * @typedef {import('./types').SignatureAlgorithm} SignatureAlgorithm
+ * @typedef {import('./types').EncodeOptions} EncodeOptions
  */
 
 /**
- * Encode a WebAuthn assertion as varsig v1.
+ * Encode a WebAuthn assertion as varsig v1 (non-recursive layout).
  *
- * Format:
- * - varsig prefix (0x34)
- * - varsig version (0x01)
- * - signature algorithm metadata (varints)
- * - payload encoding metadata (varint)
- * - assertion serialization
+ * Wire format:
+ *   header: prefix version innerAlgorithm curve webauthnMarker
+ *   body:   clientDataLen clientDataJSON authDataLen authenticatorData
+ *           signatureHashAlgorithm encodingInfo signatureBytes
  *
  * @param {WebAuthnAssertion} assertion
  * @param {SignatureAlgorithm} [algorithm]
+ * @param {EncodeOptions} [options]
  */
-export function encodeWebAuthnVarsigV1(assertion, algorithm = 'Ed25519') {
+export function encodeWebAuthnVarsigV1(
+  assertion,
+  algorithm = 'Ed25519',
+  options = {}
+) {
   const { authenticatorData, clientDataJSON, signature } = assertion
 
   validateWebAuthnAssertion(assertion)
 
   const innerAlgorithm = algorithm === 'Ed25519' ? INNER_EDDSA : INNER_ECDSA
   const curve = algorithm === 'Ed25519' ? CURVE_ED25519 : CURVE_P256
+  const sigHashAlg = options.signatureHashAlgorithm ?? MULTIHASH_SHA256
+  const encInfo = options.encodingInfo ?? PAYLOAD_ENCODING_RAW
 
   const header = new Uint8Array([VARSIG_PREFIX, VARSIG_VERSION])
-  const authDataLenBytes = varintEncode(authenticatorData.length)
   const clientDataLenBytes = varintEncode(clientDataJSON.length)
+  const authDataLenBytes = varintEncode(authenticatorData.length)
 
   return concat([
     header,
     varintEncode(innerAlgorithm),
     varintEncode(curve),
-    varintEncode(MULTIHASH_SHA256),
-    varintEncode(MULTIHASH_SHA256_LEN),
     varintEncode(WEBAUTHN_WRAPPER),
-    varintEncode(PAYLOAD_ENCODING_RAW),
-    authDataLenBytes,
-    authenticatorData,
     clientDataLenBytes,
     clientDataJSON,
+    authDataLenBytes,
+    authenticatorData,
+    varintEncode(sigHashAlg),
+    varintEncode(encInfo),
     signature,
   ])
 }
@@ -64,7 +68,10 @@ export function encodeWebAuthnVarsigV1(assertion, algorithm = 'Ed25519') {
  * @param {WebAuthnAssertion} assertion
  */
 export function validateWebAuthnAssertion(assertion) {
-  if (!assertion.authenticatorData || assertion.authenticatorData.length === 0) {
+  if (
+    !assertion.authenticatorData ||
+    assertion.authenticatorData.length === 0
+  ) {
     throw new Error('authenticatorData is required and cannot be empty')
   }
 

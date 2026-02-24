@@ -1,16 +1,13 @@
-import { varintDecode } from './utils.js'
 import {
-  VARSIG_PREFIX,
-  VARSIG_VERSION,
-  INNER_EDDSA,
-  INNER_ECDSA,
   CURVE_ED25519,
   CURVE_P256,
-  MULTIHASH_SHA256,
-  MULTIHASH_SHA256_LEN,
+  INNER_ECDSA,
+  INNER_EDDSA,
+  VARSIG_PREFIX,
+  VARSIG_VERSION,
   WEBAUTHN_WRAPPER,
-  PAYLOAD_ENCODING_RAW,
 } from './multicodec.js'
+import { varintDecode } from './utils.js'
 
 /**
  * @typedef {import('./types').DecodedVarsigV1} DecodedVarsigV1
@@ -19,14 +16,12 @@ import {
  */
 
 /**
- * Decode a WebAuthn varsig v1 into its components.
+ * Decode a WebAuthn varsig v1 (non-recursive layout) into its components.
  *
- * Format:
- * - prefix (0x34)
- * - version (0x01)
- * - signature-algorithm metadata (varints)
- * - payload-encoding metadata (varint)
- * - assertion serialization
+ * Wire format:
+ *   header: prefix version innerAlgorithm curve webauthnMarker
+ *   body:   clientDataLen clientDataJSON authDataLen authenticatorData
+ *           signatureHashAlgorithm encodingInfo signatureBytes
  *
  * @param {Uint8Array} varsig
  * @returns {DecodedVarsigV1}
@@ -40,19 +35,14 @@ export function decodeWebAuthnVarsigV1(varsig) {
     throw new Error('Unsupported varsig header')
   }
 
+  // --- header: 3 varints ---
   let offset = 2
   const [innerAlgorithm, innerAlgorithmLen] = varintDecode(varsig, offset)
   offset += innerAlgorithmLen
   const [curve, curveLen] = varintDecode(varsig, offset)
   offset += curveLen
-  const [multihashCode, multihashCodeLen] = varintDecode(varsig, offset)
-  offset += multihashCodeLen
-  const [multihashLength, multihashLengthLen] = varintDecode(varsig, offset)
-  offset += multihashLengthLen
   const [webauthnMarker, markerLen] = varintDecode(varsig, offset)
   offset += markerLen
-  const [payloadEncoding, payloadEncodingLen] = varintDecode(varsig, offset)
-  offset += payloadEncodingLen
 
   /** @type {SignatureAlgorithm | null} */
   const algorithm =
@@ -76,21 +66,20 @@ export function decodeWebAuthnVarsigV1(varsig) {
     throw new Error(`Unexpected P-256 curve code: 0x${curve.toString(16)}`)
   }
 
-  if (multihashCode !== MULTIHASH_SHA256) {
-    throw new Error('Unsupported multihash header')
-  }
-
-  if (multihashLength !== MULTIHASH_SHA256_LEN) {
-    throw new Error('Unsupported multihash header length')
-  }
-
   if (webauthnMarker !== WEBAUTHN_WRAPPER) {
     throw new Error('Missing WebAuthn extension marker')
   }
 
-  if (payloadEncoding !== PAYLOAD_ENCODING_RAW) {
-    throw new Error('Unsupported payload encoding')
+  // --- body: clientData, authData, signature metadata, signature ---
+  const [clientDataLen, clientDataLenLen] = varintDecode(varsig, offset)
+  offset += clientDataLenLen
+
+  if (offset + clientDataLen > varsig.length) {
+    throw new Error('Invalid clientDataJSON length')
   }
+
+  const clientDataJSON = varsig.slice(offset, offset + clientDataLen)
+  offset += clientDataLen
 
   const [authDataLen, authDataLenLen] = varintDecode(varsig, offset)
   offset += authDataLenLen
@@ -102,15 +91,10 @@ export function decodeWebAuthnVarsigV1(varsig) {
   const authenticatorData = varsig.slice(offset, offset + authDataLen)
   offset += authDataLen
 
-  const [clientDataLen, clientDataLenLen] = varintDecode(varsig, offset)
-  offset += clientDataLenLen
-
-  if (offset + clientDataLen > varsig.length) {
-    throw new Error('Invalid clientDataJSON length')
-  }
-
-  const clientDataJSON = varsig.slice(offset, offset + clientDataLen)
-  offset += clientDataLen
+  const [signatureHashAlgorithm, sigHashLen] = varintDecode(varsig, offset)
+  offset += sigHashLen
+  const [encodingInfo, encInfoLen] = varintDecode(varsig, offset)
+  offset += encInfoLen
 
   const signature = varsig.slice(offset)
   if (signature.length === 0) {
@@ -121,12 +105,11 @@ export function decodeWebAuthnVarsigV1(varsig) {
     algorithm,
     innerAlgorithm,
     curve,
-    multihashCode,
-    multihashLength,
     webauthnMarker,
-    payloadEncoding,
     authenticatorData,
     clientDataJSON,
+    signatureHashAlgorithm,
+    encodingInfo,
     signature,
   }
 }
