@@ -17,7 +17,7 @@ export class ErrorEvent extends Event {
    */
   static clone(event) {
     return new ErrorEvent({
-      // @ts-ignore
+      // @ts-expect-error
       message: 'message' in event ? event.message : '',
       error: 'error' in event ? event.error : undefined,
     })

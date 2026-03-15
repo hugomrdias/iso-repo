@@ -42,7 +42,7 @@ export function nowInSeconds() {
 export async function cid(envelope) {
   const bytes = Envelope.encode({
     signature: envelope.signature,
-    // @ts-ignore
+    // @ts-expect-error
     signaturePayload: signaturePayload(envelope),
   })
   const hash = await sha256.digest(bytes)
@@ -333,7 +333,7 @@ export const selector = z.union([
 export const statement =
   /** @type {typeof z.lazy<z.ZodType<import('../src/types.js').Statement<unknown>>>} */ (
     z.lazy
-    // @ts-ignore
+    // @ts-expect-error
   )(() => {
     return z.union([
       z.tuple([

@@ -207,7 +207,7 @@ export async function request(resource, options = {}) {
   }
 
   const timeoutSignal =
-    timeout !== false ? AbortSignal.timeout(timeout) : undefined
+    timeout === false ? undefined : AbortSignal.timeout(timeout)
   const combinedSignals = anySignal([signal, timeoutSignal])
 
   const _headers = new Headers(headers)

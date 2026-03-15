@@ -11,7 +11,7 @@ const config = {
     server = new WebSocketServer({
       port: 8080,
       verifyClient: (info, cb) => {
-        // @ts-ignore
+        // @ts-expect-error
         const url = new URL(info.req.url, `http://${info.req.headers.host}`)
 
         if (url.pathname.startsWith('/timeout')) {
@@ -25,7 +25,7 @@ const config = {
     })
 
     server.on('connection', (socket, req) => {
-      // @ts-ignore
+      // @ts-expect-error
       const url = new URL(req.url, `http://${req.headers.host}`)
       const query = url.searchParams
 

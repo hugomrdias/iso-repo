@@ -356,7 +356,7 @@ export class WS extends TypedEventTarget {
       },
       {
         timeout: this.options.timeout,
-        // @ts-ignore
+        // @ts-expect-error
         cb: () => {
           if (this.#ws?.readyState !== WS.OPEN) {
             this.#removeListeners()

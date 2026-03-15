@@ -576,11 +576,11 @@ describe('basex', () => {
       const description = fixture.description
       const alphabet = alphabets[fixture.alphabet] ?? fixture.alphabet
 
-      if (fixture.string !== undefined) {
-        it(`decode should throw: ${description}`, () => {
-          const codec = base(alphabet)
+      if (fixture.string === undefined) {
+        // Alphabet validation error
+        it(`should throw on invalid alphabet: ${description}`, () => {
           assert.throws(
-            () => codec.decode(/** @type {string} */ (fixture.string)),
+            () => base(alphabet),
             (err) => {
               const regex = new RegExp(fixture.exception)
               return regex.test(/** @type {Error} */ (err).toString())
@@ -588,10 +588,10 @@ describe('basex', () => {
           )
         })
       } else {
-        // Alphabet validation error
-        it(`should throw on invalid alphabet: ${description}`, () => {
+        it(`decode should throw: ${description}`, () => {
+          const codec = base(alphabet)
           assert.throws(
-            () => base(alphabet),
+            () => codec.decode(/** @type {string} */ (fixture.string)),
             (err) => {
               const regex = new RegExp(fixture.exception)
               return regex.test(/** @type {Error} */ (err).toString())

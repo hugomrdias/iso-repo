@@ -105,7 +105,6 @@ test('should retry with on response hook', async () => {
 test('should post json', async () => {
   server.use(
     http.post('https://local.dev/post', async ({ request }) => {
-      // @ts-ignore
       return Response.json(await request.json(), { status: 200 })
     })
   )
@@ -159,7 +158,6 @@ test('should request 500 with json body', async () => {
   server.use(
     http.get('https://local.dev/error-json', ({ request }) => {
       const params = Object.fromEntries(new URL(request.url).searchParams)
-      // @ts-ignore
       return HttpResponse.json(
         { error: 'error' },
         { status: Number(params.status) }

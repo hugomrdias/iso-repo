@@ -10,7 +10,7 @@ function isElectron() {
   if (
     typeof window !== 'undefined' &&
     typeof window.process === 'object' &&
-    // @ts-ignore
+    // @ts-expect-error
     window.process.type === 'renderer'
   ) {
     return true
@@ -56,12 +56,12 @@ export const IS_NODE =
   process.release.name === 'node' &&
   !IS_ELECTRON
 export const IS_WEBWORKER =
-  // @ts-ignore - we either ignore worker scope or dom scope
+  // @ts-expect-error - we either ignore worker scope or dom scope
   typeof importScripts === 'function' &&
   typeof globalThis !== 'undefined' &&
-  // @ts-ignore - we either ignore worker scope or dom scope
+  // @ts-expect-error - we either ignore worker scope or dom scope
   typeof WorkerGlobalScope !== 'undefined' &&
-  // @ts-ignore - we either ignore worker scope or dom scope
+  // @ts-expect-error - we either ignore worker scope or dom scope
   // eslint-disable-next-line no-undef
   globalThis instanceof WorkerGlobalScope
 export const IS_TEST =

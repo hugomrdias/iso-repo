@@ -70,18 +70,18 @@ export function getCoseKeyType(key) {
  * @param {COSEALG} alg
  */
 export function mapCoseAlgToWebCryptoAlg(alg) {
-  // @ts-ignore
+  // @ts-expect-error
   if ([COSEALG_MAP.RS1].includes(alg)) {
     return 'SHA-1'
   }
   if (
-    // @ts-ignore
+    // @ts-expect-error
     [COSEALG_MAP.ES256, COSEALG_MAP.PS256, COSEALG_MAP.RS256].includes(alg)
   ) {
     return 'SHA-256'
   }
   if (
-    // @ts-ignore
+    // @ts-expect-error
     [COSEALG_MAP.ES384, COSEALG_MAP.PS384, COSEALG_MAP.RS384].includes(alg)
   ) {
     return 'SHA-384'
@@ -92,7 +92,7 @@ export function mapCoseAlgToWebCryptoAlg(alg) {
       COSEALG_MAP.PS512,
       COSEALG_MAP.RS512,
       COSEALG_MAP.EdDSA,
-      // @ts-ignore
+      // @ts-expect-error
     ].includes(alg)
   ) {
     return 'SHA-512'

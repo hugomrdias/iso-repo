@@ -1,7 +1,6 @@
 import { assert, suite } from 'playwright-test/taps'
 import { validate } from '../src/policy.js'
 import type { Policy } from '../src/types.js'
-// @ts-ignore
 import fixtures from './fixtures/policy.json' with { type: 'json' }
 
 const policy = suite('policy')

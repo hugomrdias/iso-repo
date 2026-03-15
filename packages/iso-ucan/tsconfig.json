@@ -18,7 +18,7 @@
       "path": "../iso-kv"
     }
   ],
-  "include": ["src", "scripts", "package.json", "test"],
+  "include": ["src", "scripts", "package.json", "test", "test/**/*.json"],
   "exclude": ["node_modules", "dist", "out"],
   "typedocOptions": {
     "entryPointStrategy": "resolve",

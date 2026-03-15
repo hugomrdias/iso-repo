@@ -20,7 +20,7 @@ test('should abort from any signal', () => {
 test('should ignore non signal', () => {
   const controllers = Array.from({ length: 5 }).map(() => new AbortController())
   const signals = controllers.map((c) => c.signal)
-  // @ts-ignore
+  // @ts-expect-error
   const signal = anySignal([...signals, { reason: 'test' }])
 
   assert.equal(signal.aborted, false)
