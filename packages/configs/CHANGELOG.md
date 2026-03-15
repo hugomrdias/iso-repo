@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/hugomrdias/iso-repo/compare/configs-v1.1.2...configs-v1.1.3) (2026-03-15)
+
+
+### Bug Fixes
+
+* update biome configuration and dependencies, refine TypeScript settings ([e09bcff](https://github.com/hugomrdias/iso-repo/commit/e09bcff6ac9f3e32880a7feab2a095a69e9dfec1))
+
 ## [1.1.2](https://github.com/hugomrdias/iso-repo/compare/configs-v1.1.1...configs-v1.1.2) (2025-10-14)
 
 
