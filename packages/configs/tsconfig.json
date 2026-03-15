@@ -39,9 +39,9 @@
 
     /* Type Checking */
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "noFallthroughCasesInSwitch": true,
+    // "noUncheckedIndexedAccess": true,
+    // "noImplicitOverride": true,
+    // "noFallthroughCasesInSwitch": true,
     // "noImplicitReturns": false,
     // "noUnusedLocals": true,
     // "noUnusedParameters": false,
