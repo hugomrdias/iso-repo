@@ -32,10 +32,10 @@ pnpm install @biomejs/biome -w -D
   "types": "dist/src/index.d.ts",
   "files": ["dist/src", "src"],
   "scripts": {
-    "lint": "biome check --no-errors-on-unmatched --files-ignore-unknown=true ."
+    "lint": "biome check ."
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm exec biome check --no-errors-on-unmatched --files-ignore-unknown=true --staged"
+    "pre-commit": "pnpm exec biome check --staged"
   }
 }
 ```
@@ -47,20 +47,21 @@ pnpm install @biomejs/biome -w -D
   "extends": "@hugomrdias/configs/tsconfig",
   "compilerOptions": {
     "outDir": "dist",
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true // for javascript code bases
   },
   "include": ["src", "test"]
 }
 ```
 
-For typescript code bases:
+For application code bases:
 
 ```json
 {
   "extends": "@hugomrdias/configs/tsconfig",
   "compilerOptions": {
-    "outDir": "dist",
-    "module": "NodeNext"
+    "moduleResolution": "bundler",
+    "noEmit": true
+    "jsx": "react-jsx"
   },
   "include": ["src", "test"]
 }

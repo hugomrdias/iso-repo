@@ -5,8 +5,8 @@
     "composite": true,
 
     /* Language and Environment */
-    "target": "es2024",
-    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "target": "esnext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleDetection": "force",
 
     /* Modules */
@@ -35,13 +35,13 @@
     "verbatimModuleSyntax": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    // "erasableSyntaxOnly": true,
+    "erasableSyntaxOnly": true,
 
     /* Type Checking */
     "strict": true,
-    // "noUncheckedIndexedAccess": true,
-    // "noImplicitOverride": true,
-    // "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
     // "noImplicitReturns": false,
     // "noUnusedLocals": true,
     // "noUnusedParameters": false,
