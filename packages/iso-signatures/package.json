@@ -90,21 +90,21 @@
     "@noble/ed25519": "^3.0.0",
     "@noble/hashes": "^2.0.0",
     "@noble/secp256k1": "^3.0.0",
+    "eventemitter3": "5.0.1",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
-    "ox": "^0.11.1"
+    "ox": "^0.14.5"
   },
   "devDependencies": {
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.5.0",
     "assert": "^2.1.0",
-    "eventemitter3": "^5.0.1",
     "mocha": "^11.7.5",
     "playwright-test": "^14.1.12",
-    "type-fest": "^5.3.1",
+    "type-fest": "^5.4.4",
     "typescript": "5.9.3",
-    "viem": "^2.43.3"
+    "viem": "^2.47.4"
   },
   "publishConfig": {
     "provenance": true
