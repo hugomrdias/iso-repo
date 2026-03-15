@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.4.0...iso-websocket-v0.4.1) (2026-03-15)
+
+
+### Bug Fixes
+
+* refine TypeScript error handling and update test cases across multiple packages ([4012b85](https://github.com/hugomrdias/iso-repo/commit/4012b8537370ac86908df4825acf30964393f6e8))
+
 ## [0.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.3.0...iso-websocket-v0.4.0) (2025-08-27)
 
 
