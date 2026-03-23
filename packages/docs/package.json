@@ -34,7 +34,7 @@
     "test": "pnpm run lint"
   },
   "devDependencies": {
-    "@astrojs/starlight": "~0.37.1",
+    "@astrojs/starlight": "~0.38.2",
     "@biomejs/biome": "^2.4.7",
     "@types/node": "^25.5.0",
     "astro": "^5.16.6",
