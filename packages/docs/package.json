@@ -34,10 +34,10 @@
     "test": "pnpm run lint"
   },
   "devDependencies": {
-    "@astrojs/starlight": "~0.37.1",
-    "@biomejs/biome": "^2.4.7",
-    "@types/node": "^25.5.0",
-    "astro": "^5.16.6",
+    "@astrojs/starlight": "~0.38.3",
+    "@biomejs/biome": "^2.4.11",
+    "@types/node": "^25.6.0",
+    "astro": "^6.1.5",
     "typescript": "5.9.3"
   },
   "publishConfig": {
@@ -53,10 +53,10 @@
   },
   "dependencies": {
     "github-slugger": "^2.0.0",
-    "typedoc-plugin-markdown": "^4.10.0",
-    "vite": "^8.0.0",
-    "vite-plugin-static-copy": "^3.3.0",
-    "yaml": "^2.8.2"
+    "typedoc-plugin-markdown": "^4.11.0",
+    "vite": "^8.0.8",
+    "vite-plugin-static-copy": "^4.0.1",
+    "yaml": "^2.8.3"
   },
   "peerDependencies": {
     "@astrojs/starlight": ">=0.37.1"

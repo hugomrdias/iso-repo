@@ -19,12 +19,12 @@
     "docs": "typedoc --out docs --plugin typedoc-plugin-missing-exports"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.7",
+    "@biomejs/biome": "^2.4.11",
     "@hugomrdias/configs": "workspace:^",
     "depcheck": "^1.4.7",
     "simple-git-hooks": "^2.11.0",
-    "typedoc": "^0.28.17",
-    "typedoc-plugin-missing-exports": "^4.1.2",
+    "typedoc": "^0.28.18",
+    "typedoc-plugin-missing-exports": "^4.1.3",
     "typescript": "5.9.3"
   },
   "simple-git-hooks": {

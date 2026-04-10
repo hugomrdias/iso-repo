@@ -50,7 +50,7 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "@noble/ed25519": "^3.0.0",
+    "@noble/ed25519": "^3.0.1",
     "@peculiar/asn1-ecc": "^2.6.1",
     "@peculiar/asn1-schema": "^2.6.0",
     "cbor-x": "^1.6.4",
@@ -60,10 +60,10 @@
   "devDependencies": {
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.6.0",
     "assert": "^2.1.0",
     "mocha": "^11.7.5",
-    "playwright-test": "^14.1.12",
+    "playwright-test": "^14.1.13",
     "typescript": "5.9.3"
   },
   "publishConfig": {

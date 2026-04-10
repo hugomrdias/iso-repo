@@ -87,7 +87,7 @@
     "test:browser": "pw-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "@noble/ed25519": "^3.0.0",
+    "@noble/ed25519": "^3.0.1",
     "@noble/hashes": "^2.0.0",
     "@noble/secp256k1": "^3.0.0",
     "eventemitter3": "5.0.1",
@@ -98,13 +98,13 @@
   "devDependencies": {
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.6.0",
     "assert": "^2.1.0",
     "mocha": "^11.7.5",
-    "playwright-test": "^14.1.12",
-    "type-fest": "^5.4.4",
+    "playwright-test": "^14.1.13",
+    "type-fest": "^5.5.0",
     "typescript": "5.9.3",
-    "viem": "^2.47.4"
+    "viem": "^2.47.12"
   },
   "publishConfig": {
     "provenance": true
