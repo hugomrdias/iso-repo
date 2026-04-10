@@ -3,7 +3,7 @@ import { assert, suite } from 'playwright-test/taps'
 import { HttpError, JsonError, RequestError, request } from '../src/http.js'
 import { setup } from '../src/msw/msw.js'
 
-const test = suite('request').only
+const test = suite('request')
 
 const server = setup()
 
