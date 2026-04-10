@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.1.1...iso-web-v2.2.0) (2026-04-10)
+
+
+### Features
+
+* **iso-web:** retry network errors and clone request for retries ([e4d7f8d](https://github.com/hugomrdias/iso-repo/commit/e4d7f8dc8474ac6866e80aee3eefafa1d6263ab2))
+
 ## [2.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.1.0...iso-web-v2.1.1) (2026-03-15)
 
 
