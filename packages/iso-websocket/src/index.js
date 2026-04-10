@@ -1,7 +1,6 @@
 import debug from 'debug'
 import * as retry from 'retry'
 import { TypedEventTarget } from 'typescript-event-target'
-import { WebSocket } from 'unws'
 import {
   CloseEvent,
   ErrorEvent,

@@ -3,7 +3,6 @@ import pDefer from 'p-defer'
 import * as Client from 'playwright-test/client'
 /* eslint-disable unicorn/prefer-add-event-listener */
 import { assert, suite } from 'playwright-test/taps'
-import { WebSocket } from 'unws'
 import { WS } from '../src/index.js'
 
 const test = suite('ws')
