@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.4.1...iso-websocket-v0.5.0) (2026-04-10)
+
+
+### Features
+
+* remove unws dep ([b286b05](https://github.com/hugomrdias/iso-repo/commit/b286b05e5be3701f25a790204770656b81d7abce))
+
 ## [0.4.1](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.4.0...iso-websocket-v0.4.1) (2026-03-15)
 
 
