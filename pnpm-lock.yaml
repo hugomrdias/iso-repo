@@ -539,12 +539,6 @@ importers:
       typescript-event-target:
         specifier: ^1.1.2
         version: 1.1.2
-      unws:
-        specifier: ^0.3.2
-        version: 0.3.2(ws@8.20.0)
-      ws:
-        specifier: ^8.19.0
-        version: 8.20.0
     devDependencies:
       '@types/debug':
         specifier: ^4.1.13
@@ -573,6 +567,9 @@ importers:
       typescript:
         specifier: 5.9.3
         version: 5.9.3
+      ws:
+        specifier: ^8.20.0
+        version: 8.20.0
 
 packages:
 
@@ -4961,12 +4958,6 @@ packages:
 
   until-async@3.0.2:
     resolution: {integrity: sha512-IiSk4HlzAMqTUseHHe3VhIGyuFmN90zMTpD3Z3y8jeQbzLIq500MVM7Jq2vUAnTKAFPJrqwkzr6PoTcPhGcOiw==}
-
-  unws@0.3.2:
-    resolution: {integrity: sha512-j4yKfk7QpnMIrUXCH6S6v1hFPh3Ws0RwGkHbh/HZykgdj28eV4yyb5i2F0AUiCHiJDuw44/rvZcgjY7likCvjA==}
-    deprecated: For Node.js v20.10.0 and later, the WebSocket global is available natively. This package is no longer maintained.
-    peerDependencies:
-      ws: '*'
 
   use-sync-external-store@1.4.0:
     resolution: {integrity: sha512-9WXSPC5fMv61vaupRkCKCxsPxBocVnwakBEkMIHHpkTTg6icbJtg6jzgtLDm4bl3cSHAca52rYWih0k4K3PfHw==}
@@ -10247,10 +10238,6 @@ snapshots:
       idb-keyval: 6.2.2
 
   until-async@3.0.2: {}
-
-  unws@0.3.2(ws@8.20.0):
-    dependencies:
-      ws: 8.20.0
 
   use-sync-external-store@1.4.0(react@19.0.0):
     dependencies:
