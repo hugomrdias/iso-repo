@@ -1,5 +1,7 @@
 import delay from 'delay'
+import isNetworkError from 'is-network-error'
 import pRetry from 'p-retry'
+
 import { anySignal } from './signals.js'
 
 const symbol = Symbol.for('request-error')
@@ -179,8 +181,11 @@ export class HttpError extends RequestError {
   }
 }
 
+const DEFAULT_STATUS_CODES = [408, 413, 429, 500, 502, 503, 504]
+const DEFAULT_AFTER_STATUS_CODES = [413, 429, 503]
+
 /**
- * Request timeout
+ * HTTP Request
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
@@ -206,10 +211,12 @@ export async function request(resource, options = {}) {
     }
   }
 
+  // timeout signal
   const timeoutSignal =
     timeout === false ? undefined : AbortSignal.timeout(timeout)
   const combinedSignals = anySignal([signal, timeoutSignal])
 
+  // headers
   const _headers = new Headers(headers)
   if (json !== undefined) {
     _headers.set(
@@ -218,6 +225,8 @@ export async function request(resource, options = {}) {
     )
     options.body = JSON.stringify(json)
   }
+
+  // request
   const request = new Request(resource, {
     ...options,
     headers: _headers,
@@ -225,7 +234,8 @@ export async function request(resource, options = {}) {
   })
 
   async function fn() {
-    let rsp = await fetch(request)
+    const req = retry == null ? request : request.clone()
+    let rsp = await fetch(req)
 
     const result = await onResponse(rsp.clone(), request)
 
@@ -237,7 +247,7 @@ export async function request(resource, options = {}) {
     if (!rsp.ok || retryStatusCodes.includes(rsp.status)) {
       throw new HttpError({
         response: rsp,
-        request,
+        request: req,
         options,
       })
     }
@@ -247,7 +257,7 @@ export async function request(resource, options = {}) {
   try {
     const response = await (retry
       ? pRetry(() => fn(), {
-          retries: retry.retries,
+          retries: retry.retries ?? 10,
           factor: retry.factor ?? 2,
           minTimeout: retry.minTimeout ?? 1000,
           maxTimeout: retry.maxTimeout ?? Number.POSITIVE_INFINITY,
@@ -256,7 +266,7 @@ export async function request(resource, options = {}) {
           maxRetryTime: retry.maxRetryTime ?? Number.POSITIVE_INFINITY,
           signal: combinedSignals,
           onFailedAttempt: async (ctx) => {
-            const codes = retry.afterStatusCodes ?? [413, 429, 503]
+            const codes = retry.afterStatusCodes ?? DEFAULT_AFTER_STATUS_CODES
             if (HttpError.is(ctx.error) && codes.includes(ctx.error.code)) {
               // Delay if needed using Retry-After header
               const delayValue = calculateRetryAfter(ctx.error.response)
@@ -280,9 +290,7 @@ export async function request(resource, options = {}) {
               'trace',
             ]
 
-            const statusCodes = retry.statusCodes ?? [
-              408, 413, 429, 500, 502, 503, 504,
-            ]
+            const statusCodes = retry.statusCodes ?? DEFAULT_STATUS_CODES
             if (
               methods.includes(request.method.toLowerCase()) &&
               HttpError.is(ctx.error) &&
@@ -291,6 +299,9 @@ export async function request(resource, options = {}) {
               return true
             }
 
+            if (isNetworkError(ctx.error)) {
+              return true
+            }
             return false
           },
         })

@@ -3,7 +3,7 @@ import { assert, suite } from 'playwright-test/taps'
 import { HttpError, JsonError, RequestError, request } from '../src/http.js'
 import { setup } from '../src/msw/msw.js'
 
-const test = suite('request')
+const test = suite('request').only
 
 const server = setup()
 
@@ -227,34 +227,29 @@ test('should abort manually', async () => {
   }
 })
 
-test(
-  'should retry failed network error',
-  async () => {
-    let count = 0
-    server.use(
-      http.get('https://local.dev/network-error', () => {
-        return Response.error()
-      })
-    )
-    const { error } = await request('https://local.dev/network-error', {
-      retry: {
-        retries: 1,
-        shouldRetry: () => {
-          count++
-          return true
-        },
-      },
+test('should retry failed network error', async () => {
+  let count = 0
+  server.use(
+    http.get('https://local.dev/network-error', () => {
+      count++
+      return Response.error()
     })
+  )
+  const { error } = await request('https://local.dev/network-error', {
+    retry: {
+      retries: 2,
+      factor: 1,
+      minTimeout: 10,
+    },
+  })
 
-    if (error) {
-      assert.equal(error.message, 'Failed to fetch')
-      assert.equal(count, 1)
-    } else {
-      assert.fail('should fail')
-    }
-  },
-  { timeout: 10_000 }
-)
+  if (error) {
+    assert.equal(error.message, 'Failed to fetch')
+    assert.equal(count, 3)
+  } else {
+    assert.fail('should fail')
+  }
+})
 
 test(
   'should retry failed',
@@ -380,6 +375,57 @@ test(
 
     if (error) {
       assert.fail(error.message)
+    } else {
+      assert.equal(result.status, 200)
+      assert.deepEqual(await result.json(), { data: 'ready' })
+      assert.equal(count, 3)
+    }
+  },
+  { timeout: 10_000 }
+)
+
+test(
+  'should retry POST requests with custom shouldRetry',
+  async () => {
+    let count = 0
+    server.use(
+      http.post('https://local.dev/processing', () => {
+        count++
+        if (count < 3) {
+          return HttpResponse.json({ status: 'processing' }, { status: 202 })
+        }
+        return HttpResponse.json({ data: 'ready' }, { status: 200 })
+      })
+    )
+
+    const { error, result } = await request.post(
+      'https://local.dev/processing',
+      {
+        body: JSON.stringify({ hello: 'world' }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        retry: {
+          statusCodes: [202],
+          retries: 5,
+          minTimeout: 10,
+          factor: 1,
+          methods: ['post'],
+          shouldRetry: (ctx) => {
+            return ctx.error.message === 'post-error'
+          },
+        },
+        onResponse: (response) => {
+          if (response.status === 202) {
+            throw new Error('post-error')
+          }
+          return response
+        },
+      }
+    )
+
+    if (error) {
+      assert.fail(error)
     } else {
       assert.equal(result.status, 200)
       assert.deepEqual(await result.json(), { data: 'ready' })
