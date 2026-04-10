@@ -4,6 +4,7 @@ import { setupServer } from 'msw/node'
  * @returns {import('./types.ts').BrowserNodeServer}
  */
 export function setup() {
+  // biome-ignore lint/complexity/noArguments: needed
   if (arguments.length > 0) {
     throw new Error(
       'setup takes no arguments use server.use(...handlers) instead'
