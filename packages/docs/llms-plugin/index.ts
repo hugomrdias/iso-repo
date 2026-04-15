@@ -1,7 +1,5 @@
 import type { StarlightPlugin } from '@astrojs/starlight/types'
 import { AstroError } from 'astro/errors'
-import { normalizePath } from 'vite'
-import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 interface Actions {
   chatgpt?: boolean
@@ -23,6 +21,7 @@ export interface PageActionsConfig {
   actions?: Actions
   title?: string
   description?: string
+  maxDepth?: number
 }
 
 /**
@@ -37,7 +36,7 @@ export interface PageActionsConfig {
  * @param {string} [userConfig.prompt] - The prompt template for AI chat services. Use `{url}` as placeholder for the markdown URL.
  * @param {string} [userConfig.baseUrl] - The base URL of your site, required for generating the `llms.txt` file.
  * @param {Actions} [userConfig.actions] - Configure which built-in actions to display and define custom actions.
- *
+ * @param {number} [userConfig.maxDepth] - The maximum depth of the documentation tree to include in the `llms.txt` file. Defaults to 4.
  *
  * @example
  * ```javascript
@@ -52,6 +51,7 @@ export interface PageActionsConfig {
  *         llmsPlugin({
  *           prompt: "Read {url} and explain its main points briefly.",
  *           baseUrl: "https://mydocs.example.com",
+ *           maxDepth: 3,
  *           actions: {
  *            chatgpt: false,
  *            v0: true,
@@ -125,127 +125,44 @@ export function llmsPlugin(userConfig?: PageActionsConfig): StarlightPlugin {
         }
 
         addIntegration({
-          name: 'llms-plugin-integration',
+          name: 'llms',
           hooks: {
-            'astro:config:setup': ({ updateConfig }) => {
+            'astro:config:setup'({ updateConfig, injectRoute }) {
               updateConfig({
                 vite: {
                   plugins: [
                     {
                       name: 'llms-plugin-config',
-                      resolveId(id) {
+                      resolveId(id: string) {
                         if (id === 'virtual:llms-plugin/config') {
                           return `\0${id}`
                         }
+                        return undefined
                       },
-                      load(id) {
+                      load(id: string) {
                         if (id === '\0virtual:llms-plugin/config') {
                           return `export default ${JSON.stringify(config)}`
                         }
+                        return undefined
                       },
                     },
-                    viteStaticCopy({
-                      targets: [
-                        {
-                          src: 'src/content/docs/**/*.{md,mdx}',
-                          dest: '',
-                          transform: (content: string) => {
-                            const frontmatterRegex =
-                              /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/
-                            const match = content.match(frontmatterRegex)
-
-                            let title = ''
-                            let markdownContent = content
-
-                            if (
-                              match &&
-                              match[1] !== undefined &&
-                              match[2] !== undefined
-                            ) {
-                              const frontmatter = match[1]
-                              markdownContent = match[2]
-
-                              const titleMatch = frontmatter.match(
-                                /title:\s*["']?([^"'\n]+)["']?/
-                              )
-                              if (titleMatch && titleMatch[1] !== undefined) {
-                                title = titleMatch[1].trim()
-                              }
-                            }
-
-                            const contentWithoutImports = markdownContent
-                            // .split('\n')
-                            // .filter(
-                            //   (line) => !line.trim().startsWith('import ')
-                            // )
-                            // .join('\n')
-
-                            let newContent = ''
-
-                            if (title) {
-                              newContent = `# ${title}\n\n`
-                            }
-
-                            newContent += contentWithoutImports.trim()
-
-                            return newContent
-                          },
-                          rename: (
-                            fileName: string,
-                            fileExtension: string,
-                            fullPath: string
-                          ) => {
-                            const fullPathNormalized = normalizePath(fullPath)
-                            const relativePath = (
-                              fullPathNormalized.split(
-                                'src/content/docs/'
-                              )[1] as string
-                            ).replace(new RegExp(`\\.${fileExtension}$`), '')
-                            const pathSegments = relativePath.split('/')
-
-                            if (fileName === 'index') {
-                              if (pathSegments.length === 1) {
-                                return 'index.md'
-                              } else {
-                                const directories = pathSegments
-                                  .slice(0, -2)
-                                  .join('/')
-                                const folderName =
-                                  pathSegments[pathSegments.length - 2]
-
-                                return directories
-                                  ? `${directories}/${folderName}.md`
-                                  : `${folderName}.md`
-                              }
-                            }
-
-                            const directories = pathSegments
-                              .slice(0, -1)
-                              .join('/')
-                            const finalPath = directories
-                              ? `${directories}/${fileName}.md`
-                              : `${fileName}.md`
-
-                            return finalPath.replace('@', '').toLowerCase()
-                          },
-                        },
-                      ],
-                    }),
                   ],
                 },
               })
-            },
-          },
-        })
 
-        addIntegration({
-          name: 'llms',
-          hooks: {
-            'astro:config:setup'({ injectRoute }) {
-              const entrypoint = new URL('llms.txt.ts', import.meta.url)
               injectRoute({
-                entrypoint,
+                entrypoint: '@hugomrdias/docs/llms.txt',
                 pattern: '/llms.txt',
+              })
+
+              injectRoute({
+                entrypoint: '@hugomrdias/docs/llms-full.txt',
+                pattern: '/llms-full.txt',
+              })
+
+              injectRoute({
+                entrypoint: '@hugomrdias/docs/markdown',
+                pattern: '/[...slug].md',
               })
             },
           },

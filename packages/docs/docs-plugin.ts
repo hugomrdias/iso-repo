@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import url from 'node:url'
 import type { StarlightPlugin } from '@astrojs/starlight/types'
@@ -105,13 +106,25 @@ export function docsPlugin(options: DocsPluginOptions = {}): StarlightPlugin {
             urlPath: getUrlPath(directory, astroConfig.base),
           }
 
+          const projectRoot = url.fileURLToPath(astroConfig.root)
+          const _require = createRequire(path.join(projectRoot, 'package.json'))
+          const resolvedPlugins = (options.typeDocOptions?.plugin ?? []).map(
+            (p) => {
+              try {
+                return _require.resolve(p.toString())
+              } catch {
+                logger.warn(
+                  `Could not resolve TypeDoc plugin "${p}", using as-is`
+                )
+                return p
+              }
+            }
+          )
+
           const app = await Application.bootstrapWithPlugins({
             ..._defaultTypeDocOptions,
             ...options.typeDocOptions,
-            plugin: [
-              ...(options.typeDocOptions?.plugin ?? []),
-              'typedoc-plugin-markdown',
-            ],
+            plugin: [...resolvedPlugins, 'typedoc-plugin-markdown'],
             outputs: [{ name: 'markdown', path: output.path }],
             readme: 'none',
             packageOptions: {
