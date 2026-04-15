@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.11...docs-v0.2.0) (2026-04-15)
+
+
+### Features
+
+* refactor llms with Astro routing, MDX stripping, .md chat URLs ([#493](https://github.com/hugomrdias/iso-repo/issues/493)) ([e114444](https://github.com/hugomrdias/iso-repo/commit/e1144449474228d8317f170f5eb4f6b5ee5f5a25))
+
 ## [0.1.11](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.10...docs-v0.1.11) (2025-12-22)
 
 
