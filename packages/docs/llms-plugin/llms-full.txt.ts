@@ -4,5 +4,5 @@ import type { APIRoute } from 'astro'
 import { generateLlmsIndex } from './utils'
 
 export const GET: APIRoute = () => {
-  return generateLlmsIndex(site, config, config.maxDepth ?? 4)
+  return generateLlmsIndex(site, config, Number.POSITIVE_INFINITY)
 }

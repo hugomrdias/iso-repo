@@ -10,13 +10,13 @@ interface OptionsProps {
 }
 
 const currentPath = Astro.url.pathname.replace(/\/$/, "");
-const currentUrl = Astro.url.href;
+const mdUrl = `${Astro.site!}${currentPath.replace(/^\//, "")}.md`;
 const { actions, prompt: userPrompt } = config;
 const { pageActions } = (Astro.locals as any).starlightRoute.entry.data;
 
 const prompt = userPrompt?.includes("{url}")
-  ? userPrompt?.replace("{url}", currentUrl)
-  : `${userPrompt} ${currentUrl}`;
+  ? userPrompt?.replace("{url}", mdUrl)
+  : `${userPrompt} ${mdUrl}`;
 const encodedPrompt = encodeURIComponent(prompt as string);
 
 const defaultOptions: OptionsProps[] = [
