@@ -1,4 +1,4 @@
-import { base64pad } from 'iso-base/rfc4648'
+import { base64 as base64pad } from 'iso-base/rfc4648'
 import { assert, suite } from 'playwright-test/taps'
 import { Delegation } from '../src/delegation.js'
 import { Invocation } from '../src/invocation.js'
@@ -71,6 +71,7 @@ for (const fixture of data.invalid) {
       },
       (err) => {
         const error = err as Error
+
         assert.ok(
           error.message.includes(InvalidErrorMap[fixture.name]),
           `${fixture.name} - ${error.message}`

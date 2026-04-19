@@ -1,4 +1,4 @@
-import { base64pad } from 'iso-base/rfc4648'
+import { base64 } from 'iso-base/rfc4648'
 import { parse as didParse } from 'iso-did'
 import { randomBytes } from 'iso-web/crypto'
 import * as Envelope from './envelope.js'
@@ -101,7 +101,7 @@ export class Delegation {
    * @param { {now?: number}} [options]
    */
   static async fromString(token, options = {}) {
-    const bytes = base64pad.decode(token)
+    const bytes = base64.decode(token)
     const envelope = /** @type {typeof Envelope.decode<"dlg">} */ (
       Envelope.decode
     )({ envelope: bytes })
@@ -188,7 +188,7 @@ export class Delegation {
   }
 
   toString() {
-    return base64pad.encode(this.bytes)
+    return base64.encode(this.bytes)
   }
 
   toJSON() {
@@ -204,10 +204,10 @@ export class Delegation {
           pol: this.pol,
           exp: this.exp,
           nbf: this.nbf,
-          nonce: base64pad.encode(this.nonce),
+          nonce: base64.encode(this.nonce),
           meta: this.meta,
         },
-        signature: base64pad.encode(this.envelope.signature),
+        signature: base64.encode(this.envelope.signature),
         alg: this.envelope.alg,
         enc: this.envelope.enc,
         spec: this.envelope.spec,
