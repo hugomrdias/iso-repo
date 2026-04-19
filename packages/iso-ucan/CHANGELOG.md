@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.4.2...iso-ucan-v0.5.0) (2026-04-19)
+
+
+### Features
+
+* add RPC layer with protocol definition and example usage ([2db3500](https://github.com/hugomrdias/iso-repo/commit/2db3500030dc198185247b8e47a05de9795f17c6))
+* restructure RPC module and remove deprecated client/server files ([2f4104e](https://github.com/hugomrdias/iso-repo/commit/2f4104e1269527c7d729924a56d76842cf0f2ae9))
+* update proof assertion logic and enhance chain resolution in store ([eede4dc](https://github.com/hugomrdias/iso-repo/commit/eede4dc591516ca50241db5312ffca3667af7c71))
+
+
+### Bug Fixes
+
+* add spec invocation fixtures to the tests ([0621d9a](https://github.com/hugomrdias/iso-repo/commit/0621d9a6eb961010865bf1e450d69f3f7ee70b3f))
+* refine TypeScript error handling and update test cases across multiple packages ([4012b85](https://github.com/hugomrdias/iso-repo/commit/4012b8537370ac86908df4825acf30964393f6e8))
+* replace base64pad with base64 in delegation module ([3bf3b2c](https://github.com/hugomrdias/iso-repo/commit/3bf3b2cd47ec83e9e5992e5c93a140401c3be9f8))
+
 ## [0.4.2](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.4.1...iso-ucan-v0.4.2) (2025-11-12)
 
 
