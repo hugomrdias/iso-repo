@@ -65,6 +65,7 @@ export class Invocation {
     }
     // Audience or subject must match receiver
     if (
+      audience &&
       envelope.payload.aud !== audience.did &&
       envelope.payload.sub !== audience.did
     ) {

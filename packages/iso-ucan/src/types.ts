@@ -63,12 +63,22 @@ export interface DelegationOptions<Schema extends StandardSchemaV1> {
   nonce?: Uint8Array
   cmd: string
   meta?: CborObject
+  /**
+   * The current time in seconds. Mostly used for testing.
+   * @default Math.floor(Date.now() / 1000)
+   */
+  now?: number
 }
 
 export interface DelegationValidateOptions {
   isRevoked?: IsRevoked
   didResolver?: DidResolver
   verifierResolver: VerifierResolver
+  /**
+   * The current time in seconds. Mostly used for testing.
+   * @default Math.floor(Date.now() / 1000)
+   */
+  now?: number
 }
 
 export interface DelegationFromOptions extends DelegationValidateOptions {
@@ -113,7 +123,7 @@ export interface InvocationOptions extends DelegationValidateOptions {
 
 export interface InvocationFromOptions extends DelegationValidateOptions {
   bytes: Uint8Array
-  audience: VerifiableDID
+  audience?: VerifiableDID
   resolveProof: ResolveProof
 }
 

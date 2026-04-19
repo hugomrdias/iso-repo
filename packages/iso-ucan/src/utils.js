@@ -91,9 +91,9 @@ export function isSigAndDidCompatible(did, sigType) {
  * Validate the expiration of a UCAN
  *
  * @param {number | null} exp
+ * @param {number} [now]
  */
-export function assertExpiration(exp) {
-  const now = nowInSeconds()
+export function assertExpiration(exp, now = nowInSeconds()) {
   if (exp !== null && !Number.isSafeInteger(exp)) {
     throw new TypeError(
       `UCAN expiration must be null or a safe integer. Received: ${exp}`
@@ -111,9 +111,10 @@ export function assertExpiration(exp) {
  * Validate the not before time of a UCAN
  *
  * @param {number} [nbf]
+ * @param {number} [now]
  */
-export function assertNotBefore(nbf) {
-  if (nbf && nbf > nowInSeconds()) {
+export function assertNotBefore(nbf, now = nowInSeconds()) {
+  if (nbf && nbf > now) {
     throw new Error('UCAN not valid yet')
   }
 }
@@ -149,15 +150,19 @@ export async function verifySignature(
   didResolver
 ) {
   const issuer = await validateIssuerAndSignature(envelope, didResolver)
-  const isVerified = await signatureVerifierResolver.verify({
-    signature: envelope.signature,
-    message: dagCbor.encode(signaturePayload(envelope)),
-    did: issuer,
-    type: envelope.alg,
-  })
+  try {
+    const isVerified = await signatureVerifierResolver.verify({
+      signature: envelope.signature,
+      message: dagCbor.encode(signaturePayload(envelope)),
+      did: issuer,
+      type: envelope.alg,
+    })
 
-  if (!isVerified) {
-    throw new Error('UCAN signature verification failed')
+    if (!isVerified) {
+      throw new Error('UCAN signature verification failed')
+    }
+  } catch (error) {
+    throw new Error('UCAN signature verification failed', { cause: error })
   }
 
   return true

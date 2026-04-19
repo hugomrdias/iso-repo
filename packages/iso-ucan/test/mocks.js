@@ -1,5 +1,6 @@
 import { MemoryDriver } from 'iso-kv/drivers/memory.js'
 import { EdDSASigner } from 'iso-signatures/signers/eddsa.js'
+import * as ECDSA from 'iso-signatures/verifiers/ecdsa.js'
 import { verify } from 'iso-signatures/verifiers/eddsa.js'
 import { Resolver } from 'iso-signatures/verifiers/resolver.js'
 import { z } from 'zod/v4'
@@ -18,6 +19,7 @@ export const alice = await EdDSASigner.import(
 
 export const verifierResolver = new Resolver({
   Ed25519: verify,
+  ES256: ECDSA.verifier.ES256,
 })
 
 export const defaultStore = new Store(new MemoryDriver())

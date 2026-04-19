@@ -84,7 +84,7 @@ export class Delegation {
       )
     }
 
-    assertStructure(envelope.payload)
+    assertStructure(envelope.payload, options.now)
 
     await verifySignature(envelope, verifierResolver, didResolveOptions)
 
@@ -98,8 +98,9 @@ export class Delegation {
    * Create a delegation from a base64 encoded string
    *
    * @param {string} token
+   * @param { {now?: number}} [options]
    */
-  static async fromString(token) {
+  static async fromString(token, options = {}) {
     const bytes = base64pad.decode(token)
     const envelope = /** @type {typeof Envelope.decode<"dlg">} */ (
       Envelope.decode
@@ -111,7 +112,7 @@ export class Delegation {
       )
     }
 
-    assertStructure(envelope.payload)
+    assertStructure(envelope.payload, options.now)
     const _cid = await cid(envelope)
     return new Delegation(envelope, bytes, _cid)
   }
@@ -143,7 +144,7 @@ export class Delegation {
       payload.meta = options.meta
     }
 
-    assertStructure(payload)
+    assertStructure(payload, options.now)
 
     const { signature, signaturePayload } = await Envelope.sign({
       spec: 'dlg',
@@ -174,8 +175,8 @@ export class Delegation {
    * @param {DelegationValidateOptions} options
    */
   async validate(options) {
-    assertStructure(this.envelope.payload)
-    assertNotBefore(this.envelope.payload.nbf)
+    assertStructure(this.envelope.payload, options.now)
+    assertNotBefore(this.envelope.payload.nbf, options.now)
     await verifySignature(
       this.envelope,
       options.verifierResolver,
@@ -219,8 +220,9 @@ export class Delegation {
 /**
  *
  * @param {import('./types.js').DelegationPayload} payload
+ * @param {number} [now]
  */
-function assertStructure(payload) {
+function assertStructure(payload, now) {
   didParse(payload.iss)
   didParse(payload.aud)
 
@@ -229,7 +231,7 @@ function assertStructure(payload) {
   }
 
   assertIsValidCommand(payload.cmd)
-  assertExpiration(payload.exp)
+  assertExpiration(payload.exp, now)
   assertNonce(payload.nonce)
 
   // assertPolicy(payload.pol)
