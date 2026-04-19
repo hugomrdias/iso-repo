@@ -44,17 +44,13 @@
       "types": "./dist/src/varsig.d.ts",
       "default": "./src/varsig.js"
     },
-    "./server": {
-      "types": "./dist/src/server.d.ts",
-      "default": "./src/server.js"
-    },
     "./policy": {
       "types": "./dist/src/policy.d.ts",
       "default": "./src/policy.js"
     },
-    "./client": {
-      "types": "./dist/src/client.d.ts",
-      "default": "./src/client.js"
+    "./rpc": {
+      "types": "./dist/src/rpc/index.d.ts",
+      "default": "./src/rpc/index.js"
     },
     "./types": {
       "types": "./dist/src/types.d.ts"
@@ -82,14 +78,11 @@
       "store": [
         "dist/src/store"
       ],
-      "server": [
-        "dist/src/server"
-      ],
       "policy": [
         "dist/src/policy"
       ],
-      "client": [
-        "dist/src/client"
+      "rpc": [
+        "dist/src/rpc/index"
       ],
       "types": [
         "dist/src/types"

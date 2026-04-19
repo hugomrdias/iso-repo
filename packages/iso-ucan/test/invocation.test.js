@@ -45,6 +45,8 @@ inv('should fail from wrong audience', async () => {
   await store.add([delegation])
 
   const inv = await mocks.AccountCreateCap.invoke({
+    sub: mocks.bob.did,
+    iss: mocks.alice,
     args: {
       type: 'account',
       properties: {
@@ -52,8 +54,7 @@ inv('should fail from wrong audience', async () => {
       },
     },
     store,
-    sub: mocks.bob.did,
-    iss: mocks.alice,
+    verifierResolver: mocks.verifierResolver,
   })
 
   await assert.rejects(
@@ -89,6 +90,7 @@ inv('should fail from expired delegation', async () => {
       },
     },
     store,
+    verifierResolver: mocks.verifierResolver,
   })
   await delay(1000)
 
@@ -118,6 +120,7 @@ inv('should fail to invoke without proofs', async () => {
         },
       },
       store,
+      verifierResolver: mocks.verifierResolver,
     }),
     /UCAN Invocation proofs are required/
   )
@@ -137,6 +140,7 @@ inv('should invoke self signed without proofs', async () => {
       },
     },
     store,
+    verifierResolver: mocks.verifierResolver,
   })
   assert.equal(inv.delegations.length, 0)
 })
@@ -163,6 +167,7 @@ inv('should fail from invalid policy args', async () => {
         },
       },
       store,
+      verifierResolver: mocks.verifierResolver,
     }),
     /UCAN Invocation proofs are required/
   )
@@ -399,6 +404,7 @@ inv('should create proofs in correct order from store', async () => {
   })
 
   const inv = await mocks.AccountCreateCap.invoke({
+    verifierResolver: mocks.verifierResolver,
     iss: mocks.carol,
     sub: mocks.bob.did,
     aud: mocks.alice.did,

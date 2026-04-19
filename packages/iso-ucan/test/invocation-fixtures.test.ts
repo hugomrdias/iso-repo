@@ -23,7 +23,7 @@ const InvalidErrorMap: Record<string, string> = {
   'policy violation': 'UCAN Invocation invalid arguments, expected',
 }
 
-const inv = suite('invocation-fixtures').only
+const inv = suite('invocation-fixtures')
 
 for (const fixture of data.valid) {
   inv(`should validate ${fixture.name}`, async () => {

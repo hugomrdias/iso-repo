@@ -11,7 +11,6 @@ const dan = await EdDSASigner.generate()
 const AccountReadCap = Capability.from({
   schema: z.never(),
   cmd: '/account/read',
-  verifierResolver: mocks.verifierResolver,
 })
 
 proofs('direct proof', async () => {

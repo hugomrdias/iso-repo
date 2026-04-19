@@ -13,6 +13,7 @@ import type { Policy } from './types/policy'
 export type { StandardSchemaV1 } from '@standard-schema/spec'
 export type { DID, DIDURL, DIDURLObject } from 'iso-did/types'
 export type { ISigner } from 'iso-signatures/types'
+export * from './rpc/types'
 export * from './types/envelope'
 export * from './types/policy'
 export * from './types/varsig'
@@ -137,7 +138,7 @@ export interface InvocationFromOptions extends DelegationValidateOptions {
 export interface CapabilityOptions<
   Schema extends StandardSchemaV1,
   Cmd extends string = string,
-> extends DelegationValidateOptions {
+> {
   schema: Schema
   cmd: Cmd
 }
@@ -157,10 +158,7 @@ export interface CapabilityDelegateOptions<Schema extends StandardSchemaV1>
  * Invoke a capability
  */
 export interface CapabilityInvokeOptions<Schema extends StandardSchemaV1>
-  extends Omit<
-    InvocationOptions,
-    'cmd' | 'args' | 'prf' | 'verifierResolver' | 'didResolver' | 'isRevoked'
-  > {
+  extends Omit<InvocationOptions, 'cmd' | 'args' | 'prf'> {
   args: StandardSchemaV1.InferOutput<Schema>
   /**
    * Store to resolve proofs from
@@ -277,4 +275,5 @@ export type ClientOptions = {
   audience: DIDURLObject
   store: Store
   capabilities: Capability<StandardSchemaV1, string>[]
+  verifierResolver: VerifierResolver
 }

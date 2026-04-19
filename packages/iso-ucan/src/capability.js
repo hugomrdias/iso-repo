@@ -19,9 +19,6 @@ export class Capability {
   constructor(options) {
     this.schema = options.schema
     this.cmd = options.cmd
-    this.isRevoked = options.isRevoked
-    this.didResolver = options.didResolver
-    this.verifierResolver = options.verifierResolver
   }
 
   /**
@@ -64,14 +61,12 @@ export class Capability {
         args: result.value,
       })
     }
+
     return await Invocation.create({
       ...options,
       args: result.value,
       cmd: this.cmd,
       prf: proofs,
-      verifierResolver: this.verifierResolver,
-      didResolver: this.didResolver,
-      isRevoked: this.isRevoked,
     })
   }
 

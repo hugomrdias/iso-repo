@@ -38,17 +38,14 @@ export const AccountCreateCap = Capability.from({
       .strict(),
   }),
   cmd: '/account/create',
-  verifierResolver,
 })
 
 export const AccountCap = Capability.from({
   schema: z.never(),
   cmd: '/account',
-  verifierResolver,
 })
 
 export const TopCap = Capability.from({
   schema: z.never(),
   cmd: '/',
-  verifierResolver,
 })
