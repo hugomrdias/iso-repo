@@ -12,5 +12,6 @@ envelope('basic', async () => {
     store: mocks.defaultStore,
   })
 
+  // biome-ignore lint/suspicious/noConsole: test output
   console.log(JSON.stringify(ownerDelegation.toJSON(), null, 2))
 })

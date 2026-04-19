@@ -1,4 +1,10 @@
-export * from './client.js'
-export * from './command.js'
-export * from './server.js'
-export * from './types.js'
+export { defineClient } from './client.js'
+export { defineCommand } from './command.js'
+export {
+  cidSchema,
+  receipt,
+  receiptError,
+  receiptResult,
+  receiptServerError,
+} from './receipt.js'
+export { defineServer } from './server.js'

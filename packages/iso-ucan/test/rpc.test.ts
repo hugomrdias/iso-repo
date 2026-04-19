@@ -1,9 +1,6 @@
 import { assert, suite } from 'playwright-test/taps'
-import {
-  defineClient,
-  defineServer,
-  type ServerHandlers,
-} from '../src/rpc/index.js'
+import { defineClient, defineServer } from '../src/rpc/index.js'
+import type { ServerHandlers } from '../src/types.js'
 import * as Protocol from './fixtures/protocol.js'
 import * as mocks from './mocks.js'
 
