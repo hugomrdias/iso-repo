@@ -197,3 +197,221 @@ inv('should fail from invalid policy args directly', async () => {
     /UCAN Invocation invalid arguments/
   )
 })
+
+inv('should fail from root proof not self signed', async () => {
+  const store = mocks.createStore()
+  const dlg1 = await mocks.AccountCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.carol.did,
+    pol: [],
+    store,
+  })
+
+  await assert.rejects(
+    Invocation.create({
+      iss: mocks.alice,
+      sub: mocks.bob.did,
+      aud: mocks.bob.did,
+      args: {
+        type: 'accountss',
+        properties: {
+          name: 'John Doe',
+        },
+      },
+      prf: [dlg1],
+      cmd: '/account/create',
+      verifierResolver: mocks.verifierResolver,
+    }),
+    /UCAN Invocation root proof is not self-signed/
+  )
+})
+
+inv('should fail on principal alignment mismatch', async () => {
+  const store = mocks.createStore()
+
+  const dlg1 = await mocks.AccountCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
+    pol: [],
+    store,
+  })
+
+  const dlg2 = await mocks.AccountCreateCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.carol.did,
+    sub: mocks.bob.did,
+    pol: [],
+    store,
+  })
+
+  await assert.rejects(
+    Invocation.create({
+      iss: mocks.carol,
+      sub: mocks.bob.did,
+      aud: mocks.alice.did,
+      args: {
+        type: 'account',
+        properties: {
+          name: 'John Doe',
+        },
+      },
+      prf: [dlg1, dlg2],
+      cmd: '/account/create',
+      verifierResolver: mocks.verifierResolver,
+    }),
+    /UCAN Invocation principal alignment mismatch/
+  )
+})
+
+inv('should fail on subject alignment mismatch', async () => {
+  const store = mocks.createStore()
+
+  const dlg1 = await mocks.AccountCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
+    pol: [],
+    store,
+  })
+
+  const dlg2 = await mocks.AccountCreateCap.delegate({
+    iss: mocks.alice,
+    aud: mocks.carol.did,
+    sub: mocks.alice.did,
+    pol: [],
+    store,
+  })
+
+  await assert.rejects(
+    Invocation.create({
+      iss: mocks.carol,
+      sub: mocks.bob.did,
+      aud: mocks.alice.did,
+      args: {
+        type: 'account',
+        properties: {
+          name: 'John Doe',
+        },
+      },
+      prf: [dlg1, dlg2],
+      cmd: '/account/create',
+      verifierResolver: mocks.verifierResolver,
+    }),
+    /UCAN Invocation subject alignment mismatch/
+  )
+})
+
+inv('should fail on invocation command mismatch', async () => {
+  const store = mocks.createStore()
+
+  const dlg1 = await mocks.AccountCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
+    pol: [],
+    store,
+  })
+
+  const dlg2 = await mocks.AccountCreateCap.delegate({
+    iss: mocks.alice,
+    aud: mocks.carol.did,
+    sub: mocks.bob.did,
+    pol: [],
+    store,
+  })
+
+  await assert.rejects(
+    Invocation.create({
+      iss: mocks.carol,
+      sub: mocks.bob.did,
+      aud: mocks.alice.did,
+      args: {
+        type: 'account',
+        properties: {
+          name: 'John Doe',
+        },
+      },
+      prf: [dlg1, dlg2],
+      cmd: '/account',
+      verifierResolver: mocks.verifierResolver,
+    }),
+    /UCAN Invocation command mismatch/
+  )
+})
+
+inv('should fail on delegation command mismatch', async () => {
+  const store = mocks.createStore()
+
+  const dlg1 = await mocks.AccountCreateCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
+    pol: [],
+    store,
+  })
+
+  const dlg2 = await mocks.AccountCap.delegate({
+    iss: mocks.alice,
+    aud: mocks.carol.did,
+    sub: mocks.bob.did,
+    pol: [],
+    store,
+  })
+
+  await assert.rejects(
+    Invocation.create({
+      iss: mocks.carol,
+      sub: mocks.bob.did,
+      aud: mocks.alice.did,
+      args: {
+        type: 'account',
+        properties: {
+          name: 'John Doe',
+        },
+      },
+      prf: [dlg1, dlg2],
+      cmd: '/account',
+      verifierResolver: mocks.verifierResolver,
+    }),
+    /UCAN Invocation command mismatch/
+  )
+})
+
+inv('should create proofs in correct order from store', async () => {
+  const store = mocks.createStore()
+
+  const dlg1 = await mocks.AccountCap.delegate({
+    iss: mocks.bob,
+    aud: mocks.alice.did,
+    sub: mocks.bob.did,
+    pol: [],
+    store,
+  })
+
+  const dlg2 = await mocks.AccountCreateCap.delegate({
+    iss: mocks.alice,
+    aud: mocks.carol.did,
+    sub: mocks.bob.did,
+    pol: [],
+    store,
+  })
+
+  const inv = await mocks.AccountCreateCap.invoke({
+    iss: mocks.carol,
+    sub: mocks.bob.did,
+    aud: mocks.alice.did,
+    args: {
+      type: 'account',
+      properties: {
+        name: 'John Doe',
+      },
+    },
+    store,
+  })
+
+  assert.equal(inv.delegations.length, 2)
+  assert.equal(inv.delegations[0].cid.toString(), dlg1.cid.toString())
+  assert.equal(inv.delegations[1].cid.toString(), dlg2.cid.toString())
+})

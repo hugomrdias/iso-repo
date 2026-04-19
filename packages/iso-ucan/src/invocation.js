@@ -192,14 +192,15 @@ export function assertProofs(payload, proofs) {
     throw new Error("UCAN Invocation couldn't resolve all proofs CIDs")
   }
 
-  const lastProof = proofs[proofs.length - 1]
-  const issuerDid = didParse(lastProof.envelope.payload.iss).did
-  if (issuerDid !== lastProof.envelope.payload.sub) {
+  const rootProof = proofs[0]
+  const issuerDid = didParse(rootProof.iss).did
+  if (issuerDid !== rootProof.sub) {
     throw new Error('UCAN Invocation root proof is not self-signed')
   }
 
   for (let index = 0; index < proofs.length; index++) {
     const current = proofs[index].envelope.payload
+
     const currentAudience = didParse(current.aud)
     const currentSubject = didParse(current.sub ?? payload.sub)
 
@@ -210,12 +211,13 @@ export function assertProofs(payload, proofs) {
     }
 
     const nextProof = proofs[index + 1]
+
     /** @type {import("./types.js").Payload} */
     let next
     if (nextProof) {
       next = nextProof.envelope.payload
     } else {
-      next = payload
+      next = payload // checks against the invocation payload
     }
 
     const nextIssuer = didParse(next.iss)

@@ -128,14 +128,28 @@ export class Store {
   }
 
   /**
-   * Resolve a single chain of proofs ending with a root (subject === issuer).
-   * Returns the first such chain found (depth-first).
+   * Resolve the first such chain found (depth-first), ordered from root to leaf.
+   *
+   * Cycles are detected via a per-path visited set of delegation CIDs so that
+   * self-delegations or other loops can be skipped without recursing forever.
    *
    * @param {import('./types.js').StoreProofsOptions} options
    * @returns {Promise<Delegation[]>}
    */
   async chain({ aud, sub, cmd, args }) {
-    // console.log('🚀 ~ aud', aud, 'sub', sub, 'cmd', cmd)
+    const path = await this.#chain({ aud, sub, cmd, args }, new Set())
+    return path ? path.reverse() : []
+  }
+
+  /**
+   * Internal depth-first search for a delegation chain. Returns the path in
+   * leaf-to-root order, or `null` if no path exists.
+   *
+   * @param {import('./types.js').StoreProofsOptions} options
+   * @param {Set<string>} visited - delegation CIDs already on the current path
+   * @returns {Promise<Delegation[] | null>}
+   */
+  async #chain({ aud, sub, cmd, args }, visited) {
     const parents = parentCmds(cmd)
 
     const sources = merge(
@@ -147,28 +161,39 @@ export class Store {
       if (!parents.includes(proof.cmd)) continue
       if (!validate(args, proof.pol)) continue
 
+      const cidStr = proof.cid.toString()
+      if (visited.has(cidStr)) continue
+
+      const issDid = didParse(proof.iss).did
+
       // If root, return this proof as the end of the path
-      if (proof.sub === didParse(proof.iss).did) {
-        // console.log('🚀 ~ found root:', proof.iss, proof.sub, proof.cmd)
+      if (proof.sub === issDid) {
         return [proof]
       }
 
-      // Otherwise, go deeper and prepend this proof if a path is found
-      // console.log('🚀 ~ trying deeper:', proof.iss, proof.sub, proof.cmd)
-      const nextPath = await this.chain({
-        aud: didParse(proof.iss).did,
-        sub: proof.sub ? proof.sub : sub,
-        cmd: proof.cmd,
-        args,
-      })
+      // Skip non-root self-delegations (iss === aud). They never add
+      // capabilities a chain wouldn't already have through the predecessor
+      // delegation, and following them only lengthens the resulting chain.
+      if (issDid === proof.aud) continue
+
+      visited.add(cidStr)
+      const nextPath = await this.#chain(
+        {
+          aud: issDid,
+          sub: proof.sub ? proof.sub : sub,
+          cmd: proof.cmd,
+          args,
+        },
+        visited
+      )
+      visited.delete(cidStr)
+
       if (nextPath?.length) {
         return [proof, ...nextPath]
       }
-      // console.log('🚀 ~ no path found')
     }
 
-    // No path found
-    return []
+    return null
   }
 }
 
