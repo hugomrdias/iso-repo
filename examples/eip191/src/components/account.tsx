@@ -1,18 +1,49 @@
 import { DID } from 'iso-did'
+import { MemoryDriver } from 'iso-kv/drivers/memory.js'
 import { EdDSASigner } from 'iso-signatures/signers/eddsa.js'
 import { EIP191Signer, type Provider } from 'iso-signatures/signers/eip191.js'
+import * as EdDSA from 'iso-signatures/verifiers/eddsa.js'
+import * as EIP191 from 'iso-signatures/verifiers/eip191.js'
+import { Resolver } from 'iso-signatures/verifiers/resolver.js'
+import { Capability } from 'iso-ucan/capability'
 import type { Delegation } from 'iso-ucan/delegation'
 import { Invocation } from 'iso-ucan/invocation'
+import { Store } from 'iso-ucan/store'
 import { useCallback, useEffect, useState } from 'react'
 import { useAccount, useDisconnect } from 'wagmi'
-import { CapAccount } from '../../worker/capabilities'
-import * as client from '../client'
+import { z } from 'zod/v4'
 
 const audience = 'did:key:z6MkmJceVoQSHs45cReEXoLtWm1wosCG8RLxfKwhxoqzoTkC'
 
 const agent = await EdDSASigner.import(
   'gCYA//n3JI0gzjSa+w2RvMVDgO8M1a9iCaJjjM+n3PB4ZQ=='
 )
+
+export const resolver = new Resolver({
+  ...EdDSA.verifier,
+  ...EIP191.verifier,
+})
+export const store = new Store(new MemoryDriver())
+export const CapAccountCreate = Capability.from({
+  schema: z.object({
+    type: z.string(),
+    properties: z
+      .object({
+        name: z.string(),
+      })
+      .strict(),
+  }),
+  cmd: '/account/create',
+})
+
+export const CapAccount = Capability.from({
+  schema: z
+    .object({
+      name: z.string(),
+    })
+    .strict(),
+  cmd: '/account',
+})
 
 export function Account() {
   const { connector } = useAccount()
@@ -38,9 +69,10 @@ export function Account() {
       aud: agent.did,
       sub: signer.did,
       pol: [],
+      store,
     })
 
-    await client.store.add([delegation])
+    await store.add([delegation])
     setDelegation(delegation)
   }, [signer])
 
@@ -53,7 +85,8 @@ export function Account() {
       iss: agent,
       aud: aud.did,
       sub: signer.did,
-      store: client.store,
+      store,
+      verifierResolver: resolver,
       args: {
         name: 'hello',
       },
@@ -64,8 +97,8 @@ export function Account() {
     const inv = await Invocation.from({
       bytes: invocation.bytes,
       audience: aud,
-      verifierResolver: client.resolver,
-      resolveProof: (cid) => client.store.resolveProof(cid),
+      verifierResolver: resolver,
+      resolveProof: (cid) => store.resolveProof(cid),
     })
 
     console.log('🚀 ~ Account ~ inv:', inv)

@@ -12,7 +12,12 @@ export function WalletOptions() {
       key={connector.uid}
       onClick={async () => {
         const provider = (await connector.getProvider()) as EIP1193Provider
-        await getOrInstallSnap(provider, 'local:http://localhost:8080', '*')
+        await getOrInstallSnap(
+          provider,
+          'local:http://localhost:8080',
+          '*',
+          true
+        )
         connect({ connector, chainId: mainnet.id })
       }}
     />
