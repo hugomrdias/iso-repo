@@ -63,7 +63,7 @@
     "@ledgerhq/hw-transport": "^6.35.0"
   },
   "devDependencies": {
-    "@ledgerhq/hw-transport-webhid": "~6.34.0",
+    "@ledgerhq/hw-transport-webhid": "~6.35.0",
     "@types/node": "^25.6.0",
     "@types/w3c-web-hid": "^1.0.7",
     "@wagmi/core": "~3.4.4",
