@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.99.0",
-    "filsnap-adapter": "^3.3.8",
+    "filsnap-adapter": "^3.3.10",
     "iso-base": "workspace:*",
     "iso-did": "workspace:*",
     "iso-kv": "workspace:*",
