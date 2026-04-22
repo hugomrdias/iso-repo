@@ -82,6 +82,14 @@ export class NetworkError extends RequestError {
   name = 'NetworkError'
 
   /**
+   *
+   * @param {ErrorOptions} options
+   */
+  constructor(options = {}) {
+    super('Network request failed', options)
+  }
+
+  /**
    * Check if a value is a NetworkError
    *
    * @param {unknown} value
@@ -334,7 +342,7 @@ export async function request(resource, options = {}) {
     }
 
     return {
-      error: new NetworkError(err.message, { cause: err.cause }),
+      error: new NetworkError({ cause: err.cause }),
     }
   }
 }
