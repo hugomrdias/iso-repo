@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.99.0",
-    "filsnap-adapter": "^3.3.8",
+    "filsnap-adapter": "^3.3.10",
     "iso-base": "workspace:*",
     "iso-did": "workspace:*",
     "iso-kv": "workspace:*",
@@ -21,19 +21,18 @@
     "iso-ucan": "workspace:*",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "viem": "~2.48.1",
-    "wagmi": "^3.6.3",
+    "viem": "~2.48.4",
+    "wagmi": "^3.6.4",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.31.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "globals": "^17.5.0",
     "hono": "^4.12.14",
     "typescript": "~5.9.3",
-    "vite": "^8.0.8",
-    "wrangler": "^4.83.0"
+    "vite": "^8.0.9",
+    "wrangler": "^4.84.1"
   }
 }
