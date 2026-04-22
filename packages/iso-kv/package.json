@@ -62,7 +62,7 @@
     "playwright-test": "^14.1.13",
     "quick-lru": "^7.3.0",
     "tempy": "^3.2.0",
-    "typescript": "5.9.3"
+    "typescript": "6.0.3"
   },
   "publishConfig": {
     "provenance": true
