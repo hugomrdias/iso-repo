@@ -189,7 +189,7 @@ test('should handle network error', async () => {
   const { error } = await request('https://local.dev/network-error')
 
   if (error) {
-    assert.equal(error.message, 'Failed to fetch')
+    assert.equal(error.message, 'Network request failed')
     assert.equal(error.name, 'NetworkError')
   } else {
     assert.fail('should fail')
@@ -244,7 +244,7 @@ test('should retry failed network error', async () => {
   })
 
   if (error) {
-    assert.equal(error.message, 'Failed to fetch')
+    assert.equal(error.message, 'Network request failed')
     assert.equal(count, 3)
   } else {
     assert.fail('should fail')

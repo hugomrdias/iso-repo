@@ -236,5 +236,5 @@ test('should return fetch error', async () => {
   const { error } = await resolve('fetch-error.io')
 
   assert.ok(NetworkError.is(error))
-  assert.deepEqual(error.message, 'Failed to fetch')
+  assert.deepEqual(error.message, 'Network request failed')
 })
