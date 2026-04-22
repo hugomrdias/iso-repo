@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.2.0...iso-web-v2.2.1) (2026-04-22)
+
+
+### Bug Fixes
+
+* enhance NetworkError constructor to accept options ([8334aa5](https://github.com/hugomrdias/iso-repo/commit/8334aa5047b24d34842278eda7dde014130c40c7))
+
 ## [2.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.1.1...iso-web-v2.2.0) (2026-04-10)
 
 
