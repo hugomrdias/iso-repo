@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import { type Connector, useConnect } from 'wagmi'
 import { mainnet } from 'wagmi/chains'
 
+const SNAP_ID = 'npm:filsnap' //'local:http://localhost:8080'
+
 export function WalletOptions() {
   const { connectors, connect } = useConnect()
 
@@ -12,12 +14,7 @@ export function WalletOptions() {
       key={connector.uid}
       onClick={async () => {
         const provider = (await connector.getProvider()) as EIP1193Provider
-        await getOrInstallSnap(
-          provider,
-          'local:http://localhost:8080',
-          '*',
-          true
-        )
+        await getOrInstallSnap(provider, SNAP_ID, '*', true)
         connect({ connector, chainId: mainnet.id })
       }}
     />

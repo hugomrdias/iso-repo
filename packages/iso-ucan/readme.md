@@ -1,6 +1,23 @@
 # iso-ucan [![NPM Version](https://img.shields.io/npm/v/iso-ucan.svg)](https://www.npmjs.com/package/iso-ucan) [![License](https://img.shields.io/npm/l/iso-ucan.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-ucan](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-ucan.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-ucan.yml)
 
-> Isomorphic UCAN
+> Isomorphic UCAN primitives for delegations, invocations, proof storage, and
+> typed RPC.
+
+## Overview
+
+UCAN is a local-first authorization model where permissions are
+cryptographically signed, delegated, and verified without relying on a central
+authority. See [ucan.xyz](https://ucan.xyz/) for more background.
+
+`iso-ucan` provides:
+
+- Typed capabilities backed by schema validation.
+- Delegation and invocation builders for UCAN authorization flows.
+- Proof storage with pluggable `iso-kv` drivers.
+- Signer and verifier support through `iso-signatures`.
+- EIP-191 wallet signing support through `iso-signatures` `EIP191Signer`.
+- Filsnap-powered UCAN signature insights in MetaMask signature popups.
+- A typed RPC layer for request/response APIs built on UCAN invocations.
 
 ## Install
 
@@ -43,38 +60,58 @@ const invoker = await EdDSASigner.generate()
 const nowInSeconds = Math.floor(Date.now() / 1000)
 
 const ownerDelegation = await AccountCap.delegate({
-iss: owner,
-aud: bob,
-sub: owner,
-pol: [],
-exp: nowInSeconds + 1000,
+  iss: owner,
+  aud: bob,
+  sub: owner,
+  pol: [],
+  exp: nowInSeconds + 1000,
 })
 
 await store.set(ownerDelegation)
 
 const bobDelegation = await AccountCap.delegate({
-iss: bob,
-aud: invoker,
-sub: owner,
-pol: [],
-exp: nowInSeconds + 1000,
+  iss: bob,
+  aud: invoker,
+  sub: owner,
+  pol: [],
+  exp: nowInSeconds + 1000,
 })
 
 await store.set(bobDelegation)
 
 const invocation = await AccountCreateCap.invoke({
-iss: invoker,
-sub: owner,
-args: {
+  iss: invoker,
+  sub: owner,
+  args: {
     type: 'account',
     properties: {
-    name: 'John Doe',
+      name: 'John Doe',
     },
-},
-store,
-exp: nowInSeconds + 1000,
+  },
+  store,
+  exp: nowInSeconds + 1000,
 })
 ```
+
+## EIP-191 wallet signing
+
+`iso-ucan` can use EIP-191 wallet signatures through `EIP191Signer` from
+`iso-signatures`. That lets UCAN delegations and invocations be issued by an
+Ethereum account exposed through an EIP-1193 provider, such as an injected
+MetaMask wallet, while verification is handled by the matching EIP-191 verifier
+from `iso-signatures`.
+
+[`examples/eip191`](../../examples/eip191) shows this flow in a browser web
+app. It uses `wagmi` to connect the wallet, wraps the provider in
+`EIP191Signer`, then creates and verifies UCAN delegations and invocations
+directly in the browser.
+
+The example uses `filsnap-adapter` to install or enable
+[Filsnap](https://github.com/filecoin-project/filsnap), the Filecoin Wallet
+MetaMask Snap. Filsnap supports UCAN signature insights for EIP-191 signers, so
+when the app asks MetaMask to sign a UCAN delegation, the MetaMask signature
+popup can show a readable summary of the issuer, audience, subject, command,
+expiration, and raw payload.
 
 ## RPC
 
