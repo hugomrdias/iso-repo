@@ -30,7 +30,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "globals": "^17.5.0",
-    "hono": "^4.12.14",
+    "hono": "^4.12.16",
     "typescript": "~5.9.3",
     "vite": "^8.0.9",
     "wrangler": "^4.84.1"
