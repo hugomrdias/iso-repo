@@ -5,7 +5,6 @@ import { suite } from 'playwright-test/taps'
 import { temporaryDirectory } from 'tempy'
 import { z } from 'zod/v4'
 import { Conf } from '../src/index.js'
-import { parse, stringify } from '../src/json.js'
 
 const schema = z
   .object({
@@ -124,31 +123,62 @@ schemaTest('reset restores defaults', () => {
 const jsonSuite = suite('Conf json')
 const { test: jsonTest } = jsonSuite
 
-jsonTest('extended types round-trip', () => {
-  const value = {
-    url: new URL('https://example.com'),
-    map: new Map([['a', 1n]]),
-    bytes: new Uint8Array([1, 2, 3]),
-    big: 1n,
-    set: new Set([1, 2]),
-    regex: /foo/i,
-  }
-
-  assert.deepEqual(parse(stringify(value)), value)
-})
-
-jsonTest('persists extended types in passthrough keys', () => {
-  const config = createConf()
-  const url = new URL('https://example.com')
-
-  config.set('website', url)
-  const next = new Conf({
+/**
+ * @param {Conf<typeof schema>} config
+ * @returns {Conf<typeof schema>}
+ */
+function reloadConf(config) {
+  return new Conf({
     projectName: 'iso-conf-test',
     cwd: pathFor(config),
     schema,
   })
+}
 
-  assert.equal(String(next.get('website')), 'https://example.com/')
+jsonTest('persists extended types through Conf', () => {
+  const config = createConf()
+  const url = new URL('https://example.com/path')
+  const map = new Map([['a', 1n]])
+  const bytes = new Uint8Array([1, 2, 3])
+  const arrayBuffer = new ArrayBuffer(3)
+  new Uint8Array(arrayBuffer).set([7, 8, 9])
+  const nodeBuffer = { type: 'Buffer', data: [4, 5, 6] }
+  const tags = new Set([1, 2])
+  const pattern = /foo/i
+
+  config.set('website', url)
+  config.set('mapping', map)
+  config.set('bytes', bytes)
+  config.set('arrayBuffer', arrayBuffer)
+  config.set('nodeBuffer', nodeBuffer)
+  config.set('big', 1n)
+  config.set('tags', tags)
+  config.set('pattern', pattern)
+
+  const next = reloadConf(config)
+
+  assert.equal(String(next.get('website')), 'https://example.com/path')
+  assert.deepEqual(next.get('mapping'), map)
+  assert.deepEqual(next.get('bytes'), bytes)
+  assert.deepEqual(next.get('arrayBuffer'), new Uint8Array([7, 8, 9]))
+  assert.deepEqual(next.get('nodeBuffer'), new Uint8Array([4, 5, 6]))
+  assert.equal(next.get('big'), 1n)
+  assert.deepEqual(next.get('tags'), tags)
+  assert.deepEqual(next.get('pattern'), pattern)
+})
+
+jsonTest('persists nested extended types through Conf', () => {
+  const config = createConf()
+  const value = {
+    nested: { big: 2n },
+    tags: new Set(['a', 1, new Set(['c', 'd'])]),
+    pattern: /^[\s\w!,?àáâãçèéêíïñóôõöú-]+$/,
+  }
+
+  config.set('extended', value)
+  const next = reloadConf(config)
+
+  assert.deepEqual(next.get('extended'), value)
 })
 
 const hooksSuite = suite('Conf change hooks')
