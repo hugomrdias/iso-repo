@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.3.1...iso-base-v4.4.0) (2026-05-29)
+
+
+### Features
+
+* **iso-base:** add shared extended JSON serializer ([d570beb](https://github.com/hugomrdias/iso-repo/commit/d570beb2c6551f4ff40956aae084ed7112bcc1c7))
+
 ## [4.3.1](https://github.com/hugomrdias/iso-repo/compare/iso-base-v4.3.0...iso-base-v4.3.1) (2026-03-15)
 
 
