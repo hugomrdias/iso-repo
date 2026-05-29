@@ -13,7 +13,7 @@
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true ."
   },
   "dependencies": {
-    "@hono/node-server": "^1.13.7",
+    "@hono/node-server": "^2.0.4",
     "hono": "^4.12.14",
     "iso-base": "workspace:*",
     "iso-kv": "workspace:*",
@@ -23,6 +23,6 @@
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.3"
   }
 }

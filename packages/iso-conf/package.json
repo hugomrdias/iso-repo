@@ -52,15 +52,15 @@
     "@standard-schema/spec": "^1.1.0",
     "@standard-schema/utils": "^0.3.0",
     "atomically": "^2.0.3",
-    "dot-prop": "^9.0.0",
-    "env-paths": "^3.0.0",
+    "dot-prop": "^10.1.0",
+    "env-paths": "^4.0.0",
     "iso-base": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "playwright-test": "^14.1.13",
     "tempy": "^3.2.0",
-    "typescript": "5.9.3",
+    "typescript": "6.0.3",
     "zod": "^4.3.6"
   },
   "publishConfig": {
