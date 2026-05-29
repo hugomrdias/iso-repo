@@ -4,6 +4,11 @@
     "emitDeclarationOnly": true,
     "outDir": "dist"
   },
+  "references": [
+    {
+      "path": "../iso-base"
+    }
+  ],
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
   "typedocOptions": {
