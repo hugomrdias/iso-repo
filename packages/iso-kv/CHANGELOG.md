@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.1.1...iso-kv-v3.2.0) (2026-05-29)
+
+
+### Features
+
+* **iso-base:** add shared extended JSON serializer ([d570beb](https://github.com/hugomrdias/iso-repo/commit/d570beb2c6551f4ff40956aae084ed7112bcc1c7))
+
 ## [3.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.1.0...iso-kv-v3.1.1) (2025-11-12)
 
 
