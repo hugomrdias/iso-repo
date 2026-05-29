@@ -92,6 +92,7 @@ export function Account() {
       },
     })
 
+    // biome-ignore lint/suspicious/noConsole: test output
     console.log('🚀 ~ Account ~ invocation:', invocation)
 
     const inv = await Invocation.from({
@@ -101,6 +102,7 @@ export function Account() {
       resolveProof: (cid) => store.resolveProof(cid),
     })
 
+    // biome-ignore lint/suspicious/noConsole: test output
     console.log('🚀 ~ Account ~ inv:', inv)
   }, [signer])
 

@@ -39,6 +39,7 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-websocket')  ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ucan') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ledger') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-conf') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/configs') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/docs')
     runs-on: ubuntu-latest
@@ -71,5 +72,6 @@ jobs:
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-websocket') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ucan') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-ledger') ||
+      contains(fromJson(needs.release.outputs.paths_released), 'packages/iso-conf') ||
       contains(fromJson(needs.release.outputs.paths_released), 'packages/docs')
     uses: ./.github/workflows/reusable-docs.yml

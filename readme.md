@@ -6,6 +6,7 @@
 
 - [iso-base](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-base) - Isomorphic utilities for webcrypto, rfc4648 encoding, leb128 encoding, utf8 encoding and buffer sources.
 - [iso-did](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-did) - Isomorphic did core, did key and did web tooling.
+- [iso-conf](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-conf) - Simple config handling with Standard Schema validation and extended JSON serialization
 - [iso-kv](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-kv) - `iso-kv` is a simple key-value storage with support for multiple backend adapters (web storage, indexeddb, memory, sql, json file, etc)
 - [iso-passkeys](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-passkeys) - Isomorphic passkeys tooling
 - [iso-signatures](https://github.com/hugomrdias/iso-repo/tree/main/packages/iso-signatures) - Isomorphic signatures tooling

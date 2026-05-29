@@ -11,7 +11,8 @@
       "packages/iso-kv",
       "packages/iso-websocket",
       "packages/iso-ucan",
-      "packages/iso-ledger"
+      "packages/iso-ledger",
+      "packages/iso-conf"
     ],
     "excludeExternals": true,
     "sourceLinkExternal": true,

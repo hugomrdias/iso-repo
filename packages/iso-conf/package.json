@@ -1,0 +1,76 @@
+{
+  "name": "iso-conf",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Simple config handling with Standard Schema validation and extended JSON serialization",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-conf",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-conf"
+  },
+  "bugs": {
+    "url": "https://github.com/hugomrdias/iso-repo/issues"
+  },
+  "keywords": [
+    "config",
+    "conf",
+    "settings",
+    "storage",
+    "standard-schema"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts"
+    }
+  },
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "types": [
+        "dist/src/types"
+      ]
+    }
+  },
+  "files": [
+    "src",
+    "dist/src/**/*.d.ts",
+    "dist/src/**/*.d.ts.map"
+  ],
+  "scripts": {
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
+    "test": "pnpm run test:node",
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node"
+  },
+  "dependencies": {
+    "@standard-schema/spec": "^1.1.0",
+    "@standard-schema/utils": "^0.3.0",
+    "atomically": "^2.0.3",
+    "dot-prop": "^9.0.0",
+    "env-paths": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "playwright-test": "^14.1.13",
+    "tempy": "^3.2.0",
+    "typescript": "5.9.3",
+    "zod": "^4.3.6"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*"
+    ]
+  }
+}

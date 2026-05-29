@@ -1,9 +1,10 @@
-import { useState } from 'react'
+// import { useState } from 'react'
 import './app.css'
 import { useAccount } from 'wagmi'
-// import { client } from './client'
 import { Account } from './components/account'
 import { WalletOptions } from './components/wallet-options'
+
+// import { client } from './client'
 
 function ConnectWallet() {
   const { isConnected } = useAccount()
@@ -11,7 +12,7 @@ function ConnectWallet() {
   return <WalletOptions />
 }
 function App() {
-  const [name, setName] = useState('unknown')
+  // const [name, setName] = useState('unknown')
 
   return (
     <>
