@@ -21,15 +21,25 @@ import { parse, stringify } from './json.js'
  * } from './types.js'
  */
 
-/** @template T */
+/**
+ * Creates a null-prototype object for storing config data.
+ *
+ * @template T
+ */
 const createPlainObject = () => /** @type {T} */ (Object.create(null))
 
-/** @param {unknown} data */
+/**
+ * Returns whether a value is not `undefined`.
+ *
+ * @param {unknown} data
+ */
 const isExist = (data) => data !== undefined
 
 /**
- * @param {string} key
- * @param {unknown} value
+ * Ensures a value can be serialized to JSON.
+ *
+ * @param {string} key - Config key being set.
+ * @param {unknown} value - Value being set.
  */
 const checkValueType = (key, value) => {
   const nonJsonTypes = new Set(['undefined', 'symbol', 'function'])
@@ -43,8 +53,10 @@ const checkValueType = (key, value) => {
 }
 
 /**
- * @param {StandardSchemaV1} schema
- * @param {unknown} value
+ * Validates a value against a Standard Schema.
+ *
+ * @param {StandardSchemaV1} schema - Schema to validate against.
+ * @param {unknown} value - Value to validate.
  */
 const validateSchema = (schema, value) => {
   const result = schema['~standard'].validate(value)
@@ -71,12 +83,16 @@ const validateSchema = (schema, value) => {
 }
 
 /**
+ * Simple config handling for your app or module.
+ *
  * @template {StandardSchemaV1} Schema
  */
 export class Conf {
+  /** Absolute path to the config file. */
   /** @type {string} */
   path
 
+  /** Event target used for change notifications. */
   /** @type {EventTarget} */
   events
 
@@ -99,7 +115,9 @@ export class Conf {
   #debouncedChangeHandler
 
   /**
-   * @param {Options<Schema>} [partialOptions]
+   * Creates a new config store.
+   *
+   * @param {Options<Schema>} [partialOptions] - Config options.
    */
   constructor(partialOptions = {}) {
     const options = this.#prepareOptions(partialOptions)
@@ -116,8 +134,10 @@ export class Conf {
   }
 
   /**
-   * @param {string} key
-   * @param {unknown} [defaultValue]
+   * Get a config item.
+   *
+   * @param {string} key - Item key. Supports dot notation when enabled.
+   * @param {unknown} [defaultValue] - Value returned when the item does not exist.
    */
   get(key, defaultValue) {
     if (this.#options.accessPropertiesByDotNotation) {
@@ -130,8 +150,10 @@ export class Conf {
   }
 
   /**
-   * @param {Record<string, unknown> | string} key
-   * @param {unknown} [value]
+   * Set one or more config items.
+   *
+   * @param {Record<string, unknown> | string} key - Item key or object of items to set.
+   * @param {unknown} [value] - Value to set when `key` is a string.
    */
   set(key, value) {
     if (typeof key !== 'string' && typeof key !== 'object') {
@@ -177,7 +199,9 @@ export class Conf {
   }
 
   /**
-   * @param {string} key
+   * Check whether a config item exists.
+   *
+   * @param {string} key - Item key. Supports dot notation when enabled.
    */
   has(key) {
     const keyPath = String(key)
@@ -190,8 +214,12 @@ export class Conf {
   }
 
   /**
-   * @param {string} key
-   * @param {unknown} value
+   * Append an item to an array config value.
+   *
+   * Creates the array when the key does not exist.
+   *
+   * @param {string} key - Array key. Supports dot notation when enabled.
+   * @param {unknown} value - Item to append.
    */
   appendToArray(key, value) {
     const keyPath = String(key)
@@ -213,7 +241,9 @@ export class Conf {
   }
 
   /**
-   * @param {...string} keys
+   * Reset items to their schema default values.
+   *
+   * @param {...string} keys - Keys to reset.
    */
   reset(...keys) {
     for (const key of keys) {
@@ -224,7 +254,9 @@ export class Conf {
   }
 
   /**
-   * @param {string} key
+   * Delete a config item.
+   *
+   * @param {string} key - Item key. Supports dot notation when enabled.
    */
   delete(key) {
     /** @type {Record<string, unknown>} */
@@ -239,6 +271,9 @@ export class Conf {
     this.store = /** @type {StandardSchemaV1.InferOutput<Schema>} */ (store)
   }
 
+  /**
+   * Reset the config to schema default values.
+   */
   clear() {
     /** @type {Record<string, unknown>} */
     const newStore = createPlainObject()
@@ -259,9 +294,11 @@ export class Conf {
   }
 
   /**
-   * @param {string} key
-   * @param {OnDidChangeCallback} callback
-   * @returns {Unsubscribe}
+   * Watch a config key for changes.
+   *
+   * @param {string} key - Item key. Supports dot notation when enabled.
+   * @param {OnDidChangeCallback} callback - Called with `(newValue, oldValue)`.
+   * @returns {Unsubscribe} Unsubscribe function.
    */
   onDidChange(key, callback) {
     if (typeof key !== 'string') {
@@ -280,8 +317,10 @@ export class Conf {
   }
 
   /**
-   * @param {OnDidAnyChangeCallback<StandardSchemaV1.InferOutput<Schema>>} callback
-   * @returns {Unsubscribe}
+   * Watch the entire config object for changes.
+   *
+   * @param {OnDidAnyChangeCallback<StandardSchemaV1.InferOutput<Schema>>} callback - Called with `(newValue, oldValue)`.
+   * @returns {Unsubscribe} Unsubscribe function.
    */
   onDidAnyChange(callback) {
     if (typeof callback !== 'function') {
@@ -293,11 +332,16 @@ export class Conf {
     return this.#handleStoreChange(callback)
   }
 
+  /** Number of top-level config items. */
   get size() {
     return Object.keys(this.store).length
   }
 
-  /** @type {StandardSchemaV1.InferOutput<Schema>} */
+  /**
+   * Get or replace the full config object.
+   *
+   * Reading this property loads and validates the config file from disk.
+   */
   get store() {
     try {
       const data = fs.readFileSync(this.path, 'utf8')
@@ -336,6 +380,7 @@ export class Conf {
     this.events.dispatchEvent(new Event('change'))
   }
 
+  /** Iterate over config entries as `[key, value]` pairs. */
   *[Symbol.iterator]() {
     for (const [key, value] of Object.entries(this.store)) {
       yield [key, value]
@@ -344,6 +389,8 @@ export class Conf {
 
   /**
    * Close the file watcher if one exists.
+   *
+   * Useful in tests to prevent the process from hanging.
    */
   _closeWatcher() {
     if (this.#watcher) {
@@ -360,15 +407,19 @@ export class Conf {
   }
 
   /**
-   * @param {string} key
-   * @param {unknown} [defaultValue]
+   * Get a nested config value using dot notation.
+   *
+   * @param {string} key - Dot-notated key.
+   * @param {unknown} [defaultValue] - Value returned when the item does not exist.
    */
   #get(key, defaultValue) {
     return getProperty(this.store, key, defaultValue)
   }
 
   /**
-   * @param {unknown} data
+   * Parse deserialized config data and validate it.
+   *
+   * @param {unknown} data - Parsed config object.
    * @returns {StandardSchemaV1.InferOutput<Schema>}
    */
   #parseStore(data) {
@@ -377,7 +428,9 @@ export class Conf {
   }
 
   /**
-   * @param {unknown} data
+   * Validate config data against the schema when present.
+   *
+   * @param {unknown} data - Config object to validate.
    * @returns {StandardSchemaV1.InferOutput<Schema>}
    */
   #validate(data) {
@@ -390,12 +443,15 @@ export class Conf {
     )
   }
 
+  /** Ensure the config directory exists. */
   #ensureDirectory() {
     fs.mkdirSync(path.dirname(this.path), { recursive: true })
   }
 
   /**
-   * @param {StandardSchemaV1.InferOutput<Schema>} value
+   * Write config data to disk atomically.
+   *
+   * @param {StandardSchemaV1.InferOutput<Schema>} value - Config object to persist.
    */
   #write(value) {
     const data = this.#serialize(value)
@@ -424,6 +480,8 @@ export class Conf {
   }
 
   /**
+   * Subscribe to full-store change events.
+   *
    * @param {OnDidAnyChangeCallback<StandardSchemaV1.InferOutput<Schema>>} callback
    * @returns {Unsubscribe}
    */
@@ -451,7 +509,9 @@ export class Conf {
   }
 
   /**
-   * @param {() => unknown} getter
+   * Subscribe to single-key change events.
+   *
+   * @param {() => unknown} getter - Returns the current value for the watched key.
    * @param {OnDidChangeCallback} callback
    * @returns {Unsubscribe}
    */
@@ -485,6 +545,8 @@ export class Conf {
   #serialize = (value) => stringify(value, '\t')
 
   /**
+   * Normalize constructor options and apply defaults.
+   *
    * @param {Options<Schema>} partialOptions
    * @returns {Options<Schema>}
    */
@@ -526,6 +588,8 @@ export class Conf {
   }
 
   /**
+   * Capture schema default values for `reset` and `clear`.
+   *
    * @param {Options<Schema>} options
    */
   #applyDefaultValues(options) {
@@ -542,6 +606,8 @@ export class Conf {
   }
 
   /**
+   * Resolve the absolute config file path.
+   *
    * @param {Options<Schema>} options
    * @returns {string}
    */
@@ -556,6 +622,7 @@ export class Conf {
     )
   }
 
+  /** Merge schema defaults into the on-disk config when needed. */
   #initializeStore() {
     const fileStore = this.store
     let storeWithDefaults = Object.assign(createPlainObject(), fileStore)
@@ -571,6 +638,7 @@ export class Conf {
     }
   }
 
+  /** Watch the config file for external changes. */
   #watch() {
     this.#ensureDirectory()
 
@@ -611,8 +679,10 @@ export class Conf {
 }
 
 /**
- * @param {() => void} fn
- * @param {number} wait
+ * Debounce a function call.
+ *
+ * @param {() => void} fn - Function to debounce.
+ * @param {number} wait - Delay in milliseconds.
  */
 function debounce(fn, wait) {
   /** @type {ReturnType<typeof setTimeout> | undefined} */

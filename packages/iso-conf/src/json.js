@@ -1,6 +1,8 @@
 // JSON.stringify and JSON.parse with URL, Map and Uint8Array type support.
 
 /**
+ * Recursively converts extended types into JSON-safe tagged objects.
+ *
  * @param {any} value
  * @returns {any}
  */
@@ -59,10 +61,10 @@ const transform = (value) => {
 }
 
 /**
- * Json replacer with URL, Map, Set, BitInt, RegExp and Uint8Array type support.
+ * JSON replacer with URL, Map, Set, bigint, RegExp and Uint8Array support.
  *
- * @param {string} _k
- * @param {any} v
+ * @param {string} _k - Property key.
+ * @param {any} v - Property value.
  */
 export const replacer = (_k, v) => {
   if (v instanceof URL) {
@@ -93,10 +95,10 @@ export const replacer = (_k, v) => {
 }
 
 /**
- * Json reviver with URL, Map, Set, BitInt, RegExp and Uint8Array type support.
+ * JSON reviver with URL, Map, Set, bigint, RegExp and Uint8Array support.
  *
- * @param {string} _k - key
- * @param {any} v - value
+ * @param {string} _k - Property key.
+ * @param {any} v - Property value.
  */
 export const reviver = (_k, v) => {
   if (!v) return v
@@ -110,11 +112,17 @@ export const reviver = (_k, v) => {
 }
 
 /**
- * @param {any} value
- * @param {number|string} [space]
+ * Serialize a value to extended JSON.
+ *
+ * @param {any} value - Value to serialize.
+ * @param {number|string} [space] - Indentation passed to `JSON.stringify`.
  */
 export const stringify = (value, space) =>
   JSON.stringify(transform(value), replacer, space)
 
-/** @param {string} value */
+/**
+ * Parse extended JSON into native JavaScript values.
+ *
+ * @param {string} value - JSON string to parse.
+ */
 export const parse = (value) => JSON.parse(value, reviver)
