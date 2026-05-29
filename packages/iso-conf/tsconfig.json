@@ -2,7 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "types": ["node"],
+    "references": [
+      {
+        "path": "../iso-base"
+      }
+    ]
   },
   "include": ["src", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],

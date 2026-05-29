@@ -21,7 +21,7 @@
     "iso-ucan": "workspace:*",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "viem": "~2.48.4",
+    "viem": "~2.51.3",
     "wagmi": "^3.6.4",
     "zod": "^4.3.6"
   },
@@ -31,7 +31,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "globals": "^17.5.0",
     "hono": "^4.12.14",
-    "typescript": "~5.9.3",
+    "typescript": "~6.0.3",
     "vite": "^8.0.9",
     "wrangler": "^4.84.1"
   }
