@@ -3,7 +3,7 @@
  * @typedef {import('../types.js').KvKey} KvKey
  */
 
-import { parse, stringify } from '../json.js'
+import { parse, stringify } from 'iso-base/json'
 import { MemoryDriver } from './memory.js'
 
 /**

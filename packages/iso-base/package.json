@@ -64,6 +64,10 @@
       "types": "./dist/src/buffer.d.ts",
       "default": "./src/buffer.js"
     },
+    "./json": {
+      "types": "./dist/src/json.d.ts",
+      "default": "./src/json.js"
+    },
     "./types": {
       "types": "./dist/src/types.d.ts"
     }
@@ -103,6 +107,9 @@
       ],
       "buffer": [
         "dist/src/buffer"
+      ],
+      "json": [
+        "dist/src/json"
       ],
       "types": [
         "dist/src/types"

@@ -7,7 +7,7 @@ import { getDotPath, SchemaError } from '@standard-schema/utils'
 import { writeFileSync as atomicWriteFileSync } from 'atomically'
 import { deleteProperty, getProperty, hasProperty, setProperty } from 'dot-prop'
 import envPaths from 'env-paths'
-import { parse, stringify } from './json.js'
+import { parse, stringify } from 'iso-base/json'
 
 /**
  * @import {StandardSchemaV1} from '@standard-schema/spec'

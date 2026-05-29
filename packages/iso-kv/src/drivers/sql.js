@@ -1,5 +1,5 @@
+import { parse, stringify } from 'iso-base/json'
 import { Kysely } from 'kysely'
-import { parse, stringify } from '../json.js'
 
 /**
  * @typedef {import('../types.js').DriverAsync} DriverAsync

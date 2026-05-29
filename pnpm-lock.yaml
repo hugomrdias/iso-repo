@@ -269,6 +269,9 @@ importers:
       env-paths:
         specifier: ^3.0.0
         version: 3.0.0
+      iso-base:
+        specifier: workspace:^
+        version: link:../iso-base
     devDependencies:
       '@types/node':
         specifier: ^25.6.0
@@ -343,6 +346,9 @@ importers:
       idb-keyval:
         specifier: ^6.2.1
         version: 6.2.4
+      iso-base:
+        specifier: workspace:^
+        version: link:../iso-base
       kysely:
         specifier: ^0.28.16
         version: 0.28.17

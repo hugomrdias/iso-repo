@@ -18,7 +18,8 @@
       "src/varint.js",
       "src/ec-compression.js",
       "src/leb128.js",
-      "src/buffer.js"
+      "src/buffer.js",
+      "src/json.js"
     ],
     "includeVersion": true,
     "excludeExternals": true,

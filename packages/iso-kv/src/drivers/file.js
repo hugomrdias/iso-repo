@@ -1,5 +1,5 @@
 import Conf from 'conf'
-import { parse, stringify } from '../json.js'
+import { parse, stringify } from 'iso-base/json'
 
 /**
  * @typedef {import('../types.js').DriverSync} DriverSync
