@@ -98,10 +98,10 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js' --assets test/mocks"
   },
   "dependencies": {
-    "did-resolver": "^4.1.0",
+    "did-resolver": "^5.0.1",
     "iso-base": "workspace:^",
     "iso-web": "workspace:^",
-    "multiformats": "^13.4.1",
+    "multiformats": "^14.0.0",
     "p-race": "^3.1.0"
   },
   "devDependencies": {
@@ -111,10 +111,10 @@
     "@types/node": "^25.6.0",
     "assert": "^2.1.0",
     "mocha": "^11.7.5",
-    "msw": "2.12.4",
+    "msw": "2.14.6",
     "playwright-test": "^14.1.13",
     "type-fest": "^5.6.0",
-    "typescript": "5.9.3"
+    "typescript": "6.0.3"
   },
   "publishConfig": {
     "provenance": true

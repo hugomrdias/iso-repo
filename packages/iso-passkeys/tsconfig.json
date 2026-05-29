@@ -3,7 +3,8 @@
   "compilerOptions": {
     "emitDeclarationOnly": true,
     "outDir": "dist",
-    "erasableSyntaxOnly": false
+    "erasableSyntaxOnly": false,
+    "types": ["node", "mocha"]
   },
   "references": [
     {

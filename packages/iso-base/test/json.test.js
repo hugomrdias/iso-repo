@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict'
+import assert from 'assert'
 import { parse, stringify } from '../src/json.js'
 
 describe('json', () => {

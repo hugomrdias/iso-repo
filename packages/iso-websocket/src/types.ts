@@ -15,7 +15,7 @@ export interface WebSocketEventMap {
   retry: RetryEvent
 }
 
-export type Data = string | ArrayBufferLike | Blob | ArrayBufferView
+export type Data = BufferSource | Blob | string
 
 export type UrlProvider = string | URL | (() => string | URL)
 
