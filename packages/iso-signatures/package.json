@@ -103,8 +103,8 @@
     "mocha": "^11.7.5",
     "playwright-test": "^14.1.13",
     "type-fest": "^5.6.0",
-    "typescript": "5.9.3",
-    "viem": "^2.48.4"
+    "typescript": "6.0.3",
+    "viem": "^2.51.3"
   },
   "publishConfig": {
     "provenance": true
