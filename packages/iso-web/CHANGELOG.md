@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.2.1...iso-web-v2.3.0) (2026-06-01)
+
+
+### Features
+
+* **http:** add SchemaError class and support for schema validation in JSON requests ([7189d38](https://github.com/hugomrdias/iso-repo/commit/7189d38ab5c9a4edcea879d239750cbe8afc3d52))
+
+
+### Bug Fixes
+
+* **http:** streamline retry logic and improve retryAfter handling ([6e7901f](https://github.com/hugomrdias/iso-repo/commit/6e7901fcfbf1ca021dee03ad708963ddf5620e2e))
+
 ## [2.2.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.2.0...iso-web-v2.2.1) (2026-04-22)
 
 
