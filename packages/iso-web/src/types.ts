@@ -1,4 +1,6 @@
 /** biome-ignore-all lint/suspicious/noConfusingVoidType: its fine */
+
+import type { StandardSchemaV1 } from '@standard-schema/spec'
 import type { RetryContext } from 'p-retry'
 import type { Jsonifiable } from 'type-fest'
 
@@ -108,7 +110,7 @@ export interface RequestOptions {
   ) => void | Response | Promise<Response | void>
 }
 
-export interface JSONRequestOptions {
+export interface JSONRequestOptions<T = unknown> {
   fetch?: typeof globalThis.fetch
   redirect?: RequestRedirect
   body?: Jsonifiable | null
@@ -123,6 +125,7 @@ export interface JSONRequestOptions {
    */
   timeout?: number | false
   retry?: RetryOptions
+  schema?: StandardSchemaV1<unknown, T>
   onResponse?: (
     response: Response,
     request: Request

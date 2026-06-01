@@ -20,7 +20,7 @@ function isElectron() {
   if (
     typeof process !== 'undefined' &&
     typeof process.versions === 'object' &&
-    Boolean(process.versions.electron)
+    process.versions.electron
   ) {
     return true
   }

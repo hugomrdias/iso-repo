@@ -1,6 +1,13 @@
 import { delay, HttpResponse, http } from 'msw'
 import { assert, suite } from 'playwright-test/taps'
-import { HttpError, JsonError, RequestError, request } from '../src/http.js'
+import { z } from 'zod'
+import {
+  HttpError,
+  JsonError,
+  RequestError,
+  request,
+  SchemaError,
+} from '../src/http.js'
 import { setup } from '../src/msw/msw.js'
 
 const test = suite('request')
@@ -252,10 +259,10 @@ test('should retry failed network error', async () => {
 })
 
 test(
-  'should retry failed',
+  'should force retry and failed',
   async () => {
     let count = 0
-    const { error } = await request('https://local.dev/error?status=500', {
+    const { error } = await request('https://local.dev/error?status=501', {
       retry: {
         retries: 1,
         shouldRetry: () => {
@@ -266,7 +273,7 @@ test(
     })
 
     if (error) {
-      assert.equal(error.message, '500 - Internal Server Error')
+      assert.equal(error.message, '501 - Not Implemented')
       assert.equal(count, 1)
     } else {
       assert.fail('should fail')
@@ -511,6 +518,51 @@ test('should request json', async () => {
     assert.fail(error.message)
   } else {
     assert.deepEqual(result, { hello: 'world' })
+  }
+})
+
+test('should request json with schema', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return HttpResponse.json({ hello: 'world' }, { status: 200 })
+    })
+  )
+
+  const schema = z.object({ hello: z.literal('world') }).transform((value) => ({
+    greeting: value.hello,
+  }))
+
+  const { error, result } = await request.json('https://local.dev', { schema })
+
+  if (error) {
+    assert.fail(error.message)
+  } else {
+    assert.deepEqual(result, { greeting: 'world' })
+  }
+})
+
+test('should fail request json with schema issues', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return HttpResponse.json({ hello: 'world' }, { status: 200 })
+    })
+  )
+
+  const schema = z.object({ count: z.number() })
+
+  z.prettifyError
+
+  const { error } = await request.json('https://local.dev', { schema })
+
+  if (SchemaError.is(error)) {
+    assert.equal(error.message, 'Schema validation failed')
+    assert.equal(
+      error.issues[0]?.message,
+      'Invalid input: expected number, received undefined'
+    )
+    assert.equal(error.response.status, 200)
+  } else {
+    assert.fail('should fail')
   }
 })
 
