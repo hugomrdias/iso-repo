@@ -191,6 +191,7 @@ export class HttpError extends RequestError {
 
 const DEFAULT_STATUS_CODES = [408, 413, 429, 500, 502, 503, 504]
 const DEFAULT_AFTER_STATUS_CODES = [413, 429, 503]
+const DEFAULT_METHODS = ['get', 'put', 'head', 'delete', 'options', 'trace']
 
 /**
  * HTTP Request
@@ -284,20 +285,7 @@ export async function request(resource, options = {}) {
             }
           },
           shouldRetry: async (ctx) => {
-            if (retry.shouldRetry) {
-              const shouldRetry = await retry.shouldRetry(ctx)
-              return Boolean(shouldRetry)
-            }
-
-            const methods = retry.methods ?? [
-              'get',
-              'put',
-              'head',
-              'delete',
-              'options',
-              'trace',
-            ]
-
+            const methods = retry.methods ?? DEFAULT_METHODS
             const statusCodes = retry.statusCodes ?? DEFAULT_STATUS_CODES
             if (
               methods.includes(request.method.toLowerCase()) &&
@@ -310,6 +298,12 @@ export async function request(resource, options = {}) {
             if (isNetworkError(ctx.error)) {
               return true
             }
+
+            if (retry.shouldRetry) {
+              const shouldRetry = await retry.shouldRetry(ctx)
+              return Boolean(shouldRetry)
+            }
+
             return false
           },
         })
@@ -362,7 +356,7 @@ function calculateRetryAfter(response) {
     return 0
   }
 
-  let after = Number(retryAfter)
+  let after = Number(retryAfter.trim())
   if (Number.isNaN(after)) {
     // is a date string
     after = Date.parse(retryAfter) - Date.now()
