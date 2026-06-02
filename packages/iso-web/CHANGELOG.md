@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.3.0...iso-web-v3.0.0) (2026-06-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **http:** implement polling functionality and enhance retry options
+
+### Features
+
+* **http:** implement polling functionality and enhance retry options ([a35dc7f](https://github.com/hugomrdias/iso-repo/commit/a35dc7f4dd59f1575bded8a5da2996c65ed522ce))
+
 ## [2.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.2.1...iso-web-v2.3.0) (2026-06-01)
 
 
