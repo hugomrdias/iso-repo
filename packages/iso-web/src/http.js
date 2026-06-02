@@ -258,6 +258,9 @@ export async function request(resource, options = {}) {
   const retryOptions = normalizeRetryOptions(retry)
   const retryStatusCodes =
     retryOptions?.statusCodes ?? DEFAULT_RETRY_STATUS_CODES
+  const retryMethods = retryOptions?.methods
+    ? retryOptions.methods.map((method) => method.toLowerCase())
+    : DEFAULT_RETRY_METHODS
   const pollOptions = normalizePollOptions(poll)
   const pollStatusCodes = pollOptions?.statusCodes ?? DEFAULT_POLL_STATUS_CODES
 
@@ -397,11 +400,9 @@ export async function request(resource, options = {}) {
             }
           },
           shouldRetry: async (ctx) => {
-            const methods = retryOptions.methods ?? DEFAULT_RETRY_METHODS
-
             let shouldRetry = false
             if (
-              methods.includes(request.method.toLowerCase()) &&
+              retryMethods.includes(request.method.toLowerCase()) &&
               HttpError.is(ctx.error) &&
               retryStatusCodes.includes(ctx.error.code)
             ) {
