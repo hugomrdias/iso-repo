@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.0.0...iso-web-v3.0.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* **http:** refine retry logic to utilize normalized retry methods ([1a26392](https://github.com/hugomrdias/iso-repo/commit/1a26392b368c20cd5fc8441c6d88b5f954672581))
+
 ## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v2.3.0...iso-web-v3.0.0) (2026-06-02)
 
 
