@@ -6,6 +6,43 @@ import type { Jsonifiable } from 'type-fest'
 
 export type RequestInput = URL | string
 
+export interface PollOptions {
+  /**
+   * The delay between polling attempts in milliseconds.
+   *
+   * @default 1000
+   */
+  interval?: number | ((context: PollContext) => number | Promise<number>)
+  /**
+   * The maximum number of pollable responses before returning the last response.
+   *
+   * @default 10
+   */
+  limit?: number
+  /**
+   * The HTTP status codes that should trigger polling.
+   *
+   * @default [202]
+   */
+  statusCodes?: number[]
+  /**
+   * Decide whether polling should continue after a pollable response.
+   *
+   * Returning false stops polling and returns the current response. Returning a
+   * Response stops polling and returns that response instead.
+   */
+  shouldPoll?: (
+    context: PollContext
+  ) => boolean | Response | void | Promise<boolean | Response | void>
+}
+
+export interface PollContext {
+  attempt: number
+  response: Response
+  request: Request
+  options: RequestOptions
+}
+
 export interface RetryOptions {
   /**
    * The HTTP status codes to retry on.
@@ -34,11 +71,7 @@ export interface RetryOptions {
   methods?: string[]
 
   /**
-   * Decide if a retry should occur based on the context. Returning true triggers a retry, false aborts with the error.
-   *
-   * It is only called if `retries` and `maxRetryTime` have not been exhausted.
-   *
-   * It is not called for `TypeError` (except network errors) and `AbortError`.
+   * Called after built-in checks pass, before retrying. Return false to stop retrying.
    *
    * @param context - The context of the retry
    * @returns - Whether to retry the request
@@ -102,7 +135,22 @@ export interface RequestOptions {
    * @default 5000
    */
   timeout?: number | false
-  retry?: RetryOptions
+  /**
+   * Retry failed requests.
+   *
+   * Set to `true` to use the default retry options.
+   *
+   * @default false
+   */
+  retry?: RetryOptions | boolean
+  /**
+   * Poll responses that match the configured status codes.
+   *
+   * Set to `true` to use the default polling options.
+   *
+   * @default false
+   */
+  poll?: PollOptions | boolean
   json?: Jsonifiable
   onResponse?: (
     response: Response,
@@ -124,7 +172,22 @@ export interface JSONRequestOptions<T = unknown> {
    * @default 5000
    */
   timeout?: number | false
-  retry?: RetryOptions
+  /**
+   * Retry failed requests.
+   *
+   * Set to `true` to use the default retry options.
+   *
+   * @default false
+   */
+  retry?: RetryOptions | boolean
+  /**
+   * Poll responses that match the configured status codes.
+   *
+   * Set to `true` to use the default polling options.
+   *
+   * @default false
+   */
+  poll?: PollOptions | boolean
   schema?: StandardSchemaV1<unknown, T>
   onResponse?: (
     response: Response,

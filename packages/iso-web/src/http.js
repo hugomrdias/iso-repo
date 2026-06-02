@@ -220,9 +220,19 @@ export class SchemaError extends RequestError {
   }
 }
 
-const DEFAULT_STATUS_CODES = [408, 413, 429, 500, 502, 503, 504]
-const DEFAULT_AFTER_STATUS_CODES = [413, 429, 503]
-const DEFAULT_METHODS = ['get', 'put', 'head', 'delete', 'options', 'trace']
+const DEFAULT_RETRY_STATUS_CODES = [408, 413, 429, 500, 502, 503, 504]
+const DEFAULT_RETRY_AFTER_STATUS_CODES = [413, 429, 503]
+const DEFAULT_RETRY_METHODS = [
+  'get',
+  'put',
+  'head',
+  'delete',
+  'options',
+  'trace',
+]
+const DEFAULT_POLL_STATUS_CODES = [202]
+const DEFAULT_POLL_INTERVAL = 1000
+const DEFAULT_POLL_LIMIT = 10
 
 /**
  * HTTP Request
@@ -236,6 +246,7 @@ export async function request(resource, options = {}) {
     signal,
     timeout = 5000,
     retry,
+    poll,
     fetch = globalThis.fetch.bind(globalThis),
     json,
     headers,
@@ -243,6 +254,12 @@ export async function request(resource, options = {}) {
       // noop
     },
   } = options
+
+  const retryOptions = normalizeRetryOptions(retry)
+  const retryStatusCodes =
+    retryOptions?.statusCodes ?? DEFAULT_RETRY_STATUS_CODES
+  const pollOptions = normalizePollOptions(poll)
+  const pollStatusCodes = pollOptions?.statusCodes ?? DEFAULT_POLL_STATUS_CODES
 
   // validate resource type
   if (typeof resource !== 'string' && !(resource instanceof URL)) {
@@ -274,7 +291,8 @@ export async function request(resource, options = {}) {
   })
 
   async function fn() {
-    const req = retry == null ? request : request.clone()
+    const req =
+      retryOptions == null && pollOptions == null ? request : request.clone()
     let rsp = await fetch(req)
 
     const result = await onResponse(rsp.clone(), request)
@@ -283,8 +301,10 @@ export async function request(resource, options = {}) {
       rsp = result
     }
 
-    const retryStatusCodes = retry?.statusCodes ?? []
-    if (!rsp.ok || retryStatusCodes.includes(rsp.status)) {
+    const isPollStatus =
+      pollOptions != null && pollStatusCodes.includes(rsp.status)
+    const isRetryStatus = retryStatusCodes.includes(rsp.status) && !isPollStatus
+    if ((!rsp.ok && !isPollStatus) || isRetryStatus) {
       throw new HttpError({
         response: rsp,
         request: req,
@@ -294,19 +314,80 @@ export async function request(resource, options = {}) {
     return rsp
   }
 
+  /**
+   * Repeat the request while the response has a pollable status code.
+   *
+   * @returns {Promise<Response>}
+   */
+  async function pollRequest() {
+    let attempt = 0
+
+    while (true) {
+      const response = await fn()
+
+      if (!pollStatusCodes.includes(response.status)) {
+        return response
+      }
+
+      const currentAttempt = attempt
+      const result = await pollOptions?.shouldPoll?.(
+        createPollContext(response, currentAttempt)
+      )
+
+      if (result === false) {
+        return response
+      }
+
+      if (result instanceof Response) {
+        return result
+      }
+
+      attempt++
+
+      if (attempt >= (pollOptions?.limit ?? DEFAULT_POLL_LIMIT)) {
+        return response
+      }
+
+      const interval = await resolvePollInterval(
+        pollOptions?.interval,
+        createPollContext(response, currentAttempt)
+      )
+
+      await delay(interval, { signal: combinedSignals })
+    }
+  }
+
+  /**
+   * Create the context passed to polling hooks.
+   *
+   * @param {Response} response
+   * @param {number} attempt
+   * @returns {import('./types.js').PollContext}
+   */
+  function createPollContext(response, attempt) {
+    return {
+      attempt,
+      response: response.clone(),
+      request,
+      options,
+    }
+  }
+
   try {
-    const response = await (retry
-      ? pRetry(() => fn(), {
-          retries: retry.retries ?? 10,
-          factor: retry.factor ?? 2,
-          minTimeout: retry.minTimeout ?? 1000,
-          maxTimeout: retry.maxTimeout ?? Number.POSITIVE_INFINITY,
-          randomize: retry.randomize ?? false,
-          unref: retry.unref ?? false,
-          maxRetryTime: retry.maxRetryTime ?? Number.POSITIVE_INFINITY,
+    const operation = pollOptions == null ? fn : pollRequest
+    const response = await (retryOptions
+      ? pRetry(() => operation(), {
+          retries: retryOptions.retries ?? 2,
+          factor: retryOptions.factor ?? 2,
+          minTimeout: retryOptions.minTimeout ?? 1000,
+          maxTimeout: retryOptions.maxTimeout ?? Number.POSITIVE_INFINITY,
+          randomize: retryOptions.randomize ?? false,
+          unref: retryOptions.unref ?? false,
+          maxRetryTime: retryOptions.maxRetryTime ?? Number.POSITIVE_INFINITY,
           signal: combinedSignals,
           onFailedAttempt: async (ctx) => {
-            const codes = retry.afterStatusCodes ?? DEFAULT_AFTER_STATUS_CODES
+            const codes =
+              retryOptions.afterStatusCodes ?? DEFAULT_RETRY_AFTER_STATUS_CODES
             if (HttpError.is(ctx.error) && codes.includes(ctx.error.code)) {
               // Delay if needed using Retry-After header
               const delayValue = calculateRetryAfter(ctx.error.response)
@@ -316,31 +397,35 @@ export async function request(resource, options = {}) {
             }
           },
           shouldRetry: async (ctx) => {
-            const methods = retry.methods ?? DEFAULT_METHODS
-            const statusCodes = retry.statusCodes ?? DEFAULT_STATUS_CODES
+            const methods = retryOptions.methods ?? DEFAULT_RETRY_METHODS
+
+            let shouldRetry = false
             if (
               methods.includes(request.method.toLowerCase()) &&
               HttpError.is(ctx.error) &&
-              statusCodes.includes(ctx.error.code)
+              retryStatusCodes.includes(ctx.error.code)
             ) {
-              return true
+              shouldRetry = true
             }
 
             if (isNetworkError(ctx.error)) {
-              return true
+              shouldRetry = true
             }
 
-            if (retry.shouldRetry) {
-              const shouldRetry = await retry.shouldRetry(ctx)
-              return Boolean(shouldRetry)
+            if (retryOptions.shouldRetry) {
+              const result = await retryOptions.shouldRetry(ctx)
+              shouldRetry = Boolean(result)
             }
 
-            return false
+            return shouldRetry
           },
         })
-      : fn())
+      : operation())
 
-    return response.ok
+    const isPollStatus =
+      pollOptions != null && pollStatusCodes.includes(response.status)
+
+    return response.ok || isPollStatus
       ? { result: response }
       : {
           error: new HttpError({
@@ -397,6 +482,57 @@ function calculateRetryAfter(response) {
   }
 
   return after
+}
+
+/**
+ * Normalize boolean retry options into the internal options shape.
+ *
+ * @param {import('./types.js').RequestOptions['retry']} retry
+ * @returns {import('./types.js').RetryOptions | undefined}
+ */
+function normalizeRetryOptions(retry) {
+  if (retry === true) {
+    return {}
+  }
+
+  if (retry === false) {
+    return undefined
+  }
+
+  return retry
+}
+
+/**
+ * Normalize boolean polling options into the internal options shape.
+ *
+ * @param {import('./types.js').RequestOptions['poll']} poll
+ * @returns {import('./types.js').PollOptions | undefined}
+ */
+function normalizePollOptions(poll) {
+  if (poll === true) {
+    return {}
+  }
+
+  if (poll === false) {
+    return undefined
+  }
+
+  return poll
+}
+
+/**
+ * Resolve the delay before the next poll attempt.
+ *
+ * @param {import('./types.js').PollOptions['interval']} interval
+ * @param {import('./types.js').PollContext} context
+ * @returns {number | Promise<number>}
+ */
+function resolvePollInterval(interval, context) {
+  if (typeof interval === 'function') {
+    return interval(context)
+  }
+
+  return interval ?? DEFAULT_POLL_INTERVAL
 }
 
 /**
