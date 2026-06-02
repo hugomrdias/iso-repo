@@ -51,7 +51,7 @@
     "delay": "^7.0.0",
     "p-defer": "^4.0.0",
     "playwright-test": "^14.1.13",
-    "type-fest": "^5.6.0",
+    "type-fest": "^5.7.0",
     "typescript": "6.0.3",
     "ws": "^8.20.0"
   },

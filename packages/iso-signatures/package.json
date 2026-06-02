@@ -93,7 +93,7 @@
     "eventemitter3": "5.0.1",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
-    "ox": "^0.14.20"
+    "ox": "^0.14.27"
   },
   "devDependencies": {
     "@types/assert": "^1.5.11",
@@ -102,7 +102,7 @@
     "assert": "^2.1.0",
     "mocha": "^11.7.5",
     "playwright-test": "^14.1.13",
-    "type-fest": "^5.6.0",
+    "type-fest": "^5.7.0",
     "typescript": "6.0.3",
     "viem": "^2.51.3"
   },

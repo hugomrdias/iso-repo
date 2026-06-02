@@ -130,7 +130,7 @@
     "iso-base": "workspace:^",
     "msw": "2.14.6",
     "playwright-test": "^14.1.13",
-    "type-fest": "^5.6.0",
+    "type-fest": "^5.7.0",
     "typescript": "6.0.3",
     "zod": "^4.4.3"
   },
