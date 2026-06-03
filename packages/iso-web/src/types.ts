@@ -92,7 +92,7 @@ export interface RetryOptions {
 
   /**
    * The maximum amount of times to retry the operation.
-   * @default 10
+   * @default 2
    */
   retries?: number | undefined
 
