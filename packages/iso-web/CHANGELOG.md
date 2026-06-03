@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.1.0...iso-web-v3.1.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* **types:** update default retry option to 2 for improved request handling ([6c69c72](https://github.com/hugomrdias/iso-repo/commit/6c69c72b9e0781a1922ddc3a17ba0013bcce5c6d))
+
 ## [3.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.0.1...iso-web-v3.1.0) (2026-06-03)
 
 
