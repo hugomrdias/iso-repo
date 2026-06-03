@@ -7,7 +7,8 @@ import { anySignal } from './signals.js'
 const symbol = Symbol.for('request-error')
 
 /**
- * @typedef {NetworkError | TimeoutError | AbortError | HttpError} Errors
+ * @typedef {NetworkError | TimeoutError | AbortError | HttpError } RequestErrors
+ * @typedef {RequestErrors | JsonError | SchemaError} RequestJsonErrors
  */
 
 /**
@@ -239,7 +240,7 @@ const DEFAULT_POLL_LIMIT = 10
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 export async function request(resource, options = {}) {
   const {
@@ -541,7 +542,7 @@ function resolvePollInterval(interval, context) {
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 request.get = function get(resource, options = {}) {
   return request(resource, { ...options, method: 'GET' })
@@ -552,7 +553,7 @@ request.get = function get(resource, options = {}) {
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 request.post = function post(resource, options = {}) {
   return request(resource, { ...options, method: 'POST' })
@@ -563,7 +564,7 @@ request.post = function post(resource, options = {}) {
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 request.put = function put(resource, options = {}) {
   return request(resource, { ...options, method: 'PUT' })
@@ -574,7 +575,7 @@ request.put = function put(resource, options = {}) {
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 request.delete = function del(resource, options = {}) {
   return request(resource, { ...options, method: 'DELETE' })
@@ -585,7 +586,7 @@ request.delete = function del(resource, options = {}) {
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 request.patch = function patch(resource, options = {}) {
   return request(resource, { ...options, method: 'PATCH' })
@@ -596,7 +597,7 @@ request.patch = function patch(resource, options = {}) {
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 request.head = function head(resource, options = {}) {
   return request(resource, { ...options, method: 'HEAD' })
@@ -607,7 +608,7 @@ request.head = function head(resource, options = {}) {
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 request.options = function optionsFn(resource, options = {}) {
   return request(resource, { ...options, method: 'OPTIONS' })
@@ -618,7 +619,7 @@ request.options = function optionsFn(resource, options = {}) {
  *
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").RequestOptions} options
- * @returns {Promise<import("./types.js").MaybeResult<Response, Errors>>}
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 request.trace = function trace(resource, options = {}) {
   return request(resource, { ...options, method: 'TRACE' })
@@ -630,7 +631,7 @@ request.trace = function trace(resource, options = {}) {
  * @template T
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError | SchemaError>>}
+ * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
  */
 request.json = async function json(resource, options = {}) {
   const { error, result } = await request(resource, {
@@ -687,7 +688,7 @@ request.json = async function json(resource, options = {}) {
  * @template T
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError | SchemaError>>}
+ * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
  */
 request.json.get = function get(resource, options = {}) {
   return request.json(resource, { ...options, method: 'GET' })
@@ -699,7 +700,7 @@ request.json.get = function get(resource, options = {}) {
  * @template T
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError | SchemaError>>}
+ * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
  */
 request.json.post = function post(resource, options = {}) {
   return request.json(resource, { ...options, method: 'POST' })
@@ -711,7 +712,7 @@ request.json.post = function post(resource, options = {}) {
  * @template T
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError | SchemaError>>}
+ * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
  */
 request.json.put = function put(resource, options = {}) {
   return request.json(resource, { ...options, method: 'PUT' })
@@ -723,7 +724,7 @@ request.json.put = function put(resource, options = {}) {
  * @template T
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError | SchemaError>>}
+ * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
  */
 request.json.delete = function del(resource, options = {}) {
   return request.json(resource, { ...options, method: 'DELETE' })
@@ -735,7 +736,7 @@ request.json.delete = function del(resource, options = {}) {
  * @template T
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError | SchemaError>>}
+ * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
  */
 request.json.patch = function patch(resource, options = {}) {
   return request.json(resource, { ...options, method: 'PATCH' })
@@ -747,7 +748,7 @@ request.json.patch = function patch(resource, options = {}) {
  * @template T
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError | SchemaError>>}
+ * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
  */
 request.json.head = function head(resource, options = {}) {
   return request.json(resource, { ...options, method: 'HEAD' })
@@ -759,7 +760,7 @@ request.json.head = function head(resource, options = {}) {
  * @template T
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError | SchemaError>>}
+ * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
  */
 request.json.options = function optionsFn(resource, options = {}) {
   return request.json(resource, { ...options, method: 'OPTIONS' })
@@ -771,7 +772,7 @@ request.json.options = function optionsFn(resource, options = {}) {
  * @template T
  * @param {import('./types.js').RequestInput} resource
  * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, Errors | JsonError | SchemaError>>}
+ * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
  */
 request.json.trace = function trace(resource, options = {}) {
   return request.json(resource, { ...options, method: 'TRACE' })
