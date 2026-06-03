@@ -1,13 +1,12 @@
 import { KV } from 'iso-kv'
 
-// eslint-disable-next-line no-unused-vars
-import { JsonError, request } from '../http.js'
+import { request } from '../http.js'
 
 const symbol = Symbol.for('doh-error')
 
 /**
- * @typedef {import('../http.js').Errors | DohError | JsonError} Errors
- * @typedef {import('../http.js').Errors} RequestErrors
+ * @typedef {import('../http.js').RequestJsonErrors | DohError} DoHErrors
+ * @typedef {import('../http.js').RequestJsonErrors} RequestErrors
  */
 
 export {
@@ -16,6 +15,7 @@ export {
   JsonError,
   NetworkError,
   RequestError,
+  SchemaError,
   TimeoutError,
 } from '../http.js'
 
@@ -150,7 +150,7 @@ const kv = new KV()
  * @param {string} query
  * @param {import("./types.js").RecordType} type
  * @param {import("./types.js").ResolveOptions} [options]
- * @returns {Promise<import("../types.js").MaybeResult<T, Errors>>}
+ * @returns {Promise<import("../types.js").MaybeResult<T, DoHErrors>>}
  */
 export async function resolve(query, type, options = {}) {
   const { cache = kv } = options
@@ -162,7 +162,7 @@ export async function resolve(query, type, options = {}) {
   } = options
   const url = `${server}?name=${query}&type=${type}`
 
-  /** @type {import('../types.js').MaybeResult<T, Errors> | undefined} */
+  /** @type {import('../types.js').MaybeResult<T, DoHErrors> | undefined} */
   const cached = await cache.get([url])
   if (cached) {
     return cached

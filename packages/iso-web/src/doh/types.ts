@@ -36,14 +36,13 @@ export interface ResolveOptions {
    */
   timeout?: number
   /**
-   * Retry options
+   * Retry failed requests.
    *
-   * By default retries are disabled
+   * Set to `true` to use the default retry options.
    *
-   * @example
-   * { retries: 5, factor: 2, minTimeout: 1000 }
+   * @default false
    */
-  retry?: RetryOptions
+  retry?: RetryOptions | boolean
 
   cache?: IKV
 }

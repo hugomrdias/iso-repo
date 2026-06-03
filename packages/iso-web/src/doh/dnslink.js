@@ -4,15 +4,17 @@ const DOMAIN_PREFIX = '_dnslink.'
 const TXT_PREFIX = 'dnslink='
 
 /**
- * @typedef {import('../http.js').Errors | import('./index.js').DohError} Errors
+ * @typedef { import('./index.js').DoHErrors} DnslinkErrors
  */
 
 export {
   AbortError,
   DohError,
   HttpError,
+  JsonError,
   NetworkError,
   RequestError,
+  SchemaError,
   TimeoutError,
 } from './index.js'
 
