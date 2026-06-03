@@ -107,9 +107,9 @@
     "iobuffer": "^6.0.1",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
-    "iso-kv": "^3.2.0",
+    "iso-kv": "workspace:^",
     "iso-signatures": "workspace:^",
-    "iso-web": "^2.1.0",
+    "iso-web": "workspace:^",
     "it-merge": "^3.0.12",
     "multiformats": "^14.0.0",
     "zod": "^4.3.6"

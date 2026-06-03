@@ -16,6 +16,9 @@
     },
     {
       "path": "../iso-kv"
+    },
+    {
+      "path": "../iso-web"
     }
   ],
   "include": ["src", "scripts", "package.json", "test", "test/**/*.json"],
