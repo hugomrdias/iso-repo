@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.1.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.0.1...iso-web-v3.1.0) (2026-06-03)
+
+
+### Features
+
+* **http:** update error type definitions for request handling ([dc30aa4](https://github.com/hugomrdias/iso-repo/commit/dc30aa49eec2117524bb316d7a8071d42ed42c8e))
+
+
+### Bug Fixes
+
+* **doh:** update error type definitions and refine resolve function ([3b4f923](https://github.com/hugomrdias/iso-repo/commit/3b4f9235bdc2d68b827ac000d26a23876e1bef4e))
+
 ## [3.0.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.0.0...iso-web-v3.0.1) (2026-06-02)
 
 
