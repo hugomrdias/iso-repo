@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.2](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.1.1...iso-web-v3.1.2) (2026-06-04)
+
+
+### Bug Fixes
+
+* **http:** simplify polling and retry logic in request function ([fcc24f5](https://github.com/hugomrdias/iso-repo/commit/fcc24f5e24b21531ed40867c191e57a4f41eda8a))
+
 ## [3.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.1.0...iso-web-v3.1.1) (2026-06-03)
 
 
