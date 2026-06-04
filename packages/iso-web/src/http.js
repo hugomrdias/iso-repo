@@ -305,10 +305,7 @@ export async function request(resource, options = {}) {
       rsp = result
     }
 
-    const isPollStatus =
-      pollOptions != null && pollStatusCodes.includes(rsp.status)
-    const isRetryStatus = retryStatusCodes.includes(rsp.status) && !isPollStatus
-    if ((!rsp.ok && !isPollStatus) || isRetryStatus) {
+    if (!rsp.ok) {
       throw new HttpError({
         response: rsp,
         request: req,
@@ -328,22 +325,21 @@ export async function request(resource, options = {}) {
 
     while (true) {
       const response = await fn()
+      let shouldPoll = pollOptions != null
 
       if (!pollStatusCodes.includes(response.status)) {
-        return response
+        shouldPoll = false
       }
 
       const currentAttempt = attempt
-      const result = await pollOptions?.shouldPoll?.(
-        createPollContext(response, currentAttempt)
-      )
-
-      if (result === false) {
-        return response
+      if (pollOptions?.shouldPoll) {
+        shouldPoll = await pollOptions.shouldPoll(
+          createPollContext(response, attempt)
+        )
       }
 
-      if (result instanceof Response) {
-        return result
+      if (!shouldPoll) {
+        return response
       }
 
       attempt++
@@ -424,10 +420,7 @@ export async function request(resource, options = {}) {
         })
       : operation())
 
-    const isPollStatus =
-      pollOptions != null && pollStatusCodes.includes(response.status)
-
-    return response.ok || isPollStatus
+    return response.ok
       ? { result: response }
       : {
           error: new HttpError({

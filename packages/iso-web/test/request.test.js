@@ -351,41 +351,7 @@ test(
 )
 
 test(
-  'should retry on 2xx status codes when specified in statusCodes',
-  async () => {
-    let count = 0
-    server.use(
-      http.get('https://local.dev/processing', () => {
-        count++
-        if (count < 3) {
-          return HttpResponse.json({ status: 'processing' }, { status: 202 })
-        }
-        return HttpResponse.json({ data: 'ready' }, { status: 200 })
-      })
-    )
-
-    const { error, result } = await request('https://local.dev/processing', {
-      retry: {
-        statusCodes: [202],
-        retries: 5,
-        minTimeout: 10,
-        factor: 1,
-      },
-    })
-
-    if (error) {
-      assert.fail(error.message)
-    } else {
-      assert.equal(result.status, 200)
-      assert.deepEqual(await result.json(), { data: 'ready' })
-      assert.equal(count, 3)
-    }
-  },
-  { timeout: 10_000 }
-)
-
-test(
-  'should retry POST requests with custom shouldRetry',
+  'should retry POST requests with custom onResponse and shouldRetry',
   async () => {
     let count = 0
     server.use(
@@ -401,16 +367,11 @@ test(
     const { error, result } = await request.post(
       'https://local.dev/processing',
       {
-        body: JSON.stringify({ hello: 'world' }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        json: { hello: 'world' },
         retry: {
-          statusCodes: [202],
           retries: 5,
           minTimeout: 10,
           factor: 1,
-          methods: ['post'],
           shouldRetry: (ctx) => {
             return ctx.error.message === 'post-error'
           },
@@ -430,34 +391,6 @@ test(
       assert.equal(result.status, 200)
       assert.deepEqual(await result.json(), { data: 'ready' })
       assert.equal(count, 3)
-    }
-  },
-  { timeout: 10_000 }
-)
-
-test(
-  'should fail after retries exhausted on 2xx status code',
-  async () => {
-    server.use(
-      http.get('https://local.dev/always-processing', () => {
-        return HttpResponse.json({ status: 'processing' }, { status: 202 })
-      })
-    )
-
-    const { error } = await request('https://local.dev/always-processing', {
-      retry: {
-        statusCodes: [202],
-        retries: 2,
-        minTimeout: 10,
-        factor: 1,
-      },
-    })
-
-    if (error) {
-      assert.ok(HttpError.is(error))
-      assert.equal(error.code, 202)
-    } else {
-      assert.fail('should fail')
     }
   },
   { timeout: 10_000 }
@@ -675,23 +608,29 @@ test(
 )
 
 test(
-  'should stop polling when shouldPoll returns a response',
+  'should continue polling when shouldPoll returns true',
   async () => {
     let count = 0
+    let shouldPollCount = 0
     server.use(
-      http.get('https://local.dev/polling-response', () => {
+      http.get('https://local.dev/polling-continue', () => {
         count++
-        return HttpResponse.json({ status: 'processing' }, { status: 202 })
+        if (count === 1) {
+          return HttpResponse.json({ status: 'processing' }, { status: 202 })
+        }
+
+        return HttpResponse.json({ data: 'ready' }, { status: 200 })
       })
     )
 
     const { error, result } = await request(
-      'https://local.dev/polling-response',
+      'https://local.dev/polling-continue',
       {
         poll: {
           interval: 1,
           shouldPoll: () => {
-            return HttpResponse.json({ data: 'replacement' }, { status: 200 })
+            shouldPollCount++
+            return true
           },
         },
       }
@@ -701,8 +640,9 @@ test(
       assert.fail(error.message)
     } else {
       assert.equal(result.status, 200)
-      assert.deepEqual(await result.json(), { data: 'replacement' })
-      assert.equal(count, 1)
+      assert.deepEqual(await result.json(), { data: 'ready' })
+      assert.equal(count, 10)
+      assert.equal(shouldPollCount, 10)
     }
   },
   { timeout: 10_000 }

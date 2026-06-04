@@ -21,19 +21,20 @@ export interface PollOptions {
   limit?: number
   /**
    * The HTTP status codes that should trigger polling.
+   * Status codes in the range 200-299.
    *
    * @default [202]
    */
   statusCodes?: number[]
   /**
-   * Decide whether polling should continue after a pollable response.
+   * Called after built-in checks pass, before polling continues.
    *
-   * Returning false stops polling and returns the current response. Returning a
-   * Response stops polling and returns that response instead.
+   * Returning false stops polling and returns the current response.
+   *
+   * @param context - The context of the poll
+   * @returns - Whether to continue polling
    */
-  shouldPoll?: (
-    context: PollContext
-  ) => boolean | Response | void | Promise<boolean | Response | void>
+  shouldPoll?: (context: PollContext) => boolean | Promise<boolean>
 }
 
 export interface PollContext {
@@ -46,6 +47,7 @@ export interface PollContext {
 export interface RetryOptions {
   /**
    * The HTTP status codes to retry on.
+   * Status codes in the range 400-599.
    *
    * @default [408, 413, 429, 500, 502, 503, 504]
    */
