@@ -1,7 +1,7 @@
 {
   "name": "iso-conf",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Simple config handling with Standard Schema validation and extended JSON serialization",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
