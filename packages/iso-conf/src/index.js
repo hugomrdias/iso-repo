@@ -16,6 +16,11 @@ import { parse, stringify } from 'iso-base/json'
  *   OnDidAnyChangeCallback,
  *   OnDidChangeCallback,
  *   Options,
+ *   SchemaArrayElement,
+ *   SchemaEntry,
+ *   SchemaKeyPath,
+ *   SchemaValue,
+ *   SchemaValues,
  *   Serialize,
  *   Unsubscribe,
  * } from './types.js'
@@ -136,6 +141,22 @@ export class Conf {
   /**
    * Get a config item.
    *
+   * @template {SchemaKeyPath<Schema>} Key
+   * @overload
+   * @param {Key} key - Item key. Supports dot notation when enabled.
+   * @returns {SchemaValue<Schema, Key>}
+   */
+  /**
+   * Get a config item, falling back to a default value when missing.
+   *
+   * @template {SchemaKeyPath<Schema>} Key
+   * @template DefaultValue
+   * @overload
+   * @param {Key} key - Item key. Supports dot notation when enabled.
+   * @param {DefaultValue} defaultValue - Value returned when the item does not exist.
+   * @returns {Exclude<SchemaValue<Schema, Key>, undefined> | DefaultValue}
+   */
+  /**
    * @param {string} key - Item key. Supports dot notation when enabled.
    * @param {unknown} [defaultValue] - Value returned when the item does not exist.
    */
@@ -144,7 +165,6 @@ export class Conf {
       return this.#get(key, defaultValue)
     }
 
-    /** @type {Record<string, unknown>} */
     const store = this.store
     return key in store ? store[key] : defaultValue
   }
@@ -152,6 +172,20 @@ export class Conf {
   /**
    * Set one or more config items.
    *
+   * @template {SchemaKeyPath<Schema>} Key
+   * @overload
+   * @param {Key} key - Item key. Supports dot notation when enabled.
+   * @param {SchemaValue<Schema, Key>} value - Value to set.
+   * @returns {void}
+   */
+  /**
+   * Set multiple config items.
+   *
+   * @overload
+   * @param {Partial<SchemaValues<Schema>> & Record<string, unknown>} key - Object of items to set.
+   * @returns {void}
+   */
+  /**
    * @param {Record<string, unknown> | string} key - Item key or object of items to set.
    * @param {unknown} [value] - Value to set when `key` is a string.
    */
@@ -166,7 +200,6 @@ export class Conf {
       throw new TypeError('Use `delete()` to clear values')
     }
 
-    /** @type {Record<string, unknown>} */
     const store = this.store
 
     /**
@@ -195,13 +228,13 @@ export class Conf {
       set(key, value)
     }
 
-    this.store = /** @type {StandardSchemaV1.InferOutput<Schema>} */ (store)
+    this.store = store
   }
 
   /**
    * Check whether a config item exists.
    *
-   * @param {string} key - Item key. Supports dot notation when enabled.
+   * @param {SchemaKeyPath<Schema>} key - Item key. Supports dot notation when enabled.
    */
   has(key) {
     const keyPath = String(key)
@@ -218,8 +251,9 @@ export class Conf {
    *
    * Creates the array when the key does not exist.
    *
-   * @param {string} key - Array key. Supports dot notation when enabled.
-   * @param {unknown} value - Item to append.
+   * @template {SchemaKeyPath<Schema>} Key
+   * @param {Key} key - Array key. Supports dot notation when enabled.
+   * @param {SchemaArrayElement<Schema, Key>} value - Item to append.
    */
   appendToArray(key, value) {
     const keyPath = String(key)
@@ -237,13 +271,16 @@ export class Conf {
       )
     }
 
-    this.set(keyPath, [...array, value])
+    this.set(
+      keyPath,
+      /** @type {SchemaValue<Schema, string>} */ ([...array, value])
+    )
   }
 
   /**
    * Reset items to their schema default values.
    *
-   * @param {...string} keys - Keys to reset.
+   * @param {...SchemaKeyPath<Schema>} keys - Keys to reset.
    */
   reset(...keys) {
     for (const key of keys) {
@@ -256,26 +293,25 @@ export class Conf {
   /**
    * Delete a config item.
    *
-   * @param {string} key - Item key. Supports dot notation when enabled.
+   * @param {SchemaKeyPath<Schema>} key - Item key. Supports dot notation when enabled.
    */
   delete(key) {
-    /** @type {Record<string, unknown>} */
+    const keyPath = String(key)
     const store = this.store
 
     if (this.#options.accessPropertiesByDotNotation) {
-      deleteProperty(store, key)
+      deleteProperty(store, keyPath)
     } else {
-      delete store[key]
+      delete store[keyPath]
     }
 
-    this.store = /** @type {StandardSchemaV1.InferOutput<Schema>} */ (store)
+    this.store = store
   }
 
   /**
    * Reset the config to schema default values.
    */
   clear() {
-    /** @type {Record<string, unknown>} */
     const newStore = createPlainObject()
 
     for (const key of Object.keys(this.#defaultValues)) {
@@ -290,14 +326,15 @@ export class Conf {
       }
     }
 
-    this.store = /** @type {StandardSchemaV1.InferOutput<Schema>} */ (newStore)
+    this.store = newStore
   }
 
   /**
    * Watch a config key for changes.
    *
-   * @param {string} key - Item key. Supports dot notation when enabled.
-   * @param {OnDidChangeCallback} callback - Called with `(newValue, oldValue)`.
+   * @template {SchemaKeyPath<Schema>} Key
+   * @param {Key} key - Item key. Supports dot notation when enabled.
+   * @param {OnDidChangeCallback<SchemaValue<Schema, Key>>} callback - Called with `(newValue, oldValue)`.
    * @returns {Unsubscribe} Unsubscribe function.
    */
   onDidChange(key, callback) {
@@ -319,7 +356,7 @@ export class Conf {
   /**
    * Watch the entire config object for changes.
    *
-   * @param {OnDidAnyChangeCallback<StandardSchemaV1.InferOutput<Schema>>} callback - Called with `(newValue, oldValue)`.
+   * @param {OnDidAnyChangeCallback<SchemaValues<Schema>>} callback - Called with `(newValue, oldValue)`.
    * @returns {Unsubscribe} Unsubscribe function.
    */
   onDidAnyChange(callback) {
@@ -372,7 +409,7 @@ export class Conf {
     }
   }
 
-  /** @param {StandardSchemaV1.InferOutput<Schema>} value */
+  /** @param {SchemaValues<Schema>} value */
   set store(value) {
     this.#ensureDirectory()
     this.#validate(value)
@@ -380,10 +417,15 @@ export class Conf {
     this.events.dispatchEvent(new Event('change'))
   }
 
-  /** Iterate over config entries as `[key, value]` pairs. */
+  /**
+   * Iterate over config entries as `[key, value]` pairs.
+   *
+   * @returns {Generator<SchemaEntry<Schema>, void, unknown>}
+   */
   *[Symbol.iterator]() {
     for (const [key, value] of Object.entries(this.store)) {
-      yield [key, value]
+      const entry = /** @type {SchemaEntry<Schema>} */ ([key, value])
+      yield entry
     }
   }
 
@@ -482,7 +524,7 @@ export class Conf {
   /**
    * Subscribe to full-store change events.
    *
-   * @param {OnDidAnyChangeCallback<StandardSchemaV1.InferOutput<Schema>>} callback
+   * @param {OnDidAnyChangeCallback<SchemaValues<Schema>>} callback
    * @returns {Unsubscribe}
    */
   #handleStoreChange(callback) {
@@ -511,8 +553,9 @@ export class Conf {
   /**
    * Subscribe to single-key change events.
    *
-   * @param {() => unknown} getter - Returns the current value for the watched key.
-   * @param {OnDidChangeCallback} callback
+   * @template Value
+   * @param {() => Value} getter - Returns the current value for the watched key.
+   * @param {OnDidChangeCallback<Value>} callback
    * @returns {Unsubscribe}
    */
   #handleValueChange(getter, callback) {

@@ -3,18 +3,16 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { suite } from 'playwright-test/taps'
 import { temporaryDirectory } from 'tempy'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { Conf } from '../src/index.js'
 
-const schema = z
-  .object({
-    foo: z.number().min(1).max(100).default(50),
-    bar: z.url().optional(),
-    nested: z.object({ value: z.boolean() }).optional(),
-    items: z.array(z.object({ name: z.string() })).optional(),
-    newItems: z.array(z.unknown()).optional(),
-  })
-  .passthrough()
+const schema = z.looseObject({
+  foo: z.number().min(1).max(100).default(50),
+  bar: z.url().optional(),
+  nested: z.object({ value: z.boolean() }).optional(),
+  items: z.array(z.object({ name: z.string() })).optional(),
+  newItems: z.array(z.unknown()).optional(),
+})
 
 /**
  * @param {import('../src/types.js').Options<typeof schema>} [options]
@@ -97,6 +95,7 @@ const { test: schemaTest } = schemaSuite
 schemaTest('rejects invalid values', () => {
   const config = createConf()
 
+  // @ts-expect-error - runtime validation should reject schema-invalid values.
   assert.throws(() => config.set('foo', 'nope'), /Config schema violation/)
 })
 
@@ -120,8 +119,7 @@ schemaTest('reset restores defaults', () => {
   assert.equal(config.get('foo'), 50)
 })
 
-const jsonSuite = suite('Conf json')
-const { test: jsonTest } = jsonSuite
+const jsonTest = suite('Conf json')
 
 /**
  * @param {Conf<typeof schema>} config
