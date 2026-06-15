@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.3.0...iso-conf-v0.4.0) (2026-06-15)
+
+
+### Features
+
+* **string:** add kebabCase function for string formatting ([58d60be](https://github.com/hugomrdias/iso-repo/commit/58d60be6bcd6115a80ca72e1ac1f165390bdd9cd))
+
 ## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.2.0...iso-conf-v0.3.0) (2026-06-12)
 
 
