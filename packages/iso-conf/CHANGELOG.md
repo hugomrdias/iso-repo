@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.2.0...iso-conf-v0.3.0) (2026-06-12)
+
+
+### Features
+
+* **types:** enhance type definitions for configuration schema ([c1acfa4](https://github.com/hugomrdias/iso-repo/commit/c1acfa4f98c5fc372027005f6fe8691eb9fdaadd))
+
 ## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.1.0...iso-conf-v0.2.0) (2026-05-29)
 
 
