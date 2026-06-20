@@ -82,8 +82,8 @@ importers:
         specifier: ^17.5.0
         version: 17.6.0
       hono:
-        specifier: ^4.12.14
-        version: 4.12.23
+        specifier: ^4.12.25
+        version: 4.12.25
       typescript:
         specifier: ~6.0.3
         version: 6.0.3
@@ -98,10 +98,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: ^2.0.4
-        version: 2.0.4(hono@4.12.23)
+        version: 2.0.4(hono@4.12.25)
       hono:
-        specifier: ^4.12.14
-        version: 4.12.23
+        specifier: ^4.12.25
+        version: 4.12.25
       iso-base:
         specifier: workspace:*
         version: link:../../packages/iso-base
@@ -165,8 +165,8 @@ importers:
         specifier: ^17.5.0
         version: 17.6.0
       hono:
-        specifier: ^4.12.14
-        version: 4.12.23
+        specifier: ^4.12.25
+        version: 4.12.25
       typescript:
         specifier: ~6.0.3
         version: 6.0.3
@@ -1663,6 +1663,9 @@ packages:
 
   '@ledgerhq/errors@6.35.0':
     resolution: {integrity: sha512-qk9PbqIvze7NXGogVxNCsz60rNo5FrGj8gKqs7pcyDk+em5L6s70G7cRxR+1HTXdam4WoPfntUq+WX9zQUynkg==}
+
+  '@ledgerhq/errors@6.36.0':
+    resolution: {integrity: sha512-o2Q5hNvf2TzAzlH8ORAozppRbzixRPYDfmSQrP7FOcM997OEH7qDleXgp/uMpvRdxR/t3CJCG+n0i+bU/oYMKA==}
 
   '@ledgerhq/evm-tools@1.12.7':
     resolution: {integrity: sha512-5rdHGvXNUz+0jUvnm/1CHEvI7z8jhlWq1kxJdOd5ijfKxJ8oaGJTEfNmvaNoLtzfwYIeNoIUOSQVs7FYfCuyNA==}
@@ -3261,8 +3264,8 @@ packages:
     resolution: {integrity: sha512-eSmmWE5bZTK2Nou4g0AI3zZ9rswp7GRKoKXS1BLUkvPviOqs4YTN1djQIqrXy9k5gEtdLPy86JjRwsNM9tnDcA==}
     engines: {node: '>=0.10.0'}
 
-  hono@4.12.23:
-    resolution: {integrity: sha512-eIaZ9qDgu7XV0pxOCrg7/WhnQ6Ivm22UcxhXx/A3dcbqbbYgBEkc6e/J/s7j2tS96zoB0S9VBdLwQNCWwUo4LA==}
+  hono@4.12.25:
+    resolution: {integrity: sha512-2NFaIyNVgJmBs/ecmtGzlmluTFs5cHEWGTdu0t1HBwYzoGXOL5nUQBRMXsXWla5i4KkG//QMzVP88m1+I3fdAQ==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@2.0.2:
@@ -5930,9 +5933,9 @@ snapshots:
       '@shikijs/types': 3.23.0
       '@shikijs/vscode-textmate': 10.0.2
 
-  '@hono/node-server@2.0.4(hono@4.12.23)':
+  '@hono/node-server@2.0.4(hono@4.12.25)':
     dependencies:
-      hono: 4.12.23
+      hono: 4.12.25
 
   '@img/colour@1.1.0': {}
 
@@ -6127,6 +6130,8 @@ snapshots:
       - react-redux
 
   '@ledgerhq/errors@6.35.0': {}
+
+  '@ledgerhq/errors@6.36.0': {}
 
   '@ledgerhq/evm-tools@1.12.7':
     dependencies:
@@ -7971,7 +7976,7 @@ snapshots:
     dependencies:
       parse-passwd: 1.0.0
 
-  hono@4.12.23: {}
+  hono@4.12.25: {}
 
   html-escaper@2.0.2: {}
 
@@ -8117,7 +8122,7 @@ snapshots:
   iso-filecoin@7.4.7(typescript@6.0.3):
     dependencies:
       '@ipld/dag-cbor': 9.2.7
-      '@ledgerhq/errors': 6.35.0
+      '@ledgerhq/errors': 6.36.0
       '@noble/curves': 1.9.7
       '@noble/hashes': 2.2.0
       '@scure/bip32': 1.7.0
