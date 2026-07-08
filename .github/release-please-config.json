@@ -11,6 +11,7 @@
     "packages/iso-ucan": {},
     "packages/iso-ledger": {},
     "packages/iso-conf": {},
+    "packages/iso-effect": {},
     "packages/configs": {},
     "packages/docs": {}
   }

@@ -12,7 +12,8 @@
       "packages/iso-websocket",
       "packages/iso-ucan",
       "packages/iso-ledger",
-      "packages/iso-conf"
+      "packages/iso-conf",
+      "packages/iso-effect"
     ],
     "excludeExternals": true,
     "sourceLinkExternal": true,

@@ -16,7 +16,7 @@ importers:
         version: link:packages/configs
       depcheck:
         specifier: ^1.4.7
-        version: 1.4.7
+        version: 1.4.7(supports-color@8.1.1)
       simple-git-hooks:
         specifier: ^2.11.0
         version: 2.13.1
@@ -337,6 +337,37 @@ importers:
       typescript:
         specifier: 6.0.3
         version: 6.0.3
+
+  packages/iso-effect:
+    dependencies:
+      '@standard-schema/spec':
+        specifier: ^1.1.0
+        version: 1.1.0
+      '@standard-schema/utils':
+        specifier: ^0.3.0
+        version: 0.3.0
+      iso-base:
+        specifier: workspace:^
+        version: link:../iso-base
+      iso-kv:
+        specifier: workspace:^
+        version: link:../iso-kv
+    devDependencies:
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.9.1
+      delay:
+        specifier: ^7.0.0
+        version: 7.0.0
+      playwright-test:
+        specifier: ^14.1.13
+        version: 14.1.15
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      zod:
+        specifier: ^4.3.6
+        version: 4.4.3
 
   packages/iso-kv:
     dependencies:
@@ -5394,7 +5425,7 @@ snapshots:
       '@babel/parser': 7.29.7
       '@babel/types': 7.29.7
 
-  '@babel/traverse@7.29.7':
+  '@babel/traverse@7.29.7(supports-color@8.1.1)':
     dependencies:
       '@babel/code-frame': 7.29.7
       '@babel/generator': 7.29.7
@@ -6490,7 +6521,7 @@ snapshots:
 
   '@scure/bip32@1.7.0':
     dependencies:
-      '@noble/curves': 1.9.1
+      '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
 
@@ -7257,10 +7288,10 @@ snapshots:
 
   delayed-stream@1.0.0: {}
 
-  depcheck@1.4.7:
+  depcheck@1.4.7(supports-color@8.1.1):
     dependencies:
       '@babel/parser': 7.29.7
-      '@babel/traverse': 7.29.7
+      '@babel/traverse': 7.29.7(supports-color@8.1.1)
       '@vue/compiler-sfc': 3.5.35
       callsite: 1.0.0
       camelcase: 6.3.0

@@ -1,0 +1,76 @@
+{
+  "name": "iso-effect",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Isomorphic effect runner with deduplication, rate limiting and persistent caching",
+  "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
+  "license": "MIT",
+  "homepage": "https://github.com/hugomrdias/iso-repo/tree/master/packages/iso-effect",
+  "repository": {
+    "url": "hugomrdias/iso-repo",
+    "directory": "packages/iso-effect"
+  },
+  "bugs": {
+    "url": "https://github.com/hugomrdias/iso-repo/issues"
+  },
+  "keywords": [
+    "effect",
+    "cache",
+    "rate-limit",
+    "standard-schema",
+    "isomorphic"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./types": {
+      "types": "./dist/src/types.d.ts"
+    }
+  },
+  "main": "src/index.js",
+  "types": "dist/src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "types": [
+        "dist/src/types"
+      ]
+    }
+  },
+  "files": [
+    "src",
+    "dist/src/**/*.d.ts",
+    "dist/src/**/*.d.ts.map"
+  ],
+  "scripts": {
+    "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
+    "test": "pnpm run test:node && pnpm run test:browser",
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+  },
+  "dependencies": {
+    "@standard-schema/spec": "^1.1.0",
+    "@standard-schema/utils": "^0.3.0",
+    "iso-base": "workspace:^",
+    "iso-kv": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "delay": "^7.0.0",
+    "playwright-test": "^14.1.13",
+    "typescript": "6.0.3",
+    "zod": "^4.3.6"
+  },
+  "publishConfig": {
+    "provenance": true
+  },
+  "depcheck": {
+    "specials": [
+      "bin"
+    ],
+    "ignores": [
+      "@types/*"
+    ]
+  }
+}
