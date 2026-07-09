@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/hugomrdias/iso-repo/compare/configs-v1.1.3...configs-v1.1.4) (2026-07-09)
+
+
+### Bug Fixes
+
+* remove importsNotUsedAsValues ([1267906](https://github.com/hugomrdias/iso-repo/commit/126790633b24ff4a987c3343ba690ddcd6a405b6))
+
 ## [1.1.3](https://github.com/hugomrdias/iso-repo/compare/configs-v1.1.2...configs-v1.1.3) (2026-03-15)
 
 
