@@ -26,7 +26,6 @@
     "sourceMap": true,
     "removeComments": false,
     "noEmit": false,
-    "importsNotUsedAsValues": "remove",
     "stripInternal": true,
     "noEmitOnError": true,
 
