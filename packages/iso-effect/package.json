@@ -1,7 +1,7 @@
 {
   "name": "iso-effect",
   "type": "module",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Isomorphic effect runner with deduplication, rate limiting and persistent caching",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
   "license": "MIT",
