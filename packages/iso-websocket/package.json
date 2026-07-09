@@ -45,14 +45,14 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.13",
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.1.1",
     "@types/retry": "^0.12.5",
     "@types/ws": "^8.5.14",
     "delay": "^7.0.0",
     "p-defer": "^4.0.0",
     "playwright-test": "^14.1.13",
-    "type-fest": "^5.7.0",
-    "typescript": "6.0.3",
+    "type-fest": "^5.8.0",
+    "typescript": "catalog:",
     "ws": "^8.20.0"
   },
   "publishConfig": {

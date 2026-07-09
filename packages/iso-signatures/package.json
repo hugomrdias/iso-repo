@@ -93,18 +93,18 @@
     "eventemitter3": "5.0.1",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
-    "ox": "^0.14.27"
+    "ox": "^0.14.30"
   },
   "devDependencies": {
     "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.1.1",
     "assert": "^2.1.0",
     "mocha": "^11.7.5",
     "playwright-test": "^14.1.13",
-    "type-fest": "^5.7.0",
-    "typescript": "6.0.3",
-    "viem": "^2.52.0"
+    "type-fest": "^5.8.0",
+    "typescript": "catalog:",
+    "viem": "^2.54.6"
   },
   "publishConfig": {
     "provenance": true

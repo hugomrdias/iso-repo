@@ -51,19 +51,19 @@
   },
   "dependencies": {
     "conf": "^15.1.0",
-    "idb-keyval": "^6.2.1",
+    "idb-keyval": "^6.3.0",
     "iso-base": "workspace:^",
-    "kysely": "^0.29.2"
+    "kysely": "^0.29.3"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
-    "@types/node": "^25.6.0",
-    "better-sqlite3": "^12.9.0",
+    "@types/node": "^26.1.1",
+    "better-sqlite3": "^12.11.1",
     "delay": "^7.0.0",
     "playwright-test": "^14.1.13",
     "quick-lru": "^7.3.0",
     "tempy": "^3.2.0",
-    "typescript": "6.0.3"
+    "typescript": "catalog:"
   },
   "publishConfig": {
     "provenance": true

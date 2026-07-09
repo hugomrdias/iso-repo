@@ -57,10 +57,10 @@
     "iso-base": "workspace:^"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.1.1",
     "playwright-test": "^14.1.13",
     "tempy": "^3.2.0",
-    "typescript": "6.0.3",
+    "typescript": "catalog:",
     "zod": "^4.3.6"
   },
   "publishConfig": {

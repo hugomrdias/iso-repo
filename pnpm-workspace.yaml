@@ -1,6 +1,9 @@
 packages:
   - 'packages/*'
   - 'examples/*'
+
+blockExoticSubdeps: true
+
 allowBuilds:
   better-sqlite3: true
   cbor-extract: false
@@ -10,3 +13,6 @@ allowBuilds:
   sharp: true
   simple-git-hooks: true
   workerd: true
+
+catalog:
+  typescript: ^6.0.3
