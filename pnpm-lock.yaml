@@ -22,7 +22,7 @@ importers:
         version: link:packages/configs
       depcheck:
         specifier: ^1.4.7
-        version: 1.4.7(supports-color@8.1.1)
+        version: 1.4.7
       simple-git-hooks:
         specifier: ^2.11.0
         version: 2.13.1
@@ -103,8 +103,8 @@ importers:
   examples/rpc-todo:
     dependencies:
       '@hono/node-server':
-        specifier: ^2.0.8
-        version: 2.0.8(hono@4.12.28)
+        specifier: ^2.0.10
+        version: 2.0.10(hono@4.12.28)
       hono:
         specifier: ^4.12.28
         version: 4.12.28
@@ -883,6 +883,7 @@ packages:
 
   '@cloudflare/vite-plugin@1.43.2':
     resolution: {integrity: sha512-xYJ5ozwnEJ+wGRbK9GD/Chq044zehaAJ/UkvgVbF3K53Su7SyLOEs0SCTV2MWT5q4k0cdbyLk+21zyr1j+rMLQ==}
+    deprecated: Depended on a version of Wrangler with issues. Downgrade to 1.43.1
     hasBin: true
     peerDependencies:
       vite: ^6.1.0 || ^7.0.0 || ^8.0.0
@@ -1475,8 +1476,8 @@ packages:
   '@gerrit0/mini-shiki@3.23.0':
     resolution: {integrity: sha512-bEMORlG0cqdjVyCEuU0cDQbORWX+kYCeo0kV1lbxF5bt4r7SID2l9bqsxJEM0zndaxpOUT7riCyIVEuqq/Ynxg==}
 
-  '@hono/node-server@2.0.8':
-    resolution: {integrity: sha512-GuCWzLxwg218fy1JaHculFsdcuY12hxit83V+algozTPnwhNjLrRL/Alg9OYjLZLoUZ1rw/S4CdTMsnkSKCmFA==}
+  '@hono/node-server@2.0.10':
+    resolution: {integrity: sha512-ZcnNVhKTmyDJeg0UlnZjvM73JBsTAuhrH/J4fjwGOw59PwOW51r4J+p6CsKZWXdKSme4MFqU62CZMOsdDrU4CA==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -2388,6 +2389,17 @@ packages:
       zod:
         optional: true
 
+  abitype@1.3.0:
+    resolution: {integrity: sha512-fk6Te+bojIFrMvMZrnOO+SxCB+RUksTGOzq/60ZRvs1L+BVzvi2bqt9L3W/17ZLdZsyM1FuYf65P5nlmoiH1Bg==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3.22.0 || ^4.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+
   abort-error@1.0.2:
     resolution: {integrity: sha512-lVgvB2NyPLqbXXhVmXcYFTC1x5K7CiVdPgdY7LGgFQWC8506oN01sPN3i9cl9ynuwF4iJ0TS9exnR7cZ9FuX4w==}
 
@@ -2625,6 +2637,10 @@ packages:
 
   cborg@5.1.7:
     resolution: {integrity: sha512-rGg2MG9zZEUKtKqjkBppIWUecTXf9N1vs1Qru43vJWoDaODhCrtmzdehCaA/aq/c1cPI5A0kPrJ5Tf+jIfhV4w==}
+    hasBin: true
+
+  cborg@5.1.8:
+    resolution: {integrity: sha512-enonPtLyeEF8M8GF/5NdjLHmRGslrwKR2LvkN+yFYQJw7mzt6iOoPvkVs3vcb3rUvltzL0QfvtM6FQ44o8nhSg==}
     hasBin: true
 
   ccount@2.0.1:
@@ -3591,6 +3607,10 @@ packages:
 
   kysely@0.29.3:
     resolution: {integrity: sha512-VHtBdW6XB/pgoTSqraM3UAa2rYoYdNXqnNPpX+8XXP+cwYbVEFuAp3HyPt1vpNfU9l7Y2kpUrA9QDPsy8uUqOQ==}
+    engines: {node: '>=22.0.0'}
+
+  kysely@0.29.4:
+    resolution: {integrity: sha512-y5mVgQNkMbs1eK9Xyc0pmNdabN2wHhRYY/5r4W5HrUT1rYCEPeVNSj1RUJeSDKT3U0p+mXCvLgkrFuIafYI6BA==}
     engines: {node: '>=22.0.0'}
 
   lightningcss-android-arm64@1.32.0:
@@ -5145,6 +5165,7 @@ packages:
   wrangler@4.108.0:
     resolution: {integrity: sha512-mJnY6vf2Tminfo0Jy5OreBgUjIKW3iM1TQtOrZZRpFUyiQvAYUDVN0aRcDn8/aEfF0bmZgcixRdwwVHZMZaE7w==}
     engines: {node: '>=22.0.0'}
+    deprecated: This version was causing deployment failures in CI for some users. Downgrade to 4.107.1
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^5.20260706.1
@@ -5463,7 +5484,7 @@ snapshots:
       '@babel/parser': 7.29.7
       '@babel/types': 7.29.7
 
-  '@babel/traverse@7.29.7(supports-color@8.1.1)':
+  '@babel/traverse@7.29.7':
     dependencies:
       '@babel/code-frame': 7.29.7
       '@babel/generator': 7.29.7
@@ -6004,7 +6025,7 @@ snapshots:
       '@shikijs/types': 3.23.0
       '@shikijs/vscode-textmate': 10.0.2
 
-  '@hono/node-server@2.0.8(hono@4.12.28)':
+  '@hono/node-server@2.0.10(hono@4.12.28)':
     dependencies:
       hono: 4.12.28
 
@@ -6138,7 +6159,7 @@ snapshots:
 
   '@ipld/dag-cbor@9.2.7':
     dependencies:
-      cborg: 5.1.7
+      cborg: 5.1.8
       multiformats: 13.4.2
 
   '@isaacs/cliui@8.0.2':
@@ -6818,6 +6839,11 @@ snapshots:
       typescript: 6.0.3
       zod: 4.4.3
 
+  abitype@1.3.0(typescript@6.0.3)(zod@4.4.3):
+    optionalDependencies:
+      typescript: 6.0.3
+      zod: 4.4.3
+
   abort-error@1.0.2: {}
 
   acorn-jsx@5.3.2(acorn@8.17.0):
@@ -7142,6 +7168,8 @@ snapshots:
 
   cborg@5.1.7: {}
 
+  cborg@5.1.8: {}
+
   ccount@2.0.1: {}
 
   chalk@4.1.2:
@@ -7328,10 +7356,10 @@ snapshots:
 
   delayed-stream@1.0.0: {}
 
-  depcheck@1.4.7(supports-color@8.1.1):
+  depcheck@1.4.7:
     dependencies:
       '@babel/parser': 7.29.7
-      '@babel/traverse': 7.29.7(supports-color@8.1.1)
+      '@babel/traverse': 7.29.7
       '@vue/compiler-sfc': 3.5.39
       callsite: 1.0.0
       camelcase: 6.3.0
@@ -8193,7 +8221,7 @@ snapshots:
       '@noble/hashes': 2.2.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.4(typescript@6.0.3)(zod@4.4.3)
+      abitype: 1.3.0(typescript@6.0.3)(zod@4.4.3)
       bignumber.js: 9.3.1
       iso-base: 4.4.0
       iso-kv: 3.2.0
@@ -8207,7 +8235,7 @@ snapshots:
       conf: 15.1.0
       idb-keyval: 6.3.0
       iso-base: 4.4.0
-      kysely: 0.29.3
+      kysely: 0.29.4
 
   iso-web@1.4.3:
     dependencies:
@@ -8284,6 +8312,8 @@ snapshots:
   klona@2.0.6: {}
 
   kysely@0.29.3: {}
+
+  kysely@0.29.4: {}
 
   lightningcss-android-arm64@1.32.0:
     optional: true
