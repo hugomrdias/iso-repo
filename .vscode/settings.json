@@ -8,5 +8,7 @@
   "js/ts.format.enabled": false,
   "js/ts.preferences.importModuleSpecifierEnding": "js",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
-  "js/ts.tsdk.path": "./node_modules/typescript/lib"
+  "js/ts.tsdk.path": "./node_modules/typescript/lib",
+  "eslint.enable": false,
+  "prettier.enable": false
 }
