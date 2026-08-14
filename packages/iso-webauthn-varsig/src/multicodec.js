@@ -41,10 +41,16 @@ export const INNER_EDDSA = 0xed
 export const INNER_ECDSA = 0xec
 
 /**
- * Varsig curve varints (multicodec).
+ * Varsig curve codes (multicodec).
+ *
+ * These are multicodec *codes*; they are varint-encoded when written. 0xed
+ * encodes to the bytes `ed 01`, which is why ed25519-pub is often written
+ * "0xed01" in prose — but using that as the code here means the number 60673,
+ * whose varint is `81 da 03`, and no other implementation would read it as
+ * ed25519-pub. Alias the codes declared above so the two cannot drift.
  */
-export const CURVE_ED25519 = 0xed01
-export const CURVE_P256 = 0x1200
+export const CURVE_ED25519 = ED25519_PUB
+export const CURVE_P256 = P256_PUB
 
 /**
  * Varsig multihash header (SHA-256).

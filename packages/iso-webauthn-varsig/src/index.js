@@ -25,6 +25,7 @@ export {
   WEBAUTHN_P256,
   WEBAUTHN_WRAPPER,
 } from './multicodec.js'
+export { derToRawSignature, isDerSignature } from './signature.js'
 export {
   base64urlToBytes,
   bytesEqual,
@@ -38,4 +39,5 @@ export {
   verifyEd25519Signature,
   verifyP256Signature,
   verifyWebAuthnAssertion,
+  verifyWebAuthnVarsig,
 } from './verifier.js'

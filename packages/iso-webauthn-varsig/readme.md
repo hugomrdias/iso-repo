@@ -18,7 +18,8 @@ webauthn-varsig-header = varsig-prefix varsig-version inner-algorithm curve weba
 varsig-prefix = %x34
 varsig-version = %x01
 inner-algorithm = %xED / %xEC       ; EdDSA / ECDSA
-curve = %xED01 / %x1200             ; Ed25519 / P-256 (multicodec)
+curve = %xED / %x1200               ; Ed25519 / P-256 (multicodec code,
+                                    ; varint-encoded: ED -> ED 01)
 webauthn-marker = %x300001           ; private-use multicodec
 
 client-data-length = 1*unsigned-varint
@@ -39,7 +40,7 @@ import {
   encodeWebAuthnVarsigV1,
   decodeWebAuthnVarsigV1,
   parseClientDataJSON,
-  verifyWebAuthnAssertion,
+  verifyWebAuthnVarsig,
 } from 'iso-webauthn-varsig'
 
 const assertion = {
@@ -58,19 +59,37 @@ const varsig2 = encodeWebAuthnVarsigV1(assertion, 'P-256', {
 })
 
 const decoded = decodeWebAuthnVarsigV1(varsig)
-const clientData = parseClientDataJSON(decoded.clientDataJSON)
 
-console.log(decoded.signatureHashAlgorithm) // 0x12
-console.log(decoded.encodingInfo)           // 0x5f
-
-const result = await verifyWebAuthnAssertion(decoded, {
-  expectedOrigin: clientData.origin,
-  expectedRpId: new URL(clientData.origin).hostname,
-  expectedChallenge: new Uint8Array([/* ... */]),
+const result = await verifyWebAuthnVarsig(decoded, {
+  // These must come from *your* configuration and from the challenge you
+  // issued — never from the assertion being verified. Reading them out of
+  // decoded.clientDataJSON would compare each value against itself and
+  // check nothing.
+  expectedOrigin: 'https://example.com',
+  expectedRpId: 'example.com',
+  expectedChallenge: challengeYouIssued,
+  // The credential's public key, from registration: 32 raw bytes for Ed25519,
+  // or an uncompressed P-256 point (65 bytes, 0x04 || x || y).
+  publicKey: storedCredentialPublicKey,
 })
 
 console.log(result.valid)
 ```
+
+### Verifying
+
+`verifyWebAuthnVarsig` is the function you want: it checks the ceremony type,
+origin, challenge, rpIdHash and flags **and** verifies the signature.
+
+`verifyWebAuthnAssertion` performs only the first half. It is exported for
+callers who manage key lookup themselves, but on its own a `valid: true` result
+says the assertion is well-formed and addressed to you — not that it is
+authentic. It accepts a fabricated signature.
+
+P-256 signatures are accepted in either the ASN.1 DER form an authenticator
+emits or raw `r||s`; the conversion happens internally. WebCrypto only
+understands the raw form, so passing DER to `subtle.verify` yourself silently
+returns `false` for every genuine signature.
 
 ## Notes
 
