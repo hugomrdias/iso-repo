@@ -1,7 +1,7 @@
 {
   "name": "@le-space/iso-webauthn-varsig",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "WebAuthn varsig encoding/decoding helpers.",
   "author": "Nico Krause <post@nicokrause.com> (nicokrause.com)",
   "license": "MIT",
@@ -42,7 +42,8 @@
   "files": [
     "src",
     "dist/src/*.d.ts",
-    "dist/src/*.d.ts.map"
+    "dist/src/*.d.ts.map",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
