@@ -45,16 +45,13 @@ export const INNER_ECDSA = 0xec
  *
  * These are multicodec *codes*; they are varint-encoded when written. 0xed
  * encodes to the bytes `ed 01`, which is why ed25519-pub is often written
- * "0xed01" in prose — but using that as the code here means the number 60673,
- * whose varint is `81 da 03`, and no other implementation would read it as
- * ed25519-pub. Alias the codes declared above so the two cannot drift.
+ * "0xed01" in prose — but using that as the code means the number 60673, whose
+ * varint is `81 da 03`, and no other implementation would read it as
+ * ed25519-pub. The varsig spec (common.md: eddsa-curve hex `0xED`) and
+ * dialog-varsig (`config_tags vec![0xed, 0x13]`) both use the plain code.
+ * Aliased to the codes declared above so the two cannot drift.
  */
-// FIXME: 0xed01 is the varint *encoding* of multicodec 0xed, not the code.
-// Both the varsig spec (common.md: eddsa-curve hex 0xED) and dialog-varsig
-// (config_tags vec![0xed, 0x13]) use the plain code. Fixing it changes the
-// bytes on the wire, and varsig signatures are persisted in OrbitDB oplog
-// entries, so this waits for the format decision on ChainAgnostic/varsig#11.
-export const CURVE_ED25519 = 0xed01
+export const CURVE_ED25519 = ED25519_PUB
 export const CURVE_P256 = P256_PUB
 
 /**
