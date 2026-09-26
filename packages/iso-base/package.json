@@ -131,14 +131,14 @@
     "bigint-mod-arith": "^3.3.1"
   },
   "devDependencies": {
-    "@scure/base": "^2.2.0",
+    "@scure/base": "^2.4.0",
     "@types/assert": "catalog:",
     "@types/mocha": "catalog:",
     "@types/node": "catalog:",
     "assert": "catalog:",
     "mocha": "catalog:",
     "playwright-test": "catalog:",
-    "tinybench": "^6.0.0",
+    "tinybench": "^6.2.0",
     "typescript": "catalog:"
   },
   "publishConfig": {

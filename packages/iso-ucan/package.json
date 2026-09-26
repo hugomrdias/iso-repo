@@ -101,7 +101,7 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.{js,ts}'"
   },
   "dependencies": {
-    "@ipld/dag-cbor": "^10.0.1",
+    "@ipld/dag-cbor": "^10.0.2",
     "@standard-schema/spec": "catalog:",
     "@standard-schema/utils": "catalog:",
     "iobuffer": "^6.0.1",
@@ -110,7 +110,7 @@
     "iso-kv": "workspace:^",
     "iso-signatures": "workspace:^",
     "iso-web": "workspace:^",
-    "it-merge": "^3.0.12",
+    "it-merge": "^3.0.15",
     "multiformats": "catalog:",
     "zod": "catalog:"
   },

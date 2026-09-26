@@ -47,13 +47,13 @@
     "@types/debug": "catalog:",
     "@types/node": "catalog:",
     "@types/retry": "^0.12.5",
-    "@types/ws": "^8.5.14",
+    "@types/ws": "^8.18.1",
     "delay": "catalog:",
-    "p-defer": "^4.0.0",
+    "p-defer": "^4.0.1",
     "playwright-test": "catalog:",
     "type-fest": "catalog:",
     "typescript": "catalog:",
-    "ws": "^8.20.0"
+    "ws": "^8.21.3"
   },
   "publishConfig": {
     "provenance": true

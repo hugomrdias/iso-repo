@@ -51,9 +51,9 @@
   },
   "dependencies": {
     "@noble/ed25519": "catalog:",
-    "@peculiar/asn1-ecc": "^2.8.0",
-    "@peculiar/asn1-schema": "^2.8.0",
-    "cbor-x": "^1.6.4",
+    "@peculiar/asn1-ecc": "^2.9.5",
+    "@peculiar/asn1-schema": "^2.9.5",
+    "cbor-x": "^1.6.6",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^"
   },

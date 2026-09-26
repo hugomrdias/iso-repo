@@ -30,7 +30,7 @@
     "@biomejs/biome": "catalog:",
     "@hugomrdias/configs": "workspace:^",
     "depcheck": "^1.4.7",
-    "simple-git-hooks": "^2.11.0",
+    "simple-git-hooks": "^2.14.0",
     "typedoc": "^0.28.20",
     "typedoc-plugin-missing-exports": "^4.1.4",
     "typescript": "catalog:"
