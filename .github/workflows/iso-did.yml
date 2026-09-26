@@ -20,14 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/setup@v3
         with:
-          version: latest
-      - uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
-          cache: pnpm
-      - run: pnpm install
+          cache: true
       - run: pnpm run build
       - run: pnpm -r --filter iso-did run lint
       - run: pnpm -r --filter iso-did run test

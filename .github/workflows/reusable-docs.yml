@@ -20,15 +20,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/setup@v3
         with:
-          version: latest
-      - uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
-          registry-url: 'https://registry.npmjs.org'
-          cache: pnpm
-      - run: pnpm install
+          cache: true
       - run: pnpm run lint
       - run: pnpm run docs
       - uses: actions/configure-pages@v6
