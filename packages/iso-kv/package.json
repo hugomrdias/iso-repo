@@ -56,9 +56,9 @@
     "kysely": "^0.29.6"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "catalog:",
-    "better-sqlite3": "^12.11.1",
+    "better-sqlite3": "^13.0.3",
     "delay": "catalog:",
     "playwright-test": "catalog:",
     "quick-lru": "^7.3.0",

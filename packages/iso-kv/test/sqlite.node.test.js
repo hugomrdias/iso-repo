@@ -10,8 +10,7 @@ const kv = new KV({
     name: 'kv',
     dialect: new SqliteDialect({
       database: new SQLite(':memory:', {
-        nativeBinding:
-          './node_modules/better-sqlite3/build/Release/better_sqlite3.node',
+        nativeBinding: `./node_modules/better-sqlite3/prebuilds/${process.platform}-${process.arch}.node`,
       }),
     }),
   }),

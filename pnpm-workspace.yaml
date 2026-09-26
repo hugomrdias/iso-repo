@@ -5,7 +5,7 @@ packages:
 blockExoticSubdeps: true
 
 allowBuilds:
-  better-sqlite3: true
+  better-sqlite3: false
   cbor-extract: false
   esbuild: true
   keccak: false
@@ -40,7 +40,7 @@ catalog:
   tempy: ^3.2.0
   type-fest: ^5.10.0
   typescript: ^6.0.3
-  viem: ~2.54.6
+  viem: ~2.56.9
   vite: ^8.3.1
   wrangler: ^4.141.0
   zod: ^4.6.5
