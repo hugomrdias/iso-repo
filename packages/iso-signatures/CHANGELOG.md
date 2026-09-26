@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.5.1...iso-signatures-v0.5.2) (2026-09-26)
+
+
+### Bug Fixes
+
+* **iso-signatures:** bind EIP-191 signature verification to did:pkh address ([b33c480](https://github.com/hugomrdias/iso-repo/commit/b33c4806ec4effabc37a499ecf419634af2d8339))
+
 ## [0.5.1](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.5.0...iso-signatures-v0.5.1) (2025-09-29)
 
 
