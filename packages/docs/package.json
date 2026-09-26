@@ -38,8 +38,8 @@
   },
   "devDependencies": {
     "@astrojs/starlight": "^0.39.2",
-    "@biomejs/biome": "^2.5.3",
-    "@types/node": "^26.1.1",
+    "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
     "astro": "^6.4.2",
     "typescript": "catalog:"
   },

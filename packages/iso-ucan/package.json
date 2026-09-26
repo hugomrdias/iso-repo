@@ -102,8 +102,8 @@
   },
   "dependencies": {
     "@ipld/dag-cbor": "^10.0.1",
-    "@standard-schema/spec": "^1.1.0",
-    "@standard-schema/utils": "^0.3.0",
+    "@standard-schema/spec": "catalog:",
+    "@standard-schema/utils": "catalog:",
     "iobuffer": "^6.0.1",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^",
@@ -111,13 +111,13 @@
     "iso-signatures": "workspace:^",
     "iso-web": "workspace:^",
     "it-merge": "^3.0.12",
-    "multiformats": "^14.0.4",
-    "zod": "^4.3.6"
+    "multiformats": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^26.1.1",
-    "delay": "^7.0.0",
-    "playwright-test": "^14.1.13",
+    "@types/node": "catalog:",
+    "delay": "catalog:",
+    "playwright-test": "catalog:",
     "typescript": "catalog:"
   },
   "publishConfig": {

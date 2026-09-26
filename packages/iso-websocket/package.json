@@ -44,14 +44,14 @@
     "typescript-event-target": "^1.1.2"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.13",
-    "@types/node": "^26.1.1",
+    "@types/debug": "catalog:",
+    "@types/node": "catalog:",
     "@types/retry": "^0.12.5",
     "@types/ws": "^8.5.14",
-    "delay": "^7.0.0",
+    "delay": "catalog:",
     "p-defer": "^4.0.0",
-    "playwright-test": "^14.1.13",
-    "type-fest": "^5.8.0",
+    "playwright-test": "catalog:",
+    "type-fest": "catalog:",
     "typescript": "catalog:",
     "ws": "^8.20.0"
   },

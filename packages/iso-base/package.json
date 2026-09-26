@@ -132,12 +132,12 @@
   },
   "devDependencies": {
     "@scure/base": "^2.2.0",
-    "@types/assert": "^1.5.11",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "^26.1.1",
-    "assert": "^2.1.0",
-    "mocha": "^11.7.5",
-    "playwright-test": "^14.1.13",
+    "@types/assert": "catalog:",
+    "@types/mocha": "catalog:",
+    "@types/node": "catalog:",
+    "assert": "catalog:",
+    "mocha": "catalog:",
+    "playwright-test": "catalog:",
     "tinybench": "^6.0.0",
     "typescript": "catalog:"
   },

@@ -164,16 +164,100 @@ settings:
 
 catalogs:
   default:
+    '@biomejs/biome':
+      specifier: ^2.5.3
+      version: 2.5.3
+    '@noble/ed25519':
+      specifier: ^3.0.1
+      version: 3.1.0
+    '@noble/hashes':
+      specifier: ^2.0.0
+      version: 2.2.0
+    '@standard-schema/spec':
+      specifier: ^1.1.0
+      version: 1.1.0
+    '@standard-schema/utils':
+      specifier: ^0.3.0
+      version: 0.3.0
+    '@types/assert':
+      specifier: ^1.5.11
+      version: 1.5.11
+    '@types/debug':
+      specifier: ^4.1.13
+      version: 4.1.13
+    '@types/mocha':
+      specifier: ^10.0.10
+      version: 10.0.10
+    '@types/node':
+      specifier: ^26.1.1
+      version: 26.1.1
+    '@types/react':
+      specifier: ^19.2.17
+      version: 19.2.17
+    '@types/react-dom':
+      specifier: ^19.2.3
+      version: 19.2.3
+    '@vitejs/plugin-react':
+      specifier: ^6.0.3
+      version: 6.0.3
+    assert:
+      specifier: ^2.1.0
+      version: 2.1.0
+    delay:
+      specifier: ^7.0.0
+      version: 7.0.0
+    globals:
+      specifier: ^17.7.0
+      version: 17.7.0
+    hono:
+      specifier: ^4.12.28
+      version: 4.12.28
+    mocha:
+      specifier: ^11.7.5
+      version: 11.7.6
+    msw:
+      specifier: 2.14.6
+      version: 2.14.6
+    multiformats:
+      specifier: ^14.0.4
+      version: 14.0.4
+    playwright-test:
+      specifier: ^14.1.13
+      version: 14.1.15
+    react:
+      specifier: ^19.2.5
+      version: 19.2.7
+    react-dom:
+      specifier: ^19.2.5
+      version: 19.2.7
+    tempy:
+      specifier: ^3.2.0
+      version: 3.2.0
+    type-fest:
+      specifier: ^5.8.0
+      version: 5.8.0
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
+    viem:
+      specifier: ~2.54.6
+      version: 2.54.6
+    vite:
+      specifier: ^8.1.3
+      version: 8.1.3
+    wrangler:
+      specifier: ^4.108.0
+      version: 4.108.0
+    zod:
+      specifier: ^4.4.3
+      version: 4.4.3
 
 importers:
 
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^2.5.3
+        specifier: 'catalog:'
         version: 2.5.3
       '@hugomrdias/configs':
         specifier: workspace:^
@@ -221,44 +305,44 @@ importers:
         specifier: workspace:*
         version: link:../../packages/iso-ucan
       react:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.7
       react-dom:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
       viem:
-        specifier: ~2.54.6
+        specifier: 'catalog:'
         version: 2.54.6(typescript@6.0.3)(zod@4.4.3)
       wagmi:
         specifier: ^3.7.0
         version: 3.7.0(@tanstack/query-core@5.101.2)(@tanstack/react-query@5.101.2(react@19.2.7))(@types/react@19.2.17)(immer@11.1.11)(react@19.2.7)(typescript@6.0.3)(viem@2.54.6(typescript@6.0.3)(zod@4.4.3))
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
       '@types/react':
-        specifier: ^19.2.17
+        specifier: 'catalog:'
         version: 19.2.17
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.17)
       '@vitejs/plugin-react':
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3(vite@8.1.3(@types/node@26.1.1)(esbuild@0.28.1)(yaml@2.9.0))
       globals:
-        specifier: ^17.7.0
+        specifier: 'catalog:'
         version: 17.7.0
       hono:
-        specifier: ^4.12.28
+        specifier: 'catalog:'
         version: 4.12.28
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
       vite:
-        specifier: ^8.1.3
+        specifier: 'catalog:'
         version: 8.1.3(@types/node@26.1.1)(esbuild@0.28.1)(yaml@2.9.0)
       wrangler:
-        specifier: ^4.108.0
+        specifier: 'catalog:'
         version: 4.108.0
 
   examples/rpc-todo:
@@ -267,7 +351,7 @@ importers:
         specifier: ^2.0.8
         version: 2.0.8(hono@4.12.28)
       hono:
-        specifier: ^4.12.28
+        specifier: 'catalog:'
         version: 4.12.28
       iso-base:
         specifier: workspace:*
@@ -282,11 +366,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/iso-ucan
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       typescript:
         specifier: 'catalog:'
@@ -307,41 +391,41 @@ importers:
         specifier: workspace:*
         version: link:../../packages/iso-ucan
       react:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.7
       react-dom:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.43.2
         version: 1.43.2(vite@8.1.3(@types/node@26.1.1)(esbuild@0.28.1)(yaml@2.9.0))(workerd@1.20260706.1)(wrangler@4.108.0)
       '@types/react':
-        specifier: ^19.2.17
+        specifier: 'catalog:'
         version: 19.2.17
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.17)
       '@vitejs/plugin-react':
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3(vite@8.1.3(@types/node@26.1.1)(esbuild@0.28.1)(yaml@2.9.0))
       globals:
-        specifier: ^17.7.0
+        specifier: 'catalog:'
         version: 17.7.0
       hono:
-        specifier: ^4.12.28
+        specifier: 'catalog:'
         version: 4.12.28
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
       vite:
-        specifier: ^8.1.3
+        specifier: 'catalog:'
         version: 8.1.3(@types/node@26.1.1)(esbuild@0.28.1)(yaml@2.9.0)
       wrangler:
-        specifier: ^4.108.0
+        specifier: 'catalog:'
         version: 4.108.0
 
   packages/configs:
@@ -351,7 +435,7 @@ importers:
         version: 2.5.3
     devDependencies:
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       typescript:
         specifier: 'catalog:'
@@ -373,10 +457,10 @@ importers:
         specifier: ^0.39.2
         version: 0.39.3(astro@6.4.8(@types/node@26.1.1)(idb-keyval@6.3.0)(lightningcss@1.32.0)(rollup@4.62.2)(supports-color@10.2.2)(yaml@2.9.0))(supports-color@10.2.2)(typescript@6.0.3)
       '@biomejs/biome':
-        specifier: ^2.5.3
+        specifier: 'catalog:'
         version: 2.5.3
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       astro:
         specifier: ^6.4.2
@@ -395,22 +479,22 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0
       '@types/assert':
-        specifier: ^1.5.11
+        specifier: 'catalog:'
         version: 1.5.11
       '@types/mocha':
-        specifier: ^10.0.10
+        specifier: 'catalog:'
         version: 10.0.10
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       assert:
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       mocha:
-        specifier: ^11.7.5
+        specifier: 'catalog:'
         version: 11.7.6
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       tinybench:
         specifier: ^6.0.0
@@ -422,10 +506,10 @@ importers:
   packages/iso-conf:
     dependencies:
       '@standard-schema/spec':
-        specifier: ^1.1.0
+        specifier: 'catalog:'
         version: 1.1.0
       '@standard-schema/utils':
-        specifier: ^0.3.0
+        specifier: 'catalog:'
         version: 0.3.0
       atomically:
         specifier: ^2.0.3
@@ -441,19 +525,19 @@ importers:
         version: link:../iso-base
     devDependencies:
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       tempy:
-        specifier: ^3.2.0
+        specifier: 'catalog:'
         version: 3.2.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.4.3
 
   packages/iso-did:
@@ -468,38 +552,38 @@ importers:
         specifier: workspace:^
         version: link:../iso-web
       multiformats:
-        specifier: ^14.0.4
+        specifier: 'catalog:'
         version: 14.0.4
       p-race:
         specifier: ^3.1.0
         version: 3.1.0
     devDependencies:
       '@noble/hashes':
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.2.0
       '@types/assert':
-        specifier: ^1.5.11
+        specifier: 'catalog:'
         version: 1.5.11
       '@types/mocha':
-        specifier: ^10.0.10
+        specifier: 'catalog:'
         version: 10.0.10
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       assert:
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       mocha:
-        specifier: ^11.7.5
+        specifier: 'catalog:'
         version: 11.7.6
       msw:
-        specifier: 2.14.6
+        specifier: 'catalog:'
         version: 2.14.6(@types/node@26.1.1)(typescript@6.0.3)
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       type-fest:
-        specifier: ^5.8.0
+        specifier: 'catalog:'
         version: 5.8.0
       typescript:
         specifier: 'catalog:'
@@ -508,10 +592,10 @@ importers:
   packages/iso-effect:
     dependencies:
       '@standard-schema/spec':
-        specifier: ^1.1.0
+        specifier: 'catalog:'
         version: 1.1.0
       '@standard-schema/utils':
-        specifier: ^0.3.0
+        specifier: 'catalog:'
         version: 0.3.0
       iso-base:
         specifier: workspace:^
@@ -521,19 +605,19 @@ importers:
         version: link:../iso-kv
     devDependencies:
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       delay:
-        specifier: ^7.0.0
+        specifier: 'catalog:'
         version: 7.0.0
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.4.3
 
   packages/iso-kv:
@@ -555,22 +639,22 @@ importers:
         specifier: ^7.6.12
         version: 7.6.13
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       better-sqlite3:
         specifier: ^12.11.1
         version: 12.11.1
       delay:
-        specifier: ^7.0.0
+        specifier: 'catalog:'
         version: 7.0.0
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       quick-lru:
         specifier: ^7.3.0
         version: 7.3.0
       tempy:
-        specifier: ^3.2.0
+        specifier: 'catalog:'
         version: 3.2.0
       typescript:
         specifier: 'catalog:'
@@ -589,7 +673,7 @@ importers:
         specifier: ~6.36.0
         version: 6.36.0
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       '@types/w3c-web-hid':
         specifier: ^1.0.7
@@ -601,13 +685,13 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
       viem:
-        specifier: ~2.54.6
+        specifier: 'catalog:'
         version: 2.54.6(typescript@6.0.3)(zod@4.4.3)
 
   packages/iso-passkeys:
     dependencies:
       '@noble/ed25519':
-        specifier: ^3.0.1
+        specifier: 'catalog:'
         version: 3.1.0
       '@peculiar/asn1-ecc':
         specifier: ^2.8.0
@@ -626,22 +710,22 @@ importers:
         version: link:../iso-did
     devDependencies:
       '@types/assert':
-        specifier: ^1.5.11
+        specifier: 'catalog:'
         version: 1.5.11
       '@types/mocha':
-        specifier: ^10.0.10
+        specifier: 'catalog:'
         version: 10.0.10
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       assert:
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       mocha:
-        specifier: ^11.7.5
+        specifier: 'catalog:'
         version: 11.7.6
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       typescript:
         specifier: 'catalog:'
@@ -650,10 +734,10 @@ importers:
   packages/iso-signatures:
     dependencies:
       '@noble/ed25519':
-        specifier: ^3.0.1
+        specifier: 'catalog:'
         version: 3.1.0
       '@noble/hashes':
-        specifier: ^2.0.0
+        specifier: 'catalog:'
         version: 2.2.0
       '@noble/secp256k1':
         specifier: ^3.0.0
@@ -672,31 +756,31 @@ importers:
         version: 0.14.30(typescript@6.0.3)(zod@4.4.3)
     devDependencies:
       '@types/assert':
-        specifier: ^1.5.11
+        specifier: 'catalog:'
         version: 1.5.11
       '@types/mocha':
-        specifier: ^10.0.10
+        specifier: 'catalog:'
         version: 10.0.10
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       assert:
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0
       mocha:
-        specifier: ^11.7.5
+        specifier: 'catalog:'
         version: 11.7.6
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       type-fest:
-        specifier: ^5.8.0
+        specifier: 'catalog:'
         version: 5.8.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
       viem:
-        specifier: ^2.54.6
+        specifier: 'catalog:'
         version: 2.54.6(typescript@6.0.3)(zod@4.4.3)
 
   packages/iso-ucan:
@@ -705,10 +789,10 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1
       '@standard-schema/spec':
-        specifier: ^1.1.0
+        specifier: 'catalog:'
         version: 1.1.0
       '@standard-schema/utils':
-        specifier: ^0.3.0
+        specifier: 'catalog:'
         version: 0.3.0
       iobuffer:
         specifier: ^6.0.1
@@ -732,20 +816,20 @@ importers:
         specifier: ^3.0.12
         version: 3.0.14
       multiformats:
-        specifier: ^14.0.4
+        specifier: 'catalog:'
         version: 14.0.4
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       delay:
-        specifier: ^7.0.0
+        specifier: 'catalog:'
         version: 7.0.0
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       typescript:
         specifier: 'catalog:'
@@ -754,10 +838,10 @@ importers:
   packages/iso-web:
     dependencies:
       '@standard-schema/spec':
-        specifier: ^1.1.0
+        specifier: 'catalog:'
         version: 1.1.0
       delay:
-        specifier: ^7.0.0
+        specifier: 'catalog:'
         version: 7.0.0
       is-network-error:
         specifier: ^1.3.1
@@ -770,28 +854,28 @@ importers:
         version: 8.0.0
     devDependencies:
       '@types/debug':
-        specifier: ^4.1.13
+        specifier: 'catalog:'
         version: 4.1.13
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       iso-base:
         specifier: workspace:^
         version: link:../iso-base
       msw:
-        specifier: 2.14.6
+        specifier: 'catalog:'
         version: 2.14.6(@types/node@26.1.1)(typescript@6.0.3)
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       type-fest:
-        specifier: ^5.8.0
+        specifier: 'catalog:'
         version: 5.8.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
       zod:
-        specifier: ^4.4.3
+        specifier: 'catalog:'
         version: 4.4.3
 
   packages/iso-websocket:
@@ -807,10 +891,10 @@ importers:
         version: 1.1.2
     devDependencies:
       '@types/debug':
-        specifier: ^4.1.13
+        specifier: 'catalog:'
         version: 4.1.13
       '@types/node':
-        specifier: ^26.1.1
+        specifier: 'catalog:'
         version: 26.1.1
       '@types/retry':
         specifier: ^0.12.5
@@ -819,16 +903,16 @@ importers:
         specifier: ^8.5.14
         version: 8.18.1
       delay:
-        specifier: ^7.0.0
+        specifier: 'catalog:'
         version: 7.0.0
       p-defer:
         specifier: ^4.0.0
         version: 4.0.1
       playwright-test:
-        specifier: ^14.1.13
+        specifier: 'catalog:'
         version: 14.1.15
       type-fest:
-        specifier: ^5.8.0
+        specifier: 'catalog:'
         version: 5.8.0
       typescript:
         specifier: 'catalog:'
