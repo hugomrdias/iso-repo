@@ -376,58 +376,6 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
-  examples/ucan-store:
-    dependencies:
-      iso-base:
-        specifier: workspace:*
-        version: link:../../packages/iso-base
-      iso-kv:
-        specifier: workspace:*
-        version: link:../../packages/iso-kv
-      iso-signatures:
-        specifier: workspace:*
-        version: link:../../packages/iso-signatures
-      iso-ucan:
-        specifier: workspace:*
-        version: link:../../packages/iso-ucan
-      react:
-        specifier: 'catalog:'
-        version: 19.3.0
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.3.0(react@19.3.0)
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.5
-    devDependencies:
-      '@cloudflare/vite-plugin':
-        specifier: ^1.60.2
-        version: 1.60.2(@types/node@26.6.2)(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.1)(yaml@2.9.1))(wrangler@4.141.0(@types/node@26.6.2))
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.3.0
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.3.0(@types/react@19.3.0)
-      '@vitejs/plugin-react':
-        specifier: 'catalog:'
-        version: 6.1.1(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.1)(yaml@2.9.1))
-      globals:
-        specifier: 'catalog:'
-        version: 17.12.0
-      hono:
-        specifier: 'catalog:'
-        version: 4.13.9
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.3
-      vite:
-        specifier: 'catalog:'
-        version: 8.3.1(@types/node@26.6.2)(esbuild@0.28.1)(yaml@2.9.1)
-      wrangler:
-        specifier: 'catalog:'
-        version: 4.141.0(@types/node@26.6.2)
-
   packages/configs:
     dependencies:
       '@biomejs/biome':
@@ -1242,13 +1190,6 @@ packages:
     peerDependenciesMeta:
       workerd:
         optional: true
-
-  '@cloudflare/vite-plugin@1.60.2':
-    resolution: {integrity: sha512-scyKSUBOAXNJDLDD5y1qDUPBgbmGOE8v7zgTHjeYXE1VLxYGTHewhu4rUXXctJg0t2Lsp2ciW5feM858UZ5qTQ==}
-    hasBin: true
-    peerDependencies:
-      vite: ^6.1.0 || ^7.0.0 || ^8.0.0
-      wrangler: ^4.141.0
 
   '@cloudflare/workerd-darwin-64@1.20260925.1':
     resolution: {integrity: sha512-GFDjFo5jfmg98iiy73DOZjHRV+lPWaeGeJ6MbtUIVyostkh9L69KliaAWVytBHCSp36o3NNZOQ0CN8VrqO3+8A==}
@@ -5622,20 +5563,6 @@ snapshots:
       unenv: 2.0.0-rc.24
     optionalDependencies:
       workerd: 1.20260925.1
-
-  '@cloudflare/vite-plugin@1.60.2(@types/node@26.6.2)(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.1)(yaml@2.9.1))(wrangler@4.141.0(@types/node@26.6.2))':
-    dependencies:
-      '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20260925.1)
-      miniflare: 5.20260925.0-alpha(@types/node@26.6.2)
-      unenv: 2.0.0-rc.24
-      vite: 8.3.1(@types/node@26.6.2)(esbuild@0.28.1)(yaml@2.9.1)
-      workerd: 1.20260925.1
-      wrangler: 4.141.0(@types/node@26.6.2)
-      ws: 8.21.0
-    transitivePeerDependencies:
-      - '@types/node'
-      - bufferutil
-      - utf-8-validate
 
   '@cloudflare/workerd-darwin-64@1.20260925.1':
     optional: true
