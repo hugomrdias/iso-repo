@@ -5,8 +5,16 @@
   "workspaces": [
     "packages/*"
   ],
+  "packageManager": "pnpm@12.6.0",
   "engines": {
     "node": ">=22"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.21.0",
+      "onFail": "download"
+    }
   },
   "scripts": {
     "fix": "biome check --fix --no-errors-on-unmatched --files-ignore-unknown=true",
