@@ -434,6 +434,7 @@ test(
     )
     const start = Date.now()
     const { error } = await request('https://local.dev/retry-after', {
+      timeout: 5000,
       retry: {
         factor: 0,
         retries: 5,

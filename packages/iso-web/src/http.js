@@ -246,6 +246,56 @@ const DEFAULT_RETRY_METHODS = [
 const DEFAULT_POLL_STATUS_CODES = [202]
 const DEFAULT_POLL_INTERVAL = 1000
 const DEFAULT_POLL_LIMIT = 10
+const DEFAULT_ATTEMPT_TIMEOUT = 5000
+// the largest delay browsers' timers accept
+const MAX_TIMEOUT = 2 ** 31 - 1
+
+/**
+ * Total time budget when `timeout` isn't set: 5000ms for each attempt the
+ * retry and poll options allow, plus the retry backoff and poll intervals
+ * between them.
+ *
+ * A function `interval` is counted as the default interval. Returns `false`
+ * (no timeout) when the budget is unbounded or too large for a timer.
+ *
+ * @param {import('./types.js').RetryOptions | undefined} retryOptions
+ * @param {import('./types.js').PollOptions | undefined} pollOptions
+ * @returns {number | false}
+ */
+function defaultTimeout(retryOptions, pollOptions) {
+  const limit = pollOptions
+    ? Math.max(1, pollOptions.limit ?? DEFAULT_POLL_LIMIT)
+    : 1
+  const interval =
+    typeof pollOptions?.interval === 'number'
+      ? pollOptions.interval
+      : DEFAULT_POLL_INTERVAL
+  const pollTime =
+    limit * DEFAULT_ATTEMPT_TIMEOUT +
+    (pollOptions ? (limit - 1) * Math.max(0, interval) : 0)
+
+  let total = pollTime
+  if (retryOptions != null) {
+    const retries = retryOptions.retries ?? 2
+    const factor =
+      (retryOptions.factor ?? 2) > 0 ? (retryOptions.factor ?? 2) : 1
+    const minTimeout = retryOptions.minTimeout ?? 1000
+    const maxTimeout = retryOptions.maxTimeout ?? Number.POSITIVE_INFINITY
+    const random = retryOptions.randomize ? 2 : 1
+
+    for (let retry = 0; retry < retries && total <= MAX_TIMEOUT; retry++) {
+      total +=
+        Math.min(random * minTimeout * factor ** retry, maxTimeout) + pollTime
+    }
+  }
+
+  // invalid numbers are reported by the retry and poll code, not the timer
+  if (Number.isNaN(total)) {
+    return DEFAULT_ATTEMPT_TIMEOUT
+  }
+
+  return total <= MAX_TIMEOUT ? Math.ceil(total) : false
+}
 
 /**
  * HTTP Request
@@ -271,7 +321,6 @@ export async function request(resource, options = {}) {
 async function send(resource, options) {
   const {
     signal,
-    timeout = 5000,
     retry,
     poll,
     fetch = globalThis.fetch.bind(globalThis),
@@ -288,6 +337,7 @@ async function send(resource, options) {
     : DEFAULT_RETRY_METHODS
   const pollOptions = normalizePollOptions(poll)
   const pollStatusCodes = pollOptions?.statusCodes ?? DEFAULT_POLL_STATUS_CODES
+  const timeout = options.timeout ?? defaultTimeout(retryOptions, pollOptions)
 
   // validate resource type
   if (typeof resource !== 'string' && !(resource instanceof URL)) {

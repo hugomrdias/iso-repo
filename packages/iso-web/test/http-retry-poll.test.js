@@ -211,6 +211,103 @@ test('should retry immediately when X-RateLimit-Reset is in the past', async () 
   }
 })
 
+test(
+  'should fit poll: true in the default timeout',
+  async () => {
+    let count = 0
+    server.use(
+      http.get('https://local.dev/poll-default-timeout', () => {
+        count++
+        if (count <= 6) {
+          return HttpResponse.json({ status: 'processing' }, { status: 202 })
+        }
+        return HttpResponse.json({ data: 'ready' }, { status: 200 })
+      })
+    )
+
+    const { error, result } = await request(
+      'https://local.dev/poll-default-timeout',
+      { poll: true }
+    )
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.equal(result.status, 200)
+      assert.equal(count, 7)
+    }
+  },
+  { timeout: 20_000 }
+)
+
+test(
+  'should fit the retry backoff in the default timeout',
+  async () => {
+    let count = 0
+    server.use(
+      http.get('https://local.dev/retry-default-timeout', () => {
+        count++
+        if (count === 1) {
+          return HttpResponse.json({ error: 'temporary' }, { status: 500 })
+        }
+        return HttpResponse.json({ data: 'ready' }, { status: 200 })
+      })
+    )
+
+    const { error, result } = await request(
+      'https://local.dev/retry-default-timeout',
+      { retry: { retries: 1, minTimeout: 5100 } }
+    )
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.equal(result.status, 200)
+      assert.equal(count, 2)
+    }
+  },
+  { timeout: 20_000 }
+)
+
+test('should not fail on invalid numbers when computing the default timeout', async () => {
+  const fetch = async () => new Response('ok')
+
+  for (const poll of [{ limit: Number.NaN }, { interval: -1_000_000 }]) {
+    const { error, result } = await request('https://local.dev/bad-numbers', {
+      fetch,
+      poll,
+    })
+    assert.equal(error, undefined, JSON.stringify(poll))
+    assert.equal(result?.status, 200)
+  }
+
+  const { error } = await request('https://local.dev/bad-numbers', {
+    fetch,
+    retry: { retries: -1 },
+  })
+  assert.equal(error?.name, 'RequestError')
+})
+
+test('should keep an explicit timeout as the total budget', async () => {
+  let count = 0
+  server.use(
+    http.get('https://local.dev/poll-explicit-timeout', () => {
+      count++
+      return HttpResponse.json({ status: 'processing' }, { status: 202 })
+    })
+  )
+
+  const { error } = await request('https://local.dev/poll-explicit-timeout', {
+    timeout: 150,
+    retry: true,
+    poll: { interval: 100 },
+  })
+
+  assert.equal(error?.name, 'TimeoutError')
+  assert.equal(error?.message, 'Request timed out after 150ms')
+  assert.equal(count, 2)
+})
+
 test('should not wait for Retry-After when the request will not be retried', async () => {
   let count = 0
   server.use(
