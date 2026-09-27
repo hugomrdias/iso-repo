@@ -112,6 +112,38 @@ schemaTest('defaults from schema', () => {
   assert.equal(config.get('foo'), 50)
 })
 
+schemaTest('persists schema defaults into an existing file', () => {
+  const cwd = temporaryDirectory()
+  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({}))
+
+  const config = createConf({ cwd })
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+    foo: 50,
+  })
+})
+
+schemaTest('persists coerced values', () => {
+  const cwd = temporaryDirectory()
+  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ foo: '7' }))
+
+  const config = new Conf({
+    cwd,
+    schema: z.looseObject({ foo: z.coerce.number() }),
+  })
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+    foo: 7,
+  })
+})
+
+schemaTest('does not rewrite an unchanged file', () => {
+  const cwd = temporaryDirectory()
+  const raw = JSON.stringify({ foo: 10, nested: { value: true } })
+  fs.writeFileSync(path.join(cwd, 'config.json'), raw)
+
+  const config = createConf({ cwd })
+  assert.equal(fs.readFileSync(config.path, 'utf8'), raw)
+})
+
 schemaTest('reset restores defaults', () => {
   const config = createConf()
   config.set('foo', 99)

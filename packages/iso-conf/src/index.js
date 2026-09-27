@@ -1,4 +1,3 @@
-import assert from 'node:assert'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
@@ -413,33 +412,8 @@ export class Conf {
    * Reading this property loads and validates the config file from disk.
    */
   get store() {
-    try {
-      const data = fs.readFileSync(this.path, 'utf8')
-      const deserializedData = this.#deserialize(data)
-      return this.#parseStore(deserializedData)
-    } catch (error) {
-      if (/** @type {NodeJS.ErrnoException} */ (error).code === 'ENOENT') {
-        this.#ensureDirectory()
-        return createPlainObject()
-      }
-
-      if (this.#options.clearInvalidConfig) {
-        const errorInstance = /** @type {Error} */ (error)
-
-        if (errorInstance.name === 'SyntaxError') {
-          return createPlainObject()
-        }
-
-        if (
-          errorInstance instanceof SchemaError ||
-          errorInstance.message?.startsWith('Config schema violation')
-        ) {
-          return createPlainObject()
-        }
-      }
-
-      throw error
-    }
+    const { raw, value } = this.#read()
+    return value ?? raw
   }
 
   /** @param {SchemaValues<Schema>} value */
@@ -492,14 +466,41 @@ export class Conf {
   }
 
   /**
-   * Parse deserialized config data and validate it.
+   * Read the config file from disk.
    *
-   * @param {unknown} data - Parsed config object.
-   * @returns {StandardSchemaV1.InferOutput<Schema>}
+   * `value` is the validated store, and is `undefined` when the file is
+   * missing or was discarded by `clearInvalidConfig`.
+   *
+   * @returns {{ raw: StandardSchemaV1.InferOutput<Schema>, value?: StandardSchemaV1.InferOutput<Schema> }}
    */
-  #parseStore(data) {
-    const store = Object.assign(createPlainObject(), data)
-    return this.#validate(store)
+  #read() {
+    try {
+      const data = fs.readFileSync(this.path, 'utf8')
+      const raw = Object.assign(createPlainObject(), this.#deserialize(data))
+      return { raw, value: this.#validate(raw) }
+    } catch (error) {
+      if (/** @type {NodeJS.ErrnoException} */ (error).code === 'ENOENT') {
+        this.#ensureDirectory()
+        return { raw: createPlainObject() }
+      }
+
+      if (this.#options.clearInvalidConfig) {
+        const errorInstance = /** @type {Error} */ (error)
+
+        if (errorInstance.name === 'SyntaxError') {
+          return { raw: createPlainObject() }
+        }
+
+        if (
+          errorInstance instanceof SchemaError ||
+          errorInstance.message?.startsWith('Config schema violation')
+        ) {
+          return { raw: createPlainObject() }
+        }
+      }
+
+      throw error
+    }
   }
 
   /**
@@ -700,17 +701,12 @@ export class Conf {
 
   /** Merge schema defaults into the on-disk config when needed. */
   #initializeStore() {
-    const fileStore = this.store
-    let storeWithDefaults = Object.assign(createPlainObject(), fileStore)
+    const { raw, value = this.#validate(raw) } = this.#read()
 
-    if (this.#schema) {
-      storeWithDefaults = this.#validate(storeWithDefaults)
-    }
-
-    try {
-      assert.deepEqual(fileStore, storeWithDefaults)
-    } catch {
-      this.store = storeWithDefaults
+    // Schemas may return a plain object for our null-prototype input, so only
+    // compare the top level by own properties.
+    if (!isDeepStrictEqual(raw, Object.assign(createPlainObject(), value))) {
+      this.#write(value)
     }
   }
 
