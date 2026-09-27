@@ -7,7 +7,7 @@ import { anySignal } from './signals.js'
 const symbol = Symbol.for('request-error')
 
 /**
- * @typedef {NetworkError | TimeoutError | AbortError | HttpError } RequestErrors
+ * @typedef {RequestError | NetworkError | TimeoutError | AbortError | HttpError } RequestErrors
  * @typedef {RequestErrors | JsonError | SchemaError} RequestJsonErrors
  */
 
@@ -440,10 +440,26 @@ export async function request(resource, options = {}) {
       }
     }
 
+    if (isNetworkError(err)) {
+      return {
+        error: new NetworkError({ cause: err }),
+      }
+    }
+
     return {
-      error: new NetworkError({ cause: err.cause }),
+      error: toRequestError(err),
     }
   }
+}
+
+/**
+ * Wrap an error that isn't an HTTP, network, timeout or abort failure.
+ *
+ * @param {unknown} error
+ */
+function toRequestError(error) {
+  const message = error instanceof Error ? error.message : String(error)
+  return new RequestError(`Request failed: ${message}`, { cause: error })
 }
 
 /**
