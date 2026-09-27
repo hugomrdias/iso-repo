@@ -1,5 +1,48 @@
 # Changelog
 
+## [4.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.1.2...iso-web-v4.0.0) (2026-09-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-web:** a 413/429/503 with Retry-After that won't be retried (method not retryable, retries used up, or `shouldRetry` returned false) now returns the `HttpError` immediately instead of waiting first. A Retry-After wait that doesn't fit in the remaining `timeout` or `maxRetryTime` now returns the `HttpError` immediately instead of a `TimeoutError`. Retries after a Retry-After wait no longer add the backoff delay, so they happen sooner.
+* **iso-web:** with `retry` enabled, network errors are only retried for methods in `retry.methods` (default GET, PUT, HEAD, DELETE, OPTIONS, TRACE). POST and PATCH requests that fail with a network error now return the `NetworkError` after one attempt. Add the method to `retry.methods`, or return true from `retry.shouldRetry`, to keep retrying them.
+* **iso-web:** `new JsonError()` now requires `response` and `request` alongside `cause`, and sets `code` from `response.status`. Errors returned by `request.json()` and DoH `resolve()` gain `code`, `response` and `request`; `cause` and `message` are unchanged.
+* **iso-web:** `request()` and `request.json()` no longer reject. Invalid URLs, GET requests with a body, invalid header names or values, an invalid `timeout` and a missing `globalThis.fetch` now resolve to `{ error: RequestError }` (message `Request failed: <original message>`). Malformed JSON, including an empty body with a JSON content type, resolves to `{ error: RequestError('Response body is not valid JSON') }` whether the status is 2xx or an error. A throwing `schema.validate()` resolves to `{ error: RequestError }`. In every case `cause` is the original error. Code that relied on `try/catch` or `.catch()` for these cases must check `error` instead.
+* **iso-web:** `request.json.head` is removed. Use `request.head` to check a resource and read `result.headers`/`result.status`. Calling `request.json(url, { method: 'HEAD' })` directly, or any empty-bodied JSON response such as a 204 with `content-type: application/json`, now resolves to `{ error: RequestError('Response body is not valid JSON') }`.
+* **iso-web:** errors thrown by `onResponse`, `poll.shouldPoll`, a function `poll.interval` or `retry.shouldRetry` now return a `RequestError` with message `Request failed: <original message>` and the thrown error as `cause`, instead of a `NetworkError` with no cause. `NetworkError.is()` is only true for real fetch failures, and `NetworkError.cause` is now the fetch error itself (for example the Node `TypeError: fetch failed`); in Node the underlying syscall error moves from `error.cause` to `error.cause.cause`. `RequestErrors` now includes `RequestError`.
+* **iso-web:** TXT data no longer has every `"` and `'` character removed: multi-string records are concatenated without a space, and apostrophes and escaped quotes are kept. CAA, NAPTR and other non-TXT records are returned unchanged, with their quotes. A TXT value from an unquoted provider that is itself entirely wrapped in `"..."` is unquoted.
+* **iso-web:** A name with no records of the requested type now resolves to `{ result: [] }` instead of the zone's SOA record string from `Authority`, and a `Status: 0` response with neither `Answer` nor `Authority` resolves to `[]` instead of a `DohError('No answer or authority')`. SOA and NS queries on a name without those records also return `[]`. SERVFAIL and REFUSED errors are no longer cached, so they are requested again on every call, and NXDOMAIN is cached for the SOA negative TTL instead of always one hour.
+* **iso-web:** `resolve()` only returns records of the requested type. A, AAAA, TXT and other results no longer include CNAME/DNAME chain entries such as the CNAME target hostname.
+
+### Features
+
+* **iso-web:** bound the default DoH cache and accept any get/set cache ([#611](https://github.com/hugomrdias/iso-repo/issues/611)) ([97d38bd](https://github.com/hugomrdias/iso-repo/commit/97d38bdf68d8a809e0dd68dd97f238fe71fb0546))
+* **iso-web:** export env, simplify crypto, and clean up http and event-target ([#603](https://github.com/hugomrdias/iso-repo/issues/603)) ([fa74c17](https://github.com/hugomrdias/iso-repo/commit/fa74c1790ae078ec246dd695b4cb4d3c2f65d18d)), closes [#601](https://github.com/hugomrdias/iso-repo/issues/601)
+
+
+### Bug Fixes
+
+* **iso-web:** cancel response bodies discarded while polling and retrying ([#625](https://github.com/hugomrdias/iso-repo/issues/625)) ([13cc2fd](https://github.com/hugomrdias/iso-repo/commit/13cc2fddb64d91acf6d489d89fbe50ca2ccef383)), closes [#596](https://github.com/hugomrdias/iso-repo/issues/596)
+* **iso-web:** don't mutate cached TXT records when parsing dnslink ([#612](https://github.com/hugomrdias/iso-repo/issues/612)) ([b72add2](https://github.com/hugomrdias/iso-repo/commit/b72add2a8728bffe252380cfa07f6e0593bdd34d))
+* **iso-web:** don't mutate caller options when serializing json body ([#615](https://github.com/hugomrdias/iso-repo/issues/615)) ([dc71ed7](https://github.com/hugomrdias/iso-repo/commit/dc71ed7f647546e79a40575d4b8f1fb726cbef74))
+* **iso-web:** don't reset msw browser worker singleton on module load ([#606](https://github.com/hugomrdias/iso-repo/issues/606)) ([f9f6f54](https://github.com/hugomrdias/iso-repo/commit/f9f6f54aa23c2268a85b9a05bfd49cc741e96e1e)), closes [#600](https://github.com/hugomrdias/iso-repo/issues/600)
+* **iso-web:** don't retry network errors for non-idempotent methods ([#620](https://github.com/hugomrdias/iso-repo/issues/620)) ([038b65a](https://github.com/hugomrdias/iso-repo/commit/038b65a85cd7da9d27bc78bf952046a6e517961a)), closes [#593](https://github.com/hugomrdias/iso-repo/issues/593)
+* **iso-web:** encode DoH query params ([#607](https://github.com/hugomrdias/iso-repo/issues/607)) ([4cf793a](https://github.com/hugomrdias/iso-repo/commit/4cf793a4d119cd6f89087331606e078ea4ed7b7f))
+* **iso-web:** filter DoH answers by requested record type ([#608](https://github.com/hugomrdias/iso-repo/issues/608)) ([91b8d9d](https://github.com/hugomrdias/iso-repo/commit/91b8d9df6ec036222f7c0601cead79c137a7ef53))
+* **iso-web:** keep status code, response and request on JsonError ([#622](https://github.com/hugomrdias/iso-repo/issues/622)) ([db322a9](https://github.com/hugomrdias/iso-repo/commit/db322a9b5875c796aed19183e630c86d551b6089))
+* **iso-web:** only clone responses when a hook will read them ([#616](https://github.com/hugomrdias/iso-repo/issues/616)) ([9a354e9](https://github.com/hugomrdias/iso-repo/commit/9a354e938acc66b08e52edcde3c746fedd3f3dd6))
+* **iso-web:** only report real network failures as NetworkError ([#618](https://github.com/hugomrdias/iso-repo/issues/618)) ([d742738](https://github.com/hugomrdias/iso-repo/commit/d742738bf44ec5a43eee8a63466250d88cea3950))
+* **iso-web:** only wait for Retry-After when the request will be retried ([#623](https://github.com/hugomrdias/iso-repo/issues/623)) ([046b571](https://github.com/hugomrdias/iso-repo/commit/046b5714c8dc938c42c38240ee558b20a510630e)), closes [#582](https://github.com/hugomrdias/iso-repo/issues/582)
+* **iso-web:** parse quoted TXT character-strings and stop stripping quotes from other records ([#610](https://github.com/hugomrdias/iso-repo/issues/610)) ([631053e](https://github.com/hugomrdias/iso-repo/commit/631053e1d2fdc3c087b7a5fe8f8d137b688982d3))
+* **iso-web:** pass the built-in decision to shouldRetry and shouldPoll ([#619](https://github.com/hugomrdias/iso-repo/issues/619)) ([1a1c457](https://github.com/hugomrdias/iso-repo/commit/1a1c457f009eadf1fb5c9cd0886e0441b0d4e6fb)), closes [#585](https://github.com/hugomrdias/iso-repo/issues/585)
+* **iso-web:** remove request.json.head ([923a0d8](https://github.com/hugomrdias/iso-repo/commit/923a0d88eebccf880098ac28992341594f02856e))
+* **iso-web:** return { error } instead of rejecting in request and request.json ([923a0d8](https://github.com/hugomrdias/iso-repo/commit/923a0d88eebccf880098ac28992341594f02856e))
+* **iso-web:** return empty result on NODATA and use RFC 2308 negative cache TTLs ([#609](https://github.com/hugomrdias/iso-repo/issues/609)) ([c074bec](https://github.com/hugomrdias/iso-repo/commit/c074bec0d8bfd0b7901babd74f797e5ab331a4e9))
+* **iso-web:** treat X-RateLimit-Reset as a Unix timestamp, not seconds to wait ([#617](https://github.com/hugomrdias/iso-repo/issues/617)) ([db5020c](https://github.com/hugomrdias/iso-repo/commit/db5020cd541d1b5ec2c1b282740c08dbe1bf86e2))
+* **iso-web:** use AbortSignal.any in anySignal to avoid leaking listeners ([#605](https://github.com/hugomrdias/iso-repo/issues/605)) ([168a3b0](https://github.com/hugomrdias/iso-repo/commit/168a3b072de7966757b13860fdfdcf2a977e490d)), closes [#587](https://github.com/hugomrdias/iso-repo/issues/587)
+* **iso-web:** wait for msw worker unregistration before restarting in the browser ([#626](https://github.com/hugomrdias/iso-repo/issues/626)) ([eaef326](https://github.com/hugomrdias/iso-repo/commit/eaef3262af539ac32cc372653f97899cf55bd279))
+
 ## [3.1.2](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.1.1...iso-web-v3.1.2) (2026-06-04)
 
 
