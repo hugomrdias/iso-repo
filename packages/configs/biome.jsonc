@@ -68,7 +68,7 @@
       "test": "recommended"
     },
     "rules": {
-      "preset": "recommended",
+      "recommended": true,
       "complexity": {
         "useSimpleNumberKeys": "off"
       },
