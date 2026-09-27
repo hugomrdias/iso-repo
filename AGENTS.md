@@ -56,3 +56,18 @@ Common types:
 Use the package name as `scope` when changes are limited to one package (e.g. `iso-base`, `iso-kv`).
 
 Keep each commit scoped to a single package. Avoid commits that change multiple packages — split them into separate commits instead. Root-only changes (e.g. `pnpm-lock.yaml`) may use `chore` without a scope.
+
+## Cursor Cloud specific instructions
+
+`package.json` `devEngines.runtime` is Node `^24.21.0` (`onFail: download`). `examples/rpc-todo` also requires Node `>= 24` so TypeScript can run with Node's built-in type stripping. After `pnpm install`, `pnpm exec node -v` should print `v24.21.0`. Login shells prepend `~/.nvm/versions/node/v24.21.0/bin` so `node` is that runtime.
+
+Browser tests use `playwright-test` with Chromium. The environment install command installs the matching `playwright-core` browser. If a browser is missing, reinstall it:
+
+```sh
+node "$(find node_modules/.pnpm -path '*/playwright-core/cli.js' -print -quit)" install chromium
+```
+
+Runnable examples:
+
+- `examples/rpc-todo`: in that directory, `pnpm server` (port 4000), then `pnpm cli add "buy milk"`, `pnpm cli list`, and `pnpm cli complete <id>`.
+- `examples/eip191`: `pnpm --dir examples/eip191 dev` (Vite, port 5173). The page renders an Injected wallet button; connecting needs a browser wallet provider.
