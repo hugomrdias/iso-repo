@@ -1,3 +1,4 @@
+import { KV } from 'iso-kv'
 import { http } from 'msw'
 import { assert, suite } from 'playwright-test/taps'
 import { DohError, NetworkError, resolve } from '../src/doh/dnslink.js'
@@ -123,6 +124,15 @@ const handlers = [
         ])
       )
     }
+    if (params.name === '_dnslink.unsorted.io') {
+      return Response.json(
+        mockRecord([
+          'dnslink=/ipfs/ccc',
+          'dnslink=/ipfs/aaa',
+          'dnslink=/ipfs/bbb',
+        ])
+      )
+    }
     if (
       params.name === '_dnslink.doh-error.io' ||
       params.name === 'doh-error.io'
@@ -235,6 +245,20 @@ test('should return valid', async () => {
     '/testnamespace/AANO/PQ?RS=TU',
     '/testnamespace/AAVW/ XY/ ?Z1=23 ',
   ])
+})
+
+test('should not mutate cached TXT records', async () => {
+  const cache = new KV()
+  const { result } = await resolve('unsorted.io', { cache })
+
+  assert.deepEqual(result, ['/ipfs/aaa', '/ipfs/bbb', '/ipfs/ccc'])
+
+  const cached = await cache.get([
+    'https://cloudflare-dns.com/dns-query?name=_dnslink.unsorted.io&type=TXT',
+  ])
+  assert.deepEqual(cached, {
+    result: ['dnslink=/ipfs/ccc', 'dnslink=/ipfs/aaa', 'dnslink=/ipfs/bbb'],
+  })
 })
 
 test('should return doh error', async () => {

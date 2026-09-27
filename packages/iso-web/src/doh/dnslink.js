@@ -61,7 +61,7 @@ async function _resolve(domain, options) {
  */
 function parseData(data) {
   const records = []
-  for (let entry of data.sort().filter((e) => e.startsWith(TXT_PREFIX))) {
+  for (let entry of data.toSorted().filter((e) => e.startsWith(TXT_PREFIX))) {
     entry = entry.slice(TXT_PREFIX.length)
 
     if (!entry.startsWith('/')) {
