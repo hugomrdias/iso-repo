@@ -16,6 +16,10 @@ export interface PollOptions {
   /**
    * The maximum number of pollable responses before returning the last response.
    *
+   * When `retry` is also enabled, the limit applies per retry attempt, not overall.
+   * A retry restarts polling from the first request with a fresh counter, so the
+   * worst case is `(retries + 1) × limit` requests.
+   *
    * @default 10
    */
   limit?: number
@@ -41,6 +45,11 @@ export interface PollOptions {
 }
 
 export interface PollContext {
+  /**
+   * Zero-based index of the current poll within the current retry attempt.
+   *
+   * Resets to `0` on every retry when `retry` is also enabled.
+   */
   attempt: number
   response: Response
   request: Request
@@ -122,6 +131,9 @@ export interface RetryOptions {
 
   /**
    * The maximum amount of times to retry the operation.
+   *
+   * When `poll` is also enabled, each retry reruns the whole polling loop and
+   * restarts its counter, so up to `(retries + 1) × poll.limit` requests can be made.
    * @default 2
    */
   retries?: number | undefined
@@ -185,6 +197,10 @@ export interface RequestOptions {
    *
    * Set to `true` to use the default polling options.
    *
+   * When combined with `retry`, a retryable failure during polling retries the
+   * whole polling loop, which starts again from the first poll. `poll.limit`
+   * applies per retry.
+   *
    * @default false
    */
   poll?: PollOptions | boolean
@@ -228,6 +244,10 @@ export interface JSONRequestOptions<T = unknown> {
    * Poll responses that match the configured status codes.
    *
    * Set to `true` to use the default polling options.
+   *
+   * When combined with `retry`, a retryable failure during polling retries the
+   * whole polling loop, which starts again from the first poll. `poll.limit`
+   * applies per retry.
    *
    * @default false
    */
