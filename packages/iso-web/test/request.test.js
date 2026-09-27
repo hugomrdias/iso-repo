@@ -4,6 +4,7 @@ import { z } from 'zod'
 import {
   HttpError,
   JsonError,
+  NetworkError,
   RequestError,
   request,
   SchemaError,
@@ -185,6 +186,87 @@ test('should handle network error', async () => {
   } else {
     assert.fail('should fail')
   }
+})
+
+test('should keep the fetch error as NetworkError cause', async () => {
+  server.use(
+    http.get('https://local.dev/network-error', () => {
+      return Response.error()
+    })
+  )
+  const { error } = await request('https://local.dev/network-error')
+
+  assert.ok(NetworkError.is(error))
+  assert.ok(error.cause instanceof TypeError)
+})
+
+test('should keep a browser-style fetch TypeError as NetworkError cause', async () => {
+  const fetchError = new TypeError('Failed to fetch')
+  const { error } = await request('https://local.dev', {
+    fetch: () => Promise.reject(fetchError),
+  })
+
+  assert.ok(NetworkError.is(error))
+  assert.equal(error.cause, fetchError)
+})
+
+test('should return RequestError when onResponse throws', async () => {
+  server.use(
+    http.get('https://local.dev', () =>
+      HttpResponse.text('ok', { status: 200 })
+    )
+  )
+  const hookError = new Error('post-error')
+  const { error } = await request('https://local.dev', {
+    onResponse: () => {
+      throw hookError
+    },
+  })
+
+  assert.ok(RequestError.is(error))
+  assert.equal(error.message, 'Request failed: post-error')
+  assert.equal(error.cause, hookError)
+})
+
+test('should return RequestError when onResponse throws and retries are exhausted', async () => {
+  let count = 0
+  server.use(
+    http.get('https://local.dev', () => {
+      count++
+      return HttpResponse.text('ok', { status: 200 })
+    })
+  )
+  const hookError = new Error('post-error')
+  const { error } = await request('https://local.dev', {
+    retry: { retries: 1, minTimeout: 1, shouldRetry: () => true },
+    onResponse: () => {
+      throw hookError
+    },
+  })
+
+  assert.ok(RequestError.is(error))
+  assert.equal(error.cause, hookError)
+  assert.equal(count, 2)
+})
+
+test('should return RequestError when shouldPoll throws', async () => {
+  server.use(
+    http.get('https://local.dev', () =>
+      HttpResponse.json({ status: 'processing' }, { status: 202 })
+    )
+  )
+  const hookError = new RangeError('hook bug')
+  const { error } = await request('https://local.dev', {
+    poll: {
+      interval: 1,
+      shouldPoll: () => {
+        throw hookError
+      },
+    },
+  })
+
+  assert.ok(RequestError.is(error))
+  assert.equal(error.cause, hookError)
 })
 
 test('should timeout after 100ms', async () => {
