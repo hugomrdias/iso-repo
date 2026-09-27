@@ -18,7 +18,8 @@ export interface PollOptions {
    *
    * When `retry` is also enabled, the limit applies per retry attempt, not overall.
    * A retry restarts polling from the first request with a fresh counter, so the
-   * worst case is `(retries + 1) × limit` requests.
+   * worst case is `(retries + 1) × limit` requests. The default `timeout` is
+   * sized for that worst case, and an explicit `timeout` covers all of them.
    *
    * @default 10
    */
@@ -134,6 +135,7 @@ export interface RetryOptions {
    *
    * When `poll` is also enabled, each retry reruns the whole polling loop and
    * restarts its counter, so up to `(retries + 1) × poll.limit` requests can be made.
+   * The default `timeout` is sized for that worst case.
    * @default 2
    */
   retries?: number | undefined
