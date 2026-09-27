@@ -152,6 +152,13 @@ export class Conf {
   #debouncedChangeHandler
 
   /**
+   * Store snapshots shared by all listeners of a single `change` event.
+   *
+   * @type {WeakMap<Event, { data: string | undefined, store: SchemaValues<Schema> }>}
+   */
+  #changeSnapshots = new WeakMap()
+
+  /**
    * Creates a new config store.
    *
    * @param {Options<Schema>} [partialOptions] - Config options.
@@ -193,12 +200,7 @@ export class Conf {
    * @param {unknown} [defaultValue] - Value returned when the item does not exist.
    */
   get(key, defaultValue) {
-    if (this.#options.accessPropertiesByDotNotation) {
-      return this.#get(key, defaultValue)
-    }
-
-    const store = this.store
-    return key in store ? store[key] : defaultValue
+    return this.#getIn(this.store, key, defaultValue)
   }
 
   /**
@@ -234,30 +236,12 @@ export class Conf {
 
     const store = this.store
 
-    /**
-     * @param {string} itemKey
-     * @param {unknown} itemValue
-     */
-    const set = (itemKey, itemValue) => {
-      checkValueType(itemKey, itemValue)
-
-      if (this.#options.accessPropertiesByDotNotation) {
-        setProperty(store, itemKey, itemValue)
-      } else if (
-        itemKey !== '__proto__' &&
-        itemKey !== 'constructor' &&
-        itemKey !== 'prototype'
-      ) {
-        store[itemKey] = itemValue
-      }
-    }
-
     if (typeof key === 'object') {
       for (const [itemKey, itemValue] of Object.entries(key)) {
-        set(itemKey, itemValue)
+        this.#setIn(store, itemKey, itemValue)
       }
     } else {
-      set(key, value)
+      this.#setIn(store, key, value)
     }
 
     this.store = store
@@ -291,11 +275,8 @@ export class Conf {
     const keyPath = String(key)
     checkValueType(keyPath, value)
 
-    const array = this.#options.accessPropertiesByDotNotation
-      ? this.#get(keyPath, [])
-      : keyPath in this.store
-        ? this.store[keyPath]
-        : []
+    const store = this.store
+    const array = this.#getIn(store, keyPath, [])
 
     if (!Array.isArray(array)) {
       throw new TypeError(
@@ -303,10 +284,8 @@ export class Conf {
       )
     }
 
-    this.set(
-      keyPath,
-      /** @type {SchemaValue<Schema, string>} */ ([...array, value])
-    )
+    this.#setIn(store, keyPath, [...array, value])
+    this.store = store
   }
 
   /**
@@ -315,11 +294,19 @@ export class Conf {
    * @param {...SchemaKeyPath<Schema>} keys - Keys to reset.
    */
   reset(...keys) {
-    for (const key of keys) {
-      if (isExist(this.#defaultValues[key])) {
-        this.set(key, this.#defaultValues[key])
-      }
+    const defaults = keys.filter((key) => isExist(this.#defaultValues[key]))
+
+    if (defaults.length === 0) {
+      return
     }
+
+    const store = this.store
+
+    for (const key of defaults) {
+      this.#setIn(store, String(key), this.#defaultValues[key])
+    }
+
+    this.store = store
   }
 
   /**
@@ -348,13 +335,7 @@ export class Conf {
 
     for (const key of Object.keys(this.#defaultValues)) {
       if (isExist(this.#defaultValues[key])) {
-        checkValueType(key, this.#defaultValues[key])
-
-        if (this.#options.accessPropertiesByDotNotation) {
-          setProperty(newStore, key, this.#defaultValues[key])
-        } else {
-          newStore[key] = this.#defaultValues[key]
-        }
+        this.#setIn(newStore, key, this.#defaultValues[key])
       }
     }
 
@@ -382,7 +363,11 @@ export class Conf {
       )
     }
 
-    return this.#handleValueChange(() => this.get(key), callback)
+    return this.#subscribe(
+      (store) =>
+        /** @type {SchemaValue<Schema, Key>} */ (this.#getIn(store, key)),
+      callback
+    )
   }
 
   /**
@@ -398,7 +383,10 @@ export class Conf {
       )
     }
 
-    return this.#handleStoreChange(callback)
+    return this.#subscribe(
+      (store) => store,
+      /** @type {OnDidChangeCallback<SchemaValues<Schema>>} */ (callback)
+    )
   }
 
   /** Number of top-level config items. */
@@ -412,8 +400,7 @@ export class Conf {
    * Reading this property loads and validates the config file from disk.
    */
   get store() {
-    const { raw, value } = this.#read()
-    return value ?? raw
+    return this.#load(this.#readFile())
   }
 
   /** @param {SchemaValues<Schema>} value */
@@ -456,34 +443,55 @@ export class Conf {
   }
 
   /**
-   * Get a nested config value using dot notation.
+   * Read the raw config file.
    *
-   * @param {string} key - Dot-notated key.
-   * @param {unknown} [defaultValue] - Value returned when the item does not exist.
+   * @returns {string | undefined} File contents, or `undefined` when the file does not exist.
    */
-  #get(key, defaultValue) {
-    return getProperty(this.store, key, defaultValue)
+  #readFile() {
+    try {
+      return fs.readFileSync(this.path, 'utf8')
+    } catch (error) {
+      if (/** @type {NodeJS.ErrnoException} */ (error).code === 'ENOENT') {
+        this.#ensureDirectory()
+        return undefined
+      }
+
+      throw error
+    }
   }
 
   /**
-   * Read the config file from disk.
+   * Build a new store object from raw file contents.
+   *
+   * Returns the validated store, or the empty `raw` object when `#parse`
+   * discards the file.
+   *
+   * @param {string | undefined} data - Raw file contents from `#readFile`.
+   * @returns {SchemaValues<Schema>}
+   */
+  #load(data) {
+    const { raw, value } = this.#parse(data)
+    return value ?? raw
+  }
+
+  /**
+   * Deserialize and validate raw config file contents.
    *
    * `value` is the validated store, and is `undefined` when the file is
    * missing or was discarded by `clearInvalidConfig`.
    *
+   * @param {string | undefined} data - Raw file contents from `#readFile`.
    * @returns {{ raw: StandardSchemaV1.InferOutput<Schema>, value?: StandardSchemaV1.InferOutput<Schema> }}
    */
-  #read() {
+  #parse(data) {
+    if (data === undefined) {
+      return { raw: createPlainObject() }
+    }
+
     try {
-      const data = fs.readFileSync(this.path, 'utf8')
       const raw = Object.assign(createPlainObject(), this.#deserialize(data))
       return { raw, value: this.#validate(raw) }
     } catch (error) {
-      if (/** @type {NodeJS.ErrnoException} */ (error).code === 'ENOENT') {
-        this.#ensureDirectory()
-        return { raw: createPlainObject() }
-      }
-
       if (this.#options.clearInvalidConfig) {
         const errorInstance = /** @type {Error} */ (error)
 
@@ -501,6 +509,62 @@ export class Conf {
 
       throw error
     }
+  }
+
+  /**
+   * Read a config value from an already loaded store.
+   *
+   * @param {Record<string, unknown>} store - Loaded config object.
+   * @param {string} key - Item key. Supports dot notation when enabled.
+   * @param {unknown} [defaultValue] - Value returned when the item does not exist.
+   */
+  #getIn(store, key, defaultValue) {
+    if (this.#options.accessPropertiesByDotNotation) {
+      return getProperty(store, key, defaultValue)
+    }
+
+    return key in store ? store[key] : defaultValue
+  }
+
+  /**
+   * Write a config value into an already loaded store without persisting it.
+   *
+   * @param {Record<string, unknown>} store - Loaded config object to mutate.
+   * @param {string} key - Item key. Supports dot notation when enabled.
+   * @param {unknown} value - Value to set.
+   */
+  #setIn(store, key, value) {
+    checkValueType(key, value)
+
+    if (this.#options.accessPropertiesByDotNotation) {
+      setProperty(store, key, value)
+    } else if (
+      key !== '__proto__' &&
+      key !== 'constructor' &&
+      key !== 'prototype'
+    ) {
+      store[key] = value
+    }
+  }
+
+  /**
+   * Read the config file once per `change` event and share it across listeners.
+   *
+   * `store` is only for change detection and must never reach callbacks.
+   * Listeners that fire get their own copy by loading `data` again.
+   *
+   * @param {Event} event - The `change` event being dispatched.
+   */
+  #changeSnapshot(event) {
+    let snapshot = this.#changeSnapshots.get(event)
+
+    if (!snapshot) {
+      const data = this.#readFile()
+      snapshot = { data, store: this.#load(data) }
+      this.#changeSnapshots.set(event, snapshot)
+    }
+
+    return snapshot
   }
 
   /**
@@ -556,54 +620,26 @@ export class Conf {
   }
 
   /**
-   * Subscribe to full-store change events.
-   *
-   * @param {OnDidAnyChangeCallback<SchemaValues<Schema>>} callback
-   * @returns {Unsubscribe}
-   */
-  #handleStoreChange(callback) {
-    let currentValue = this.store
-
-    /** @type {EventListener} */
-    const onChange = () => {
-      const oldValue = currentValue
-      const newValue = this.store
-
-      if (isDeepStrictEqual(newValue, oldValue)) {
-        return
-      }
-
-      currentValue = newValue
-      callback.call(this, newValue, oldValue)
-    }
-
-    this.events.addEventListener('change', onChange)
-
-    return () => {
-      this.events.removeEventListener('change', onChange)
-    }
-  }
-
-  /**
-   * Subscribe to single-key change events.
+   * Subscribe to change events for the value selected by `getter`.
    *
    * @template Value
-   * @param {() => Value} getter - Returns the current value for the watched key.
+   * @param {(store: SchemaValues<Schema>) => Value} getter - Selects the watched value from a store.
    * @param {OnDidChangeCallback<Value>} callback
    * @returns {Unsubscribe}
    */
-  #handleValueChange(getter, callback) {
-    let currentValue = getter()
+  #subscribe(getter, callback) {
+    let currentValue = getter(this.store)
 
     /** @type {EventListener} */
-    const onChange = () => {
-      const oldValue = currentValue
-      const newValue = getter()
+    const onChange = (event) => {
+      const snapshot = this.#changeSnapshot(event)
 
-      if (isDeepStrictEqual(newValue, oldValue)) {
+      if (isDeepStrictEqual(getter(snapshot.store), currentValue)) {
         return
       }
 
+      const oldValue = currentValue
+      const newValue = getter(this.#load(snapshot.data))
       currentValue = newValue
       callback.call(this, newValue, oldValue)
     }
@@ -701,7 +737,7 @@ export class Conf {
 
   /** Merge schema defaults into the on-disk config when needed. */
   #initializeStore() {
-    const { raw, value = this.#validate(raw) } = this.#read()
+    const { raw, value = this.#validate(raw) } = this.#parse(this.#readFile())
 
     // Schemas may return a plain object for our null-prototype input, so only
     // compare the top level by own properties.

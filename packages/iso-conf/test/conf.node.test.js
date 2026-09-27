@@ -254,6 +254,146 @@ hooksTest('onDidAnyChange', () => {
   assert.equal(snapshots[0]?.oldValue.foo, 50)
 })
 
+const readsSuite = suite('Conf disk reads')
+const { test: readsTest } = readsSuite
+
+/**
+ * Count config file reads from disk while running `fn`.
+ *
+ * @param {Conf<typeof schema>} config
+ * @param {() => void} fn
+ */
+function countDiskReads(config, fn) {
+  const readFileSync = fs.readFileSync
+  let reads = 0
+
+  fs.readFileSync = /** @type {typeof fs.readFileSync} */ (
+    (/** @type {Parameters<typeof fs.readFileSync>} */ ...args) => {
+      if (args[0] === config.path) {
+        reads++
+      }
+      return readFileSync(...args)
+    }
+  )
+
+  try {
+    fn()
+  } finally {
+    fs.readFileSync = readFileSync
+  }
+
+  return reads
+}
+
+readsTest('appendToArray reads the store once', () => {
+  for (const accessPropertiesByDotNotation of [true, false]) {
+    const config = createConf({ accessPropertiesByDotNotation })
+    config.set('items', [{ name: 'foo' }])
+
+    const reads = countDiskReads(config, () => {
+      config.appendToArray('items', { name: 'bar' })
+    })
+
+    assert.equal(reads, 1)
+    assert.deepEqual(config.get('items'), [{ name: 'foo' }, { name: 'bar' }])
+  }
+})
+
+readsTest('reset reads the store once for multiple keys', () => {
+  const config = createConf()
+  config.set('foo', 99)
+
+  /** @type {unknown[]} */
+  const changes = []
+  config.onDidAnyChange((newValue) => changes.push(newValue.foo))
+
+  const reads = countDiskReads(config, () => {
+    config.reset('foo', 'foo')
+  })
+
+  assert.equal(reads, 2, 'one read for reset, one for listeners')
+  assert.deepEqual(changes, [50])
+})
+
+readsTest('listeners share one disk read per change', () => {
+  const config = createConf()
+
+  /** @type {unknown[]} */
+  const fooChanges = []
+  /** @type {unknown[]} */
+  const barChanges = []
+  /** @type {unknown[]} */
+  const anyChanges = []
+  config.onDidChange('foo', (newValue, oldValue) =>
+    fooChanges.push([newValue, oldValue])
+  )
+  config.onDidChange('bar', (newValue, oldValue) =>
+    barChanges.push([newValue, oldValue])
+  )
+  config.onDidAnyChange((newValue) => anyChanges.push(newValue.foo))
+
+  const reads = countDiskReads(config, () => {
+    config.set('foo', 10)
+  })
+
+  assert.equal(reads, 2, 'one read for set, one for listeners')
+  assert.deepEqual(fooChanges, [[10, 50]])
+  assert.deepEqual(barChanges, [])
+  assert.deepEqual(anyChanges, [10])
+})
+
+readsTest('listeners handle manually dispatched change events', () => {
+  const config = createConf()
+
+  /** @type {unknown[]} */
+  const changes = []
+  config.onDidChange('foo', (newValue) => changes.push(newValue))
+  config.onDidAnyChange((newValue) => changes.push(newValue.foo))
+
+  fs.writeFileSync(config.path, JSON.stringify({ foo: 7 }))
+  const reads = countDiskReads(config, () => {
+    config.events.dispatchEvent(new Event('change'))
+  })
+
+  assert.equal(reads, 1)
+  assert.deepEqual(changes, [7, 7])
+})
+
+readsTest('each listener gets its own copy', () => {
+  const config = createConf()
+
+  /** @type {Array<{ newValue: unknown, oldValue: unknown }>} */
+  const nestedChanges = []
+  /** @type {unknown[]} */
+  const anyNested = []
+  /** @type {unknown[]} */
+  const fooChanges = []
+
+  config.onDidChange('nested', (newValue) => {
+    if (newValue) {
+      newValue.value = false
+    }
+  })
+  config.onDidAnyChange((newValue) => {
+    anyNested.push(structuredClone(newValue.nested))
+    newValue.foo = 1
+  })
+  config.onDidChange('nested', (newValue, oldValue) => {
+    nestedChanges.push({ newValue, oldValue })
+  })
+  config.onDidChange('foo', (newValue) => fooChanges.push(newValue))
+
+  config.set('nested', { value: true })
+
+  assert.deepEqual(anyNested, [{ value: true }])
+  assert.deepEqual(nestedChanges, [
+    { newValue: { value: true }, oldValue: undefined },
+  ])
+  assert.deepEqual(fooChanges, [])
+  assert.deepEqual(config.get('nested'), { value: true })
+  assert.equal(config.get('foo'), 50)
+})
+
 const invalidSuite = suite('Conf invalid config')
 const { test: invalidTest } = invalidSuite
 
