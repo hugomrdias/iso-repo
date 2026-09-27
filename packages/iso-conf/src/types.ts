@@ -121,8 +121,39 @@ export type SchemaEntry<Schema extends StandardSchemaV1> =
         ]
       }[Extract<keyof SchemaValues<Schema>, string>]
 
+/** Initial config values accepted by the `defaults` option. */
+export type SchemaDefaults<Schema extends StandardSchemaV1> =
+  unknown extends StandardSchemaV1.InferInput<Schema>
+    ? Record<string, unknown>
+    : StandardSchemaV1.InferInput<Schema>
+
+type DefaultsOptions<Schema extends StandardSchemaV1> =
+  // biome-ignore lint/complexity/noBannedTypes: `{}` checks whether every input key is optional.
+  {} extends SchemaDefaults<Schema>
+    ? {
+        /**
+         * Initial values for top-level keys missing from the stored config.
+         * They are merged under the stored config before schema validation, so
+         * schema defaults still apply to keys not listed here.
+         */
+        defaults?: SchemaDefaults<Schema>
+      }
+    : {
+        /**
+         * Initial values for top-level keys missing from the stored config.
+         * They are merged under the stored config before schema validation, so
+         * schema defaults still apply to keys not listed here.
+         *
+         * Required because the schema has required fields without a default.
+         */
+        defaults: SchemaDefaults<Schema>
+      }
+
 /** Options for creating a {@link Conf} instance. */
-export interface Options<Schema extends StandardSchemaV1 = StandardSchemaV1> {
+export type Options<Schema extends StandardSchemaV1 = StandardSchemaV1> =
+  BaseOptions<Schema> & DefaultsOptions<Schema>
+
+interface BaseOptions<Schema extends StandardSchemaV1> {
   /** Standard Schema used to validate the full config object. */
   schema?: Schema
   /** Project name used to resolve the default config directory. Required unless `cwd` is set. */

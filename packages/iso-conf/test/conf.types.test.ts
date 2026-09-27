@@ -89,6 +89,23 @@ const strictSchema = z.object({
 const strictConfig = new Conf({
   cwd: temporaryDirectory(),
   schema: strictSchema,
+  defaults: { count: 0, nested: { enabled: false } },
+})
+
+// @ts-expect-error - required fields without a schema default need `defaults`.
+new Conf({ cwd: temporaryDirectory(), schema: strictSchema })
+
+new Conf({
+  cwd: temporaryDirectory(),
+  schema: strictSchema,
+  // @ts-expect-error - `defaults` must include every required field.
+  defaults: { count: 0 },
+})
+
+new Conf({
+  cwd: temporaryDirectory(),
+  schema,
+  defaults: { foo: 1 },
 })
 
 expectType<z.infer<typeof strictSchema>>(strictConfig.store)
