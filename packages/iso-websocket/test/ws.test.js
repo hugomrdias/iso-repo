@@ -449,3 +449,51 @@ test('should not retry timeout after connect opened', async () => {
   assert.equal(count, 0)
   ws.close()
 })
+
+test('should not retry timeout after opened and closed without retry', async () => {
+  const closed = pDefer()
+  let retries = 0
+  let errors = 0
+  const ws = new WS(`${URL}?exitCode=4004&delay=50`, {
+    ws: WebSocket,
+    timeout: 300,
+    shouldRetry: (e) => !('code' in e && e.code === 4004),
+  })
+
+  ws.addEventListener('retry', () => {
+    retries++
+  })
+  ws.addEventListener('error', () => {
+    errors++
+  })
+  ws.addEventListener('close', () => {
+    closed.resolve()
+  })
+
+  await closed.promise
+  await delay(500)
+  assert.equal(retries, 0)
+  assert.equal(errors, 0)
+  ws.close()
+})
+
+test('should not retry timeout after server closes with 1000', async () => {
+  const closed = pDefer()
+  let retries = 0
+  const ws = new WS(`${URL}?exitCode=1000&delay=50`, {
+    ws: WebSocket,
+    timeout: 300,
+  })
+
+  ws.addEventListener('retry', () => {
+    retries++
+  })
+  ws.addEventListener('close', () => {
+    closed.resolve()
+  })
+
+  await closed.promise
+  await delay(500)
+  assert.equal(retries, 0)
+  ws.close()
+})

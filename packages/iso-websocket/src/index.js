@@ -48,6 +48,9 @@ export class WS extends TypedEventTarget {
   /** @type {boolean} */
   #reconnectWhenOnline = false
 
+  /** @type {ReturnType<typeof setTimeout> | undefined} */
+  #connectTimer
+
   /**
    *
    * @param {UrlProvider} url
@@ -242,8 +245,14 @@ export class WS extends TypedEventTarget {
     }
   }
 
+  #clearConnectTimer() {
+    clearTimeout(this.#connectTimer)
+    this.#connectTimer = undefined
+  }
+
   #handleOffline = () => {
     log('offline event')
+    this.#clearConnectTimer()
     this.#retry?.stop()
     this.#retry = undefined
     this.#ws?.close(1000)
@@ -267,6 +276,7 @@ export class WS extends TypedEventTarget {
       throw new TypeError('Open event before socket should never happend.')
     }
 
+    this.#clearConnectTimer()
     this.#reconnectWhenOnline = false
 
     if (this.onopen) {
@@ -290,6 +300,7 @@ export class WS extends TypedEventTarget {
   #handleClose = (event) => {
     log('close event %s %s %s', event.code, event.reason, event.wasClean)
 
+    this.#clearConnectTimer()
     this.#maybeReconnect(event)
 
     if (this.onclose) {
@@ -341,31 +352,29 @@ export class WS extends TypedEventTarget {
     }
 
     this.#retry = retry.operation(this.options.retry)
-    this.#retry.attempt(
-      (currentAttempt) => {
-        const url = this.#getUrl()
-        log('connect to %s attempt %s', url, currentAttempt)
+    this.#retry.attempt((currentAttempt) => {
+      const url = this.#getUrl()
+      log('connect to %s attempt %s', url, currentAttempt)
+      this.#clearConnectTimer()
+      this.#removeListeners()
+
+      const Ws = this.options.ws
+
+      const ws = new Ws(url, this.options.protocols)
+      ws.binaryType = this.#binaryType
+      this.#ws = ws
+      this.#addListeners()
+
+      this.#connectTimer = setTimeout(() => {
+        this.#connectTimer = undefined
+        if (ws.readyState !== WS.CONNECTING) {
+          return
+        }
         this.#removeListeners()
-
-        const Ws = this.options.ws
-
-        this.#ws = new Ws(url, this.options.protocols)
-        this.#ws.binaryType = this.#binaryType
-        this.#addListeners()
-      },
-      {
-        timeout: this.options.timeout,
-        // @ts-expect-error
-        cb: () => {
-          if (this.#ws?.readyState !== WS.OPEN) {
-            this.#removeListeners()
-            this.#maybeReconnect(
-              new ErrorEvent({ message: 'Connection timeout' })
-            )
-          }
-        },
-      }
-    )
+        ws.close()
+        this.#maybeReconnect(new ErrorEvent({ message: 'Connection timeout' }))
+      }, this.options.timeout)
+    })
   }
 
   /**
@@ -461,6 +470,7 @@ export class WS extends TypedEventTarget {
   // biome-ignore lint/style/useDefaultParameterLast: todo
   close(code = 1000, reason) {
     log('close %s %s', code, reason)
+    this.#clearConnectTimer()
     this.#removeListeners()
     this.#retry?.stop()
     this.#retry = undefined
