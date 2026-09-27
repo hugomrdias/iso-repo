@@ -5,7 +5,7 @@
   "packages/iso-signatures": "0.5.2",
   "packages/iso-web": "3.1.2",
   "packages/iso-kv": "3.2.0",
-  "packages/iso-websocket": "0.5.0",
+  "packages/iso-websocket": "0.5.1",
   "packages/iso-ucan": "0.5.0",
   "packages/iso-ledger": "0.1.7",
   "packages/iso-conf": "0.4.0",

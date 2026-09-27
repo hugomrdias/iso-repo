@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.1](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.5.0...iso-websocket-v0.5.1) (2026-09-27)
+
+
+### Bug Fixes
+
+* **iso-websocket:** handle missing global WebSocket and fix debug namespace ([7a78981](https://github.com/hugomrdias/iso-repo/commit/7a7898184149559d66de8493776b2e5d25d9beb4))
+* **iso-websocket:** only treat still-connecting sockets as connection timeouts ([#576](https://github.com/hugomrdias/iso-repo/issues/576)) ([a3a7a32](https://github.com/hugomrdias/iso-repo/commit/a3a7a32b97a25b824a81a14bb8db19e944788a4e)), closes [#466](https://github.com/hugomrdias/iso-repo/issues/466)
+
 ## [0.5.0](https://github.com/hugomrdias/iso-repo/compare/iso-websocket-v0.4.1...iso-websocket-v0.5.0) (2026-04-10)
 
 
