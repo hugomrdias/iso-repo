@@ -422,7 +422,7 @@ test('should abort manually with retries', async () => {
 })
 
 test(
-  'should delay with retry after header',
+  'should not wait for a retry after header longer than the timeout',
   async () => {
     server.use(
       http.get('https://local.dev/retry-after', () => {
@@ -432,6 +432,7 @@ test(
         )
       })
     )
+    const start = Date.now()
     const { error } = await request('https://local.dev/retry-after', {
       retry: {
         factor: 0,
@@ -439,12 +440,11 @@ test(
       },
     })
 
-    if (error) {
-      assert.equal(error.message, 'Request timed out after 5000ms')
-      assert.ok(error.cause)
-      assert.equal(error.name, 'TimeoutError')
+    if (HttpError.is(error)) {
+      assert.equal(error.code, 429)
+      assert.ok(Date.now() - start < 1000)
     } else {
-      assert.fail('should fail')
+      assert.fail('should fail with an HTTP error')
     }
   },
   { timeout: 10_000 }
