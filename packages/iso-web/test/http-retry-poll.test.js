@@ -211,6 +211,156 @@ test('should retry immediately when X-RateLimit-Reset is in the past', async () 
   }
 })
 
+test('should pass the built-in decision to shouldRetry', async () => {
+  server.use(
+    http.all('https://local.dev/should-retry-default', ({ request }) => {
+      const status = new URL(request.url).searchParams.get('status')
+      return HttpResponse.json({ error: 'failed' }, { status: Number(status) })
+    })
+  )
+
+  /** @type {Array<[string, number, boolean]>} */
+  const decisions = []
+  for (const [method, status] of /** @type {const} */ ([
+    ['GET', 500],
+    ['POST', 500],
+    ['GET', 400],
+  ])) {
+    await request(`https://local.dev/should-retry-default?status=${status}`, {
+      method,
+      retry: {
+        retries: 2,
+        minTimeout: 1,
+        shouldRetry: (ctx) => {
+          decisions.push([method, status, ctx.defaultShouldRetry])
+          return false
+        },
+      },
+    })
+  }
+
+  assert.deepEqual(decisions, [
+    ['GET', 500, true],
+    ['POST', 500, false],
+    ['GET', 400, false],
+  ])
+})
+
+test('should let shouldRetry override the built-in checks', async () => {
+  let count = 0
+  server.use(
+    http.all('https://local.dev/should-retry-override', ({ request }) => {
+      count++
+      const status = new URL(request.url).searchParams.get('status')
+      return HttpResponse.json({ error: 'failed' }, { status: Number(status) })
+    })
+  )
+
+  for (const [method, status] of /** @type {const} */ ([
+    ['POST', 500],
+    ['GET', 400],
+  ])) {
+    count = 0
+    const { error } = await request(
+      `https://local.dev/should-retry-override?status=${status}`,
+      {
+        method,
+        retry: { retries: 2, minTimeout: 1, shouldRetry: () => true },
+      }
+    )
+
+    assert.ok(HttpError.is(error))
+    assert.equal(error.code, status)
+    assert.equal(count, 3, `${method} ${status}`)
+  }
+})
+
+test('should let shouldRetry defer to the built-in decision', async () => {
+  let count = 0
+  server.use(
+    http.all('https://local.dev/should-retry-defer', ({ request }) => {
+      count++
+      if (request.method === 'GET' && count > 1) {
+        return HttpResponse.json({ data: 'ready' }, { status: 200 })
+      }
+      return HttpResponse.json({ error: 'failed' }, { status: 500 })
+    })
+  )
+
+  /** @type {import('../src/types.js').RetryOptions} */
+  const retry = {
+    retries: 2,
+    minTimeout: 1,
+    shouldRetry: (ctx) => ctx.defaultShouldRetry,
+  }
+
+  const get = await request.get('https://local.dev/should-retry-defer', {
+    retry,
+  })
+  assert.equal(get.result?.status, 200)
+  assert.equal(count, 2)
+
+  count = 0
+  const post = await request.post('https://local.dev/should-retry-defer', {
+    retry,
+  })
+  assert.ok(HttpError.is(post.error))
+  assert.equal(count, 1)
+})
+
+test('should pass the built-in decision to shouldPoll', async () => {
+  let count = 0
+  server.use(
+    http.get('https://local.dev/should-poll-default', () => {
+      count++
+      if (count < 3) {
+        return HttpResponse.json({ status: 'processing' }, { status: 202 })
+      }
+      return HttpResponse.json({ data: 'ready' }, { status: 200 })
+    })
+  )
+
+  /** @type {boolean[]} */
+  const decisions = []
+  const { error, result } = await request(
+    'https://local.dev/should-poll-default',
+    {
+      poll: {
+        interval: 1,
+        shouldPoll: (ctx) => {
+          decisions.push(ctx.defaultShouldPoll)
+          return ctx.defaultShouldPoll
+        },
+      },
+    }
+  )
+
+  if (error) {
+    assert.fail(error.message)
+  } else {
+    assert.equal(result.status, 200)
+    assert.equal(count, 3)
+    assert.deepEqual(decisions, [true, true, false])
+  }
+})
+
+test('should let shouldPoll override the built-in checks', async () => {
+  let count = 0
+  server.use(
+    http.get('https://local.dev/should-poll-override', () => {
+      count++
+      return HttpResponse.json({ data: 'ready' }, { status: 200 })
+    })
+  )
+
+  const { result } = await request('https://local.dev/should-poll-override', {
+    poll: { interval: 1, limit: 3, shouldPoll: () => true },
+  })
+
+  assert.equal(result?.status, 200)
+  assert.equal(count, 3)
+})
+
 test(
   'should poll custom status codes with interval context',
   async () => {

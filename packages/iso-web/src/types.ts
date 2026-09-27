@@ -27,14 +27,17 @@ export interface PollOptions {
    */
   statusCodes?: number[]
   /**
-   * Called after built-in checks pass, before polling continues.
+   * Decide whether to poll again. Called for every successful response, and
+   * its return value replaces the built-in check (`statusCodes`).
    *
-   * Returning false stops polling and returns the current response.
+   * `context.defaultShouldPoll` holds the built-in decision, so return it to
+   * keep the default behavior. Returning false stops polling and returns the
+   * current response. `limit` still applies.
    *
    * @param context - The context of the poll
    * @returns - Whether to continue polling
    */
-  shouldPoll?: (context: PollContext) => boolean | Promise<boolean>
+  shouldPoll?: (context: ShouldPollContext) => boolean | Promise<boolean>
 }
 
 export interface PollContext {
@@ -42,6 +45,21 @@ export interface PollContext {
   response: Response
   request: Request
   options: RequestOptions
+}
+
+export interface ShouldPollContext extends PollContext {
+  /**
+   * Whether the built-in check (`statusCodes`) would poll again.
+   */
+  defaultShouldPoll: boolean
+}
+
+export interface ShouldRetryContext extends RetryContext {
+  /**
+   * Whether the built-in checks (`methods`, `statusCodes` and network errors)
+   * would retry.
+   */
+  defaultShouldRetry: boolean
 }
 
 export interface RetryOptions {
@@ -69,12 +87,19 @@ export interface RetryOptions {
   methods?: string[]
 
   /**
-   * Called after built-in checks pass, before retrying. Return false to stop retrying.
+   * Decide whether to retry a failed attempt. Called for every failure while
+   * retries are left, and its return value replaces the built-in checks
+   * (`methods`, `statusCodes` and network errors).
+   *
+   * `context.defaultShouldRetry` holds the built-in decision, so return it to
+   * keep the default behavior. Return true to retry requests the built-in
+   * checks would not, for example an idempotent `POST`. `retries` and
+   * `maxRetryTime` still apply.
    *
    * @param context - The context of the retry
    * @returns - Whether to retry the request
    */
-  shouldRetry?: (context: RetryContext) => boolean | Promise<boolean>
+  shouldRetry?: (context: ShouldRetryContext) => boolean | Promise<boolean>
 
   /**
    * Whether to [unref](https://nodejs.org/api/timers.html#timers_unref) the setTimeout's.
