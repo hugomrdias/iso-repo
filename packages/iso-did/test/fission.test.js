@@ -40,6 +40,34 @@ describe('did fission ', () => {
     assert.strictEqual(out.didResolutionMetadata.error, 'notFound')
   })
 
+  it('should fail with not found when the TXT record does not exist', async () => {
+    const host = 'http://localhost:4401'
+    const didString = format(host)
+    server.use(
+      http.get(`${host}/dns-query`, () => {
+        return Response.json({
+          Status: 0,
+          Question: [{ name: '_did.localhost.', type: 16 }],
+          Authority: [
+            {
+              name: 'localhost.',
+              type: 6,
+              TTL: 300,
+              data: 'ns1.localhost. admin.localhost. 2024010101 7200 3600 1209600 300',
+            },
+          ],
+        })
+      })
+    )
+
+    // @ts-expect-error - testing
+    const out = await didFissionResolver(didString, parse(didString))
+
+    // eslint-disable-next-line unicorn/no-null
+    assert.strictEqual(out.didDocument, null)
+    assert.strictEqual(out.didResolutionMetadata.error, 'notFound')
+  })
+
   it('should resolve real ', async () => {
     const host = 'http://localhost:4400'
     const didString = format(host)

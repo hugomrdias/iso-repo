@@ -159,6 +159,54 @@ const RECORD_TYPES = {
   CAA: 257,
 }
 
+/** Negative cache TTL in seconds when the response has no SOA record */
+const NEGATIVE_TTL_FALLBACK = 300
+/** Upper bound for negative cache TTLs in seconds */
+const NEGATIVE_TTL_MAX = 3600
+/** Cache TTL in seconds for deterministic DoH error statuses */
+const ERROR_TTL = 3600
+
+/**
+ * Negative cache TTL for NXDOMAIN and NODATA responses: the minimum of the SOA
+ * record TTL and its MINIMUM field.
+ *
+ * @see https://datatracker.ietf.org/doc/html/rfc2308#section-5
+ *
+ * @param {import('./types.js').DoHResponse} response
+ */
+function negativeTtl(response) {
+  const soa = response.Authority?.find((a) => a.type === RECORD_TYPES.SOA)
+  if (!soa || !Number.isFinite(soa.TTL)) {
+    return NEGATIVE_TTL_FALLBACK
+  }
+  // SOA data: mname rname serial refresh retry expire minimum
+  const minimum = Number(soa.data.trim().split(/\s+/)[6])
+  const ttl = Number.isFinite(minimum) ? Math.min(soa.TTL, minimum) : soa.TTL
+  return Math.max(0, Math.min(ttl, NEGATIVE_TTL_MAX))
+}
+
+/**
+ * Cache TTL for a non-zero DoH status, `undefined` when it should not be cached
+ *
+ * @param {import('./types.js').DoHResponse} response
+ */
+function errorTtl(response) {
+  switch (response.Status) {
+    // SERVFAIL and REFUSED are usually transient
+    case 2:
+    case 5: {
+      return undefined
+    }
+    // NXDOMAIN
+    case 3: {
+      return negativeTtl(response)
+    }
+    default: {
+      return ERROR_TTL
+    }
+  }
+}
+
 const kv = new KV()
 /**
  * Resolve a DNS query using DNS over HTTPS
@@ -220,33 +268,26 @@ export async function resolve(query, type, options = {}) {
     const out = {
       error: new DohError(error, { data: result }),
     }
-    await cache.set([url], out, { ttl: 3600 }) // caches errors for 1 hour
+    const ttl = errorTtl(result)
+    if (ttl !== undefined) {
+      await cache.set([url], out, { ttl })
+    }
     return out
   }
 
-  if (result.Answer) {
-    // Answer can hold a CNAME/DNAME chain before the records of the requested type
-    const typeNumber = RECORD_TYPES[type] ?? result.Question?.[0]?.type
-    const data = /** @type {T} */ (
-      result.Answer.filter((a) => a.type === typeNumber).map((a) =>
-        a.data.replaceAll(/["']+/g, '')
-      )
-    )
-    const ttl = Math.min(...result.Answer.map((a) => a.TTL))
-    const out = { result: data }
-    await cache.set([url], out, { ttl })
-    return out
-  }
+  // Answer can hold a CNAME/DNAME chain before the records of the requested type
+  const answers = result.Answer ?? []
+  const typeNumber = RECORD_TYPES[type] ?? result.Question?.[0]?.type
+  const records = answers.filter((a) => a.type === typeNumber)
+  // the result is only valid while every link of the chain is
+  const chainTtl = Math.min(...answers.map((a) => a.TTL))
+  const ttl =
+    records.length > 0 ? chainTtl : Math.min(chainTtl, negativeTtl(result))
 
-  if (result.Authority) {
-    const data = /** @type {T} */ (result.Authority.map((a) => a.data))
-    const ttl = Math.min(...result.Authority.map((a) => a.TTL))
-    const out = { result: data }
-    await cache.set([url], out, { ttl })
-    return out
-  }
-
-  return {
-    error: new DohError('No answer or authority', { data: result }),
-  }
+  const data = /** @type {T} */ (
+    records.map((a) => a.data.replaceAll(/["']+/g, ''))
+  )
+  const out = { result: data }
+  await cache.set([url], out, { ttl })
+  return out
 }
