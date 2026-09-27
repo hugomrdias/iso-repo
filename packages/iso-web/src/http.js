@@ -251,9 +251,7 @@ export async function request(resource, options = {}) {
     fetch = globalThis.fetch.bind(globalThis),
     json,
     headers,
-    onResponse = () => {
-      // noop
-    },
+    onResponse,
   } = options
 
   const retryOptions = normalizeRetryOptions(retry)
@@ -301,7 +299,10 @@ export async function request(resource, options = {}) {
       retryOptions == null && pollOptions == null ? request : request.clone()
     let rsp = await fetch(req)
 
-    const result = await onResponse(rsp.clone(), request)
+    // cloning tees the body, so only clone when a hook will read it
+    const result = onResponse
+      ? await onResponse(rsp.clone(), request)
+      : undefined
 
     if (result instanceof Response) {
       rsp = result
@@ -350,8 +351,7 @@ export async function request(resource, options = {}) {
         return response
       }
 
-      const interval = await resolvePollInterval(
-        pollOptions?.interval,
+      const interval = await resolvePollInterval(pollOptions?.interval, () =>
         createPollContext(response, currentAttempt)
       )
 
@@ -513,12 +513,12 @@ function normalizePollOptions(poll) {
  * Resolve the delay before the next poll attempt.
  *
  * @param {import('./types.js').PollOptions['interval']} interval
- * @param {import('./types.js').PollContext} context
+ * @param {() => import('./types.js').PollContext} createContext
  * @returns {number | Promise<number>}
  */
-function resolvePollInterval(interval, context) {
+function resolvePollInterval(interval, createContext) {
   if (typeof interval === 'function') {
-    return interval(context)
+    return interval(createContext())
   }
 
   return interval ?? DEFAULT_POLL_INTERVAL
