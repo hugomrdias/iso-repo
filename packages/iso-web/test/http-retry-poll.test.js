@@ -125,6 +125,92 @@ test('should stop retrying when shouldRetry returns false', async () => {
   }
 })
 
+for (const header of ['X-RateLimit-Reset', 'X-Rate-Limit-Reset']) {
+  test(
+    `should treat ${header} as a Unix timestamp in seconds`,
+    async () => {
+      let count = 0
+      const reset = Math.ceil(Date.now() / 1000) + 1
+      server.use(
+        http.get(`https://local.dev/rate-limit-reset/${header}`, () => {
+          count++
+          if (count === 1) {
+            return HttpResponse.json(
+              { error: 'rate limited' },
+              { status: 429, headers: { [header]: String(reset) } }
+            )
+          }
+
+          return HttpResponse.json({ data: 'ready' }, { status: 200 })
+        })
+      )
+
+      const start = Date.now()
+      const { error, result } = await request(
+        `https://local.dev/rate-limit-reset/${header}`,
+        {
+          timeout: 5000,
+          retry: {
+            retries: 1,
+            minTimeout: 1,
+            factor: 1,
+          },
+        }
+      )
+
+      if (error) {
+        assert.fail(error.message)
+      } else {
+        assert.equal(result.status, 200)
+        assert.equal(count, 2)
+        assert.ok(Date.now() - start >= 900)
+      }
+    },
+    { timeout: 10_000 }
+  )
+}
+
+test('should retry immediately when X-RateLimit-Reset is in the past', async () => {
+  let count = 0
+  server.use(
+    http.get('https://local.dev/rate-limit-reset-past', () => {
+      count++
+      if (count === 1) {
+        return HttpResponse.json(
+          { error: 'rate limited' },
+          {
+            status: 429,
+            headers: {
+              'X-RateLimit-Reset': String(Math.floor(Date.now() / 1000) - 60),
+            },
+          }
+        )
+      }
+
+      return HttpResponse.json({ data: 'ready' }, { status: 200 })
+    })
+  )
+
+  const { error, result } = await request(
+    'https://local.dev/rate-limit-reset-past',
+    {
+      timeout: 1000,
+      retry: {
+        retries: 1,
+        minTimeout: 1,
+        factor: 1,
+      },
+    }
+  )
+
+  if (error) {
+    assert.fail(error.message)
+  } else {
+    assert.equal(result.status, 200)
+    assert.equal(count, 2)
+  }
+})
+
 test(
   'should poll custom status codes with interval context',
   async () => {

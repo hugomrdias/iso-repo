@@ -453,12 +453,15 @@ export async function request(resource, options = {}) {
 function calculateRetryAfter(response) {
   const retryAfter =
     response.headers.get('Retry-After') ??
-    response.headers.get('RateLimit-Reset') ??
-    response.headers.get('X-RateLimit-Reset') ?? // github
-    response.headers.get('X-Rate-Limit-Reset') // twitter
+    response.headers.get('RateLimit-Reset')
 
   if (retryAfter === null) {
-    return 0
+    // Unix timestamp in seconds
+    const reset =
+      response.headers.get('X-RateLimit-Reset') ?? // github
+      response.headers.get('X-Rate-Limit-Reset') // twitter
+
+    return reset === null ? 0 : Number(reset.trim()) * 1000 - Date.now()
   }
 
   let after = Number(retryAfter.trim())

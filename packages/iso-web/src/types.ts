@@ -55,7 +55,7 @@ export interface RetryOptions {
   /**
    * The status codes to retry after
    *
-   * Request will wait until the date, timeout, or timestamp given in the Retry-After header has passed to retry the request. If Retry-After is missing, the non-standard RateLimit-Reset header is used in its place as a fallback. If the provided status code is not in the list, the Retry-After header will be ignored.
+   * Request will wait until the date or number of seconds given in the Retry-After header has passed to retry the request. If Retry-After is missing, the non-standard RateLimit-Reset header (seconds) is used in its place as a fallback, then X-RateLimit-Reset or X-Rate-Limit-Reset (Unix timestamp in seconds). If the provided status code is not in the list, the Retry-After header will be ignored.
    *
    * @default [413, 429, 503]
    */
