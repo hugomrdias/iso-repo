@@ -211,6 +211,61 @@ test('should retry immediately when X-RateLimit-Reset is in the past', async () 
   }
 })
 
+test('should not retry network errors for methods outside the retry method list', async () => {
+  let count = 0
+  server.use(
+    http.all('https://local.dev/network-error-post', () => {
+      count++
+      return Response.error()
+    })
+  )
+
+  for (const method of ['POST', 'PATCH']) {
+    count = 0
+    /** @type {boolean[]} */
+    const decisions = []
+    const { error } = await request('https://local.dev/network-error-post', {
+      method,
+      retry: {
+        retries: 2,
+        minTimeout: 1,
+        shouldRetry: (ctx) => {
+          decisions.push(ctx.defaultShouldRetry)
+          return ctx.defaultShouldRetry
+        },
+      },
+    })
+
+    assert.equal(error?.name, 'NetworkError')
+    assert.equal(count, 1, method)
+    assert.deepEqual(decisions, [false], method)
+  }
+})
+
+test('should retry network errors for methods added to the retry method list', async () => {
+  let count = 0
+  server.use(
+    http.post('https://local.dev/network-error-post-allowed', () => {
+      count++
+      return Response.error()
+    })
+  )
+
+  const { error } = await request.post(
+    'https://local.dev/network-error-post-allowed',
+    { retry: { retries: 2, minTimeout: 1, methods: ['POST'] } }
+  )
+
+  assert.equal(error?.name, 'NetworkError')
+  assert.equal(count, 3)
+
+  count = 0
+  await request.post('https://local.dev/network-error-post-allowed', {
+    retry: { retries: 2, minTimeout: 1, shouldRetry: () => true },
+  })
+  assert.equal(count, 3)
+})
+
 test('should pass the built-in decision to shouldRetry', async () => {
   server.use(
     http.all('https://local.dev/should-retry-default', ({ request }) => {
