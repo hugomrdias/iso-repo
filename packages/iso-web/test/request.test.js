@@ -90,6 +90,24 @@ test('should post json', async () => {
   }
 })
 
+test('should not mutate options when posting json', async () => {
+  server.use(
+    http.post('https://local.dev/post', async ({ request }) => {
+      return Response.json(await request.json(), { status: 200 })
+    })
+  )
+  /** @type {import('../src/types.js').RequestOptions} */
+  const options = { method: 'POST', json: { hello: 'world' } }
+  const { error, result } = await request('https://local.dev/post', options)
+
+  if (error) {
+    assert.fail(error.message)
+  } else {
+    assert.deepEqual(await result.json(), { hello: 'world' })
+    assert.deepEqual(options, { method: 'POST', json: { hello: 'world' } })
+  }
+})
+
 test('should request 500', async () => {
   const { error } = await request('https://local.dev/error?status=500')
 
