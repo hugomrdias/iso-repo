@@ -809,10 +809,9 @@ export class Conf {
    * @returns {string}
    */
   #resolvePath(options) {
-    const fileExtension =
-      typeof options.fileExtension === 'string'
-        ? `.${options.fileExtension}`
-        : ''
+    const fileExtension = options.fileExtension
+      ? `.${options.fileExtension}`
+      : ''
     return path.resolve(
       options.cwd ?? process.cwd(),
       `${options.configName ?? 'config'}${fileExtension}`

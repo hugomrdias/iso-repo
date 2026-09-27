@@ -92,6 +92,18 @@ test('path and iteration', () => {
   assert.deepEqual(entries, [['foo', 10]])
 })
 
+test('fileExtension', () => {
+  assert.equal(
+    path.basename(createConf({ fileExtension: '.yaml' }).path),
+    'config.yaml'
+  )
+  assert.equal(path.basename(createConf({ fileExtension: '' }).path), 'config')
+  assert.equal(
+    path.basename(createConf({ fileExtension: '...' }).path),
+    'config'
+  )
+})
+
 const schemaSuite = suite('Conf schema')
 const { test: schemaTest } = schemaSuite
 
