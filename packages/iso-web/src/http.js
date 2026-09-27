@@ -58,14 +58,26 @@ export class JsonError extends RequestError {
   /** @type {import('type-fest').JsonValue} */
   cause
 
+  /** @type {number} */
+  code = 0
+
+  /** @type {Response} */
+  response
+
+  /** @type {Request} */
+  request
+
   /**
    *
-   * @param {{ cause: import('type-fest').JsonValue }} options
+   * @param {{ cause: import('type-fest').JsonValue, response: Response, request: Request }} options
    */
   constructor(options) {
-    super('Failed with a JSON error, see cause.', options)
+    super('Failed with a JSON error, see cause.', { cause: options.cause })
 
     this.cause = options.cause
+    this.code = options.response.status
+    this.response = options.response
+    this.request = options.request
   }
 
   /**
@@ -665,12 +677,17 @@ request.json = async function json(resource, options = {}) {
       HttpError.is(error) &&
       error.response.headers.get('content-type')?.includes('json')
     ) {
+      const response = error.response.clone()
       const body = await parseJson(error.response)
       if (body.error) {
         return body
       }
       return {
-        error: new JsonError({ cause: body.result }),
+        error: new JsonError({
+          cause: body.result,
+          response,
+          request: error.request,
+        }),
       }
     }
     return { error }

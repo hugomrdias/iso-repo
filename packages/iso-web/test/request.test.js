@@ -921,6 +921,26 @@ test('should request json and error', async () => {
   assert.deepEqual(error.cause, { hello: 'world' })
 })
 
+for (const status of [404, 429, 500]) {
+  test(`should keep status, response and request on JsonError for ${status}`, async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return HttpResponse.json({ message: 'nope' }, { status })
+      })
+    )
+
+    const { error } = await request.json('https://local.dev')
+
+    assert.ok(JsonError.is(error))
+    assert.equal(error.code, status)
+    assert.deepEqual(error.cause, { message: 'nope' })
+    assert.equal(error.response.status, status)
+    assert.deepEqual(await error.response.json(), { message: 'nope' })
+    assert.equal(error.request.method, 'GET')
+    assert.equal(error.request.url, 'https://local.dev/')
+  })
+}
+
 test('should return RequestError for an invalid url', async () => {
   const { error } = await request('http://')
 
