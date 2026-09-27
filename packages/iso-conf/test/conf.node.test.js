@@ -71,6 +71,31 @@ test('set object', () => {
   assert.equal(config.get('foo'), 25)
 })
 
+test('set rejects null and array keys', () => {
+  const config = createConf()
+
+  assert.throws(
+    // @ts-expect-error - runtime validation should reject null keys.
+    () => config.set(null),
+    {
+      name: 'TypeError',
+      message: 'Expected `key` to be of type `string` or `object`, got null',
+    }
+  )
+
+  assert.throws(
+    // @ts-expect-error - runtime validation should reject array keys.
+    () => config.set(['a', 'b']),
+    {
+      name: 'TypeError',
+      message: 'Expected `key` to be of type `string` or `object`, got array',
+    }
+  )
+
+  assert.equal(config.has('0'), false)
+  assert.equal(config.has('1'), false)
+})
+
 test('appendToArray', () => {
   const config = createConf()
   config.set('items', [{ name: 'foo' }])

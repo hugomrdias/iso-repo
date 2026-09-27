@@ -66,6 +66,27 @@ const kebabCase = (str) => {
 }
 
 /**
+ * Describes a `set()` key for error messages.
+ *
+ * `typeof null` and `typeof []` are both `object`, which would accept them
+ * as object keys.
+ *
+ * @param {unknown} key - Key passed to `set()`.
+ * @returns {string}
+ */
+const setKeyType = (key) => {
+  if (key === null) {
+    return 'null'
+  }
+
+  if (Array.isArray(key)) {
+    return 'array'
+  }
+
+  return typeof key
+}
+
+/**
  * Ensures a value can be serialized to JSON.
  *
  * @param {string} key - Config key being set.
@@ -233,9 +254,11 @@ export class Conf {
    * @param {unknown} [value] - Value to set when `key` is a string.
    */
   set(key, value) {
-    if (typeof key !== 'string' && typeof key !== 'object') {
+    const keyType = setKeyType(key)
+
+    if (keyType !== 'string' && keyType !== 'object') {
       throw new TypeError(
-        `Expected \`key\` to be of type \`string\` or \`object\`, got ${typeof key}`
+        `Expected \`key\` to be of type \`string\` or \`object\`, got ${keyType}`
       )
     }
 
