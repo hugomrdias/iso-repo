@@ -354,17 +354,15 @@ async function send(resource, options) {
 
     while (true) {
       const response = await fn()
-      let shouldPoll = pollOptions != null
-
-      if (!pollStatusCodes.includes(response.status)) {
-        shouldPoll = false
-      }
+      const defaultShouldPoll = pollStatusCodes.includes(response.status)
+      let shouldPoll = defaultShouldPoll
 
       const currentAttempt = attempt
       if (pollOptions?.shouldPoll) {
-        shouldPoll = await pollOptions.shouldPoll(
-          createPollContext(response, attempt)
-        )
+        shouldPoll = await pollOptions.shouldPoll({
+          ...createPollContext(response, attempt),
+          defaultShouldPoll,
+        })
       }
 
       if (!shouldPoll) {
@@ -425,25 +423,28 @@ async function send(resource, options) {
             }
           },
           shouldRetry: async (ctx) => {
-            let shouldRetry = false
+            let defaultShouldRetry = false
             if (
               retryMethods.includes(request.method.toLowerCase()) &&
               HttpError.is(ctx.error) &&
               retryStatusCodes.includes(ctx.error.code)
             ) {
-              shouldRetry = true
+              defaultShouldRetry = true
             }
 
             if (isNetworkError(ctx.error)) {
-              shouldRetry = true
+              defaultShouldRetry = true
             }
 
             if (retryOptions.shouldRetry) {
-              const result = await retryOptions.shouldRetry(ctx)
-              shouldRetry = Boolean(result)
+              const result = await retryOptions.shouldRetry({
+                ...ctx,
+                defaultShouldRetry,
+              })
+              return Boolean(result)
             }
 
-            return shouldRetry
+            return defaultShouldRetry
           },
         })
       : operation())
