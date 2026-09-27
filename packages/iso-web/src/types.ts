@@ -100,6 +100,9 @@ export interface RetryOptions {
    * checks would not, for example an idempotent `POST`. `retries` and
    * `maxRetryTime` still apply.
    *
+   * When the request is retried, the body of the failed response is cancelled
+   * after this hook returns. Read it inside the hook, or clone it to keep it.
+   *
    * @param context - The context of the retry
    * @returns - Whether to retry the request
    */
