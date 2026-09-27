@@ -3,6 +3,7 @@ import { KV } from 'iso-kv'
 import { http } from 'msw'
 import { assert, suite } from 'playwright-test/taps'
 import { DohError, HttpError, JsonError, resolve } from '../src/doh/index.js'
+import { LRUCache } from '../src/lru.js'
 import { setup } from '../src/msw/msw.js'
 
 let expireCount = 0
@@ -734,4 +735,57 @@ test('should fail with non-ascii chars', async () => {
   } else {
     assert.fail('should fail')
   }
+})
+
+/**
+ * Answer every A query with an IP and count requests per name.
+ */
+function countRequests() {
+  /** @type {Map<string, number>} */
+  const calls = new Map()
+  server.use(
+    http.get('https://cloudflare-dns.com/dns-query', ({ request }) => {
+      const name = new URL(request.url).searchParams.get('name') ?? ''
+      calls.set(name, (calls.get(name) ?? 0) + 1)
+      return Response.json({
+        Status: 0,
+        Question: [{ name, type: 1 }],
+        Answer: [{ name, type: 1, TTL: 300, data: '1.2.3.4' }],
+      })
+    })
+  )
+  return calls
+}
+
+test('should resolve with a LRUCache', async () => {
+  const calls = countRequests()
+  const cache = new LRUCache({ max: 2 })
+
+  await resolve('lru-a.com', 'A', { cache })
+  await resolve('lru-b.com', 'A', { cache })
+  const cached = await resolve('lru-a.com', 'A', { cache })
+  await resolve('lru-c.com', 'A', { cache })
+  await resolve('lru-a.com', 'A', { cache })
+  await resolve('lru-b.com', 'A', { cache })
+
+  assert.deepEqual(cached, { result: ['1.2.3.4'] })
+  assert.equal(cache.size, 2)
+  assert.deepEqual(Object.fromEntries(calls), {
+    'lru-a.com': 1,
+    'lru-b.com': 2,
+    'lru-c.com': 1,
+  })
+})
+
+test('should keep the default cache bounded to 1000 entries', async () => {
+  const calls = countRequests()
+
+  for (let i = 0; i <= 1000; i++) {
+    await resolve(`default-${i}.com`, 'A')
+  }
+  await resolve('default-1000.com', 'A')
+  await resolve('default-0.com', 'A')
+
+  assert.equal(calls.get('default-1000.com'), 1, 'newest entry is cached')
+  assert.equal(calls.get('default-0.com'), 2, 'oldest entry was evicted')
 })

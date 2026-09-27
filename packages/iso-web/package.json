@@ -49,6 +49,10 @@
       "types": "./dist/src/env.d.ts",
       "default": "./src/env.js"
     },
+    "./lru": {
+      "types": "./dist/src/lru.d.ts",
+      "default": "./src/lru.js"
+    },
     "./doh": {
       "types": "./dist/src/doh/index.d.ts",
       "default": "./src/doh/index.js"
@@ -84,6 +88,9 @@
       ],
       "env": [
         "dist/src/env"
+      ],
+      "lru": [
+        "dist/src/lru"
       ],
       "doh": [
         "dist/src/doh/index"
@@ -124,13 +131,13 @@
     "@standard-schema/spec": "catalog:",
     "delay": "catalog:",
     "is-network-error": "^1.3.2",
-    "iso-kv": "workspace:^",
     "p-retry": "^8.0.1"
   },
   "devDependencies": {
     "@types/debug": "catalog:",
     "@types/node": "catalog:",
     "iso-base": "workspace:^",
+    "iso-kv": "workspace:^",
     "msw": "catalog:",
     "playwright-test": "catalog:",
     "type-fest": "catalog:",

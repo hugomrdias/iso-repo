@@ -22,6 +22,7 @@
       "src/crypto.js",
       "src/http.js",
       "src/env.js",
+      "src/lru.js",
       "src/doh/index.js",
       "src/doh/dnslink.js"
     ],
