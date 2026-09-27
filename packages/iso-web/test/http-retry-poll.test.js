@@ -211,6 +211,136 @@ test('should retry immediately when X-RateLimit-Reset is in the past', async () 
   }
 })
 
+test('should not wait for Retry-After when the request will not be retried', async () => {
+  let count = 0
+  server.use(
+    http.all('https://local.dev/retry-after-no-retry', () => {
+      count++
+      return HttpResponse.json(
+        { error: 'rate limited' },
+        { status: 429, headers: { 'retry-after': '1' } }
+      )
+    })
+  )
+
+  /** @type {Array<[string, import('../src/types.js').RequestOptions]>} */
+  const cases = [
+    ['GET with retries: 0', { method: 'GET', retry: { retries: 0 } }],
+    ['POST', { method: 'POST', retry: true }],
+    [
+      'GET with shouldRetry false',
+      { method: 'GET', retry: { shouldRetry: () => false } },
+    ],
+  ]
+
+  for (const [name, options] of cases) {
+    count = 0
+    const start = Date.now()
+    const { error } = await request(
+      'https://local.dev/retry-after-no-retry',
+      options
+    )
+
+    assert.ok(HttpError.is(error), name)
+    assert.equal(error.code, 429, name)
+    assert.equal(count, 1, name)
+    assert.ok(Date.now() - start < 500, `${name} waited for Retry-After`)
+  }
+})
+
+test('should return the HttpError when Retry-After exceeds the timeout budget', async () => {
+  let count = 0
+  server.use(
+    http.get('https://local.dev/retry-after-over-budget', () => {
+      count++
+      return HttpResponse.json(
+        { error: 'rate limited' },
+        { status: 429, headers: { 'retry-after': '60' } }
+      )
+    })
+  )
+
+  const start = Date.now()
+  const { error } = await request('https://local.dev/retry-after-over-budget', {
+    timeout: 1500,
+    retry: true,
+  })
+
+  assert.ok(HttpError.is(error))
+  assert.equal(error.code, 429)
+  assert.equal(count, 1)
+  assert.ok(Date.now() - start < 500)
+})
+
+test(
+  'should wait for Retry-After instead of the backoff delay',
+  async () => {
+    let count = 0
+    server.use(
+      http.get('https://local.dev/retry-after-no-stacking', () => {
+        count++
+        if (count === 1) {
+          return HttpResponse.json(
+            { error: 'rate limited' },
+            { status: 429, headers: { 'retry-after': '0.2' } }
+          )
+        }
+        return HttpResponse.json({ data: 'ready' }, { status: 200 })
+      })
+    )
+
+    const start = Date.now()
+    const { error, result } = await request(
+      'https://local.dev/retry-after-no-stacking',
+      { timeout: 10_000, retry: { minTimeout: 2000 } }
+    )
+    const elapsed = Date.now() - start
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.equal(result.status, 200)
+      assert.equal(count, 2)
+      assert.ok(elapsed >= 150, `retried after ${elapsed}ms`)
+      assert.ok(elapsed < 1500, `backoff stacked: ${elapsed}ms`)
+    }
+  },
+  { timeout: 10_000 }
+)
+
+test('should count Retry-After retries against retries', async () => {
+  let count = 0
+  server.use(
+    http.get('https://local.dev/retry-after-bounded', () => {
+      count++
+      return HttpResponse.json(
+        { error: 'rate limited' },
+        { status: 429, headers: { 'retry-after': '0.01' } }
+      )
+    })
+  )
+
+  /** @type {Array<[number, number, number]>} */
+  const contexts = []
+  const { error } = await request('https://local.dev/retry-after-bounded', {
+    retry: {
+      retries: 2,
+      minTimeout: 1,
+      shouldRetry: (ctx) => {
+        contexts.push([ctx.retriesConsumed, ctx.retriesLeft, ctx.retryDelay])
+        return ctx.defaultShouldRetry
+      },
+    },
+  })
+
+  assert.ok(HttpError.is(error))
+  assert.equal(count, 3)
+  assert.deepEqual(contexts, [
+    [0, 2, 10],
+    [1, 1, 10],
+  ])
+})
+
 test('should not retry network errors for methods outside the retry method list', async () => {
   let count = 0
   server.use(

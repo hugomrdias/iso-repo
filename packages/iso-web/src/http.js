@@ -297,6 +297,7 @@ async function send(resource, options) {
   }
 
   // timeout signal
+  const start = performance.now()
   const timeoutSignal =
     timeout === false ? undefined : AbortSignal.timeout(timeout)
   const combinedSignals = anySignal([signal, timeoutSignal])
@@ -399,47 +400,89 @@ async function send(resource, options) {
     }
   }
 
+  /**
+   * Retry `operation` with p-retry, waiting for Retry-After instead of the
+   * backoff delay.
+   *
+   * p-retry has no per-attempt delay, so a Retry-After attempt tells p-retry
+   * not to consume a retry (which skips its backoff) and `shouldRetry` waits
+   * instead, once it knows a retry will happen. Those retries are counted
+   * here so they still count against `retries`.
+   *
+   * @param {import('./types.js').RetryOptions} retryOptions
+   * @param {() => Promise<Response>} operation
+   */
+  function retryRequest(retryOptions, operation) {
+    const retries = retryOptions.retries ?? 2
+    const maxRetryTime = retryOptions.maxRetryTime ?? Number.POSITIVE_INFINITY
+    const afterStatusCodes =
+      retryOptions.afterStatusCodes ?? DEFAULT_RETRY_AFTER_STATUS_CODES
+    const deadline = Math.min(
+      timeout === false ? Number.POSITIVE_INFINITY : start + timeout,
+      performance.now() + maxRetryTime
+    )
+    let retryAfterRetries = 0
+    let retryAfter = 0
+
+    return pRetry(() => operation(), {
+      retries,
+      factor: retryOptions.factor ?? 2,
+      minTimeout: retryOptions.minTimeout ?? 1000,
+      maxTimeout: retryOptions.maxTimeout ?? Number.POSITIVE_INFINITY,
+      randomize: retryOptions.randomize ?? false,
+      unref: retryOptions.unref ?? false,
+      maxRetryTime,
+      signal: combinedSignals,
+      shouldConsumeRetry: (ctx) => {
+        retryAfter =
+          HttpError.is(ctx.error) && afterStatusCodes.includes(ctx.error.code)
+            ? calculateRetryAfter(ctx.error.response)
+            : 0
+        return !(retryAfter > 0)
+      },
+      shouldRetry: async (ctx) => {
+        const retriesConsumed = ctx.retriesConsumed + retryAfterRetries
+        if (retriesConsumed >= retries) {
+          return false
+        }
+
+        const defaultShouldRetry =
+          retryMethods.includes(request.method.toLowerCase()) &&
+          ((HttpError.is(ctx.error) &&
+            retryStatusCodes.includes(ctx.error.code)) ||
+            isNetworkError(ctx.error))
+
+        const shouldRetry = retryOptions.shouldRetry
+          ? Boolean(
+              await retryOptions.shouldRetry({
+                ...ctx,
+                retriesConsumed,
+                retriesLeft: retries - retriesConsumed,
+                retryDelay: retryAfter > 0 ? retryAfter : ctx.retryDelay,
+                defaultShouldRetry,
+              })
+            )
+          : defaultShouldRetry
+
+        if (!shouldRetry || !(retryAfter > 0)) {
+          return shouldRetry
+        }
+
+        if (performance.now() + retryAfter > deadline) {
+          return false
+        }
+
+        await delay(retryAfter, { signal: combinedSignals })
+        retryAfterRetries++
+        return true
+      },
+    })
+  }
+
   try {
     const operation = pollOptions == null ? fn : pollRequest
     const response = await (retryOptions
-      ? pRetry(() => operation(), {
-          retries: retryOptions.retries ?? 2,
-          factor: retryOptions.factor ?? 2,
-          minTimeout: retryOptions.minTimeout ?? 1000,
-          maxTimeout: retryOptions.maxTimeout ?? Number.POSITIVE_INFINITY,
-          randomize: retryOptions.randomize ?? false,
-          unref: retryOptions.unref ?? false,
-          maxRetryTime: retryOptions.maxRetryTime ?? Number.POSITIVE_INFINITY,
-          signal: combinedSignals,
-          onFailedAttempt: async (ctx) => {
-            const codes =
-              retryOptions.afterStatusCodes ?? DEFAULT_RETRY_AFTER_STATUS_CODES
-            if (HttpError.is(ctx.error) && codes.includes(ctx.error.code)) {
-              // Delay if needed using Retry-After header
-              const delayValue = calculateRetryAfter(ctx.error.response)
-              if (delayValue > 0) {
-                await delay(delayValue, { signal: combinedSignals })
-              }
-            }
-          },
-          shouldRetry: async (ctx) => {
-            const defaultShouldRetry =
-              retryMethods.includes(request.method.toLowerCase()) &&
-              ((HttpError.is(ctx.error) &&
-                retryStatusCodes.includes(ctx.error.code)) ||
-                isNetworkError(ctx.error))
-
-            if (retryOptions.shouldRetry) {
-              const result = await retryOptions.shouldRetry({
-                ...ctx,
-                defaultShouldRetry,
-              })
-              return Boolean(result)
-            }
-
-            return defaultShouldRetry
-          },
-        })
+      ? retryRequest(retryOptions, operation)
       : operation())
 
     return { result: response }

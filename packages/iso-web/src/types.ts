@@ -75,6 +75,8 @@ export interface RetryOptions {
    *
    * Request will wait until the date or number of seconds given in the Retry-After header has passed to retry the request. If Retry-After is missing, the non-standard RateLimit-Reset header (seconds) is used in its place as a fallback, then X-RateLimit-Reset or X-Rate-Limit-Reset (Unix timestamp in seconds). If the provided status code is not in the list, the Retry-After header will be ignored.
    *
+   * The wait only happens when the request will be retried, and it replaces the backoff delay. If the wait doesn't fit in the remaining `timeout` or `maxRetryTime`, the `HttpError` is returned right away. Retries after a Retry-After wait count against `retries`.
+   *
    * @default [413, 429, 503]
    */
   afterStatusCodes?: number[]
