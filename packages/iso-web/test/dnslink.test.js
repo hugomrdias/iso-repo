@@ -31,12 +31,24 @@ const handlers = [
   http.get('https://cloudflare-dns.com/dns-query', ({ request }) => {
     const params = Object.fromEntries(new URL(request.url).searchParams)
     if (params.name === '_dnslink.docs.ipfs.tech') {
-      return Response.json(
-        mockRecord([
-          '_dnslink.ipfs-docs.on.fleek.co.',
-          'dnslink=/ipfs/Qdocsipfstech',
-        ])
-      )
+      return Response.json({
+        ...mockRecord([]),
+        Question: [{ name: '_dnslink.docs.ipfs.tech', type: 16 }],
+        Answer: [
+          {
+            name: '_dnslink.docs.ipfs.tech',
+            type: 5,
+            TTL: 60,
+            data: '_dnslink.ipfs-docs.on.fleek.co.',
+          },
+          {
+            name: '_dnslink.ipfs-docs.on.fleek.co',
+            type: 16,
+            TTL: 60,
+            data: 'dnslink=/ipfs/Qdocsipfstech',
+          },
+        ],
+      })
     }
     if (params.name === '_dnslink.ipfs.io') {
       return Response.json(mockRecord(['"dnslink=/ipns/ipns/path/here"']))
