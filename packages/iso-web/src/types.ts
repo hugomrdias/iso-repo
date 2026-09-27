@@ -56,8 +56,8 @@ export interface ShouldPollContext extends PollContext {
 
 export interface ShouldRetryContext extends RetryContext {
   /**
-   * Whether the built-in checks (`methods`, `statusCodes` and network errors)
-   * would retry.
+   * Whether the built-in checks would retry: the method is in `methods` and
+   * the error is a network error or an HTTP error with a code in `statusCodes`.
    */
   defaultShouldRetry: boolean
 }
@@ -80,7 +80,9 @@ export interface RetryOptions {
   afterStatusCodes?: number[]
 
   /**
-   * The methods to retry
+   * The methods to retry. Both `statusCodes` and network errors are only
+   * retried for these methods, so non-idempotent methods like `POST` and
+   * `PATCH` are not retried unless added here or allowed by `shouldRetry`.
    *
    * @default ['get', 'put', 'head', 'delete', 'options', 'trace']
    */

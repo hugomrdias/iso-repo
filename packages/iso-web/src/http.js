@@ -423,18 +423,11 @@ async function send(resource, options) {
             }
           },
           shouldRetry: async (ctx) => {
-            let defaultShouldRetry = false
-            if (
+            const defaultShouldRetry =
               retryMethods.includes(request.method.toLowerCase()) &&
-              HttpError.is(ctx.error) &&
-              retryStatusCodes.includes(ctx.error.code)
-            ) {
-              defaultShouldRetry = true
-            }
-
-            if (isNetworkError(ctx.error)) {
-              defaultShouldRetry = true
-            }
+              ((HttpError.is(ctx.error) &&
+                retryStatusCodes.includes(ctx.error.code)) ||
+                isNetworkError(ctx.error))
 
             if (retryOptions.shouldRetry) {
               const result = await retryOptions.shouldRetry({
