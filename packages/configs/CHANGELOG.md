@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/configs-v1.1.4...configs-v2.0.0) (2026-09-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **configs:** requires @biomejs/biome >= 2.5.0.
+
+### Bug Fixes
+
+* **configs:** replace deprecated rules.recommended with preset ([faf6700](https://github.com/hugomrdias/iso-repo/commit/faf6700b208fcdae61a77f0cea7a8275326a3468))
+
 ## [1.1.4](https://github.com/hugomrdias/iso-repo/compare/configs-v1.1.3...configs-v1.1.4) (2026-09-26)
 
 
