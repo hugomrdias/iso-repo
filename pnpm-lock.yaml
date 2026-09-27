@@ -379,7 +379,7 @@ importers:
   packages/configs:
     dependencies:
       '@biomejs/biome':
-        specifier: ^2.1.2
+        specifier: ^2.5.0
         version: 2.5.14
     devDependencies:
       '@types/node':
