@@ -1,4 +1,3 @@
-import type { IKV } from 'iso-kv'
 import type { RetryOptions } from '../types'
 
 export type RecordType =
@@ -43,8 +42,25 @@ export interface ResolveOptions {
    * @default false
    */
   retry?: RetryOptions | boolean
+  /**
+   * Cache for DoH results
+   *
+   * Defaults to a shared in-memory `LRUCache` from `iso-web/lru` with 1000 entries.
+   */
+  cache?: DohCache
+}
 
-  cache?: IKV
+/**
+ * Cache used by `resolve()`
+ *
+ * `KV` instances from `iso-kv` satisfy this interface.
+ */
+export interface DohCache {
+  get: (key: string[]) => unknown
+  /**
+   * @param options.ttl - Time-to-live in seconds
+   */
+  set: (key: string[], value: unknown, options: { ttl: number }) => unknown
 }
 
 export interface Answer {

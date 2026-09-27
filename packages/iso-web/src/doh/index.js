@@ -1,12 +1,12 @@
-import { KV } from 'iso-kv'
-
 import { request } from '../http.js'
+import { LRUCache } from '../lru.js'
 
 const symbol = Symbol.for('doh-error')
 
 /**
  * @typedef {import('../http.js').RequestJsonErrors | DohError} DoHErrors
  * @typedef {import('../http.js').RequestJsonErrors} RequestErrors
+ * @typedef {import('./types.js').DohCache} DohCache
  */
 
 export {
@@ -251,7 +251,7 @@ function parseTxt(data) {
   return decoder.decode(new Uint8Array(bytes))
 }
 
-const kv = new KV()
+const defaultCache = new LRUCache({ max: 1000 })
 /**
  * Resolve a DNS query using DNS over HTTPS
  *
@@ -266,7 +266,7 @@ const kv = new KV()
  * @returns {Promise<import("../types.js").MaybeResult<T, DoHErrors>>}
  */
 export async function resolve(query, type, options = {}) {
-  const { cache = kv } = options
+  const { cache = defaultCache } = options
   const {
     server = 'https://cloudflare-dns.com/dns-query',
     signal,
@@ -278,8 +278,10 @@ export async function resolve(query, type, options = {}) {
   requestUrl.searchParams.set('type', type)
   const url = requestUrl.toString()
 
-  /** @type {import('../types.js').MaybeResult<T, DoHErrors> | undefined} */
-  const cached = await cache.get([url])
+  const cached =
+    /** @type {import('../types.js').MaybeResult<T, DoHErrors> | undefined} */ (
+      await cache.get([url])
+    )
   if (cached) {
     return cached
   }
