@@ -141,7 +141,7 @@ export interface Options<Schema extends StandardSchemaV1 = StandardSchemaV1> {
   clearInvalidConfig?: boolean
   /** Watch the config file for external changes. @default false */
   watch?: boolean
-  /** File mode used when creating the config file. @default 0o666 */
+  /** File mode used when creating the config file. @default 0o600 */
   configFileMode?: number
   /** Custom serializer. Defaults to extended JSON via `stringify`. */
   serialize?: Serialize

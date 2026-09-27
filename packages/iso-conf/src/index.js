@@ -634,7 +634,7 @@ export class Conf {
       projectSuffix: 'nodejs',
       clearInvalidConfig: false,
       accessPropertiesByDotNotation: true,
-      configFileMode: 0o666,
+      configFileMode: 0o600,
       ...partialOptions,
     }
 

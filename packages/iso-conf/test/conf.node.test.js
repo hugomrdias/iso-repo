@@ -254,3 +254,17 @@ writeTest('writes and reads back', () => {
   })
   assert.equal(reloaded.get('foo'), 33)
 })
+
+writeTest('defaults config files to owner read-write', () => {
+  const config = createConf()
+  config.set('foo', 33)
+
+  assert.equal(fs.statSync(config.path).mode & 0o777, 0o600)
+})
+
+writeTest('uses configFileMode when set', () => {
+  const config = createConf({ configFileMode: 0o640 })
+  config.set('foo', 33)
+
+  assert.equal(fs.statSync(config.path).mode & 0o777, 0o640)
+})
