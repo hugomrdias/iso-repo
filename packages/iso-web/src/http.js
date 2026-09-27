@@ -800,18 +800,6 @@ request.json.patch = function patch(resource, options = {}) {
 }
 
 /**
- * Request Json HEAD
- *
- * @template T
- * @param {import('./types.js').RequestInput} resource
- * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
- */
-request.json.head = function head(resource, options = {}) {
-  return request.json(resource, { ...options, method: 'HEAD' })
-}
-
-/**
  * Request Json OPTIONS
  *
  * @template T

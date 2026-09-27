@@ -1057,3 +1057,7 @@ test('should return RequestError for an empty json response', async () => {
   assert.ok(RequestError.is(error))
   assert.ok(error.cause instanceof SyntaxError)
 })
+
+test('should not have request.json.head', () => {
+  assert.equal('head' in request.json, false)
+})
