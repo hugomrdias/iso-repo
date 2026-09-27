@@ -129,6 +129,7 @@ schemaTest('persists coerced values', () => {
   const config = new Conf({
     cwd,
     schema: z.looseObject({ foo: z.coerce.number() }),
+    defaults: { foo: 0 },
   })
   assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
     foo: 7,
@@ -149,6 +150,140 @@ schemaTest('reset restores defaults', () => {
   config.set('foo', 99)
   config.reset('foo')
   assert.equal(config.get('foo'), 50)
+})
+
+schemaTest('reset restores nested defaults with dot notation', () => {
+  const config = new Conf({
+    cwd: temporaryDirectory(),
+    schema: z.looseObject({
+      n: z.object({ v: z.number().default(7) }).default({ v: 7 }),
+    }),
+  })
+  config.set('n.v', 1)
+  config.reset('n.v')
+  assert.equal(config.get('n.v'), 7)
+})
+
+schemaTest('reset leaves keys without a default unchanged', () => {
+  const config = createConf()
+  config.set('bar', 'https://example.com')
+  config.reset('bar')
+  assert.equal(config.get('bar'), 'https://example.com')
+})
+
+schemaTest('defaults apply after the file is deleted', () => {
+  const config = createConf()
+  fs.rmSync(config.path)
+  assert.equal(config.get('foo'), 50)
+})
+
+const requiredSchema = z.looseObject({
+  req: z.number(),
+  foo: z.number().default(50),
+})
+
+const requiredSuite = suite('Conf required fields')
+const { test: requiredTest } = requiredSuite
+
+requiredTest('throws on first run without defaults', () => {
+  assert.throws(
+    () =>
+      // @ts-expect-error - `defaults` is required for this schema.
+      new Conf({ cwd: temporaryDirectory(), schema: requiredSchema }),
+    /Config schema violation: `req`/
+  )
+})
+
+requiredTest('uses defaults on first run', () => {
+  const config = new Conf({
+    cwd: temporaryDirectory(),
+    schema: requiredSchema,
+    defaults: { req: 1 },
+  })
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+    req: 1,
+    foo: 50,
+  })
+})
+
+requiredTest('fills new required fields in an existing file', () => {
+  const cwd = temporaryDirectory()
+  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ foo: 3 }))
+  const config = new Conf({ cwd, schema: requiredSchema, defaults: { req: 1 } })
+  assert.equal(config.get('req'), 1)
+  assert.equal(config.get('foo'), 3)
+})
+
+requiredTest('reset and clear use defaults and schema defaults', () => {
+  const config = new Conf({
+    cwd: temporaryDirectory(),
+    schema: requiredSchema,
+    defaults: { req: 1 },
+  })
+  config.set({ req: 2, foo: 3 })
+  config.reset('req', 'foo')
+  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+
+  config.set({ req: 2, foo: 3, extra: true })
+  config.clear()
+  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+})
+
+requiredTest('reset works per key when other keys are required', () => {
+  const cwd = temporaryDirectory()
+  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ req: 1 }))
+  // @ts-expect-error - `defaults` is required for this schema.
+  const config = new Conf({ cwd, schema: requiredSchema })
+  config.set('foo', 1)
+  config.reset('foo')
+  assert.equal(config.get('foo'), 50)
+  config.reset('req')
+  assert.equal(config.get('req'), 1)
+})
+
+requiredTest('defaults work without a schema', () => {
+  const config = new Conf({
+    cwd: temporaryDirectory(),
+    defaults: { nested: { a: 1 } },
+  })
+  config.set('nested.a', 2)
+  config.reset('nested.a')
+  assert.deepEqual(config.get('nested'), { a: 1 })
+  config.clear()
+  assert.deepEqual({ ...config.store }, { nested: { a: 1 } })
+})
+
+const outputSuite = suite('Conf schema output')
+const { test: outputTest } = outputSuite
+
+outputTest('writes the validated output', () => {
+  const config = new Conf({
+    cwd: temporaryDirectory(),
+    schema: z.object({ a: z.number().default(1) }),
+  })
+  config.set('extra', 5)
+  assert.equal(config.get('extra'), undefined)
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), { a: 1 })
+})
+
+outputTest('rejects writes whose output is not valid input', () => {
+  const config = new Conf({
+    cwd: temporaryDirectory(),
+    schema: z.looseObject({
+      s: z
+        .string()
+        .transform((v) => v.length)
+        .optional(),
+    }),
+  })
+  // @ts-expect-error - `s` is typed as the transformed output.
+  assert.throws(() => config.set('s', 'abc'), {
+    name: 'TypeError',
+    message: /Schema output must be valid schema input/,
+  })
+  assert.equal(config.get('s'), undefined)
+  config.set('other', 1)
+  assert.equal(config.get('other'), 1)
 })
 
 const jsonTest = suite('Conf json')
@@ -400,19 +535,19 @@ const { test: invalidTest } = invalidSuite
 invalidTest('clearInvalidConfig on corrupt json', () => {
   const config = createConf({ clearInvalidConfig: true })
   fs.writeFileSync(config.path, '{invalid')
-  assert.equal(Object.keys(config.store).length, 0)
+  assert.deepEqual({ ...config.store }, { foo: 50 })
 })
 
 invalidTest('clearInvalidConfig on schema violation', () => {
   const config = createConf({ clearInvalidConfig: true })
   fs.writeFileSync(config.path, JSON.stringify({ foo: 'bad' }))
-  assert.equal(Object.keys(config.store).length, 0)
+  assert.deepEqual({ ...config.store }, { foo: 50 })
 })
 
 invalidTest('clearInvalidConfig on extended JSON reviver error', () => {
   const config = createConf({ clearInvalidConfig: true })
   fs.writeFileSync(config.path, JSON.stringify({ u: { $url: 'nope' } }))
-  assert.equal(Object.keys(config.store).length, 0)
+  assert.deepEqual({ ...config.store }, { foo: 50 })
 })
 
 invalidTest('clearInvalidConfig on custom deserialize error', () => {
@@ -427,7 +562,7 @@ invalidTest('clearInvalidConfig on custom deserialize error', () => {
     },
   })
   fs.writeFileSync(config.path, 'bad')
-  assert.equal(Object.keys(config.store).length, 0)
+  assert.deepEqual({ ...config.store }, { foo: 50 })
 })
 
 invalidTest('clearInvalidConfig recovers on init', () => {
@@ -438,6 +573,20 @@ invalidTest('clearInvalidConfig recovers on init', () => {
   )
   const config = createConf({ cwd, clearInvalidConfig: true })
   assert.equal(config.get('foo'), 50)
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+    foo: 50,
+  })
+})
+
+invalidTest('clearInvalidConfig rewrites a cleared file on init', () => {
+  const cwd = temporaryDirectory()
+  fs.writeFileSync(path.join(cwd, 'config.json'), '{invalid')
+  const config = new Conf({
+    cwd,
+    schema: z.looseObject({ bar: z.string().optional() }),
+    clearInvalidConfig: true,
+  })
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {})
 })
 
 invalidTest('deserialize errors propagate without clearInvalidConfig', () => {

@@ -37,6 +37,24 @@ console.log(config.get('foo'))
 
 Any [Standard Schema](https://standardschema.dev) compliant library can be used for the `schema` option. Zod is shown above as an example only.
 
+### Defaults and required fields
+
+Missing top-level keys are filled from the `defaults` option and then from schema defaults, on every read and write. `defaults` is required when the schema has required fields without a schema default, since a fresh config would otherwise fail validation.
+
+```js
+const schema = z.object({
+  token: z.string(),
+  retries: z.number().default(3),
+})
+
+const config = new Conf({ projectName: 'my-app', schema, defaults: { token: '' } })
+
+config.reset('token') // => ''
+config.clear() // => { token: '', retries: 3 }
+```
+
+The schema output is what gets written to disk and validated again on the next read, so it must also be valid schema input. Transforms that change a value's type (e.g. `z.string().transform((s) => s.length)`) are rejected on write.
+
 ## Docs
 
 Check <https://hugomrdias.github.io/iso-repo/modules/iso_conf.html>

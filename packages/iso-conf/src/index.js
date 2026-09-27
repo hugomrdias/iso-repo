@@ -32,13 +32,6 @@ import { parse, stringify } from 'iso-base/json'
  */
 const createPlainObject = () => /** @type {T} */ (Object.create(null))
 
-/**
- * Returns whether a value is not `undefined`.
- *
- * @param {unknown} data
- */
-const isExist = (data) => data !== undefined
-
 // any combination of spaces and punctuation characters
 // thanks to http://stackoverflow.com/a/25575009
 var wordSeparators =
@@ -139,8 +132,13 @@ export class Conf {
   /** @type {Readonly<Options<Schema>>} */
   #options
 
-  /** @type {Partial<StandardSchemaV1.InferOutput<Schema>>} */
-  #defaultValues = createPlainObject()
+  /**
+   * Serialized `defaults` option, deserialized on demand so every store gets
+   * its own copy.
+   *
+   * @type {string | undefined}
+   */
+  #defaultsData
 
   /** @type {fs.FSWatcher | undefined} */
   #watcher
@@ -163,11 +161,13 @@ export class Conf {
    *
    * @param {Options<Schema>} [partialOptions] - Config options.
    */
-  constructor(partialOptions = {}) {
+  constructor(partialOptions = /** @type {Options<Schema>} */ ({})) {
     const options = this.#prepareOptions(partialOptions)
     this.#options = options
     this.#schema = options.schema
-    this.#applyDefaultValues(options)
+    if (options.defaults !== undefined) {
+      this.#defaultsData = this.#serialize(options.defaults)
+    }
     this.events = new EventTarget()
     this.path = this.#resolvePath(options)
     this.#initializeStore()
@@ -289,24 +289,30 @@ export class Conf {
   }
 
   /**
-   * Reset items to their schema default values.
+   * Reset items to their default values.
    *
-   * @param {...SchemaKeyPath<Schema>} keys - Keys to reset.
+   * Values come from the `defaults` option first, then from the schema.
+   * Keys without a default are left unchanged.
+   *
+   * @param {...SchemaKeyPath<Schema>} keys - Keys to reset. Supports dot notation when enabled.
    */
   reset(...keys) {
-    const defaults = keys.filter((key) => isExist(this.#defaultValues[key]))
-
-    if (defaults.length === 0) {
-      return
-    }
-
     const store = this.store
+    let changed = false
 
-    for (const key of defaults) {
-      this.#setIn(store, String(key), this.#defaultValues[key])
+    for (const key of keys) {
+      const keyPath = String(key)
+      const value = this.#defaultFor(store, keyPath)
+
+      if (value !== undefined) {
+        this.#setIn(store, keyPath, value)
+        changed = true
+      }
     }
 
-    this.store = store
+    if (changed) {
+      this.store = store
+    }
   }
 
   /**
@@ -328,18 +334,10 @@ export class Conf {
   }
 
   /**
-   * Reset the config to schema default values.
+   * Reset the config to the `defaults` option and schema default values.
    */
   clear() {
-    const newStore = createPlainObject()
-
-    for (const key of Object.keys(this.#defaultValues)) {
-      if (isExist(this.#defaultValues[key])) {
-        this.#setIn(newStore, key, this.#defaultValues[key])
-      }
-    }
-
-    this.store = newStore
+    this.store = createPlainObject()
   }
 
   /**
@@ -403,11 +401,14 @@ export class Conf {
     return this.#load(this.#readFile())
   }
 
-  /** @param {SchemaValues<Schema>} value */
+  /**
+   * Validates `value` and persists the schema output. Missing top-level keys
+   * are filled from the `defaults` option and schema defaults.
+   *
+   * @param {SchemaValues<Schema>} value
+   */
   set store(value) {
-    this.#ensureDirectory()
-    this.#validate(value)
-    this.#write(value)
+    this.#persist(this.#validate(value))
     this.events.dispatchEvent(new Event('change'))
   }
 
@@ -461,42 +462,92 @@ export class Conf {
   }
 
   /**
-   * Build a new store object from raw file contents.
-   *
-   * Returns the validated store, or the empty `raw` object when `#parse`
-   * discards the file.
+   * Build a new validated store object from raw file contents.
    *
    * @param {string | undefined} data - Raw file contents from `#readFile`.
    * @returns {SchemaValues<Schema>}
    */
   #load(data) {
-    const { raw, value } = this.#parse(data)
-    return value ?? raw
+    return this.#parse(data).value
   }
 
   /**
    * Deserialize and validate raw config file contents.
    *
-   * `value` is the validated store, and is `undefined` when the file is
-   * missing or was discarded by `clearInvalidConfig`.
+   * `raw` is the deserialized file, or an empty object when the file is
+   * missing or was discarded by `clearInvalidConfig` (then `cleared` is
+   * `true`). `value` is always the validated store.
    *
    * @param {string | undefined} data - Raw file contents from `#readFile`.
-   * @returns {{ raw: StandardSchemaV1.InferOutput<Schema>, value?: StandardSchemaV1.InferOutput<Schema> }}
+   * @returns {{ raw: Record<string, unknown>, value: SchemaValues<Schema>, cleared?: boolean }}
    */
   #parse(data) {
-    if (data === undefined) {
-      return { raw: createPlainObject() }
+    if (data !== undefined) {
+      try {
+        /** @type {Record<string, unknown>} */
+        const raw = Object.assign(createPlainObject(), this.#deserialize(data))
+        return { raw, value: this.#validate(raw) }
+      } catch (error) {
+        if (!this.#options.clearInvalidConfig) {
+          throw error
+        }
+      }
+    }
+
+    /** @type {Record<string, unknown>} */
+    const raw = createPlainObject()
+    return { raw, value: this.#validate(raw), cleared: data !== undefined }
+  }
+
+  /**
+   * Fresh copy of the `defaults` option.
+   *
+   * @returns {Record<string, unknown>}
+   */
+  #defaults() {
+    if (this.#defaultsData === undefined) {
+      return createPlainObject()
+    }
+
+    return Object.assign(
+      createPlainObject(),
+      this.#deserialize(this.#defaultsData)
+    )
+  }
+
+  /**
+   * Resolve the default value for a key in `store`.
+   *
+   * Uses the `defaults` option when it has the key, otherwise validates a copy
+   * of `store` without the key so the schema can fill in its default.
+   *
+   * @param {SchemaValues<Schema>} store - Loaded config object.
+   * @param {string} key - Item key. Supports dot notation when enabled.
+   */
+  #defaultFor(store, key) {
+    const value = this.#getIn(this.#defaults(), key)
+
+    if (value !== undefined) {
+      return value
+    }
+
+    /** @type {Record<string, unknown>} */
+    const probe = Object.assign(
+      createPlainObject(),
+      this.#deserialize(this.#serialize(store))
+    )
+
+    if (this.#options.accessPropertiesByDotNotation) {
+      deleteProperty(probe, key)
+    } else {
+      delete probe[key]
     }
 
     try {
-      const raw = Object.assign(createPlainObject(), this.#deserialize(data))
-      return { raw, value: this.#validate(raw) }
-    } catch (error) {
-      if (this.#options.clearInvalidConfig) {
-        return { raw: createPlainObject() }
-      }
-
-      throw error
+      return this.#getIn(this.#validate(probe), key)
+    } catch {
+      // The key is required and has no default.
+      return undefined
     }
   }
 
@@ -557,19 +608,46 @@ export class Conf {
   }
 
   /**
-   * Validate config data against the schema when present.
+   * Merge the `defaults` option under `data` and validate the result against
+   * the schema when present.
    *
-   * @param {unknown} data - Config object to validate.
-   * @returns {StandardSchemaV1.InferOutput<Schema>}
+   * @param {object} data - Config object to validate.
+   * @returns {SchemaValues<Schema>}
    */
   #validate(data) {
+    const input = Object.assign(this.#defaults(), data)
+
     if (!this.#schema) {
-      return /** @type {StandardSchemaV1.InferOutput<Schema>} */ (data)
+      return /** @type {SchemaValues<Schema>} */ (input)
     }
 
-    return /** @type {StandardSchemaV1.InferOutput<Schema>} */ (
-      validateSchema(this.#schema, data)
+    return /** @type {SchemaValues<Schema>} */ (
+      validateSchema(this.#schema, input)
     )
+  }
+
+  /**
+   * Write validated schema output to disk.
+   *
+   * The output is read back as schema input on the next load, so it must pass
+   * validation again or the file could never be loaded.
+   *
+   * @param {SchemaValues<Schema>} value - Validated config object.
+   */
+  #persist(value) {
+    if (this.#schema) {
+      try {
+        this.#validate(value)
+      } catch (error) {
+        throw new TypeError(
+          `Schema output must be valid schema input to be stored. ${/** @type {Error} */ (error).message}`,
+          { cause: error }
+        )
+      }
+    }
+
+    this.#ensureDirectory()
+    this.#write(value)
   }
 
   /** Ensure the config directory exists. */
@@ -690,24 +768,6 @@ export class Conf {
   }
 
   /**
-   * Capture schema default values for `reset` and `clear`.
-   *
-   * @param {Options<Schema>} options
-   */
-  #applyDefaultValues(options) {
-    if (options.schema) {
-      try {
-        const value = validateSchema(options.schema, {})
-        if (value && typeof value === 'object') {
-          Object.assign(this.#defaultValues, value)
-        }
-      } catch {
-        // Ignore invalid empty defaults.
-      }
-    }
-  }
-
-  /**
    * Resolve the absolute config file path.
    *
    * @param {Options<Schema>} options
@@ -724,14 +784,20 @@ export class Conf {
     )
   }
 
-  /** Merge schema defaults into the on-disk config when needed. */
+  /**
+   * Persist defaults and normalised schema output into the on-disk config when
+   * needed, and replace a file discarded by `clearInvalidConfig`.
+   */
   #initializeStore() {
-    const { raw, value = this.#validate(raw) } = this.#parse(this.#readFile())
+    const { raw, value, cleared } = this.#parse(this.#readFile())
 
     // Schemas may return a plain object for our null-prototype input, so only
     // compare the top level by own properties.
-    if (!isDeepStrictEqual(raw, Object.assign(createPlainObject(), value))) {
-      this.#write(value)
+    if (
+      cleared ||
+      !isDeepStrictEqual(raw, Object.assign(createPlainObject(), value))
+    ) {
+      this.#persist(value)
     }
   }
 
