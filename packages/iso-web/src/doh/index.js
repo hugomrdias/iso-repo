@@ -207,6 +207,50 @@ function errorTtl(response) {
   }
 }
 
+const QUOTED_STRINGS = /^\s*(?:"(?:[^"\\]|\\.)*"\s*)+$/s
+const QUOTED_STRING = /"((?:[^"\\]|\\.)*)"/gs
+const ESCAPE = /\\(25[0-5]|2[0-4]\d|[01]\d\d|.)/gs
+const DECIMAL_ESCAPE = /^\d{3}$/
+const encoder = new TextEncoder()
+const decoder = new TextDecoder()
+
+/**
+ * Parse TXT record data into a single string.
+ *
+ * Some DoH servers (e.g. Cloudflare) return the presentation format: one or
+ * more quoted character-strings with `\X` and `\DDD` escapes, which are
+ * unescaped and concatenated. Others (e.g. Google) return the concatenated
+ * value unquoted, which is returned as is.
+ *
+ * @see https://datatracker.ietf.org/doc/html/rfc1035#section-5.1
+ * @see https://datatracker.ietf.org/doc/html/rfc7208#section-3.3
+ *
+ * @param {string} data
+ */
+function parseTxt(data) {
+  if (!QUOTED_STRINGS.test(data)) {
+    return data
+  }
+
+  // `\DDD` escapes are bytes, so decode everything as UTF-8 bytes
+  /** @type {number[]} */
+  const bytes = []
+  for (const [, value] of data.matchAll(QUOTED_STRING)) {
+    let last = 0
+    for (const match of value.matchAll(ESCAPE)) {
+      bytes.push(...encoder.encode(value.slice(last, match.index)))
+      bytes.push(
+        ...(DECIMAL_ESCAPE.test(match[1])
+          ? [Number(match[1])]
+          : encoder.encode(match[1]))
+      )
+      last = match.index + match[0].length
+    }
+    bytes.push(...encoder.encode(value.slice(last)))
+  }
+  return decoder.decode(new Uint8Array(bytes))
+}
+
 const kv = new KV()
 /**
  * Resolve a DNS query using DNS over HTTPS
@@ -285,7 +329,9 @@ export async function resolve(query, type, options = {}) {
     records.length > 0 ? chainTtl : Math.min(chainTtl, negativeTtl(result))
 
   const data = /** @type {T} */ (
-    records.map((a) => a.data.replaceAll(/["']+/g, ''))
+    records.map((a) =>
+      typeNumber === RECORD_TYPES.TXT ? parseTxt(a.data) : a.data
+    )
   )
   const out = { result: data }
   await cache.set([url], out, { ttl })

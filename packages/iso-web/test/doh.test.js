@@ -597,6 +597,134 @@ test('should cache deterministic errors for an hour', async () => {
   assert.equal(sets[0].ttl, 3600)
 })
 
+const spfStart =
+  'v=spf1 ip4:192.30.252.0/22 include:_netblocks.google.com ip4:62.253.2'
+const spfEnd = '27.114 ip4:166.78.69.169 ~all'
+
+/** @type {Array<[name: string, cloudflare: string, google: string, expected: string]>} */
+const txtCases = [
+  [
+    'multiple strings',
+    '"dnslink=/ipfs/abc" "def"',
+    'dnslink=/ipfs/abcdef',
+    'dnslink=/ipfs/abcdef',
+  ],
+  [
+    'long SPF record',
+    `"${spfStart}" "${spfEnd}"`,
+    `${spfStart}${spfEnd}`,
+    `${spfStart}${spfEnd}`,
+  ],
+  ['apostrophe', `"it's here"`, "it's here", "it's here"],
+  ['escaped quotes', String.raw`"say \"hi\""`, 'say "hi"', 'say "hi"'],
+  [
+    'escaped backslash',
+    String.raw`"back\\slash"`,
+    String.raw`back\slash`,
+    String.raw`back\slash`,
+  ],
+  ['escaped char', String.raw`"semi\;colon"`, 'semi;colon', 'semi;colon'],
+  ['decimal escape', String.raw`"\065BC"`, 'ABC', 'ABC'],
+  ['decimal escaped utf-8', String.raw`"caf\195\169"`, 'café', 'café'],
+  ['raw utf-8', '"café"', 'café', 'café'],
+  ['empty string', '""', '', ''],
+  ['empty strings between', '"a" "" "b"', 'ab', 'ab'],
+  [
+    'inner quotes',
+    String.raw`"v=1 \"quoted\" tail"`,
+    'v=1 "quoted" tail',
+    'v=1 "quoted" tail',
+  ],
+]
+
+/**
+ * @param {string} data
+ */
+function respondWithTxt(data) {
+  respondWith({
+    Question: [{ name: 'txt.com', type: 16 }],
+    Answer: [{ name: 'txt.com', type: 16, TTL: 300, data }],
+  })
+}
+
+for (const [name, cloudflare, google, expected] of txtCases) {
+  test(`should parse quoted TXT data: ${name}`, async () => {
+    respondWithTxt(cloudflare)
+    const out = await resolve('txt.com', 'TXT', { cache: new KV() })
+    assert.deepEqual(out, { result: [expected] })
+  })
+
+  test(`should keep unquoted TXT data: ${name}`, async () => {
+    respondWithTxt(google)
+    const out = await resolve('txt.com', 'TXT', { cache: new KV() })
+    assert.deepEqual(out, { result: [expected] })
+  })
+}
+
+test('should keep TXT data that is not only quoted strings', async () => {
+  for (const data of ['"a" b', 'a "b"', '"unterminated', String.raw`"a\"`]) {
+    respondWithTxt(data)
+    const out = await resolve('txt.com', 'TXT', { cache: new KV() })
+    assert.deepEqual(out, { result: [data] }, data)
+  }
+})
+
+test('should cache the parsed TXT data', async () => {
+  respondWithTxt('"dnslink=/ipfs/abc" "def"')
+  const cache = new KV()
+
+  await resolve('txt.com', 'TXT', { cache })
+  const out = await resolve('txt.com', 'TXT', { cache })
+
+  assert.deepEqual(out, { result: ['dnslink=/ipfs/abcdef'] })
+})
+
+test('should not touch quotes in CAA data', async () => {
+  respondWith({
+    Question: [{ name: 'caa.com', type: 257 }],
+    Answer: [
+      {
+        name: 'caa.com',
+        type: 257,
+        TTL: 300,
+        data: '0 issue "letsencrypt.org"',
+      },
+      {
+        name: 'caa.com',
+        type: 257,
+        TTL: 300,
+        data: '0 iodef "mailto:security@caa.com"',
+      },
+    ],
+  })
+
+  const out = await resolve('caa.com', 'CAA', { cache: new KV() })
+
+  assert.deepEqual(out, {
+    result: ['0 issue "letsencrypt.org"', '0 iodef "mailto:security@caa.com"'],
+  })
+})
+
+test('should not touch quotes in non TXT data', async () => {
+  respondWith({
+    Question: [{ name: 'naptr.com', type: 35 }],
+    Answer: [
+      {
+        name: 'naptr.com',
+        type: 35,
+        TTL: 300,
+        data: `100 10 "U" "E2U+sip" "!^.*$!sip:it's@naptr.com!" .`,
+      },
+    ],
+  })
+
+  const out = await resolve('naptr.com', 'NAPTR', { cache: new KV() })
+
+  assert.deepEqual(out, {
+    result: [`100 10 "U" "E2U+sip" "!^.*$!sip:it's@naptr.com!" .`],
+  })
+})
+
 test('should fail with non-ascii chars', async () => {
   const { error } = await resolve('exampleελ.com', 'A')
   if (error) {
