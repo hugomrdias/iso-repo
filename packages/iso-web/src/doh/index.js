@@ -138,6 +138,27 @@ function statusToDescription(status) {
   }
 }
 
+/**
+ * DNS resource record type numbers
+ *
+ * @see https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
+ *
+ * @type {Record<import('./types.js').RecordType, number>}
+ */
+const RECORD_TYPES = {
+  A: 1,
+  NS: 2,
+  CNAME: 5,
+  SOA: 6,
+  PTR: 12,
+  MX: 15,
+  TXT: 16,
+  AAAA: 28,
+  SRV: 33,
+  NAPTR: 35,
+  CAA: 257,
+}
+
 const kv = new KV()
 /**
  * Resolve a DNS query using DNS over HTTPS
@@ -204,8 +225,12 @@ export async function resolve(query, type, options = {}) {
   }
 
   if (result.Answer) {
+    // Answer can hold a CNAME/DNAME chain before the records of the requested type
+    const typeNumber = RECORD_TYPES[type] ?? result.Question?.[0]?.type
     const data = /** @type {T} */ (
-      result.Answer.map((a) => a.data.replaceAll(/["']+/g, ''))
+      result.Answer.filter((a) => a.type === typeNumber).map((a) =>
+        a.data.replaceAll(/["']+/g, '')
+      )
     )
     const ttl = Math.min(...result.Answer.map((a) => a.TTL))
     const out = { result: data }

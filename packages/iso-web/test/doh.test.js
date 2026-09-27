@@ -273,6 +273,125 @@ test('should use the encoded request url as cache key', async () => {
   )
 })
 
+/**
+ * KV that records the ttl of every `set` call.
+ */
+function spyCache() {
+  const cache = new KV()
+  /** @type {Array<{ key: unknown[], value: unknown, ttl?: number | null }>} */
+  const sets = []
+  const set = cache.set.bind(cache)
+  cache.set = (key, value, options) => {
+    sets.push({ key, value, ttl: options?.ttl })
+    return set(key, value, options)
+  }
+  return { cache, sets }
+}
+
+/**
+ * Answer every DoH request to cloudflare with `response`.
+ *
+ * @param {Record<string, unknown>} response
+ */
+function respondWith(response) {
+  server.use(
+    http.get('https://cloudflare-dns.com/dns-query', () =>
+      Response.json({ Status: 0, ...response })
+    )
+  )
+}
+
+test('should not return CNAME records for an A query', async () => {
+  respondWith({
+    Question: [{ name: 'www.alias.com', type: 1 }],
+    Answer: [
+      { name: 'www.alias.com', type: 5, TTL: 300, data: 'target.cdn.net.' },
+      { name: 'target.cdn.net', type: 1, TTL: 300, data: '93.184.216.34' },
+    ],
+  })
+
+  const out = await resolve('www.alias.com', 'A', { cache: new KV() })
+
+  assert.deepEqual(out, { result: ['93.184.216.34'] })
+})
+
+test('should not return CNAME or DNAME records for a TXT query', async () => {
+  respondWith({
+    Question: [{ name: '_dnslink.docs.alias.com', type: 16 }],
+    Answer: [
+      { name: 'alias.com', type: 39, TTL: 300, data: 'other.com.' },
+      {
+        name: '_dnslink.docs.alias.com',
+        type: 5,
+        TTL: 300,
+        data: '_dnslink.docs.other.com.',
+      },
+      {
+        name: '_dnslink.docs.other.com',
+        type: 16,
+        TTL: 300,
+        data: 'dnslink=/ipfs/abc',
+      },
+    ],
+  })
+
+  const out = await resolve('_dnslink.docs.alias.com', 'TXT', {
+    cache: new KV(),
+  })
+
+  assert.deepEqual(out, { result: ['dnslink=/ipfs/abc'] })
+})
+
+test('should return CNAME records for a CNAME query', async () => {
+  respondWith({
+    Question: [{ name: 'www.alias.com', type: 5 }],
+    Answer: [
+      { name: 'www.alias.com', type: 5, TTL: 300, data: 'target.cdn.net.' },
+    ],
+  })
+
+  const out = await resolve('www.alias.com', 'CNAME', { cache: new KV() })
+
+  assert.deepEqual(out, { result: ['target.cdn.net.'] })
+})
+
+test('should cache with the minimum ttl of the whole CNAME chain', async () => {
+  respondWith({
+    Question: [{ name: 'www.alias.com', type: 28 }],
+    Answer: [
+      { name: 'www.alias.com', type: 5, TTL: 30, data: 'target.cdn.net.' },
+      { name: 'target.cdn.net', type: 28, TTL: 300, data: '2001:db8::1' },
+    ],
+  })
+  const { cache, sets } = spyCache()
+
+  const out = await resolve('www.alias.com', 'AAAA', { cache })
+
+  assert.deepEqual(out, { result: ['2001:db8::1'] })
+  assert.equal(sets.length, 1)
+  assert.equal(sets[0].ttl, 30)
+})
+
+test('should fall back to the Question type for unknown record types', async () => {
+  respondWith({
+    Question: [{ name: 'svc.alias.com', type: 65 }],
+    Answer: [
+      { name: 'svc.alias.com', type: 5, TTL: 300, data: 'svc.other.com.' },
+      { name: 'svc.other.com', type: 65, TTL: 300, data: '1 . alpn=h2' },
+    ],
+  })
+
+  const out = await resolve(
+    'svc.alias.com',
+    /** @type {import('../src/doh/types.js').RecordType} */ (
+      /** @type {unknown} */ ('HTTPS')
+    ),
+    { cache: new KV() }
+  )
+
+  assert.deepEqual(out, { result: ['1 . alpn=h2'] })
+})
+
 test('should fail with non-ascii chars', async () => {
   const { error } = await resolve('exampleελ.com', 'A')
   if (error) {
