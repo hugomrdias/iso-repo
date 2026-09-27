@@ -10,6 +10,6 @@
   "packages/iso-ledger": "0.1.7",
   "packages/iso-conf": "0.4.1",
   "packages/iso-effect": "1.0.0",
-  "packages/configs": "1.1.4",
+  "packages/configs": "2.0.0",
   "packages/docs": "0.2.0"
 }
