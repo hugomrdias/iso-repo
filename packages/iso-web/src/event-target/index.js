@@ -12,12 +12,17 @@ export class TypedEventTarget extends EventTarget {
    * event's cancelable attribute value is false or its preventDefault() method
    * was not invoked, and false otherwise.
    *
-   * @template {keyof M} T
-   * @param {T} _type
+   * @template {keyof M & string} T
+   * @param {T} type
    * @param {M[T]} event
    * @returns {boolean}
    */
-  dispatchTypedEvent(_type, event) {
+  dispatchTypedEvent(type, event) {
+    if (event.type !== type) {
+      throw new TypeError(
+        `Event type "${event.type}" does not match dispatch type "${type}"`
+      )
+    }
     return super.dispatchEvent(event)
   }
 

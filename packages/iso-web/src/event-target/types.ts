@@ -35,8 +35,19 @@ export type TypedEventListenerOrEventListenerObject<M, T extends keyof M> =
   | TypedEventListenerObject<M, T>
 
 export type ValueIsEvent<T> = {
-  [key in keyof T]: CustomEvent
+  [key in keyof T]: Event
 }
+
+/**
+ * Arguments for {@link ITypedEventTarget.emit}. `detail` is only accepted for
+ * `CustomEvent` values, and is required unless its type is `any`.
+ */
+export type EmitArgs<M, T extends keyof M> =
+  M[T] extends CustomEvent<infer D>
+    ? [D] extends [IsAny<D>]
+      ? [type: T, detail?: unknown]
+      : [type: T, detail: D]
+    : [type: T]
 
 /**
  * Typescript friendly version of {@link EventTarget}
@@ -106,9 +117,5 @@ export interface ITypedEventTarget<M extends ValueIsEvent<M>> {
    */
   dispatchEvent: (event: Event) => boolean
 
-  emit: <T extends keyof M>(
-    ...args: M[T]['detail'] extends IsAny<M[T]['detail']>
-      ? [type: T, detail?: unknown]
-      : [type: T, detail: M[T]['detail']]
-  ) => boolean
+  emit: <T extends keyof M>(...args: EmitArgs<M, T>) => boolean
 }

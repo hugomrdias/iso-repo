@@ -30,9 +30,7 @@
     },
     "./crypto": {
       "types": "./dist/src/crypto.d.ts",
-      "node": "./src/crypto.js",
-      "react-native": "./src/crypto-browser.js",
-      "default": "./src/crypto-browser.js"
+      "default": "./src/crypto.js"
     },
     "./msw": {
       "types": "./dist/src/msw/msw.d.ts",
@@ -46,6 +44,10 @@
     "./http": {
       "types": "./dist/src/http.d.ts",
       "default": "./src/http.js"
+    },
+    "./env": {
+      "types": "./dist/src/env.d.ts",
+      "default": "./src/env.js"
     },
     "./doh": {
       "types": "./dist/src/doh/index.d.ts",
@@ -66,8 +68,6 @@
   "main": "src/index.js",
   "types": "dist/src/index.d.ts",
   "browser": {
-    "crypto": false,
-    "./src/crypto.js": "./src/crypto-browser.js",
     "msw/node": false,
     "./src/msw/msw.js": "./src/msw/msw-browser.js"
   },
@@ -81,6 +81,9 @@
       ],
       "http": [
         "dist/src/http"
+      ],
+      "env": [
+        "dist/src/env"
       ],
       "doh": [
         "dist/src/doh/index"
