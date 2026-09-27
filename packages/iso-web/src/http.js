@@ -279,17 +279,19 @@ export async function request(resource, options = {}) {
 
   // headers
   const _headers = new Headers(headers)
+  let body = options.body
   if (json !== undefined) {
     _headers.set(
       'content-type',
       _headers.get('content-type') ?? 'application/json'
     )
-    options.body = JSON.stringify(json)
+    body = JSON.stringify(json)
   }
 
   // request
   const request = new Request(resource, {
     ...options,
+    body,
     headers: _headers,
     signal: combinedSignals,
   })
