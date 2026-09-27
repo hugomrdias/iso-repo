@@ -1,8 +1,5 @@
 import { setupWorker } from 'msw/browser'
 
-/** @type {import('msw/browser').SetupWorker | null} */
-globalThis.MSW_BROWSER_SERVER = null
-
 /**
  * @returns {import('./types.ts').BrowserNodeServer}
  */
@@ -13,10 +10,13 @@ export function setup() {
       'setup takes no arguments use server.use(...handlers) instead'
     )
   }
-  if (!globalThis.MSW_BROWSER_SERVER) {
-    globalThis.MSW_BROWSER_SERVER = setupWorker()
-  }
-  const server = globalThis.MSW_BROWSER_SERVER
+  // Kept on globalThis so duplicate module instances share one worker
+  const g =
+    /** @type {typeof globalThis & { MSW_BROWSER_SERVER?: import('msw/browser').SetupWorker }} */ (
+      globalThis
+    )
+  g.MSW_BROWSER_SERVER ??= setupWorker()
+  const server = g.MSW_BROWSER_SERVER
 
   return {
     start: (options) => server.start(options?.browser ?? { quiet: true }),
