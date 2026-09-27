@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict'
+import { EventEmitter } from 'node:events'
 import fs from 'node:fs'
 import path from 'node:path'
+import process from 'node:process'
+import { setTimeout as sleep } from 'node:timers/promises'
 import { suite } from 'playwright-test/taps'
 import { temporaryDirectory } from 'tempy'
 import { z } from 'zod'
@@ -632,4 +635,104 @@ writeTest('uses configFileMode when set', () => {
   config.set('foo', 33)
 
   assert.equal(fs.statSync(config.path).mode & 0o777, 0o640)
+})
+
+const watchSuite = suite('Conf watch')
+const { test: watchTest } = watchSuite
+
+/**
+ * Run `fn` with `fs.watch` replaced by a fake watcher on the `fs.watch` code
+ * path, so tests are deterministic on every platform.
+ *
+ * @param {(fake: { watcher: EventEmitter & { closed: boolean }, emitChange: () => void }) => Promise<void>} fn
+ */
+async function withFakeWatcher(fn) {
+  const watch = fs.watch
+  const platform = Object.getOwnPropertyDescriptor(process, 'platform')
+  const watcher = Object.assign(new EventEmitter(), {
+    closed: false,
+    close() {
+      watcher.closed = true
+    },
+  })
+  /** @type {((eventType: string, filename: string) => void) | undefined} */
+  let listener
+
+  fs.watch = /** @type {typeof fs.watch} */ (
+    /** @type {unknown} */ (
+      (
+        /** @type {string} */ _directory,
+        /** @type {object} */ _options,
+        /** @type {typeof listener} */ callback
+      ) => {
+        listener = callback
+        return watcher
+      }
+    )
+  )
+  Object.defineProperty(process, 'platform', { value: 'darwin' })
+
+  try {
+    await fn({
+      watcher,
+      emitChange: () => listener?.('change', 'config.json'),
+    })
+  } finally {
+    fs.watch = watch
+    if (platform) {
+      Object.defineProperty(process, 'platform', platform)
+    }
+  }
+}
+
+watchTest('dispatches change after the debounce delay', async () => {
+  await withFakeWatcher(async ({ emitChange }) => {
+    const config = createConf({ watch: true })
+    let changes = 0
+    config.events.addEventListener('change', () => changes++)
+
+    emitChange()
+    emitChange()
+    await sleep(150)
+    config._closeWatcher()
+
+    assert.equal(changes, 1)
+  })
+})
+
+watchTest('_closeWatcher cancels a pending change', async () => {
+  await withFakeWatcher(async ({ watcher, emitChange }) => {
+    const config = createConf({ watch: true })
+    let changes = 0
+    config.events.addEventListener('change', () => changes++)
+
+    emitChange()
+    config._closeWatcher()
+    await sleep(150)
+
+    assert.equal(watcher.closed, true)
+    assert.equal(changes, 0)
+  })
+})
+
+watchTest('watcher errors close the watcher and dispatch error', async () => {
+  await withFakeWatcher(async ({ watcher, emitChange }) => {
+    const config = createConf({ watch: true })
+    /** @type {unknown[]} */
+    const errors = []
+    let changes = 0
+    config.events.addEventListener('error', (event) => {
+      errors.push(/** @type {CustomEvent} */ (event).detail)
+    })
+    config.events.addEventListener('change', () => changes++)
+
+    const error = new Error('EPERM')
+    emitChange()
+    watcher.emit('error', error)
+    await sleep(150)
+
+    assert.equal(watcher.closed, true)
+    assert.deepEqual(errors, [error])
+    assert.equal(changes, 0)
+  })
 })
