@@ -173,6 +173,8 @@ test('should fail with 400 for invalid domain', async () => {
 
   if (error) {
     assert.ok(JsonError.is(error))
+    assert.equal(error.code, 400)
+    assert.equal(error.response.status, 400)
     assert.deepEqual(error.cause, {
       error: 'Invalid query name `example..com`.',
     })
