@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.1.1...iso-did-v3.0.0) (2026-09-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-web:** A name with no records of the requested type now resolves to `{ result: [] }` instead of the zone's SOA record string from `Authority`, and a `Status: 0` response with neither `Answer` nor `Authority` resolves to `[]` instead of a `DohError('No answer or authority')`. SOA and NS queries on a name without those records also return `[]`. SERVFAIL and REFUSED errors are no longer cached, so they are requested again on every call, and NXDOMAIN is cached for the SOA negative TTL instead of always one hour.
+
+### Bug Fixes
+
+* **iso-web:** return empty result on NODATA and use RFC 2308 negative cache TTLs ([#609](https://github.com/hugomrdias/iso-repo/issues/609)) ([c074bec](https://github.com/hugomrdias/iso-repo/commit/c074bec0d8bfd0b7901babd74f797e5ab331a4e9))
+
 ## [2.1.1](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.1.0...iso-did-v2.1.1) (2025-09-29)
 
 
