@@ -137,7 +137,10 @@ export interface Options<Schema extends StandardSchemaV1 = StandardSchemaV1> {
   projectSuffix?: string
   /** Access nested properties using dot notation. @default true */
   accessPropertiesByDotNotation?: boolean
-  /** Reset to an empty config when the file is invalid. @default false */
+  /**
+   * Reset to an empty config when the file cannot be deserialized or fails
+   * schema validation. File system errors are still thrown. @default false
+   */
   clearInvalidConfig?: boolean
   /** Watch the config file for external changes. @default false */
   watch?: boolean
