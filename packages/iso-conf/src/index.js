@@ -122,7 +122,12 @@ export class Conf {
   /** @type {string} */
   path
 
-  /** Event target used for change notifications. */
+  /**
+   * Event target used for change notifications.
+   *
+   * With `watch` enabled, a file watcher failure stops watching and dispatches
+   * an `error` `CustomEvent` whose `detail` is the error.
+   */
   /** @type {EventTarget} */
   events
 
@@ -146,7 +151,7 @@ export class Conf {
   /** @type {boolean | undefined} */
   #watchFile
 
-  /** @type {(() => void) | undefined} */
+  /** @type {ReturnType<typeof debounce> | undefined} */
   #debouncedChangeHandler
 
   /**
@@ -440,6 +445,7 @@ export class Conf {
       this.#watchFile = false
     }
 
+    this.#debouncedChangeHandler?.cancel()
     this.#debouncedChangeHandler = undefined
   }
 
@@ -828,6 +834,11 @@ export class Conf {
           this.#debouncedChangeHandler?.()
         }
       )
+
+      this.#watcher.on('error', (error) => {
+        this._closeWatcher()
+        this.events.dispatchEvent(new CustomEvent('error', { detail: error }))
+      })
     } else {
       this.#debouncedChangeHandler ??= debounce(() => {
         this.events.dispatchEvent(new Event('change'))
@@ -851,11 +862,18 @@ function debounce(fn, wait) {
   /** @type {ReturnType<typeof setTimeout> | undefined} */
   let timeout
 
-  return () => {
-    if (timeout) {
-      clearTimeout(timeout)
-    }
-
-    timeout = setTimeout(fn, wait)
+  const cancel = () => {
+    clearTimeout(timeout)
+    timeout = undefined
   }
+
+  const debounced = () => {
+    cancel()
+    timeout = setTimeout(() => {
+      timeout = undefined
+      fn()
+    }, wait)
+  }
+
+  return Object.assign(debounced, { cancel })
 }
