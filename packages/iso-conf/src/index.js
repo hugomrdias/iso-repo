@@ -125,8 +125,11 @@ export class Conf {
   /**
    * Event target used for change notifications.
    *
-   * With `watch` enabled, a file watcher failure stops watching and dispatches
-   * an `error` `CustomEvent` whose `detail` is the error.
+   * Errors thrown by `onDidChange` / `onDidAnyChange` callbacks, or while
+   * reading the config file for a change, are dispatched as an `error`
+   * `CustomEvent` whose `detail` is the error, instead of escaping as uncaught
+   * exceptions. With `watch` enabled, a file watcher failure also stops
+   * watching and dispatches an `error` event.
    */
   /** @type {EventTarget} */
   events
@@ -155,9 +158,10 @@ export class Conf {
   #debouncedChangeHandler
 
   /**
-   * Store snapshots shared by all listeners of a single `change` event.
+   * Store snapshots shared by all listeners of a single `change` event, or
+   * `null` when reading the config file failed.
    *
-   * @type {WeakMap<Event, { data: string | undefined, store: SchemaValues<Schema> }>}
+   * @type {WeakMap<Event, { data: string | undefined, store: SchemaValues<Schema> } | null>}
    */
   #changeSnapshots = new WeakMap()
 
@@ -599,18 +603,36 @@ export class Conf {
    * `store` is only for change detection and must never reach callbacks.
    * Listeners that fire get their own copy by loading `data` again.
    *
+   * A read failure is dispatched as an `error` event once per `change` event
+   * and returns `null`.
+   *
    * @param {Event} event - The `change` event being dispatched.
    */
   #changeSnapshot(event) {
     let snapshot = this.#changeSnapshots.get(event)
 
-    if (!snapshot) {
-      const data = this.#readFile()
-      snapshot = { data, store: this.#load(data) }
+    if (snapshot === undefined) {
+      try {
+        const data = this.#readFile()
+        snapshot = { data, store: this.#load(data) }
+      } catch (error) {
+        snapshot = null
+        this.#dispatchError(error)
+      }
+
       this.#changeSnapshots.set(event, snapshot)
     }
 
     return snapshot
+  }
+
+  /**
+   * Dispatch an `error` event with `error` as its `detail`.
+   *
+   * @param {unknown} error
+   */
+  #dispatchError(error) {
+    this.events.dispatchEvent(new CustomEvent('error', { detail: error }))
   }
 
   /**
@@ -705,16 +727,23 @@ export class Conf {
 
     /** @type {EventListener} */
     const onChange = (event) => {
-      const snapshot = this.#changeSnapshot(event)
+      try {
+        const snapshot = this.#changeSnapshot(event)
 
-      if (isDeepStrictEqual(getter(snapshot.store), currentValue)) {
-        return
+        if (
+          snapshot === null ||
+          isDeepStrictEqual(getter(snapshot.store), currentValue)
+        ) {
+          return
+        }
+
+        const oldValue = currentValue
+        const newValue = getter(this.#load(snapshot.data))
+        currentValue = newValue
+        callback.call(this, newValue, oldValue)
+      } catch (error) {
+        this.#dispatchError(error)
       }
-
-      const oldValue = currentValue
-      const newValue = getter(this.#load(snapshot.data))
-      currentValue = newValue
-      callback.call(this, newValue, oldValue)
     }
 
     this.events.addEventListener('change', onChange)
@@ -837,7 +866,7 @@ export class Conf {
 
       this.#watcher.on('error', (error) => {
         this._closeWatcher()
-        this.events.dispatchEvent(new CustomEvent('error', { detail: error }))
+        this.#dispatchError(error)
       })
     } else {
       this.#debouncedChangeHandler ??= debounce(() => {

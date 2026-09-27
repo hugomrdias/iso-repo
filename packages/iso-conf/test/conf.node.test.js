@@ -392,6 +392,30 @@ hooksTest('onDidAnyChange', () => {
   assert.equal(snapshots[0]?.oldValue.foo, 50)
 })
 
+hooksTest('callback errors dispatch error events', async () => {
+  const config = createConf()
+  /** @type {unknown[]} */
+  const errors = []
+  /** @type {unknown[]} */
+  const values = []
+  const error = new Error('listener boom')
+
+  config.events.addEventListener('error', (event) => {
+    errors.push(/** @type {CustomEvent} */ (event).detail)
+  })
+  config.onDidChange('foo', () => {
+    throw error
+  })
+  config.onDidChange('foo', (newValue) => values.push(newValue))
+
+  config.set('foo', 10)
+  config.set('foo', 20)
+  await sleep(0)
+
+  assert.deepEqual(errors, [error, error])
+  assert.deepEqual(values, [10, 20])
+})
+
 const readsSuite = suite('Conf disk reads')
 const { test: readsTest } = readsSuite
 
@@ -734,5 +758,36 @@ watchTest('watcher errors close the watcher and dispatch error', async () => {
     assert.equal(watcher.closed, true)
     assert.deepEqual(errors, [error])
     assert.equal(changes, 0)
+  })
+})
+
+watchTest('invalid external writes dispatch a single error', async () => {
+  await withFakeWatcher(async ({ emitChange }) => {
+    const config = createConf({ watch: true })
+    /** @type {unknown[]} */
+    const errors = []
+    /** @type {unknown[]} */
+    const values = []
+    config.events.addEventListener('error', (event) => {
+      errors.push(/** @type {CustomEvent} */ (event).detail)
+    })
+    config.onDidChange('foo', (newValue) => values.push(newValue))
+    config.onDidAnyChange((newValue) => values.push(newValue.foo))
+
+    fs.writeFileSync(config.path, '{partial')
+    emitChange()
+    await sleep(150)
+
+    assert.equal(errors.length, 1)
+    assert.ok(errors[0] instanceof SyntaxError)
+    assert.deepEqual(values, [])
+
+    fs.writeFileSync(config.path, JSON.stringify({ foo: 10 }))
+    emitChange()
+    await sleep(150)
+    config._closeWatcher()
+
+    assert.equal(errors.length, 1)
+    assert.deepEqual(values, [10, 10])
   })
 })
