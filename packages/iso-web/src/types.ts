@@ -157,7 +157,14 @@ export interface RequestOptions {
   signal?: AbortSignal
   keepalive?: boolean
   /**
-   * Timeout in milliseconds for the request, `false` to disable timeout
+   * Total time budget in milliseconds for the request, including every retry,
+   * poll and the delays between them. `false` disables the timeout.
+   *
+   * Without `retry` or `poll` the default is 5000. With them, the default is
+   * 5000 for each attempt they allow plus the retry backoff and poll intervals
+   * (59000 for `poll: true`, 18000 for `retry: true`). A function `interval`
+   * counts as 1000. There is no default timeout when that budget is unbounded,
+   * for example `retries: Infinity`.
    *
    * @default 5000
    */
@@ -194,7 +201,14 @@ export interface JSONRequestOptions<T = unknown> {
   signal?: AbortSignal
   keepalive?: boolean
   /**
-   * Timeout in milliseconds for the request, `false` to disable timeout
+   * Total time budget in milliseconds for the request, including every retry,
+   * poll and the delays between them. `false` disables the timeout.
+   *
+   * Without `retry` or `poll` the default is 5000. With them, the default is
+   * 5000 for each attempt they allow plus the retry backoff and poll intervals
+   * (59000 for `poll: true`, 18000 for `retry: true`). A function `interval`
+   * counts as 1000. There is no default timeout when that budget is unbounded,
+   * for example `retries: Infinity`.
    *
    * @default 5000
    */
