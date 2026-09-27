@@ -492,14 +492,7 @@ export class Conf {
       const raw = Object.assign(createPlainObject(), this.#deserialize(data))
       return { raw, value: this.#validate(raw) }
     } catch (error) {
-      const errorInstance = /** @type {Error} */ (error)
-
-      if (
-        this.#options.clearInvalidConfig &&
-        (errorInstance.name === 'SyntaxError' ||
-          errorInstance instanceof SchemaError ||
-          errorInstance.message?.startsWith('Config schema violation'))
-      ) {
+      if (this.#options.clearInvalidConfig) {
         return { raw: createPlainObject() }
       }
 

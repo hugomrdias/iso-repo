@@ -409,6 +409,50 @@ invalidTest('clearInvalidConfig on schema violation', () => {
   assert.equal(Object.keys(config.store).length, 0)
 })
 
+invalidTest('clearInvalidConfig on extended JSON reviver error', () => {
+  const config = createConf({ clearInvalidConfig: true })
+  fs.writeFileSync(config.path, JSON.stringify({ u: { $url: 'nope' } }))
+  assert.equal(Object.keys(config.store).length, 0)
+})
+
+invalidTest('clearInvalidConfig on custom deserialize error', () => {
+  class CustomError extends Error {}
+  const config = createConf({
+    clearInvalidConfig: true,
+    deserialize: (value) => {
+      if (value.includes('bad')) {
+        throw new CustomError('bad config')
+      }
+      return JSON.parse(value)
+    },
+  })
+  fs.writeFileSync(config.path, 'bad')
+  assert.equal(Object.keys(config.store).length, 0)
+})
+
+invalidTest('clearInvalidConfig recovers on init', () => {
+  const cwd = temporaryDirectory()
+  fs.writeFileSync(
+    path.join(cwd, 'config.json'),
+    JSON.stringify({ u: { $url: 'nope' } })
+  )
+  const config = createConf({ cwd, clearInvalidConfig: true })
+  assert.equal(config.get('foo'), 50)
+})
+
+invalidTest('deserialize errors propagate without clearInvalidConfig', () => {
+  const config = createConf()
+  fs.writeFileSync(config.path, JSON.stringify({ u: { $url: 'nope' } }))
+  assert.throws(() => config.store, TypeError)
+})
+
+invalidTest('clearInvalidConfig does not hide fs errors', () => {
+  const config = createConf({ clearInvalidConfig: true })
+  fs.rmSync(config.path)
+  fs.mkdirSync(config.path)
+  assert.throws(() => config.store, { code: 'EISDIR' })
+})
+
 const writeSuite = suite('Conf atomic write')
 const { test: writeTest } = writeSuite
 
