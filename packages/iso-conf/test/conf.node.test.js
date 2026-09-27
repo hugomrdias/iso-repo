@@ -1,13 +1,22 @@
 import assert from 'node:assert/strict'
 import { EventEmitter } from 'node:events'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { setTimeout as sleep } from 'node:timers/promises'
+import envPaths from 'env-paths'
 import { suite } from 'playwright-test/taps'
-import { temporaryDirectory } from 'tempy'
 import { z } from 'zod'
 import { Conf } from '../src/index.js'
+
+/**
+ * Importing `tempy` masks uncaught exceptions thrown from `EventTarget`
+ * listeners, which would hide listener and watcher error regressions.
+ */
+function temporaryDirectory() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'iso-conf-'))
+}
 
 const schema = z.looseObject({
   foo: z.number().min(1).max(100).default(50),
@@ -65,14 +74,40 @@ test('dot notation', () => {
   assert.equal(flat.get('nested.value'), true)
 })
 
+test('flat keys for has, delete and appendToArray', () => {
+  const config = createConf({ accessPropertiesByDotNotation: false })
+
+  config.set('nested.value', true)
+  assert.equal(config.has('nested.value'), true)
+  assert.equal(config.has('nested'), false)
+
+  config.appendToArray('list.items', 'a')
+  config.appendToArray('list.items', 'b')
+  assert.deepEqual(config.get('list.items'), ['a', 'b'])
+  assert.equal(config.has('list'), false)
+
+  config.delete('nested.value')
+  assert.equal(config.has('nested.value'), false)
+  assert.deepEqual({ ...config.store }, { foo: 50, 'list.items': ['a', 'b'] })
+})
+
 test('set object', () => {
   const config = createConf()
   config.set({ foo: 25 })
   assert.equal(config.get('foo'), 25)
 })
 
-test('set rejects null and array keys', () => {
+test('set rejects keys that are not strings or objects', () => {
   const config = createConf()
+
+  assert.throws(
+    // @ts-expect-error - runtime validation should reject number keys.
+    () => config.set(1, 'a'),
+    {
+      name: 'TypeError',
+      message: 'Expected `key` to be of type `string` or `object`, got number',
+    }
+  )
 
   assert.throws(
     // @ts-expect-error - runtime validation should reject null keys.
@@ -119,6 +154,14 @@ test('path and iteration', () => {
 
 test('fileExtension', () => {
   assert.equal(
+    path.basename(createConf({ fileExtension: '.json' }).path),
+    'config.json'
+  )
+  assert.equal(
+    path.basename(createConf({ fileExtension: 'yaml' }).path),
+    'config.yaml'
+  )
+  assert.equal(
     path.basename(createConf({ fileExtension: '.yaml' }).path),
     'config.yaml'
   )
@@ -127,6 +170,55 @@ test('fileExtension', () => {
     path.basename(createConf({ fileExtension: '...' }).path),
     'config'
   )
+})
+
+test('custom serialize and deserialize', () => {
+  const cwd = temporaryDirectory()
+  /** @type {import('../src/types.js').Serialize} */
+  const serialize = (value) =>
+    Buffer.from(JSON.stringify(value)).toString('base64')
+  /** @type {import('../src/types.js').Deserialize} */
+  const deserialize = (value) =>
+    JSON.parse(Buffer.from(value, 'base64').toString('utf8'))
+  const options = {
+    cwd,
+    defaults: { bar: 'https://example.com' },
+    serialize,
+    deserialize,
+  }
+
+  const config = createConf(options)
+  config.set('foo', 10)
+
+  assert.deepEqual(deserialize(fs.readFileSync(config.path, 'utf8')), {
+    foo: 10,
+    bar: 'https://example.com',
+  })
+  assert.deepEqual(
+    { ...createConf(options).store },
+    { foo: 10, bar: 'https://example.com' }
+  )
+})
+
+test('projectName resolves the config directory', () => {
+  const config = new Conf({ projectName: `IsoConf Test ${process.pid}` })
+
+  try {
+    assert.equal(
+      config.path,
+      path.join(envPaths(`iso-conf-test-${process.pid}`).config, 'config.json')
+    )
+    assert.equal(fs.existsSync(path.dirname(config.path)), true)
+  } finally {
+    fs.rmSync(path.dirname(config.path), { recursive: true, force: true })
+  }
+})
+
+test('throws without projectName or cwd', () => {
+  assert.throws(() => new Conf(), {
+    name: 'Error',
+    message: 'Please specify the `projectName` option.',
+  })
 })
 
 const schemaSuite = suite('Conf schema')
@@ -217,6 +309,25 @@ schemaTest('defaults apply after the file is deleted', () => {
   assert.equal(config.get('foo'), 50)
 })
 
+schemaTest('rejects async schemas', () => {
+  /** @type {import('@standard-schema/spec').StandardSchemaV1} */
+  const asyncSchema = {
+    '~standard': {
+      version: 1,
+      vendor: 'test',
+      validate: async (value) => ({ value }),
+    },
+  }
+
+  assert.throws(
+    () => new Conf({ cwd: temporaryDirectory(), schema: asyncSchema }),
+    {
+      name: 'TypeError',
+      message: /Async schemas are not supported/,
+    }
+  )
+})
+
 const requiredSchema = z.looseObject({
   req: z.number(),
   foo: z.number().default(50),
@@ -252,6 +363,35 @@ requiredTest('fills new required fields in an existing file', () => {
   const config = new Conf({ cwd, schema: requiredSchema, defaults: { req: 1 } })
   assert.equal(config.get('req'), 1)
   assert.equal(config.get('foo'), 3)
+})
+
+requiredTest('throws after the file is deleted without defaults', () => {
+  const cwd = temporaryDirectory()
+  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ req: 1 }))
+  // @ts-expect-error - `defaults` is required for this schema.
+  const config = new Conf({ cwd, schema: requiredSchema })
+
+  fs.rmSync(config.path)
+  assert.throws(() => config.get('req'), /Config schema violation: `req`/)
+})
+
+requiredTest('defaults apply after the file is deleted or cleared', () => {
+  const config = new Conf({
+    cwd: temporaryDirectory(),
+    schema: requiredSchema,
+    defaults: { req: 1 },
+    clearInvalidConfig: true,
+  })
+  config.set({ req: 2, foo: 3 })
+
+  fs.rmSync(config.path)
+  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+
+  fs.writeFileSync(config.path, '{invalid')
+  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+
+  fs.writeFileSync(config.path, JSON.stringify({ req: 'bad' }))
+  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
 })
 
 requiredTest('reset and clear use defaults and schema defaults', () => {
@@ -452,6 +592,52 @@ hooksTest('callback errors dispatch error events', async () => {
   assert.deepEqual(errors, [error, error])
   assert.deepEqual(values, [10, 20])
 })
+
+hooksTest('onDidAnyChange callback errors dispatch error events', async () => {
+  const config = createConf()
+  /** @type {unknown[]} */
+  const errors = []
+  /** @type {unknown[]} */
+  const values = []
+  const error = new Error('any listener boom')
+
+  config.events.addEventListener('error', (event) => {
+    errors.push(/** @type {CustomEvent} */ (event).detail)
+  })
+  config.onDidAnyChange(() => {
+    throw error
+  })
+  config.onDidAnyChange((newValue) => values.push(newValue.foo))
+
+  config.set('foo', 10)
+  await sleep(0)
+
+  assert.deepEqual(errors, [error])
+  assert.deepEqual(values, [10])
+})
+
+hooksTest(
+  'callback errors without an error listener do not escape',
+  async () => {
+    const config = createConf()
+    /** @type {unknown[]} */
+    const values = []
+
+    config.onDidChange('foo', () => {
+      throw new Error('unobserved boom')
+    })
+    config.onDidAnyChange(() => {
+      throw new Error('unobserved boom')
+    })
+    config.onDidChange('foo', (newValue) => values.push(newValue))
+
+    config.set('foo', 10)
+    await sleep(0)
+
+    assert.deepEqual(values, [10])
+    assert.equal(config.get('foo'), 10)
+  }
+)
 
 const readsSuite = suite('Conf disk reads')
 const { test: readsTest } = readsSuite
@@ -797,6 +983,57 @@ watchTest('watcher errors close the watcher and dispatch error', async () => {
     assert.equal(changes, 0)
   })
 })
+
+watchTest(
+  'watchFile triggers onDidChange and _closeWatcher unwatches',
+  async () => {
+    const { watchFile, unwatchFile } = fs
+    const platform = Object.getOwnPropertyDescriptor(process, 'platform')
+    /** @type {(() => void) | undefined} */
+    let listener
+    /** @type {fs.PathLike[]} */
+    const unwatched = []
+
+    fs.watchFile = /** @type {typeof fs.watchFile} */ (
+      /** @type {unknown} */ (
+        (
+          /** @type {fs.PathLike} */ _file,
+          /** @type {object} */ _options,
+          /** @type {() => void} */ callback
+        ) => {
+          listener = callback
+        }
+      )
+    )
+    fs.unwatchFile = /** @type {typeof fs.unwatchFile} */ (
+      (/** @type {fs.PathLike} */ file) => {
+        unwatched.push(file)
+      }
+    )
+    Object.defineProperty(process, 'platform', { value: 'linux' })
+
+    try {
+      const config = createConf({ watch: true })
+      /** @type {unknown[]} */
+      const values = []
+      config.onDidChange('foo', (newValue) => values.push(newValue))
+
+      fs.writeFileSync(config.path, JSON.stringify({ foo: 10 }))
+      listener?.()
+      await sleep(1100)
+      config._closeWatcher()
+
+      assert.deepEqual(values, [10])
+      assert.deepEqual(unwatched, [config.path])
+    } finally {
+      fs.watchFile = watchFile
+      fs.unwatchFile = unwatchFile
+      if (platform) {
+        Object.defineProperty(process, 'platform', platform)
+      }
+    }
+  }
+)
 
 watchTest('invalid external writes dispatch a single error', async () => {
   await withFakeWatcher(async ({ emitChange }) => {
