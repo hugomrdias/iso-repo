@@ -169,11 +169,11 @@ export class HttpError extends RequestError {
    * @param {ErrorOptions & {response: Response, request: Request, options: import('./types.js').RequestOptions}} options
    */
   constructor(options) {
-    const msg = `${options.response.status} - ${options.response.statusText}`
+    super(`${options.response.status} - ${options.response.statusText}`, {
+      cause: options.cause,
+    })
 
-    super(msg)
-
-    this.code = options.response?.status ?? 0
+    this.code = options.response.status
     this.response = options.response
     this.request = options.request
     this.options = options.options
@@ -420,15 +420,7 @@ export async function request(resource, options = {}) {
         })
       : operation())
 
-    return response.ok
-      ? { result: response }
-      : {
-          error: new HttpError({
-            response,
-            request,
-            options,
-          }),
-        }
+    return { result: response }
   } catch (error) {
     const err = /** @type {Error} */ (error)
 
