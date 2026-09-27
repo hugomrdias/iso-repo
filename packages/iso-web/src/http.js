@@ -376,13 +376,19 @@ async function send(resource, options) {
       retryOptions == null && pollOptions == null ? request : request.clone()
     let rsp = await fetch(req)
 
-    // cloning tees the body, so only clone when a hook will read it
-    const result = onResponse
-      ? await onResponse(rsp.clone(), request)
-      : undefined
+    if (onResponse) {
+      let result
+      try {
+        // cloning tees the body, so only clone when a hook will read it
+        result = await onResponse(rsp.clone(), request)
+      } catch (error) {
+        discard(rsp)
+        throw error
+      }
 
-    if (result instanceof Response) {
-      rsp = result
+      if (result instanceof Response) {
+        rsp = result
+      }
     }
 
     if (!rsp.ok) {
@@ -430,6 +436,7 @@ async function send(resource, options) {
         createPollContext(response, currentAttempt)
       )
 
+      discard(response)
       await delay(interval, { signal: combinedSignals })
     }
   }
@@ -514,16 +521,24 @@ async function send(resource, options) {
             )
           : defaultShouldRetry
 
-        if (!shouldRetry || !(retryAfter > 0)) {
-          return shouldRetry
-        }
-
-        if (performance.now() + retryAfter > deadline) {
+        if (!shouldRetry) {
           return false
         }
 
-        await delay(retryAfter, { signal: combinedSignals })
-        retryAfterRetries++
+        const wait = retryAfter > 0 ? retryAfter : 0
+        // checked before discarding, since this error is returned if it doesn't fit
+        if (performance.now() + wait > deadline) {
+          return false
+        }
+
+        if (HttpError.is(ctx.error)) {
+          discard(ctx.error.response)
+        }
+
+        if (wait > 0) {
+          await delay(wait, { signal: combinedSignals })
+          retryAfterRetries++
+        }
         return true
       },
     })
@@ -573,6 +588,19 @@ async function send(resource, options) {
 function toRequestError(error) {
   const message = error instanceof Error ? error.message : String(error)
   return new RequestError(`Request failed: ${message}`, { cause: error })
+}
+
+/**
+ * Cancel the body of a response that won't be returned, so the connection
+ * is released without waiting for garbage collection. Clones handed to hooks
+ * are separate branches and stay readable.
+ *
+ * @param {Response} response
+ */
+function discard(response) {
+  response.body?.cancel().catch(() => {
+    // already read or locked by a hook
+  })
 }
 
 /**

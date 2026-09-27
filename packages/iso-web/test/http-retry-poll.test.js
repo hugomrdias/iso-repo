@@ -828,3 +828,155 @@ test(
   },
   { timeout: 10_000 }
 )
+
+/**
+ * Stub fetch that answers with `statuses` in order (the last one repeats)
+ * and records every response and every cancelled body.
+ *
+ * @param {Array<number | [number, Record<string, string>]>} statuses
+ */
+function trackedFetch(statuses) {
+  /** @type {Response[]} */
+  const responses = []
+  /** @type {number[]} */
+  const cancelled = []
+  /** @type {typeof globalThis.fetch} */
+  const fetch = () => {
+    const index = responses.length
+    const entry = statuses[Math.min(index, statuses.length - 1)]
+    const [status, headers] = typeof entry === 'number' ? [entry, {}] : entry
+    const body = new ReadableStream({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode(`body ${index}`))
+        controller.close()
+      },
+      cancel() {
+        cancelled.push(index)
+      },
+    })
+    const response = new Response(body, { status, headers })
+    responses.push(response)
+    return Promise.resolve(response)
+  }
+  return { fetch, responses, cancelled }
+}
+
+const tick = () => new Promise((resolve) => setTimeout(resolve, 10))
+
+test('should cancel the bodies of responses discarded while polling', async () => {
+  const tracked = trackedFetch([202, 202, 202, 200])
+  const { error, result } = await request('https://local.dev/cancel-poll', {
+    fetch: tracked.fetch,
+    poll: { interval: 1 },
+  })
+  await tick()
+
+  if (error) {
+    assert.fail(error.message)
+  } else {
+    assert.equal(result.status, 200)
+    assert.equal(await result.text(), 'body 3')
+    assert.deepEqual(tracked.cancelled, [0, 1, 2])
+  }
+})
+
+test('should not cancel the last response when the poll limit is reached', async () => {
+  const tracked = trackedFetch([202])
+  const { result } = await request('https://local.dev/cancel-poll-limit', {
+    fetch: tracked.fetch,
+    poll: { interval: 1, limit: 2 },
+  })
+  await tick()
+
+  assert.equal(result?.status, 202)
+  assert.equal(await result?.text(), 'body 1')
+  assert.deepEqual(tracked.cancelled, [0])
+})
+
+test('should cancel the bodies of failed attempts that are retried', async () => {
+  const tracked = trackedFetch([503, [429, { 'retry-after': '0.01' }], 200])
+  const { error, result } = await request('https://local.dev/cancel-retry', {
+    fetch: tracked.fetch,
+    retry: { minTimeout: 1 },
+  })
+  await tick()
+
+  if (error) {
+    assert.fail(error.message)
+  } else {
+    assert.equal(result.status, 200)
+    assert.equal(await result.text(), 'body 2')
+    assert.deepEqual(tracked.cancelled, [0, 1])
+  }
+})
+
+test('should not cancel the body of an error that is returned', async () => {
+  const tracked = trackedFetch([500])
+  const { error } = await request.post('https://local.dev/cancel-no-retry', {
+    fetch: tracked.fetch,
+    retry: { retries: 2, minTimeout: 1 },
+  })
+  await tick()
+
+  assert.ok(HttpError.is(error))
+  assert.equal(await error.response.text(), 'body 0')
+  assert.deepEqual(tracked.cancelled, [])
+
+  const exhausted = trackedFetch([500])
+  const last = await request('https://local.dev/cancel-exhausted', {
+    fetch: exhausted.fetch,
+    retry: { retries: 2, minTimeout: 1 },
+  })
+  await tick()
+
+  assert.ok(HttpError.is(last.error))
+  assert.equal(await last.error.response.text(), 'body 2')
+  assert.deepEqual(exhausted.cancelled, [0, 1])
+})
+
+test('should let hooks read responses before they are cancelled', async () => {
+  const tracked = trackedFetch([500, 202, 200])
+  /** @type {string[]} */
+  const read = []
+  const { result } = await request('https://local.dev/cancel-hooks', {
+    fetch: tracked.fetch,
+    retry: {
+      minTimeout: 1,
+      shouldRetry: async (ctx) => {
+        if (HttpError.is(ctx.error)) {
+          read.push(await ctx.error.response.text())
+        }
+        return ctx.defaultShouldRetry
+      },
+    },
+    poll: {
+      interval: 1,
+      shouldPoll: async (ctx) => {
+        read.push(await ctx.response.text())
+        return ctx.defaultShouldPoll
+      },
+    },
+  })
+  await tick()
+
+  assert.equal(result?.status, 200)
+  assert.equal(await result?.text(), 'body 2')
+  assert.deepEqual(read, ['body 0', 'body 1', 'body 2'])
+  assert.ok(tracked.responses[1].bodyUsed, 'polled response was not released')
+})
+
+test('should cancel the body when onResponse throws', async () => {
+  const tracked = trackedFetch([200])
+  const { error } = await request('https://local.dev/cancel-on-response', {
+    fetch: tracked.fetch,
+    retry: { retries: 1, minTimeout: 1, shouldRetry: () => true },
+    onResponse: () => {
+      throw new Error('hook failed')
+    },
+  })
+  await tick()
+
+  assert.equal(error?.name, 'RequestError')
+  assert.equal(tracked.responses.length, 2)
+  assert.ok(tracked.responses.every((response) => response.bodyUsed))
+})
