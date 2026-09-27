@@ -160,7 +160,10 @@ export async function resolve(query, type, options = {}) {
     retry,
     timeout,
   } = options
-  const url = `${server}?name=${query}&type=${type}`
+  const requestUrl = new URL(server)
+  requestUrl.searchParams.set('name', query)
+  requestUrl.searchParams.set('type', type)
+  const url = requestUrl.toString()
 
   /** @type {import('../types.js').MaybeResult<T, DoHErrors> | undefined} */
   const cached = await cache.get([url])
@@ -168,7 +171,7 @@ export async function resolve(query, type, options = {}) {
     return cached
   }
 
-  const { error, result: rawResult } = await request.json(new URL(url), {
+  const { error, result: rawResult } = await request.json(requestUrl, {
     signal,
     headers: { accept: 'application/dns-json' },
     retry,

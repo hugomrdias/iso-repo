@@ -175,6 +175,104 @@ test('should fail with 400 for invalid domain', async () => {
   }
 })
 
+/**
+ * Capture DoH requests made to `server` and answer them with a TXT record.
+ *
+ * @param {string} server
+ */
+function captureRequests(server) {
+  /** @type {URL[]} */
+  const urls = []
+  const handler = http.get(server, ({ request }) => {
+    const url = new URL(request.url)
+    urls.push(url)
+    return Response.json({
+      Status: 0,
+      Question: [{ name: url.searchParams.get('name'), type: 16 }],
+      Answer: [
+        {
+          name: url.searchParams.get('name'),
+          type: 16,
+          TTL: 60,
+          data: 'hello',
+        },
+      ],
+    })
+  })
+  return { urls, handler }
+}
+
+test('should encode query name with reserved characters', async () => {
+  const { urls, handler } = captureRequests(
+    'https://cloudflare-dns.com/dns-query'
+  )
+  server.use(handler)
+  const cache = new KV()
+
+  const out = await resolve('a.com&type=A', 'TXT', { cache })
+
+  assert.deepEqual(out, { result: ['hello'] })
+  assert.equal(urls.length, 1)
+  assert.deepEqual(urls[0].searchParams.getAll('name'), ['a.com&type=A'])
+  assert.deepEqual(urls[0].searchParams.getAll('type'), ['TXT'])
+})
+
+test('should not truncate query name at #', async () => {
+  const { urls, handler } = captureRequests(
+    'https://cloudflare-dns.com/dns-query'
+  )
+  server.use(handler)
+  const cache = new KV()
+
+  const out = await resolve('c.com#frag', 'TXT', { cache })
+
+  assert.deepEqual(out, { result: ['hello'] })
+  assert.equal(urls.length, 1)
+  assert.deepEqual(urls[0].searchParams.getAll('name'), ['c.com#frag'])
+  assert.deepEqual(urls[0].searchParams.getAll('type'), ['TXT'])
+})
+
+test('should keep existing query params of the server url', async () => {
+  const { urls, handler } = captureRequests('https://dns.example/resolve')
+  server.use(handler)
+  const cache = new KV()
+
+  const out = await resolve('b.com', 'TXT', {
+    cache,
+    server: 'https://dns.example/resolve?ct=application/dns-json',
+  })
+
+  assert.deepEqual(out, { result: ['hello'] })
+  assert.equal(urls.length, 1)
+  assert.deepEqual(Object.fromEntries(urls[0].searchParams), {
+    ct: 'application/dns-json',
+    name: 'b.com',
+    type: 'TXT',
+  })
+})
+
+test('should use the encoded request url as cache key', async () => {
+  const { urls, handler } = captureRequests(
+    'https://cloudflare-dns.com/dns-query'
+  )
+  server.use(handler)
+  const cache = new KV()
+
+  await resolve('a.com&type=A', 'TXT', { cache })
+  await resolve('a.com', 'A', { cache })
+  await resolve('a.com&type=A', 'TXT', { cache })
+
+  assert.equal(urls.length, 2)
+  assert.ok(
+    await cache.get([
+      'https://cloudflare-dns.com/dns-query?name=a.com%26type%3DA&type=TXT',
+    ])
+  )
+  assert.ok(
+    await cache.get(['https://cloudflare-dns.com/dns-query?name=a.com&type=A'])
+  )
+})
+
 test('should fail with non-ascii chars', async () => {
   const { error } = await resolve('exampleελ.com', 'A')
   if (error) {
