@@ -44,7 +44,7 @@ export interface WSOptions {
   /**
    * Enable debug mode. This will log all events to the console.
    *
-   * `DEBUG=iso-web:ws node test.js` will also enable debug mode
+   * `DEBUG=iso-ws node test.js` will also enable debug mode
    *
    * @default false
    */

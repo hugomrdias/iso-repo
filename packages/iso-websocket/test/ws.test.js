@@ -1,3 +1,4 @@
+import debug from 'debug'
 import delay from 'delay'
 import pDefer from 'p-defer'
 import * as Client from 'playwright-test/client'
@@ -8,6 +9,45 @@ import { WS } from '../src/index.js'
 const test = suite('ws')
 
 const URL = 'ws://localhost:8080'
+
+/**
+ * @param {() => void | Promise<void>} fn
+ */
+async function withoutGlobalWebSocket(fn) {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'WebSocket')
+  // @ts-expect-error
+  delete globalThis.WebSocket
+  try {
+    await fn()
+  } finally {
+    if (descriptor) {
+      Object.defineProperty(globalThis, 'WebSocket', descriptor)
+    }
+  }
+}
+
+test('should throw TypeError when no WebSocket implementation exists', async () => {
+  const NativeWebSocket = WebSocket
+  await withoutGlobalWebSocket(() => {
+    assert.throws(
+      () => new WS(URL, { automaticOpen: false }),
+      TypeError,
+      'No WebSocket implementation found.'
+    )
+    const ws = new WS(URL, { automaticOpen: false, ws: NativeWebSocket })
+    assert.equal(ws.options.ws, NativeWebSocket)
+  })
+})
+
+test('should enable the logger namespace with debug option', () => {
+  const previous = debug.disable()
+  try {
+    new WS(URL, { automaticOpen: false, ws: WebSocket, debug: true })
+    assert.ok(debug.enabled('iso-ws'))
+  } finally {
+    debug.enable(previous)
+  }
+})
 
 test('should queue and send', async () => {
   const deferred = pDefer()

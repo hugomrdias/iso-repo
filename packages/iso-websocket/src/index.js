@@ -9,7 +9,8 @@ import {
   RetryEvent,
 } from './events.js'
 
-const log = debug('iso-ws')
+const DEBUG_NAMESPACE = 'iso-ws'
+const log = debug(DEBUG_NAMESPACE)
 
 export * from './events.js'
 
@@ -59,7 +60,8 @@ export class WS extends TypedEventTarget {
   constructor(url, options = {}) {
     super()
 
-    if (!options.ws && WebSocket === undefined) {
+    const ws = options.ws || globalThis.WebSocket
+    if (!ws) {
       throw new TypeError('No WebSocket implementation found.')
     }
 
@@ -69,7 +71,6 @@ export class WS extends TypedEventTarget {
       timeout: 5000,
       automaticOpen: true,
       protocols: [],
-      ws: options.ws || WebSocket,
       debug: false,
       retry: {
         retries: 3,
@@ -80,10 +81,11 @@ export class WS extends TypedEventTarget {
       },
       shouldRetry: defaultShouldRetry,
       ...options,
+      ws,
     }
 
     if (this.options.debug) {
-      debug.enable('iso-web:ws')
+      debug.enable(DEBUG_NAMESPACE)
     }
 
     if (this.options.automaticOpen) {
