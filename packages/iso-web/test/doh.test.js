@@ -392,6 +392,211 @@ test('should fall back to the Question type for unknown record types', async () 
   assert.deepEqual(out, { result: ['1 . alpn=h2'] })
 })
 
+/**
+ * @param {number} ttl
+ * @param {number} minimum
+ */
+function soa(ttl, minimum) {
+  return {
+    name: 'nodata.com',
+    type: 6,
+    TTL: ttl,
+    data: `ns1.nodata.com. admin.nodata.com. 2024010101 7200 3600 1209600 ${minimum}`,
+  }
+}
+
+test('should return empty result for NODATA instead of the SOA record', async () => {
+  respondWith({
+    Question: [{ name: 'nodata.com', type: 16 }],
+    Authority: [soa(900, 300)],
+  })
+  const { cache, sets } = spyCache()
+
+  const out = await resolve('nodata.com', 'TXT', { cache })
+
+  assert.deepEqual(out, { result: [] })
+  assert.equal(sets.length, 1)
+  assert.equal(sets[0].ttl, 300)
+})
+
+test('should cache NODATA with the SOA ttl when lower than MINIMUM', async () => {
+  respondWith({
+    Question: [{ name: 'nodata.com', type: 1 }],
+    Authority: [soa(60, 300)],
+  })
+  const { cache, sets } = spyCache()
+
+  const out = await resolve('nodata.com', 'A', { cache })
+
+  assert.deepEqual(out, { result: [] })
+  assert.equal(sets[0].ttl, 60)
+})
+
+test('should cap the negative cache ttl', async () => {
+  respondWith({
+    Question: [{ name: 'nodata.com', type: 1 }],
+    Authority: [soa(86_400, 86_400)],
+  })
+  const { cache, sets } = spyCache()
+
+  await resolve('nodata.com', 'A', { cache })
+
+  assert.equal(sets[0].ttl, 3600)
+})
+
+test('should return empty result for NODATA on SOA queries', async () => {
+  respondWith({
+    Question: [{ name: 'www.nodata.com', type: 6 }],
+    Authority: [soa(900, 300)],
+  })
+
+  const out = await resolve('www.nodata.com', 'SOA', { cache: new KV() })
+
+  assert.deepEqual(out, { result: [] })
+})
+
+test('should return SOA records from Answer for SOA queries', async () => {
+  const record = soa(900, 300)
+  respondWith({
+    Question: [{ name: 'nodata.com', type: 6 }],
+    Answer: [record],
+  })
+
+  const out = await resolve('nodata.com', 'SOA', { cache: new KV() })
+
+  assert.deepEqual(out, { result: [record.data] })
+})
+
+test('should return empty result without Answer or Authority', async () => {
+  respondWith({ Question: [{ name: 'nodata.com', type: 16 }] })
+  const { cache, sets } = spyCache()
+
+  const out = await resolve('nodata.com', 'TXT', { cache })
+
+  assert.deepEqual(out, { result: [] })
+  assert.equal(sets[0].ttl, 300)
+})
+
+test('should not cache an empty Answer forever', async () => {
+  respondWith({ Question: [{ name: 'empty.com', type: 16 }], Answer: [] })
+  const { cache, sets } = spyCache()
+
+  const out = await resolve('empty.com', 'TXT', { cache })
+
+  assert.deepEqual(out, { result: [] })
+  assert.equal(sets.length, 1)
+  assert.equal(sets[0].ttl, 300)
+})
+
+test('should cache a CNAME chain without target records as NODATA', async () => {
+  respondWith({
+    Question: [{ name: 'www.alias.com', type: 16 }],
+    Answer: [
+      { name: 'www.alias.com', type: 5, TTL: 900, data: 'target.cdn.net.' },
+    ],
+    Authority: [soa(900, 120)],
+  })
+  const { cache, sets } = spyCache()
+
+  const out = await resolve('www.alias.com', 'TXT', { cache })
+
+  assert.deepEqual(out, { result: [] })
+  assert.equal(sets[0].ttl, 120)
+})
+
+/**
+ * Answer the first request with `status` and every other one with an A record.
+ *
+ * @param {number} status
+ */
+function failOnce(status) {
+  let calls = 0
+  server.use(
+    http.get('https://cloudflare-dns.com/dns-query', () => {
+      calls++
+      if (calls === 1) {
+        return Response.json({
+          Status: status,
+          Question: [{ name: 'flaky.com', type: 1 }],
+        })
+      }
+      return Response.json({
+        Status: 0,
+        Question: [{ name: 'flaky.com', type: 1 }],
+        Answer: [{ name: 'flaky.com', type: 1, TTL: 300, data: '1.2.3.4' }],
+      })
+    })
+  )
+  return {
+    get calls() {
+      return calls
+    },
+  }
+}
+
+test('should not cache SERVFAIL', async () => {
+  const upstream = failOnce(2)
+  const cache = new KV()
+
+  const first = await resolve('flaky.com', 'A', { cache })
+  assert.ok(DohError.is(first.error))
+  assert.equal(
+    first.error?.message,
+    'Server failed to complete the DNS request'
+  )
+
+  const second = await resolve('flaky.com', 'A', { cache })
+  assert.deepEqual(second, { result: ['1.2.3.4'] })
+  assert.equal(upstream.calls, 2)
+})
+
+test('should not cache REFUSED', async () => {
+  const upstream = failOnce(5)
+  const cache = new KV()
+
+  const first = await resolve('flaky.com', 'A', { cache })
+  assert.ok(DohError.is(first.error))
+
+  const second = await resolve('flaky.com', 'A', { cache })
+  assert.deepEqual(second, { result: ['1.2.3.4'] })
+  assert.equal(upstream.calls, 2)
+})
+
+test('should cache NXDOMAIN with the SOA negative ttl', async () => {
+  respondWith({
+    Status: 3,
+    Question: [{ name: 'nxdomain.com', type: 1 }],
+    Authority: [soa(900, 1800)],
+  })
+  const { cache, sets } = spyCache()
+
+  const out = await resolve('nxdomain.com', 'A', { cache })
+
+  assert.ok(DohError.is(out.error))
+  assert.equal(out.error?.message, 'Domain name does not exist')
+  assert.equal(sets.length, 1)
+  assert.equal(sets[0].ttl, 900)
+})
+
+test('should cache NXDOMAIN without SOA with the fallback ttl', async () => {
+  respondWith({ Status: 3, Question: [{ name: 'nxdomain.com', type: 1 }] })
+  const { cache, sets } = spyCache()
+
+  await resolve('nxdomain.com', 'A', { cache })
+
+  assert.equal(sets[0].ttl, 300)
+})
+
+test('should cache deterministic errors for an hour', async () => {
+  respondWith({ Status: 1, Question: [{ name: 'formerr.com', type: 1 }] })
+  const { cache, sets } = spyCache()
+
+  const out = await resolve('formerr.com', 'A', { cache })
+
+  assert.ok(DohError.is(out.error))
+  assert.equal(sets[0].ttl, 3600)
+})
+
 test('should fail with non-ascii chars', async () => {
   const { error } = await resolve('exampleελ.com', 'A')
   if (error) {
