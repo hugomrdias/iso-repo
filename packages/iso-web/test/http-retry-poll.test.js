@@ -269,6 +269,25 @@ test(
   { timeout: 20_000 }
 )
 
+test('should not fail on invalid numbers when computing the default timeout', async () => {
+  const fetch = async () => new Response('ok')
+
+  for (const poll of [{ limit: Number.NaN }, { interval: -1_000_000 }]) {
+    const { error, result } = await request('https://local.dev/bad-numbers', {
+      fetch,
+      poll,
+    })
+    assert.equal(error, undefined, JSON.stringify(poll))
+    assert.equal(result?.status, 200)
+  }
+
+  const { error } = await request('https://local.dev/bad-numbers', {
+    fetch,
+    retry: { retries: -1 },
+  })
+  assert.equal(error?.name, 'RequestError')
+})
+
 test('should keep an explicit timeout as the total budget', async () => {
   let count = 0
   server.use(

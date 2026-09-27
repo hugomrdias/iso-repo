@@ -271,22 +271,27 @@ function defaultTimeout(retryOptions, pollOptions) {
       ? pollOptions.interval
       : DEFAULT_POLL_INTERVAL
   const pollTime =
-    limit * DEFAULT_ATTEMPT_TIMEOUT + (pollOptions ? (limit - 1) * interval : 0)
-
-  if (retryOptions == null) {
-    return pollTime
-  }
-
-  const retries = retryOptions.retries ?? 2
-  const factor = (retryOptions.factor ?? 2) > 0 ? (retryOptions.factor ?? 2) : 1
-  const minTimeout = retryOptions.minTimeout ?? 1000
-  const maxTimeout = retryOptions.maxTimeout ?? Number.POSITIVE_INFINITY
-  const random = retryOptions.randomize ? 2 : 1
+    limit * DEFAULT_ATTEMPT_TIMEOUT +
+    (pollOptions ? (limit - 1) * Math.max(0, interval) : 0)
 
   let total = pollTime
-  for (let retry = 0; retry < retries && total <= MAX_TIMEOUT; retry++) {
-    total +=
-      Math.min(random * minTimeout * factor ** retry, maxTimeout) + pollTime
+  if (retryOptions != null) {
+    const retries = retryOptions.retries ?? 2
+    const factor =
+      (retryOptions.factor ?? 2) > 0 ? (retryOptions.factor ?? 2) : 1
+    const minTimeout = retryOptions.minTimeout ?? 1000
+    const maxTimeout = retryOptions.maxTimeout ?? Number.POSITIVE_INFINITY
+    const random = retryOptions.randomize ? 2 : 1
+
+    for (let retry = 0; retry < retries && total <= MAX_TIMEOUT; retry++) {
+      total +=
+        Math.min(random * minTimeout * factor ** retry, maxTimeout) + pollTime
+    }
+  }
+
+  // invalid numbers are reported by the retry and poll code, not the timer
+  if (Number.isNaN(total)) {
+    return DEFAULT_ATTEMPT_TIMEOUT
   }
 
   return total <= MAX_TIMEOUT ? Math.ceil(total) : false
