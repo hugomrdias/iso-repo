@@ -50,7 +50,7 @@ Common types:
 
 - `feat` — new feature (minor release)
 - `fix` — bug fix (patch release)
-- `feat!` / `fix!` — breaking change (major release)
+- `feat(scope)!:` / `fix(scope)!:` — breaking change (major release). The `!` goes after the scope; `fix!(scope):` does not parse and Release Please silently ignores it
 - `test`, `docs`, `chore` — no version bump
 
 Use the package name as `scope` when changes are limited to one package (e.g. `iso-base`, `iso-kv`).
