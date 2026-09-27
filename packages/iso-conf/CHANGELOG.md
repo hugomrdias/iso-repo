@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.1](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.4.0...iso-conf-v0.4.1) (2026-09-27)
+
+
+### Bug Fixes
+
+* **iso-conf:** cancel pending change on close and handle watcher errors ([#571](https://github.com/hugomrdias/iso-repo/issues/571)) ([248c761](https://github.com/hugomrdias/iso-repo/commit/248c761fbd802b63b46eb2a303188c5f92be6a06))
+* **iso-conf:** clear config on any deserialize or validation error ([#569](https://github.com/hugomrdias/iso-repo/issues/569)) ([0db23fd](https://github.com/hugomrdias/iso-repo/commit/0db23fd4939c0e55dc29fe9dfdc547c636722fa9)), closes [#555](https://github.com/hugomrdias/iso-repo/issues/555)
+* **iso-conf:** dispatch listener and watch read errors instead of crashing ([#572](https://github.com/hugomrdias/iso-repo/issues/572)) ([f74d3ec](https://github.com/hugomrdias/iso-repo/commit/f74d3ec1cd70befb3c3356c5d80112a41aa479e0)), closes [#551](https://github.com/hugomrdias/iso-repo/issues/551)
+* **iso-conf:** omit trailing dot for empty fileExtension ([#573](https://github.com/hugomrdias/iso-repo/issues/573)) ([34219bf](https://github.com/hugomrdias/iso-repo/commit/34219bfeb95bd39b78305e90614c4a981645eafc))
+* **iso-conf:** persist normalised schema output on init ([#566](https://github.com/hugomrdias/iso-repo/issues/566)) ([20c4ca3](https://github.com/hugomrdias/iso-repo/commit/20c4ca3af9922999da1d9e967491e95b4509983f)), closes [#559](https://github.com/hugomrdias/iso-repo/issues/559)
+* **iso-conf:** read the store once per operation and per change event ([#568](https://github.com/hugomrdias/iso-repo/issues/568)) ([3c14596](https://github.com/hugomrdias/iso-repo/commit/3c14596b41dea3d23d91972289706c101c22c966))
+* **iso-conf:** reject null and array keys in set() ([#574](https://github.com/hugomrdias/iso-repo/issues/574)) ([ffa5285](https://github.com/hugomrdias/iso-repo/commit/ffa52850ba178e2cf51206edbc269f7f08886ca8))
+
 ## [0.4.0](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.3.0...iso-conf-v0.4.0) (2026-06-15)
 
 
