@@ -2,7 +2,13 @@ import delay from 'delay'
 import { KV } from 'iso-kv'
 import { http } from 'msw'
 import { assert, suite } from 'playwright-test/taps'
-import { DohError, HttpError, JsonError, resolve } from '../src/doh/index.js'
+import {
+  DohError,
+  HttpError,
+  JsonError,
+  RequestError,
+  resolve,
+} from '../src/doh/index.js'
 import { LRUCache } from '../src/lru.js'
 import { setup } from '../src/msw/msw.js'
 
@@ -174,6 +180,25 @@ test('should fail with 400 for invalid domain', async () => {
   } else {
     assert.fail('should fail')
   }
+})
+
+test('should return RequestError for malformed json and not cache it', async () => {
+  server.use(
+    http.get(
+      'https://cloudflare-dns.com/dns-query',
+      () =>
+        new Response('{bad', {
+          headers: { 'content-type': 'application/dns-json' },
+        })
+    )
+  )
+  const { cache, sets } = spyCache()
+
+  const { error } = await resolve('google.com', 'A', { cache })
+
+  assert.ok(RequestError.is(error))
+  assert.ok(error.cause instanceof SyntaxError)
+  assert.equal(sets.length, 0)
 })
 
 /**

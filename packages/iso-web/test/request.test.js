@@ -920,3 +920,144 @@ test('should request json and error', async () => {
   assert.ok(JsonError.is(error))
   assert.deepEqual(error.cause, { hello: 'world' })
 })
+
+test('should return RequestError for an invalid url', async () => {
+  const { error } = await request('http://')
+
+  assert.ok(RequestError.is(error))
+  assert.ok(error.cause instanceof TypeError)
+})
+
+test('should return RequestError for a GET with a body', async () => {
+  const { error } = await request.json.get('https://local.dev', {
+    body: { a: 1 },
+  })
+
+  assert.ok(RequestError.is(error))
+  assert.ok(error.cause instanceof TypeError)
+})
+
+test('should return RequestError for an invalid header name', async () => {
+  const { error } = await request('https://local.dev', {
+    headers: { 'bad header': 'x' },
+  })
+
+  assert.ok(RequestError.is(error))
+  assert.ok(error.cause instanceof TypeError)
+})
+
+test('should return RequestError for an invalid timeout', async () => {
+  const { error } = await request('https://local.dev', { timeout: -1 })
+
+  assert.ok(RequestError.is(error))
+  // RangeError in Node, TypeError in browsers
+  assert.ok(error.cause instanceof Error)
+})
+
+test('should return RequestError when fetch is missing', async () => {
+  const fetch = globalThis.fetch
+  // @ts-expect-error - tests a runtime without fetch
+  globalThis.fetch = undefined
+  try {
+    const { error } = await request('https://local.dev')
+
+    assert.ok(RequestError.is(error))
+    assert.ok(error.cause instanceof TypeError)
+  } finally {
+    globalThis.fetch = fetch
+  }
+})
+
+test('should return RequestError for malformed json', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return new HttpResponse('{bad', {
+        headers: { 'content-type': 'application/json' },
+      })
+    })
+  )
+
+  const { error } = await request.json('https://local.dev')
+
+  assert.ok(RequestError.is(error))
+  assert.equal(error.message, 'Response body is not valid JSON')
+  assert.ok(error.cause instanceof SyntaxError)
+})
+
+test('should return RequestError for malformed json with schema', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return new HttpResponse('{bad', {
+        headers: { 'content-type': 'application/json' },
+      })
+    })
+  )
+
+  const { error } = await request.json('https://local.dev', {
+    schema: z.object({ hello: z.string() }),
+  })
+
+  assert.ok(RequestError.is(error))
+  assert.ok(error.cause instanceof SyntaxError)
+})
+
+test('should return RequestError for a malformed json error body', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return new HttpResponse('{bad', {
+        status: 500,
+        headers: { 'content-type': 'application/json' },
+      })
+    })
+  )
+
+  const { error } = await request.json('https://local.dev')
+
+  assert.ok(RequestError.is(error))
+  assert.equal(error.message, 'Response body is not valid JSON')
+  assert.ok(error.cause instanceof SyntaxError)
+})
+
+test('should return RequestError when schema validation throws', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return HttpResponse.json({ hello: 'world' })
+    })
+  )
+  const validateError = new Error('boom')
+
+  const { error } = await request.json('https://local.dev', {
+    schema: {
+      '~standard': {
+        version: 1,
+        vendor: 'test',
+        validate: () => {
+          throw validateError
+        },
+      },
+    },
+  })
+
+  assert.ok(RequestError.is(error))
+  assert.equal(error.cause, validateError)
+})
+
+test('should return RequestError for an empty json response', async () => {
+  server.use(
+    http.get('https://local.dev', () => {
+      return new HttpResponse(null, {
+        status: 204,
+        headers: { 'content-type': 'application/json' },
+      })
+    })
+  )
+
+  const { error } = await request.json('https://local.dev')
+
+  assert.ok(RequestError.is(error))
+  assert.ok(error.cause instanceof SyntaxError)
+})
+
+test('should not have request.json.head', () => {
+  assert.equal('head' in request.json, false)
+})

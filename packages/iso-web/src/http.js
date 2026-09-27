@@ -243,6 +243,20 @@ const DEFAULT_POLL_LIMIT = 10
  * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
  */
 export async function request(resource, options = {}) {
+  try {
+    return await send(resource, options)
+  } catch (error) {
+    // option handling and `new Request` throw before `send` can catch anything
+    return { error: toRequestError(error) }
+  }
+}
+
+/**
+ * @param {import('./types.js').RequestInput} resource
+ * @param {import("./types.js").RequestOptions} options
+ * @returns {Promise<import("./types.js").MaybeResult<Response, RequestErrors>>}
+ */
+async function send(resource, options) {
   const {
     signal,
     timeout = 5000,
@@ -651,8 +665,12 @@ request.json = async function json(resource, options = {}) {
       HttpError.is(error) &&
       error.response.headers.get('content-type')?.includes('json')
     ) {
+      const body = await parseJson(error.response)
+      if (body.error) {
+        return body
+      }
       return {
-        error: new JsonError({ cause: await error.response.json() }),
+        error: new JsonError({ cause: body.result }),
       }
     }
     return { error }
@@ -663,8 +681,17 @@ request.json = async function json(resource, options = {}) {
 
     if (schema) {
       const response = result.clone()
-      const value = await result.json()
-      const validation = await schema['~standard'].validate(value)
+      const value = await parseJson(result)
+      if (value.error) {
+        return value
+      }
+
+      let validation
+      try {
+        validation = await schema['~standard'].validate(value.result)
+      } catch (error) {
+        return { error: toRequestError(error) }
+      }
 
       if (validation.issues) {
         return {
@@ -678,13 +705,37 @@ request.json = async function json(resource, options = {}) {
       return { result: /** @type {T} */ (validation.value) }
     }
 
-    const value = await result.json()
+    const value = await parseJson(result)
+    if (value.error) {
+      return value
+    }
 
-    return { result: /** @type {T} */ (value) }
+    return { result: /** @type {T} */ (value.result) }
   }
 
   return {
     error: new RequestError('Response is not JSON', { cause: result }),
+  }
+}
+
+/**
+ * Parse a JSON body without rejecting.
+ *
+ * @param {Response} response
+ * @returns {Promise<import("./types.js").MaybeResult<import('type-fest').JsonValue, RequestError>>}
+ */
+async function parseJson(response) {
+  try {
+    return { result: await response.json() }
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return {
+        error: new RequestError('Response body is not valid JSON', {
+          cause: error,
+        }),
+      }
+    }
+    return { error: toRequestError(error) }
   }
 }
 
@@ -746,18 +797,6 @@ request.json.delete = function del(resource, options = {}) {
  */
 request.json.patch = function patch(resource, options = {}) {
   return request.json(resource, { ...options, method: 'PATCH' })
-}
-
-/**
- * Request Json HEAD
- *
- * @template T
- * @param {import('./types.js').RequestInput} resource
- * @param {import("./types.js").JSONRequestOptions<T>} options
- * @returns {Promise<import("./types.js").MaybeResult<T, RequestJsonErrors>>}
- */
-request.json.head = function head(resource, options = {}) {
-  return request.json(resource, { ...options, method: 'HEAD' })
 }
 
 /**
