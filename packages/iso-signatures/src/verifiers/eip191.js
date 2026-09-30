@@ -27,7 +27,7 @@ export function getSignPayload(data) {
 }
 
 /** @type {import('../types.js').Verify} */
-export async function verify({ signature, message, did }) {
+export async function verify({ signature, message, did, strict }) {
   if (signature.length !== 65) {
     throw new Error('Invalid signature length')
   }
@@ -40,9 +40,13 @@ export async function verify({ signature, message, did }) {
   }
 
   const didPkh = DIDPkh.fromString(did.did)
-  const sigRecovered = Signature.fromBytes(signature.slice(0, 64))
-    .addRecoveryBit(v % 27)
-    .toBytes('recovered')
+  const sig = Signature.fromBytes(signature.slice(0, 64))
+  // strict mode only accepts the canonical encoding: low S and v as 27/28
+  if (strict && (sig.hasHighS() || (v !== 27 && v !== 28))) {
+    return false
+  }
+
+  const sigRecovered = sig.addRecoveryBit(v % 27).toBytes('recovered')
   const pubKey = await recoverPublicKeyAsync(
     sigRecovered,
     getSignPayload(message),

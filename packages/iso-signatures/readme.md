@@ -52,6 +52,31 @@ const verified = await resolver.verify({
 })
 ```
 
+### Strict verification
+
+`ECDSASigner` always emits low S signatures (`s <= n/2`). Verifiers accept both
+low and high S by default, since other implementations produce high S
+signatures. If you control all your signers, enable `strict` to only accept the
+canonical encoding: ECDSA (P-256/384/521) and EIP-191 signatures with high S are
+rejected, and EIP-191 signatures must use 27/28 as the recovery byte.
+
+```js
+import * as ECDSA from 'iso-signatures/verifiers/ecdsa'
+import * as EIP191 from 'iso-signatures/verifiers/eip191'
+import { Resolver } from 'iso-signatures/verifiers/resolver'
+
+const resolver = new Resolver(
+  {
+    ...ECDSA.verifier,
+    ...EIP191.verifier,
+  },
+  { strict: true }
+)
+
+// or per call
+await ECDSA.verify('ES256', { signature, message, did, strict: true })
+```
+
 ## Docs
 
 Check <https://hugomrdias.github.io/iso-repo/modules/iso_signatures.html>

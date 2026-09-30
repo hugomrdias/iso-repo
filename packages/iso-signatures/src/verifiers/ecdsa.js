@@ -1,7 +1,7 @@
 import { verifyAsync as secpVerify } from '@noble/secp256k1'
 import { webcrypto } from 'iso-base/crypto'
 import { decompress, isCompressed } from 'iso-base/ec-compression'
-import { createEcdsaParams } from '../signers/ecdsa.js'
+import { createEcdsaParams, isHighS } from '../signers/ecdsa.js'
 
 /**
  *
@@ -11,7 +11,11 @@ function createVerifier(curve) {
   const params = createEcdsaParams(curve)
 
   /** @type {import('../types.js').Verify} */
-  async function fn({ signature, message, did }) {
+  async function fn({ signature, message, did, strict }) {
+    if (strict && isHighS(curve, signature)) {
+      return false
+    }
+
     let publicKey = did.verifiableDid.publicKey
     if (isCompressed(publicKey)) {
       publicKey = decompress(publicKey, params.namedCurve)
@@ -58,9 +62,9 @@ export const verifier = {
 /**
  *
  * @param {'ES256' | 'ES384' | 'ES512' | 'ES256K'} type
- * @param {import('../types.js').VerifyInput} param1
+ * @param {import('../types.js').VerifyInput} input
  * @returns
  */
-export async function verify(type, { signature, message, did }) {
-  return await verifier[type]({ signature, message, did })
+export async function verify(type, input) {
+  return await verifier[type](input)
 }
