@@ -6,7 +6,6 @@ import { concat } from 'iso-base/utils'
 import { DIDPkh } from 'iso-did/pkh'
 import * as Address from 'ox/Address'
 import * as PublicKey from 'ox/PublicKey'
-import * as SignatureOx from 'ox/Signature'
 
 const PREFIX = '\x19Ethereum Signed Message:\n'
 
@@ -33,9 +32,16 @@ export async function verify({ signature, message, did }) {
     throw new Error('Invalid signature length')
   }
 
+  // personal_sign signatures carry v as 27/28, or 0/1 from some signers.
+  // EIP-155 values (v >= 35) only apply to transactions.
+  const v = signature[64]
+  if (v !== 0 && v !== 1 && v !== 27 && v !== 28) {
+    throw new Error('Invalid signature recovery byte')
+  }
+
   const didPkh = DIDPkh.fromString(did.did)
   const sigRecovered = Signature.fromBytes(signature.slice(0, 64))
-    .addRecoveryBit(SignatureOx.vToYParity(signature[64]))
+    .addRecoveryBit(v % 27)
     .toBytes('recovered')
   const pubKey = await recoverPublicKeyAsync(
     sigRecovered,
