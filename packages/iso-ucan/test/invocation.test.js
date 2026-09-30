@@ -65,8 +65,133 @@ inv('should fail from wrong audience', async () => {
       verifierResolver: mocks.verifierResolver,
       resolveProof: (cid) => store.resolveProof(cid),
     }),
-    /UCAN Invocation audience or subject does not match receiver/
+    /UCAN Invocation audience does not match receiver/
   )
+})
+
+/**
+ * @param {import('../src/types.js').ISigner} iss
+ * @param {import('../src/types.js').DID} sub
+ */
+async function aliceProofFrom(iss, sub) {
+  const store = mocks.createStore()
+  const dlg = await Delegation.create({
+    iss,
+    aud: mocks.alice.did,
+    sub,
+    pol: [],
+    cmd: '/x',
+  })
+  await store.add([dlg])
+  return { store, dlg }
+}
+
+inv('should omit aud when not set', async () => {
+  const { store, dlg } = await aliceProofFrom(mocks.bob, mocks.bob.did)
+  const invocation = await Invocation.create({
+    iss: mocks.alice,
+    sub: mocks.bob.did,
+    cmd: '/x',
+    args: {},
+    prf: [dlg],
+    verifierResolver: mocks.verifierResolver,
+  })
+  assert.equal('aud' in invocation.payload, false)
+
+  const decoded = await Invocation.from({
+    bytes: invocation.bytes,
+    audience: mocks.bob,
+    verifierResolver: mocks.verifierResolver,
+    resolveProof: (cid) => store.resolveProof(cid),
+  })
+  assert.equal('aud' in decoded.payload, false)
+})
+
+inv('should omit aud when it equals sub', async () => {
+  const { dlg } = await aliceProofFrom(mocks.bob, mocks.bob.did)
+  const invocation = await Invocation.create({
+    iss: mocks.alice,
+    sub: mocks.bob.did,
+    aud: mocks.bob.did,
+    cmd: '/x',
+    args: {},
+    prf: [dlg],
+    verifierResolver: mocks.verifierResolver,
+  })
+  assert.equal('aud' in invocation.payload, false)
+})
+
+inv('should fail when aud names a different executor', async () => {
+  const { store, dlg } = await aliceProofFrom(mocks.bob, mocks.bob.did)
+  const invocation = await Invocation.create({
+    iss: mocks.alice,
+    sub: mocks.bob.did,
+    aud: mocks.carol.did,
+    cmd: '/x',
+    args: {},
+    prf: [dlg],
+    verifierResolver: mocks.verifierResolver,
+  })
+  assert.equal(invocation.payload.aud, mocks.carol.did)
+
+  await assert.rejects(
+    Invocation.from({
+      bytes: invocation.bytes,
+      audience: mocks.bob,
+      verifierResolver: mocks.verifierResolver,
+      resolveProof: (cid) => store.resolveProof(cid),
+    }),
+    {
+      name: 'TypeError',
+      message: `UCAN Invocation audience does not match receiver. Expected: ${mocks.bob.did} but got: ${mocks.carol.did}`,
+    }
+  )
+})
+
+inv('should fail to decode when aud equals sub', async () => {
+  const { store, dlg } = await aliceProofFrom(mocks.bob, mocks.bob.did)
+  const bytes = await forgeInvocation({
+    iss: mocks.alice,
+    sub: mocks.bob.did,
+    aud: mocks.bob.did,
+    cmd: '/x',
+    prf: [dlg],
+  })
+
+  await assert.rejects(
+    Invocation.from({
+      bytes,
+      audience: mocks.bob,
+      verifierResolver: mocks.verifierResolver,
+      resolveProof: (cid) => store.resolveProof(cid),
+    }),
+    {
+      name: 'TypeError',
+      message:
+        'UCAN Invocation audience must be omitted when it equals the subject',
+    }
+  )
+})
+
+inv('should accept when aud is the receiver and sub differs', async () => {
+  const { store, dlg } = await aliceProofFrom(mocks.bob, mocks.bob.did)
+  const invocation = await Invocation.create({
+    iss: mocks.alice,
+    sub: mocks.bob.did,
+    aud: mocks.carol.did,
+    cmd: '/x',
+    args: {},
+    prf: [dlg],
+    verifierResolver: mocks.verifierResolver,
+  })
+
+  const decoded = await Invocation.from({
+    bytes: invocation.bytes,
+    audience: mocks.carol,
+    verifierResolver: mocks.verifierResolver,
+    resolveProof: (cid) => store.resolveProof(cid),
+  })
+  assert.equal(decoded.payload.aud, mocks.carol.did)
 })
 
 inv('should fail from expired delegation', async () => {
@@ -447,14 +572,15 @@ inv('commandCovers should compare commands by segment', () => {
  * @param {import('../src/types.js').DID} options.sub
  * @param {string} options.cmd
  * @param {Delegation[]} options.prf
+ * @param {import('../src/types.js').DID} [options.aud]
  */
-async function forgeInvocation({ iss, sub, cmd, prf }) {
+async function forgeInvocation({ iss, sub, cmd, prf, aud }) {
   const { signature, signaturePayload } = await Envelope.sign({
     spec: 'inv',
     signer: iss,
     payload: {
       iss: iss.toString(),
-      aud: sub,
+      ...(aud && { aud }),
       sub,
       cmd,
       nonce: new Uint8Array(12),
