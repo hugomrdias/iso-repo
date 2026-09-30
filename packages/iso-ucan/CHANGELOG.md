@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.5.2...iso-ucan-v1.0.0) (2026-09-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-ucan:** invocations with `aud` equal to `sub` are rejected. Every invocation created by iso-ucan <= 0.5.2 has this shape, including all RPC client requests, so clients must upgrade alongside servers.
+
+### Bug Fixes
+
+* **iso-ucan:** omit invocation aud when it equals sub and check receiver against aud ([#637](https://github.com/hugomrdias/iso-repo/issues/637)) ([a0b39fd](https://github.com/hugomrdias/iso-repo/commit/a0b39fd2d52070b0d34fdd670992e29f96775b3f))
+
 ## [0.5.2](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.5.1...iso-ucan-v0.5.2) (2026-09-30)
 
 
