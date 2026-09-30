@@ -79,14 +79,11 @@ export class Invocation {
         `Invalid envelope type. Expected "inv" but got "${envelope.spec}"`
       )
     }
-    // Audience or subject must match receiver
-    if (
-      audience &&
-      envelope.payload.aud !== audience.did &&
-      envelope.payload.sub !== audience.did
-    ) {
+    // The executor is `aud` when present, otherwise `sub`
+    const executor = envelope.payload.aud ?? envelope.payload.sub
+    if (audience && executor !== audience.did) {
       throw new TypeError(
-        `UCAN Invocation audience or subject does not match receiver. Expected: ${audience.did} but got: ${envelope.payload.aud ?? envelope.payload.sub ?? 'null'}`
+        `UCAN Invocation audience does not match receiver. Expected: ${audience.did} but got: ${executor ?? 'null'}`
       )
     }
 
@@ -140,13 +137,16 @@ export class Invocation {
     /** @type {import("./types.js").InvocationPayload} */
     const payload = {
       iss: options.iss.toString(),
-      aud: options.aud ? options.aud : options.sub,
       sub: options.sub,
       cmd: options.cmd,
       nonce,
       exp: expOrTtl(options),
       args: options.args,
       prf: options.prf.map((p) => p.cid),
+    }
+    // `aud` MUST be omitted when the executor is the subject
+    if (options.aud && options.aud !== options.sub) {
+      payload.aud = options.aud
     }
     if (options.cause) {
       payload.cause = options.cause
@@ -226,6 +226,12 @@ function assertStructure(payload) {
 
   if (payload.aud) {
     didParse(payload.aud)
+    // Spec: `aud` MUST be omitted when the executor is the subject
+    if (payload.aud === payload.sub) {
+      throw new TypeError(
+        'UCAN Invocation audience must be omitted when it equals the subject'
+      )
+    }
   }
 
   assertIsValidCommand(payload.cmd)
