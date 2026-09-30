@@ -238,7 +238,7 @@ export function assertProofs(payload, proofs) {
 
     if (!commandCovers(current.cmd, next.cmd)) {
       throw new Error(
-        `UCAN Invocation command mismatch, expected ${current.cmd} to be a broader than ${next.cmd}`
+        `UCAN Invocation command mismatch, expected ${current.cmd} to cover ${next.cmd}`
       )
     }
   }
