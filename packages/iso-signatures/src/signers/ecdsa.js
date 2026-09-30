@@ -1,4 +1,5 @@
 import { webcrypto } from 'iso-base/crypto'
+import { hex } from 'iso-base/rfc4648'
 import { u8 } from 'iso-base/utils'
 import { DID } from 'iso-did'
 import { DIDKey } from 'iso-did/key'
@@ -36,6 +37,63 @@ function curveToSignatureType(type) {
     default:
       throw new TypeError(`Unsupported key type ${type}`)
   }
+}
+
+/**
+ * Curve orders (n) and signature component sizes in bytes
+ *
+ * @type {Record<Curves, {n: bigint, size: number}>}
+ */
+const CURVES = {
+  'P-256': {
+    n: 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551n,
+    size: 32,
+  },
+  'P-384': {
+    n: 0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973n,
+    size: 48,
+  },
+  'P-521': {
+    n: 0x01fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa51868783bf2f966b7fcc0148f709a5d03bb5c9b8899c47aebb6fb71e91386409n,
+    size: 66,
+  },
+}
+
+/**
+ * Check if a raw `r‖s` ECDSA signature has a high S value (`s > n/2`)
+ *
+ * Signatures with the wrong length for the curve are reported as high S.
+ *
+ * @param {Curves} curve
+ * @param {Uint8Array} signature
+ */
+export function isHighS(curve, signature) {
+  const { n, size } = CURVES[curve]
+  if (signature.length !== size * 2) {
+    return true
+  }
+  const s = BigInt(`0x${hex.encode(signature.subarray(size))}`)
+  return s > n >> 1n
+}
+
+/**
+ * Normalize a raw `r‖s` ECDSA signature to low S (`s <= n/2`)
+ *
+ * @param {Curves} curve
+ * @param {Uint8Array} signature
+ */
+export function normalizeS(curve, signature) {
+  const { n, size } = CURVES[curve]
+  if (signature.length !== size * 2) {
+    throw new Error('Invalid signature length')
+  }
+  const s = BigInt(`0x${hex.encode(signature.subarray(size))}`)
+  if (s <= n >> 1n) {
+    return signature
+  }
+  const out = new Uint8Array(signature)
+  out.set(hex.decode((n - s).toString(16).padStart(size * 2, '0')), size)
+  return out
 }
 
 /**
@@ -195,6 +253,9 @@ export class ECDSASigner extends DID {
   /**
    * Sign a message
    *
+   * Signatures are normalized to low S (`s <= n/2`) so each message has a
+   * single signature encoding per signing operation.
+   *
    * @param {Uint8Array} message
    */
   async sign(message) {
@@ -204,7 +265,7 @@ export class ECDSASigner extends DID {
       /** @type {BufferSource} */ (message)
     )
 
-    return u8(buf)
+    return normalizeS(this.curve, u8(buf))
   }
 
   /**

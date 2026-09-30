@@ -1,9 +1,11 @@
 import assert from 'assert'
-import { base64url } from 'iso-base/rfc4648'
+import { webcrypto } from 'iso-base/crypto'
+import { base64url, hex } from 'iso-base/rfc4648'
 import { concat } from 'iso-base/utils'
 import { DIDKey } from 'iso-did/key'
 import { ECDSASigner } from '../src/signers/ecdsa.js'
 import * as ECDSA from '../src/verifiers/ecdsa.js'
+import { Resolver } from '../src/verifiers/resolver.js'
 
 /**
  * @type {{
@@ -243,3 +245,154 @@ describe('Verifier ES521', () => {
     })
   }
 })
+
+/** @type {Record<'P-256' | 'P-384' | 'P-521', {n: bigint, size: number, type: 'ES256' | 'ES384' | 'ES512'}>} */
+const curves = {
+  'P-256': {
+    n: 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551n,
+    size: 32,
+    type: 'ES256',
+  },
+  'P-384': {
+    n: 0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973n,
+    size: 48,
+    type: 'ES384',
+  },
+  'P-521': {
+    n: 0x01fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa51868783bf2f966b7fcc0148f709a5d03bb5c9b8899c47aebb6fb71e91386409n,
+    size: 66,
+    type: 'ES512',
+  },
+}
+
+/**
+ * @param {Uint8Array} signature
+ * @param {number} size
+ */
+function getS(signature, size) {
+  return BigInt(`0x${hex.encode(signature.subarray(size))}`)
+}
+
+/**
+ * Replace s with n - s
+ *
+ * @param {Uint8Array} signature
+ * @param {bigint} n
+ * @param {number} size
+ */
+function flipS(signature, n, size) {
+  const out = new Uint8Array(signature)
+  out.set(
+    hex.decode(
+      (n - getS(signature, size)).toString(16).padStart(size * 2, '0')
+    ),
+    size
+  )
+  return out
+}
+
+for (const [curve, { n, size, type }] of Object.entries(curves)) {
+  describe(`${type} low S`, () => {
+    it('should always sign with low S', async () => {
+      const signer = await ECDSASigner.generate(
+        /** @type {keyof typeof curves} */ (curve)
+      )
+      for (let i = 0; i < 64; i++) {
+        const message = webcrypto.getRandomValues(new Uint8Array(32))
+        const signature = await signer.sign(message)
+        assert.strictEqual(signature.length, size * 2)
+        assert.ok(getS(signature, size) <= n >> 1n, 'high S signature')
+        assert.ok(
+          await ECDSA.verify(type, { signature, message, did: signer }),
+          'signature does not verify'
+        )
+      }
+    })
+
+    it('should verify high S by default', async () => {
+      const signer = await ECDSASigner.generate(
+        /** @type {keyof typeof curves} */ (curve)
+      )
+      const message = new TextEncoder().encode('hello world')
+      const signature = flipS(await signer.sign(message), n, size)
+      assert.ok(getS(signature, size) > n >> 1n)
+
+      assert.ok(await ECDSA.verify(type, { signature, message, did: signer }))
+      assert.ok(
+        await new Resolver(ECDSA.verifier).verify({
+          signature,
+          message,
+          did: signer,
+          type,
+        })
+      )
+    })
+
+    it('should reject high S in strict mode', async () => {
+      const signer = await ECDSASigner.generate(
+        /** @type {keyof typeof curves} */ (curve)
+      )
+      const message = new TextEncoder().encode('hello world')
+      const lowS = await signer.sign(message)
+      const highS = flipS(lowS, n, size)
+
+      assert.ok(
+        await ECDSA.verify(type, {
+          signature: lowS,
+          message,
+          did: signer,
+          strict: true,
+        })
+      )
+      assert.strictEqual(
+        await ECDSA.verify(type, {
+          signature: highS,
+          message,
+          did: signer,
+          strict: true,
+        }),
+        false
+      )
+
+      const resolver = new Resolver(ECDSA.verifier, {
+        strict: true,
+        cache: true,
+      })
+      assert.ok(
+        await resolver.verify({ signature: lowS, message, did: signer, type })
+      )
+      assert.strictEqual(
+        await resolver.verify({ signature: highS, message, did: signer, type }),
+        false
+      )
+      // per call option overrides the resolver default
+      assert.ok(
+        await resolver.verify({
+          signature: highS,
+          message,
+          did: signer,
+          type,
+          strict: false,
+        })
+      )
+    })
+
+    it('should reject a signature with the wrong length in strict mode', async () => {
+      const signer = await ECDSASigner.generate(
+        /** @type {keyof typeof curves} */ (curve)
+      )
+      const message = new TextEncoder().encode('hello world')
+      const signature = await signer.sign(message)
+
+      assert.strictEqual(
+        await ECDSA.verify(type, {
+          signature: signature.subarray(1),
+          message,
+          did: signer,
+          strict: true,
+        }),
+        false
+      )
+    })
+  })
+}
