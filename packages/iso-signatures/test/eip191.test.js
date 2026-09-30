@@ -25,6 +25,32 @@ async function sign(privateKey, message) {
   return EIP191.hexToBytes(sig)
 }
 
+/**
+ * Sign messages until one produces a signature with the given y parity.
+ *
+ * @param {0 | 1} yParity
+ */
+async function signWithParity(yParity) {
+  for (let i = 0; i < 64; i++) {
+    const message = utf8.decode(`hello world ${i}`)
+    const signature = await sign(PRIVATE_KEY, message)
+    if (signature[64] === 27 + yParity) {
+      return { signature, message }
+    }
+  }
+  throw new Error(`No signature with y parity ${yParity} found`)
+}
+
+/**
+ * @param {Uint8Array} signature
+ * @param {number} v
+ */
+function withV(signature, v) {
+  const out = signature.slice()
+  out[64] = v
+  return out
+}
+
 describe('Verifier eip191', () => {
   it('should verify a signature from the did:pkh address', async () => {
     const did = DIDPkh.fromAddress(account.address)
@@ -103,6 +129,49 @@ describe('Verifier eip191', () => {
     await assert.rejects(
       EIP191.verify({ signature: signature.slice(0, 64), message: msg, did }),
       /Invalid signature length/
+    )
+  })
+
+  for (const yParity of /** @type {const} */ ([0, 1])) {
+    for (const v of [yParity, 27 + yParity]) {
+      it(`should verify a signature with v = ${v}`, async () => {
+        const did = DIDPkh.fromAddress(account.address)
+        const { signature, message } = await signWithParity(yParity)
+
+        const verified = await EIP191.verify({
+          signature: withV(signature, v),
+          message,
+          did,
+        })
+        assert.equal(verified, true)
+      })
+    }
+  }
+
+  // EIP-155 style values decode to a valid y parity in ox's vToYParity,
+  // but are not valid for personal messages
+  for (const v of [35, 36, 37, 255]) {
+    it(`should reject a signature with v = ${v}`, async () => {
+      const did = DIDPkh.fromAddress(account.address)
+      // 35 + chainId * 2 + yParity, so match the parity for an otherwise valid signature
+      const { signature, message } = await signWithParity(
+        /** @type {0 | 1} */ ((v - 35) % 2)
+      )
+
+      await assert.rejects(
+        EIP191.verify({ signature: withV(signature, v), message, did }),
+        /Invalid signature recovery byte/
+      )
+    })
+  }
+
+  it('should reject a signature with v = 2', async () => {
+    const did = DIDPkh.fromAddress(account.address)
+    const signature = await sign(PRIVATE_KEY, msg)
+
+    await assert.rejects(
+      EIP191.verify({ signature: withV(signature, 2), message: msg, did }),
+      /Invalid signature recovery byte/
     )
   })
 })
