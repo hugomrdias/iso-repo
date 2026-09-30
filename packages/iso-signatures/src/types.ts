@@ -24,6 +24,16 @@ export interface VerifyInput {
   signature: Uint8Array
   message: Uint8Array
   did: VerifiableDID
+  /**
+   * Only accept the canonical signature encoding. ECDSA (P-256/384/521) and
+   * EIP-191 signatures with a high S value (`s > n/2`) are rejected, and
+   * EIP-191 signatures must use 27/28 as the recovery byte.
+   *
+   * Other signature types ignore this option.
+   *
+   * @default false
+   */
+  strict?: boolean
 }
 export type Verify = (input: VerifyInput) => Promise<boolean>
 
@@ -45,4 +55,14 @@ export interface IResolver {
 
 export interface ResolverOptions {
   cache?: Cache | boolean | undefined
+  /**
+   * Default `strict` value for verify calls that don't set it.
+   *
+   * Only enable this when you control all signers: other implementations
+   * produce high S ECDSA signatures and 0/1 EIP-191 recovery bytes.
+   *
+   * @see {@link VerifyInput.strict}
+   * @default false
+   */
+  strict?: boolean
 }

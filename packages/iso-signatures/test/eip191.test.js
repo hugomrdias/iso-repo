@@ -1,3 +1,4 @@
+import { Signature } from '@noble/secp256k1'
 import assert from 'assert'
 import { utf8 } from 'iso-base/utf8'
 import { DIDPkh } from 'iso-did/pkh'
@@ -173,5 +174,69 @@ describe('Verifier eip191', () => {
       EIP191.verify({ signature: withV(signature, 2), message: msg, did }),
       /Invalid signature recovery byte/
     )
+  })
+
+  describe('strict', () => {
+    const did = DIDPkh.fromAddress(account.address)
+
+    /**
+     * Flip s to n - s and the recovery parity, which recovers the same key
+     *
+     * @param {Uint8Array} signature
+     */
+    function flipS(signature) {
+      const sig = Signature.fromBytes(signature.slice(0, 64))
+      const n =
+        0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n
+      const flipped = new Signature(sig.r, n - sig.s).toBytes()
+      return new Uint8Array([...flipped, signature[64] === 27 ? 28 : 27])
+    }
+
+    it('should accept a low S signature with v 27/28', async () => {
+      const signature = await sign(PRIVATE_KEY, msg)
+      assert.ok(signature[64] === 27 || signature[64] === 28)
+
+      assert.equal(
+        await EIP191.verify({ signature, message: msg, did, strict: true }),
+        true
+      )
+    })
+
+    it('should verify high S with the flipped v by default', async () => {
+      const signature = flipS(await sign(PRIVATE_KEY, msg))
+
+      assert.equal(await EIP191.verify({ signature, message: msg, did }), true)
+    })
+
+    it('should reject high S with the flipped v in strict mode', async () => {
+      const signature = flipS(await sign(PRIVATE_KEY, msg))
+
+      assert.equal(
+        await EIP191.verify({ signature, message: msg, did, strict: true }),
+        false
+      )
+
+      const resolver = new Resolver(EIP191.verifier, { strict: true })
+      assert.equal(
+        await resolver.verify({
+          signature,
+          message: msg,
+          did,
+          type: 'EIP191',
+        }),
+        false
+      )
+    })
+
+    it('should reject v of 0/1 in strict mode only', async () => {
+      const signature = await sign(PRIVATE_KEY, msg)
+      signature[64] -= 27
+
+      assert.equal(await EIP191.verify({ signature, message: msg, did }), true)
+      assert.equal(
+        await EIP191.verify({ signature, message: msg, did, strict: true }),
+        false
+      )
+    })
   })
 })

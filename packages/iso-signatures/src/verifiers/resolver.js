@@ -23,7 +23,7 @@ function memoryCache() {
 
   /** @type {import('../types').Cache} */
   async function fn(input, verify) {
-    const key = `${input.did.verifiableDid.toString()}:${hex.encode(input.signature)}:${hex.encode(input.message)}`
+    const key = `${input.did.verifiableDid.toString()}:${hex.encode(input.signature)}:${hex.encode(input.message)}:${input.strict === true}`
     if (cache.has(key)) {
       return cache.get(key)
     }
@@ -51,6 +51,7 @@ export class Resolver {
     this.registry = registry
     this.cache =
       options.cache === true ? memoryCache() : options.cache || noCache
+    this.strict = options.strict === true
   }
 
   /** @type {IResolver['verify']} */
@@ -60,6 +61,6 @@ export class Resolver {
       throw new TypeError(`Unsupported signature type "${input.type}"`)
     }
 
-    return this.cache(input, verify)
+    return this.cache({ ...input, strict: input.strict ?? this.strict }, verify)
   }
 }
