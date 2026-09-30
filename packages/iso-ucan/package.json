@@ -125,7 +125,8 @@
     "@types/node": "catalog:",
     "delay": "catalog:",
     "playwright-test": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "viem": "catalog:"
   },
   "publishConfig": {
     "provenance": true

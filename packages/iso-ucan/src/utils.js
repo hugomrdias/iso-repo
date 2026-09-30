@@ -1,4 +1,5 @@
 import * as dagCbor from '@ipld/dag-cbor'
+import { equals } from 'iso-base/utils'
 import { DID } from 'iso-did'
 import { CID } from 'multiformats/cid'
 import { sha256 } from 'multiformats/hashes/sha2'
@@ -310,16 +311,145 @@ export function assertMeta(meta) {
 }
 
 /**
+ * ECDSA curve orders by signature algorithm, with the byte length of each
+ * signature component.
+ *
+ * @type {Record<string, {n: bigint, size: number}>}
+ */
+const ECDSA_CURVES = {
+  ES256: {
+    n: 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551n,
+    size: 32,
+  },
+  ES384: {
+    n: 0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973n,
+    size: 48,
+  },
+  ES512: {
+    n: 0x01fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa51868783bf2f966b7fcc0148f709a5d03bb5c9b8899c47aebb6fb71e91386409n,
+    size: 66,
+  },
+  ES256K: {
+    n: 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n,
+    size: 32,
+  },
+  EIP191: {
+    n: 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n,
+    size: 32,
+  },
+}
+
+/**
+ * @param {Uint8Array} bytes
+ */
+function bytesToBigInt(bytes) {
+  let n = 0n
+  for (const b of bytes) n = (n << 8n) | BigInt(b)
+  return n
+}
+
+/**
+ * @param {bigint} n
+ * @param {number} size
+ */
+function bigIntToBytes(n, size) {
+  const out = new Uint8Array(size)
+  for (let i = size - 1; i >= 0; i--) {
+    out[i] = Number(n & 0xffn)
+    n >>= 8n
+  }
+  return out
+}
+
+/**
+ * Signatures a signer could have issued that verify the same as `signature`.
+ *
+ * ECDSA signatures are malleable: `(r, s)` and `(r, n - s)` are both valid.
+ * EIP-191 signatures additionally carry a recovery byte `v` that wallets
+ * return as 27/28 or 0/1. Verifiers also accept EIP-155 style `v >= 35`,
+ * but no signer issues those for `personal_sign`, so they are not listed.
+ *
+ * The result always includes `signature` itself. Other algorithms (Ed25519,
+ * RSA) have a single valid signature.
+ *
+ * @param {import('iso-signatures/types').SignatureType} alg
+ * @param {Uint8Array} signature
+ * @returns {Uint8Array[]}
+ */
+export function equivalentSignatures(alg, signature) {
+  const curve = ECDSA_CURVES[alg]
+  if (!curve) {
+    return [signature]
+  }
+
+  const { n, size } = curve
+  const isEip191 = alg === 'EIP191'
+  if (signature.length !== size * 2 + (isEip191 ? 1 : 0)) {
+    return [signature]
+  }
+
+  const r = signature.subarray(0, size)
+  const s = bytesToBigInt(signature.subarray(size, size * 2))
+  if (s === 0n || s >= n) {
+    return [signature]
+  }
+  const sFlipped = bigIntToBytes(n - s, size)
+
+  if (!isEip191) {
+    return [signature, new Uint8Array([...r, ...sFlipped])]
+  }
+
+  const v = signature[size * 2]
+  /** @type {number} */
+  let parity
+  if (v === 0 || v === 27) parity = 0
+  else if (v === 1 || v === 28) parity = 1
+  else if (v >= 35) parity = v % 2 === 0 ? 1 : 0
+  else return [signature]
+
+  const sBytes = signature.subarray(size, size * 2)
+  const candidates = [
+    new Uint8Array([...r, ...sBytes, parity]),
+    new Uint8Array([...r, ...sBytes, parity + 27]),
+    new Uint8Array([...r, ...sFlipped, 1 - parity]),
+    new Uint8Array([...r, ...sFlipped, 28 - parity]),
+  ]
+  return [signature, ...candidates.filter((c) => !equals(c, signature))]
+}
+
+/**
+ * CIDs of every envelope that verifies the same as `envelope`: one per
+ * signature in {@link equivalentSignatures}, starting with the CID of
+ * `envelope` itself.
+ *
+ * @param {import('./types.js').DecodedEnvelope<PayloadSpec>} envelope
+ */
+export async function equivalentCids(envelope) {
+  return await Promise.all(
+    equivalentSignatures(envelope.alg, envelope.signature).map((signature) =>
+      cid({ ...envelope, signature })
+    )
+  )
+}
+
+/**
  * Assert that the input is not revoked.
  *
- * @param {import('multiformats/cid').CID} cid
+ * Checks every equivalent CID of the envelope (see {@link equivalentCids}),
+ * so re-encoding a revoked UCAN with another valid signature does not get it
+ * past a CID-based revocation list.
+ *
+ * @param {import('./types.js').DecodedEnvelope<PayloadSpec>} envelope
  * @param {(cid: CID) => Promise<boolean>} [isRevokedFn]
  */
-export async function assertNotRevoked(cid, isRevokedFn) {
-  isRevokedFn = isRevokedFn ?? (async () => false)
-  const isRevoked = await isRevokedFn(cid)
-  if (isRevoked) {
-    throw new Error('UCAN revoked')
+export async function assertNotRevoked(envelope, isRevokedFn) {
+  if (!isRevokedFn) {
+    return
+  }
+  for (const c of await equivalentCids(envelope)) {
+    if (await isRevokedFn(c)) {
+      throw new Error('UCAN revoked')
+    }
   }
 }
 

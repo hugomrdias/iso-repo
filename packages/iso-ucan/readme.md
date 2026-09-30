@@ -125,6 +125,15 @@ instances execute invocations, implement the `ReplayStore` interface on a
 shared store with an atomic set-if-absent, such as Redis `SET NX` or SQL
 `INSERT ... ON CONFLICT DO NOTHING`.
 
+## Revocation
+
+Pass `isRevoked` to `Delegation.from`, `Delegation#validate` or
+`Invocation.from` to reject revoked delegations by CID. Because ECDSA and
+EIP-191 signatures can be re-encoded into another valid signature, a revoked
+delegation can reappear under a different CID. `iso-ucan` therefore calls
+`isRevoked` with every CID the delegation could have been issued under (up to
+2 for ECDSA and 4 for EIP-191), and rejects it if any is revoked.
+
 ## EIP-191 wallet signing
 
 `iso-ucan` can use EIP-191 wallet signatures through `EIP191Signer` from

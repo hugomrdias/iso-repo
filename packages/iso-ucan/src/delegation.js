@@ -89,7 +89,7 @@ export class Delegation {
     await verifySignature(envelope, verifierResolver, didResolveOptions)
 
     const _cid = await cid(envelope)
-    await assertNotRevoked(_cid, options.isRevoked)
+    await assertNotRevoked(envelope, options.isRevoked)
 
     return new Delegation(envelope, bytes, _cid)
   }
@@ -182,7 +182,7 @@ export class Delegation {
       options.verifierResolver,
       options.didResolver
     )
-    await assertNotRevoked(this.cid, options.isRevoked)
+    await assertNotRevoked(this.envelope, options.isRevoked)
 
     return true
   }

@@ -19,6 +19,13 @@ export * from './types/policy'
 export * from './types/varsig'
 
 export type ResolveProof = (proof: CID) => Promise<Delegation>
+/**
+ * Check whether a delegation CID is revoked.
+ *
+ * Called once for each CID the delegation could have been issued under
+ * (up to 2 for ECDSA and 4 for EIP-191 signatures), since those signatures
+ * can be re-encoded into another valid signature with a different CID.
+ */
 export type IsRevoked = (cid: CID) => Promise<boolean>
 export type VerifierResolver = Resolver
 export type DidResolver = _DidResolver
