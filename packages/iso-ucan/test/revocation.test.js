@@ -175,14 +175,7 @@ revocation(
     /** @param {import('multiformats').CID} c */
     const isRevoked = async (c) => revoked.has(c.toString())
 
-    // EIP-155 style v, accepted by the verifier but never issued by signers
-    const parity = sig[64] === 0 || sig[64] === 27 ? 0 : 1
-    const eip155 = new Uint8Array([...sig.subarray(0, 64), 37 + parity])
-
-    for (const signature of [
-      ...equivalentSignatures('EIP191', sig).slice(1),
-      eip155,
-    ]) {
+    for (const signature of equivalentSignatures('EIP191', sig).slice(1)) {
       const bytes = reencode(dlg, signature)
       await Delegation.from({ bytes, verifierResolver })
       await assert.rejects(
@@ -191,6 +184,14 @@ revocation(
         `v=${signature[64]}`
       )
     }
+
+    // EIP-155 style v is rejected by the verifier before revocation is checked
+    const parity = sig[64] === 0 || sig[64] === 27 ? 0 : 1
+    const eip155 = new Uint8Array([...sig.subarray(0, 64), 37 + parity])
+    await assert.rejects(
+      Delegation.from({ bytes: reencode(dlg, eip155), verifierResolver }),
+      { message: 'UCAN signature verification failed' }
+    )
   }
 )
 
