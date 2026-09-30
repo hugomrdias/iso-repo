@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.2](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.5.1...iso-ucan-v0.5.2) (2026-09-30)
+
+
+### Bug Fixes
+
+* **iso-ucan:** check isRevoked against every equivalent signature encoding ([ea7b212](https://github.com/hugomrdias/iso-repo/commit/ea7b2126f26f98e1761de2d48e8c2900108d9011))
+* **iso-ucan:** reject replayed invocations ([6299177](https://github.com/hugomrdias/iso-repo/commit/6299177a53841447fe549d3f9771dfbd2fc330e8))
+
 ## [0.5.1](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.5.0...iso-ucan-v0.5.1) (2026-09-30)
 
 
