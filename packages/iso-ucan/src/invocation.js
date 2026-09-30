@@ -9,6 +9,7 @@ import {
   assertMeta,
   assertNonce,
   cid,
+  commandCovers,
   expOrTtl,
   verifySignature,
 } from './utils.js'
@@ -235,7 +236,7 @@ export function assertProofs(payload, proofs) {
       )
     }
 
-    if (!next.cmd.startsWith(current.cmd)) {
+    if (!commandCovers(current.cmd, next.cmd)) {
       throw new Error(
         `UCAN Invocation command mismatch, expected ${current.cmd} to be a broader than ${next.cmd}`
       )

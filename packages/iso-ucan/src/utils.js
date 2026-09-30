@@ -169,6 +169,25 @@ export async function verifySignature(
 }
 
 /**
+ * Check if a command is covered by (equal to or a segment-wise child of) another command.
+ *
+ * Commands are compared by path segment, not by string prefix: `/crypto` covers
+ * `/crypto` and `/crypto/sign` but not `/cryptocurrency`. The command `/` covers
+ * every command.
+ *
+ * Both commands are expected to be valid per {@link assertIsValidCommand}, so
+ * `${parent}/` is always a real segment boundary.
+ *
+ * @param {string} parent - The broader command, e.g. from a delegation.
+ * @param {string} child - The command that must be attenuated from `parent`.
+ * @returns {boolean}
+ */
+export function commandCovers(parent, child) {
+  if (parent === '/') return child.startsWith('/')
+  return child === parent || child.startsWith(`${parent}/`)
+}
+
+/**
  * Asserts that a UCAN command string is syntactically valid.
  * If the command is invalid, it throws a descriptive error.
  *
