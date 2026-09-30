@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.5.2...iso-signatures-v0.6.0) (2026-09-30)
+
+
+### Features
+
+* **iso-signatures:** emit low-S ECDSA signatures and add opt-in strict verification ([#636](https://github.com/hugomrdias/iso-repo/issues/636)) ([926ec2b](https://github.com/hugomrdias/iso-repo/commit/926ec2be237b9d5e0b38c1f236d6273969e116c5)), closes [#633](https://github.com/hugomrdias/iso-repo/issues/633)
+
+
+### Bug Fixes
+
+* **iso-signatures:** only accept v in {0, 1, 27, 28} for EIP-191 signatures ([#634](https://github.com/hugomrdias/iso-repo/issues/634)) ([ba89f9d](https://github.com/hugomrdias/iso-repo/commit/ba89f9d242ce0f86530f7cf77337d7b9144636ed)), closes [#631](https://github.com/hugomrdias/iso-repo/issues/631)
+
 ## [0.5.2](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.5.1...iso-signatures-v0.5.2) (2026-09-26)
 
 
