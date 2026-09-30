@@ -11,6 +11,8 @@ import {
   cid,
   commandCovers,
   expOrTtl,
+  nowInSeconds,
+  replayKey,
   verifySignature,
 } from './utils.js'
 
@@ -34,18 +36,31 @@ export class Invocation {
   cid
 
   /**
+   * Key to deduplicate this invocation on: the CID of its signature payload.
+   *
+   * Use this instead of {@link Invocation.cid} to detect replays. The CID
+   * covers the signature bytes, and some signature algorithms (e.g. ECDSA)
+   * accept more than one valid signature for the same payload.
+   *
+   * @type {string}
+   */
+  replayKey
+
+  /**
    *
    * @param {import("./types.js").DecodedEnvelope<'inv'>} envelope
    * @param {Uint8Array} bytes
    * @param {CID} cid
    * @param {Delegation[]} delegations
+   * @param {string} replayKey
    */
-  constructor(envelope, bytes, cid, delegations) {
+  constructor(envelope, bytes, cid, delegations, replayKey) {
     this.envelope = envelope
     this.payload = envelope.payload
     this.bytes = bytes
     this.cid = cid
     this.delegations = delegations
+    this.replayKey = replayKey
   }
 
   /**
@@ -96,8 +111,24 @@ export class Invocation {
       assertProofs(envelope.payload, proofs)
     }
 
+    if (options.maxTtl !== undefined) {
+      assertMaxTtl(envelope.payload.exp, options.maxTtl, options.now)
+    }
+
+    const _replayKey = await replayKey(envelope)
+
+    // Must run last, so only fully validated invocations are recorded
+    if (
+      options.replayStore &&
+      !(await options.replayStore.checkAndSet(_replayKey, envelope.payload.exp))
+    ) {
+      throw new Error(
+        `UCAN Invocation replay detected, already seen ${_replayKey}`
+      )
+    }
+
     const _cid = await cid(envelope)
-    return new Invocation(envelope, bytes, _cid, proofs)
+    return new Invocation(envelope, bytes, _cid, proofs, _replayKey)
   }
 
   /**
@@ -158,7 +189,31 @@ export class Invocation {
       version: Envelope.VERSION,
     }
 
-    return new Invocation(envelope, bytes, await cid(envelope), options.prf)
+    return new Invocation(
+      envelope,
+      bytes,
+      await cid(envelope),
+      options.prf,
+      await replayKey(envelope)
+    )
+  }
+}
+
+/**
+ * @param {number | null} exp
+ * @param {number} maxTtl
+ * @param {number} [now]
+ */
+function assertMaxTtl(exp, maxTtl, now = nowInSeconds()) {
+  if (exp === null) {
+    throw new Error(
+      `UCAN Invocation must expire within ${maxTtl} seconds, but has no expiration`
+    )
+  }
+  if (exp > now + maxTtl) {
+    throw new Error(
+      `UCAN Invocation must expire within ${maxTtl} seconds. Received: ${exp} but current time is ${now}`
+    )
   }
 }
 

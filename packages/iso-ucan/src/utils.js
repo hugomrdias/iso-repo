@@ -51,6 +51,22 @@ export async function cid(envelope) {
 }
 
 /**
+ * Replay key of a UCAN: the CID of its signature payload, the exact bytes the
+ * signature covers.
+ *
+ * Unlike {@link cid}, it does not depend on the signature bytes, so a second
+ * valid signature over the same payload (for example a malleated ECDSA
+ * signature) gets the same key.
+ *
+ * @param {import('./types.js').DecodedEnvelope<PayloadSpec>} envelope
+ */
+export async function replayKey(envelope) {
+  const hash = await sha256.digest(dagCbor.encode(signaturePayload(envelope)))
+
+  return CID.create(1, dagCbor.code, hash).toString()
+}
+
+/**
  * Check if a DID and signature type are compatible
  *
  * @param {import('iso-did/types').VerifiableDID} did

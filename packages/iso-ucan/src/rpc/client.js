@@ -39,7 +39,7 @@ export function defineClient(commands, options) {
         iss: options.issuer,
         sub: options.audience.did,
         store: options.store,
-        exp: null,
+        ttl: options.ttl,
         verifierResolver: options.verifierResolver,
       })
 
@@ -77,7 +77,7 @@ export function defineClient(commands, options) {
         iss: options.issuer,
         sub: options.audience.did,
         store: options.store,
-        exp: null,
+        ttl: options.ttl,
         verifierResolver: options.verifierResolver,
       })
     },

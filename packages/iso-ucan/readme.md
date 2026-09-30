@@ -93,6 +93,38 @@ const invocation = await AccountCreateCap.invoke({
 })
 ```
 
+## Replay protection
+
+The UCAN spec requires executors to reject replayed invocations. Pass a
+`replayStore` to `Invocation.from` so an invocation is accepted only once, and
+set `maxTtl` so invocations must expire soon, which keeps the store bounded:
+
+```ts
+import { Invocation } from 'iso-ucan/invocation'
+import { KVReplayStore } from 'iso-ucan/replay'
+
+const replayStore = new KVReplayStore() // in memory by default
+
+const invocation = await Invocation.from({
+  bytes,
+  audience: executor,
+  verifierResolver,
+  resolveProof: (cid) => store.resolveProof(cid),
+  replayStore,
+  maxTtl: 300,
+})
+```
+
+The store is keyed on `invocation.replayKey`, the CID of the signed payload.
+Do not deduplicate on `invocation.cid`: it also covers the signature, and
+some signature algorithms (such as ECDSA) accept more than one valid signature
+for the same payload.
+
+`KVReplayStore` is atomic within one process only. When several processes or
+instances execute invocations, implement the `ReplayStore` interface on a
+shared store with an atomic set-if-absent, such as Redis `SET NX` or SQL
+`INSERT ... ON CONFLICT DO NOTHING`.
+
 ## EIP-191 wallet signing
 
 `iso-ucan` can use EIP-191 wallet signatures through `EIP191Signer` from
@@ -214,6 +246,14 @@ app.post('/rpc', (c) => rpc(c.req.raw))
 serve({ fetch: app.fetch, port: 3000 })
 ```
 
+`defineServer` rejects replayed invocations with an in-memory `KVReplayStore`
+by default. Pass `replayStore` to share it between server instances.
+
+It also rejects invocations that never expire or expire more than `maxTtl`
+seconds from now (default 600). Pass a different `maxTtl` to change the
+limit, or `null` to accept any expiration. See
+[Replay protection](#replay-protection).
+
 ### Client
 
 ```ts
@@ -226,7 +266,11 @@ const client = defineClient(Protocol, {
   store,
   verifierResolver,
 })
+```
 
+Invocations created by the client expire after `ttl` seconds (default 300).
+
+```ts
 // `args` and the returned receipt are typed from the protocol entry for `cmd`.
 const r = await client.request({ cmd: '/todo/complete', args: { id: '42' } })
 

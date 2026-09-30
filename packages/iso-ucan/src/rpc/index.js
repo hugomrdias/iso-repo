@@ -7,4 +7,4 @@ export {
   receiptResult,
   receiptServerError,
 } from './receipt.js'
-export { defineServer } from './server.js'
+export { DEFAULT_MAX_TTL, defineServer } from './server.js'

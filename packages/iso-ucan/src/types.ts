@@ -126,6 +126,33 @@ export interface InvocationFromOptions extends DelegationValidateOptions {
   bytes: Uint8Array
   audience?: VerifiableDID
   resolveProof: ResolveProof
+  /**
+   * Store of seen invocations. When set, an invocation whose signed payload was
+   * already seen is rejected. Checked after all other validation passes.
+   *
+   * Executors MUST use one to prevent replay attacks.
+   */
+  replayStore?: ReplayStore
+  /**
+   * Maximum lifetime in seconds accepted for the invocation. When set,
+   * invocations without an expiration, or expiring more than `maxTtl` seconds
+   * after `now`, are rejected. This keeps the replay store bounded.
+   */
+  maxTtl?: number
+}
+
+/**
+ * Store of seen invocations, used to reject replays.
+ */
+export interface ReplayStore {
+  /**
+   * Atomically record `key` and resolve `true`, or resolve `false` if `key`
+   * was already recorded and has not expired.
+   *
+   * @param key - Replay key of the invocation, see {@link Invocation.replayKey}
+   * @param expiration - Unix time in seconds after which the key can be forgotten, or `null` to keep it forever
+   */
+  checkAndSet(key: string, expiration: number | null): Promise<boolean>
 }
 
 /**
@@ -276,4 +303,9 @@ export type ClientOptions = {
   store: Store
   capabilities: Capability<StandardSchemaV1, string>[]
   verifierResolver: VerifierResolver
+  /**
+   * Time to live in seconds of the invocations created by the client
+   * @default 300
+   */
+  ttl?: number
 }

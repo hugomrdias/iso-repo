@@ -44,6 +44,10 @@
       "types": "./dist/src/varsig.d.ts",
       "default": "./src/varsig.js"
     },
+    "./replay": {
+      "types": "./dist/src/replay.d.ts",
+      "default": "./src/replay.js"
+    },
     "./policy": {
       "types": "./dist/src/policy.d.ts",
       "default": "./src/policy.js"
@@ -80,6 +84,9 @@
       ],
       "policy": [
         "dist/src/policy"
+      ],
+      "replay": [
+        "dist/src/replay"
       ],
       "rpc": [
         "dist/src/rpc/index"

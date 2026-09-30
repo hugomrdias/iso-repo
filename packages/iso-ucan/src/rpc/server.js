@@ -1,5 +1,6 @@
 import { u8 } from 'iso-base/utils'
 import { Invocation } from '../invocation.js'
+import { KVReplayStore } from '../replay.js'
 
 /**
  * @import {
@@ -9,6 +10,12 @@ import { Invocation } from '../invocation.js'
  * } from './types.js'
  * @import {ReceiptServerError} from './receipt.js'
  */
+
+/**
+ * Default maximum invocation lifetime accepted by {@link defineServer}, in
+ * seconds. Twice the client default `ttl`, to tolerate clock skew.
+ */
+export const DEFAULT_MAX_TTL = 600
 
 /**
  * Build a {@link ReceiptServerError} payload.
@@ -56,6 +63,13 @@ function serverErrorResponse(status, message, extra) {
  * schema, and dispatches to the corresponding handler in `options.handlers`.
  * The handler's return value is serialized to JSON.
  *
+ * Each invocation is executed at most once: replays are rejected using
+ * `options.replayStore`, which defaults to an in-memory {@link KVReplayStore}.
+ * Pass a shared store when running more than one server instance.
+ *
+ * Invocations must expire within `options.maxTtl` seconds, which defaults to
+ * {@link DEFAULT_MAX_TTL}. Pass `null` to accept any expiration.
+ *
  * @template {CommandsRecord} Commands
  * @param {Commands} commands
  * @param {DefineServerOptions<Commands>} options
@@ -70,6 +84,11 @@ export function defineServer(commands, options) {
 
   /** @type {Record<string, (opts: any) => unknown>} */
   const handlers = options.handlers
+  const replayStore = options.replayStore ?? new KVReplayStore()
+  const maxTtl =
+    options.maxTtl === undefined
+      ? DEFAULT_MAX_TTL
+      : (options.maxTtl ?? undefined)
 
   return async (request) => {
     /** @type {Invocation | undefined} */
@@ -83,6 +102,8 @@ export function defineServer(commands, options) {
         audience: options.signer,
         verifierResolver: options.verifierResolver,
         resolveProof: options.store.resolveProof.bind(options.store),
+        replayStore,
+        maxTtl,
       })
     } catch (error) {
       return serverErrorResponse(

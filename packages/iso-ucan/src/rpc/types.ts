@@ -3,7 +3,12 @@ import type { ISigner } from 'iso-signatures/types'
 import type { Capability } from '../capability.js'
 import type { Invocation } from '../invocation.js'
 import type { Store } from '../store.js'
-import type { ClientOptions, Promisable, VerifierResolver } from '../types.js'
+import type {
+  ClientOptions,
+  Promisable,
+  ReplayStore,
+  VerifierResolver,
+} from '../types.js'
 
 export interface CommandOptions<
   Args extends StandardSchemaV1,
@@ -145,6 +150,22 @@ export interface DefineServerOptions<Commands extends CommandsRecord> {
   signer: ISigner
   store: Store
   verifierResolver: VerifierResolver
+  /**
+   * Store of seen invocations, used to reject replays.
+   * Use a store shared by all instances when running more than one server.
+   *
+   * @default new KVReplayStore() (in memory)
+   */
+  replayStore?: ReplayStore
+  /**
+   * Maximum lifetime in seconds accepted for invocations. Invocations without
+   * an expiration, or expiring later than `maxTtl` seconds from now, are
+   * rejected. This keeps the replay store bounded. Pass `null` to accept any
+   * expiration, including none.
+   *
+   * @default 600
+   */
+  maxTtl?: number | null
 }
 
 /**
