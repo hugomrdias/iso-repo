@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.5.0...iso-ucan-v0.5.1) (2026-09-30)
+
+
+### Bug Fixes
+
+* **iso-ucan:** compare commands by path segment when checking proof attenuation ([#629](https://github.com/hugomrdias/iso-repo/issues/629)) ([72868a0](https://github.com/hugomrdias/iso-repo/commit/72868a09a113c416da29563a0059a2b9ab76cfcf))
+
 ## [0.5.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.4.2...iso-ucan-v0.5.0) (2026-04-19)
 
 
