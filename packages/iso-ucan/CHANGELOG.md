@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v1.0.0...iso-ucan-v2.0.0) (2026-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-ucan:** newly created delegations and invocations use the `ucan/dlg@1.0.0` / `ucan/inv@1.0.0` payload tags, so their bytes and CIDs differ from what iso-ucan <= 1.0.0 produced for the same payload. Tokens tagged `@1.0.0-rc.1` are still accepted on decode and keep their original CIDs. Envelopes with any other version, an unknown spec, a non DAG-CBOR varsig encoding or a malformed shape are now rejected.
+
+### Bug Fixes
+
+* **iso-ucan:** check proof CIDs against prf and align invocation payload validation with spec ([#650](https://github.com/hugomrdias/iso-repo/issues/650)) ([ee10995](https://github.com/hugomrdias/iso-repo/commit/ee10995063274984d0c22ef2758e0b3fab6e9d7f))
+* **iso-ucan:** emit ucan/{dlg,inv}[@1](https://github.com/1).0.0 payload tags and validate envelopes on decode ([#649](https://github.com/hugomrdias/iso-repo/issues/649)) ([4b1137d](https://github.com/hugomrdias/iso-repo/commit/4b1137df8e1634d32c202519b6717d4afdfbebed))
+* **iso-ucan:** rewrite policy selector parser and evaluator to match spec ([#651](https://github.com/hugomrdias/iso-repo/issues/651)) ([c116987](https://github.com/hugomrdias/iso-repo/commit/c11698713249b787bf94254bb7f06192c380b2fa)), closes [#641](https://github.com/hugomrdias/iso-repo/issues/641) [#644](https://github.com/hugomrdias/iso-repo/issues/644) [#642](https://github.com/hugomrdias/iso-repo/issues/642) [#645](https://github.com/hugomrdias/iso-repo/issues/645)
+
 ## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v0.5.2...iso-ucan-v1.0.0) (2026-09-30)
 
 
