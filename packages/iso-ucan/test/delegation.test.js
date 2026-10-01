@@ -293,6 +293,56 @@ proofs('should fail to validate not before', async () => {
   )
 })
 
+proofs('should fail to parse invalid not before', async () => {
+  for (const nbf of [1.5, 2 ** 53, -(2 ** 53)]) {
+    await assert.rejects(
+      Delegation.create({
+        iss: owner,
+        aud: invoker.did,
+        sub: owner.did,
+        pol: [],
+        cmd: '/account/create',
+        nbf,
+      }),
+      {
+        name: 'TypeError',
+        message: `UCAN nbf must be a safe integer. Received: ${nbf}`,
+      }
+    )
+
+    // Signed directly, as a peer that skips the issuer-side checks would
+    const { signature, signaturePayload } = await Envelope.sign({
+      spec: 'dlg',
+      signer: owner,
+      payload: {
+        iss: owner.toString(),
+        aud: invoker.did,
+        sub: owner.did,
+        pol: [],
+        cmd: '/account/create',
+        nonce: randomBytes(12),
+        exp: null,
+        nbf,
+      },
+    })
+    const bytes = Envelope.encode({ signature, signaturePayload })
+    await assert.rejects(Delegation.from({ bytes, verifierResolver }), {
+      name: 'TypeError',
+      message: `UCAN nbf must be a safe integer. Received: ${nbf}`,
+    })
+  }
+
+  const delegation = await Delegation.create({
+    iss: owner,
+    aud: invoker.did,
+    sub: owner.did,
+    pol: [],
+    cmd: '/account/create',
+    nbf: nowInSeconds() - 1000,
+  })
+  await delegation.validate({ verifierResolver })
+})
+
 proofs(
   'should fail to validate issuer and signature alg mismatch',
   async () => {

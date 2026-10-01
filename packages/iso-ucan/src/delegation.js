@@ -10,6 +10,7 @@ import {
   assertNonce,
   assertNotBefore,
   assertNotRevoked,
+  assertTimestamp,
   cid,
   expOrTtl,
   verifySignature,
@@ -235,6 +236,7 @@ function assertStructure(payload, now) {
 
   assertIsValidCommand(payload.cmd)
   assertExpiration(payload.exp, now)
+  assertTimestamp(payload.nbf, 'nbf')
   assertNonce(payload.nonce)
 
   // assertPolicy(payload.pol)

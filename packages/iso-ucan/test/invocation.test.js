@@ -833,3 +833,197 @@ for (const { root, child, ok } of delegationCmdCases) {
     }
   )
 }
+
+/**
+ * Decode a self-issued invocation from alice, forged with `fields`.
+ *
+ * @param {Record<string, unknown>} fields
+ * @param {number} [now]
+ */
+async function fromSelfIssued(fields, now) {
+  const bytes = await forgeInvocation({
+    iss: mocks.alice,
+    sub: mocks.alice.did,
+    cmd: '/x',
+    prf: [],
+    fields,
+  })
+  return await Invocation.from({
+    bytes,
+    now,
+    verifierResolver: mocks.verifierResolver,
+    resolveProof: () => Promise.reject(new Error('no proofs expected')),
+  })
+}
+
+inv('should check the invocation exp against now', async () => {
+  const invocation = await Invocation.create({
+    iss: mocks.alice,
+    sub: mocks.alice.did,
+    cmd: '/x',
+    args: {},
+    prf: [],
+    exp: 1000,
+    now: 500,
+    verifierResolver: mocks.verifierResolver,
+  })
+  /** @param {number} [now] */
+  const from = (now) =>
+    Invocation.from({
+      bytes: invocation.bytes,
+      now,
+      verifierResolver: mocks.verifierResolver,
+      resolveProof: () => Promise.reject(new Error('no proofs expected')),
+    })
+
+  await from(500)
+  await from(1000)
+  await assert.rejects(from(1001), {
+    message:
+      'UCAN expiration must be in the future. Received: 1000 but current time is 1001',
+  })
+  await assert.rejects(from(), /UCAN expiration must be in the future/)
+  await assert.rejects(
+    Invocation.create({
+      iss: mocks.alice,
+      sub: mocks.alice.did,
+      cmd: '/x',
+      args: {},
+      prf: [],
+      exp: 1000,
+      now: 1001,
+      verifierResolver: mocks.verifierResolver,
+    }),
+    /UCAN expiration must be in the future/
+  )
+})
+
+inv(
+  'should reject an invocation expired at now when the wall clock is earlier',
+  async () => {
+    const exp = nowInSeconds() + 60
+    await fromSelfIssued({ exp })
+    await assert.rejects(
+      fromSelfIssued({ exp }, exp + 1),
+      /UCAN expiration must be in the future/
+    )
+  }
+)
+
+inv('should omit empty meta', async () => {
+  const invocation = await Invocation.create({
+    iss: mocks.alice,
+    sub: mocks.alice.did,
+    cmd: '/x',
+    args: {},
+    prf: [],
+    meta: {},
+    verifierResolver: mocks.verifierResolver,
+  })
+  assert.equal('meta' in invocation.payload, false)
+
+  const withMeta = await Invocation.create({
+    iss: mocks.alice,
+    sub: mocks.alice.did,
+    cmd: '/x',
+    args: {},
+    prf: [],
+    meta: { a: 1 },
+    verifierResolver: mocks.verifierResolver,
+  })
+  assert.deepEqual(withMeta.payload.meta, { a: 1 })
+  await fromSelfIssued({ meta: { a: 1 } })
+})
+
+inv('should fail to decode empty or null meta', async () => {
+  const message =
+    'UCAN Invocation meta must be a non-empty map, omit it when empty'
+  await assert.rejects(fromSelfIssued({ meta: {} }), {
+    name: 'TypeError',
+    message,
+  })
+  await assert.rejects(fromSelfIssued({ meta: null }), {
+    name: 'TypeError',
+    message,
+  })
+})
+
+inv('should require prf on decode', async () => {
+  const message = 'UCAN Invocation prf must be an array of CIDs'
+  await assert.rejects(fromSelfIssued({ prf: undefined }), {
+    name: 'TypeError',
+    message,
+  })
+  await assert.rejects(fromSelfIssued({ prf: null }), {
+    name: 'TypeError',
+    message,
+  })
+  await assert.rejects(fromSelfIssued({ prf: ['bafy'] }), {
+    name: 'TypeError',
+    message,
+  })
+
+  const invocation = await fromSelfIssued({ prf: [] })
+  assert.deepEqual(invocation.payload.prf, [])
+})
+
+inv('should validate iat as a safe integer', async () => {
+  for (const iat of ['x', 1.5, 2 ** 53, null]) {
+    await assert.rejects(
+      fromSelfIssued({ iat }),
+      {
+        name: 'TypeError',
+        message: `UCAN iat must be a safe integer. Received: ${iat}`,
+      },
+      `iat: ${iat}`
+    )
+  }
+  await assert.rejects(
+    Invocation.create({
+      iss: mocks.alice,
+      sub: mocks.alice.did,
+      cmd: '/x',
+      args: {},
+      prf: [],
+      iat: 1.5,
+      verifierResolver: mocks.verifierResolver,
+    }),
+    /UCAN iat must be a safe integer/
+  )
+
+  const iat = nowInSeconds()
+  const decoded = await fromSelfIssued({ iat })
+  assert.equal(decoded.payload.iat, iat)
+
+  const created = await Invocation.create({
+    iss: mocks.alice,
+    sub: mocks.alice.did,
+    cmd: '/x',
+    args: {},
+    prf: [],
+    iat: 0,
+    verifierResolver: mocks.verifierResolver,
+  })
+  assert.equal(created.payload.iat, 0)
+})
+
+inv('should not emit nbf', async () => {
+  const invocation = await Invocation.create({
+    iss: mocks.alice,
+    sub: mocks.alice.did,
+    cmd: '/x',
+    args: {},
+    prf: [],
+    // @ts-expect-error - nbf is not an invocation field
+    nbf: nowInSeconds() + 1000,
+    verifierResolver: mocks.verifierResolver,
+  })
+  assert.equal('nbf' in invocation.payload, false)
+})
+
+inv('should fail to decode nbf', async () => {
+  await assert.rejects(fromSelfIssued({ nbf: nowInSeconds() }), {
+    name: 'TypeError',
+    message: 'UCAN Invocation must not have nbf',
+  })
+})
