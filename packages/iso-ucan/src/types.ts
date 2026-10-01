@@ -123,14 +123,22 @@ export interface InvocationOptions extends DelegationValidateOptions {
    * Issued at time in seconds
    */
   iat?: number
-  nbf?: number
   nonce?: Uint8Array
   cause?: CID
+  /**
+   * Metadata, omitted from the payload when empty
+   */
   meta?: CborObject
 }
 
 export interface InvocationFromOptions extends DelegationValidateOptions {
   bytes: Uint8Array
+  /**
+   * The current time in seconds, used for the invocation's own `exp`, the time
+   * bounds of its proofs and `maxTtl`. Mostly used for testing.
+   * @default Math.floor(Date.now() / 1000)
+   */
+  now?: number
   audience?: VerifiableDID
   resolveProof: ResolveProof
   /**

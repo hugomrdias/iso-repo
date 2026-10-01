@@ -3,12 +3,63 @@ import { isObject } from './utils.js'
 import * as varsig from './varsig.js'
 
 /**
- * @import { Envelope, PayloadTag, EnvelopeDecodeOptions, EnvelopeEncodeOptions, EnvelopeSignOptions, SignaturePayload, PayloadSpec, DecodedEnvelope, DelegationPayload, InvocationPayload, Payload} from './types.js'
- * @import { ByteView } from 'multiformats'
+ * @import { PayloadTag, EnvelopeDecodeOptions, EnvelopeEncodeOptions, EnvelopeSignOptions, SignaturePayload, PayloadSpec, DecodedEnvelope, DelegationPayload, InvocationPayload, Payload} from './types.js'
  */
 
-/** Version */
-export const VERSION = '1.0.0-rc.1'
+/**
+ * Payload tag version used for new tokens (`ucan/dlg@1.0.0`, `ucan/inv@1.0.0`)
+ *
+ * @see https://github.com/ucan-wg/delegation#type-tag
+ * @see https://github.com/ucan-wg/invocation#type-tag
+ */
+export const VERSION = '1.0.0'
+
+/**
+ * Payload tag versions accepted on decode.
+ *
+ * `1.0.0-rc.1` is still accepted so tokens issued by iso-ucan <= 1.0.0 keep
+ * verifying. New tokens are always encoded with {@link VERSION}.
+ *
+ * @type {readonly string[]}
+ */
+export const SUPPORTED_VERSIONS = Object.freeze([VERSION, '1.0.0-rc.1'])
+
+/**
+ * Payload specs
+ *
+ * @type {readonly PayloadSpec[]}
+ */
+export const SPECS = Object.freeze(/** @type {const} */ (['dlg', 'inv']))
+
+const PAYLOAD_TAG_REGEX = /^ucan\/([^@/]+)@(.+)$/
+
+/**
+ * Parse and validate a payload tag (`ucan/<spec>@<version>`)
+ *
+ * @param {string} tag
+ */
+export function parsePayloadTag(tag) {
+  const match = PAYLOAD_TAG_REGEX.exec(tag)
+  if (!match) {
+    throw new TypeError(
+      `Invalid payload tag "${tag}" expected "ucan/<spec>@<version>"`
+    )
+  }
+  const spec = /** @type {PayloadSpec} */ (match[1])
+  const version = match[2]
+  if (!SPECS.includes(spec)) {
+    throw new TypeError(
+      `Unsupported payload tag spec "${spec}" in "${tag}" expected one of: ${SPECS.join(', ')}`
+    )
+  }
+  if (!SUPPORTED_VERSIONS.includes(version)) {
+    throw new TypeError(
+      `Unsupported payload tag version "${version}" in "${tag}" expected one of: ${SUPPORTED_VERSIONS.join(', ')}`
+    )
+  }
+
+  return { tag: /** @type {PayloadTag} */ (tag), spec, version }
+}
 
 /**
  * Get the signature payload for a given payload
@@ -22,7 +73,7 @@ export const VERSION = '1.0.0-rc.1'
 export function getSignaturePayload(options) {
   const { spec, version, signatureType, payload } = options
 
-  const payloadTag = /** @type {PayloadTag} */ (
+  const { tag: payloadTag } = parsePayloadTag(
     `ucan/${spec}@${version ?? VERSION}`
   )
 
@@ -37,42 +88,68 @@ export function getSignaturePayload(options) {
 }
 
 /**
- * Decode a signature payload
+ * Validate a decoded signature payload (`{ h, "ucan/<spec>@<version>": payload }`)
+ *
+ * @see https://github.com/ucan-wg/spec#envelope
+ * @param {unknown} sigPayload
+ */
+function parseSignaturePayload(sigPayload) {
+  if (!isObject(sigPayload)) {
+    throw new TypeError(
+      `Invalid signature payload expected object got ${Array.isArray(sigPayload) ? 'array' : typeof sigPayload}`
+    )
+  }
+  const keys = Object.keys(sigPayload)
+  if (keys.length !== 2) {
+    throw new TypeError(
+      `Invalid signature payload expected 2 keys (h and payload tag) got ${keys.length}: ${keys.join(', ')}`
+    )
+  }
+  if (!keys.includes('h')) {
+    throw new TypeError('Invalid signature payload missing h')
+  }
+  const { tag, spec, version } = parsePayloadTag(
+    /** @type {string} */ (keys.find((key) => key !== 'h'))
+  )
+  // DAG-CBOR sorts map keys by length first, so `h` must be the first key.
+  if (keys[0] !== 'h') {
+    throw new TypeError(
+      'Invalid signature payload keys are not in canonical DAG-CBOR order'
+    )
+  }
+
+  const header = sigPayload.h
+  if (!(header instanceof Uint8Array)) {
+    throw new TypeError('Invalid signature payload h expected bytes')
+  }
+  const { alg, enc } = varsig.decode(header)
+  if (enc !== 'DAG-CBOR') {
+    throw new TypeError(
+      `Unsupported varsig payload encoding ${enc} expected DAG-CBOR`
+    )
+  }
+
+  const payload = sigPayload[tag]
+  if (!isObject(payload)) {
+    throw new TypeError(`Invalid signature payload ${tag} expected object`)
+  }
+
+  return {
+    alg,
+    enc,
+    spec,
+    version,
+    payload: /** @type {Payload} */ (/** @type {unknown} */ (payload)),
+  }
+}
+
+/**
+ * Decode and validate a signature payload
  *
  * @param {Uint8Array} bytes
  */
 export function decodeSignaturePayload(bytes) {
-  const decode = /** @type typeof cbor.decode<SignaturePayload> **/ (
-    cbor.decode
-  )
-  const decoded = decode(bytes)
-
-  if (!isObject(decoded)) {
-    throw new TypeError(
-      `Invalid signature payload expected object got ${typeof decoded}`
-    )
-  }
-  if (!('h' in decoded)) {
-    throw new TypeError('Invalid signature payload missing h')
-  }
-  const keys = Object.keys(decoded)
-  if (keys.length !== 2) {
-    throw new TypeError(
-      `Invalid signature payload expected 2 keys got ${keys.length}`
-    )
-  }
-  if (!keys[1].startsWith('ucan/dlg') && !keys[1].startsWith('ucan/inv')) {
-    throw new TypeError('Invalid signature payload missing payload')
-  }
-
-  const payloadTag = /** @type {PayloadTag} */ (keys[1])
-  const { alg, enc } = varsig.decode(decoded.h)
-  const payload = decoded[payloadTag]
-  return {
-    alg,
-    enc,
-    payload,
-  }
+  return parseSignaturePayload(cbor.decode(bytes))
 }
 
 /**
@@ -141,20 +218,20 @@ export function encode(options) {
 export function decode(options) {
   const { envelope } = options
 
-  const decoded = /** @type typeof cbor.decode<Envelope> **/ (cbor.decode)(
-    /** @type {ByteView<Envelope>} */ (envelope)
-  )
+  const decoded = cbor.decode(envelope)
+
+  if (!Array.isArray(decoded) || decoded.length !== 2) {
+    throw new TypeError(
+      `Invalid envelope expected array of 2 elements [signature, signature payload] got ${Array.isArray(decoded) ? `array of ${decoded.length} elements` : typeof decoded}`
+    )
+  }
 
   const [signature, sigPayload] = decoded
-  const [_h, payloadTag] = Object.keys(sigPayload)
-  const header = sigPayload.h
-  /** @type {DelegationPayload | InvocationPayload} */
-  const payload = sigPayload[/** @type {PayloadTag} */ (payloadTag)]
+  if (!(signature instanceof Uint8Array)) {
+    throw new TypeError('Invalid envelope signature expected bytes')
+  }
 
-  const [_ucan, specVersion] = payloadTag.split('/')
-  const [spec, version] = specVersion.split('@')
-
-  const { alg, enc } = varsig.decode(header)
+  const { alg, enc, spec, version, payload } = parseSignaturePayload(sigPayload)
 
   return {
     alg,

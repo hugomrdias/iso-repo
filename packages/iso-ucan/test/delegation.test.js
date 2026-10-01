@@ -1,3 +1,4 @@
+import { base64 } from 'iso-base/rfc4648'
 import { EdDSASigner } from 'iso-signatures/signers/eddsa.js'
 import { ES256KSigner } from 'iso-signatures/signers/es256k.js'
 import { verify } from 'iso-signatures/verifiers/eddsa.js'
@@ -292,6 +293,56 @@ proofs('should fail to validate not before', async () => {
   )
 })
 
+proofs('should fail to parse invalid not before', async () => {
+  for (const nbf of [1.5, 2 ** 53, -(2 ** 53)]) {
+    await assert.rejects(
+      Delegation.create({
+        iss: owner,
+        aud: invoker.did,
+        sub: owner.did,
+        pol: [],
+        cmd: '/account/create',
+        nbf,
+      }),
+      {
+        name: 'TypeError',
+        message: `UCAN nbf must be a safe integer. Received: ${nbf}`,
+      }
+    )
+
+    // Signed directly, as a peer that skips the issuer-side checks would
+    const { signature, signaturePayload } = await Envelope.sign({
+      spec: 'dlg',
+      signer: owner,
+      payload: {
+        iss: owner.toString(),
+        aud: invoker.did,
+        sub: owner.did,
+        pol: [],
+        cmd: '/account/create',
+        nonce: randomBytes(12),
+        exp: null,
+        nbf,
+      },
+    })
+    const bytes = Envelope.encode({ signature, signaturePayload })
+    await assert.rejects(Delegation.from({ bytes, verifierResolver }), {
+      name: 'TypeError',
+      message: `UCAN nbf must be a safe integer. Received: ${nbf}`,
+    })
+  }
+
+  const delegation = await Delegation.create({
+    iss: owner,
+    aud: invoker.did,
+    sub: owner.did,
+    pol: [],
+    cmd: '/account/create',
+    nbf: nowInSeconds() - 1000,
+  })
+  await delegation.validate({ verifierResolver })
+})
+
 proofs(
   'should fail to validate issuer and signature alg mismatch',
   async () => {
@@ -404,4 +455,45 @@ proofs('should fail to validate if revoked', async () => {
       message: 'UCAN revoked',
     }
   )
+})
+
+proofs('should reject non-canonical bytes', async () => {
+  const delegation = await Delegation.create({
+    iss: owner,
+    aud: invoker.did,
+    sub: owner.did,
+    pol: [],
+    cmd: '/account/create',
+    meta: { x: 1.5 },
+  })
+  // Same envelope with `1.5` as a float16 instead of the canonical float64
+  const float64 = [0xfb, 0x3f, 0xf8, 0, 0, 0, 0, 0, 0]
+  const at = delegation.bytes.findIndex((_, i) =>
+    float64.every((b, j) => delegation.bytes[i + j] === b)
+  )
+  assert.ok(at > 0)
+  const bytes = new Uint8Array([
+    ...delegation.bytes.subarray(0, at),
+    0xf9,
+    0x3e,
+    0x00,
+    ...delegation.bytes.subarray(at + float64.length),
+  ])
+
+  const message =
+    'UCAN envelope is not canonical DAG-CBOR, re-encoding does not match the received bytes'
+  await assert.rejects(Delegation.from({ bytes, verifierResolver }), {
+    name: 'TypeError',
+    message,
+  })
+  await assert.rejects(Delegation.fromString(base64.encode(bytes)), {
+    name: 'TypeError',
+    message,
+  })
+
+  const decoded = await Delegation.from({
+    bytes: delegation.bytes,
+    verifierResolver,
+  })
+  assert.ok(decoded.cid.equals(delegation.cid))
 })

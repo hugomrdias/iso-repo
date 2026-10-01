@@ -96,7 +96,6 @@ function getPreset(bytes, presets) {
 }
 
 /**
-/**
  * Decode varsig header
  *
  * @param {Uint8Array} buf
@@ -119,39 +118,51 @@ export function decode(buf) {
   }
   const [code] = varint.decode(buf, 2)
 
+  /** @type {import('./types.js').DecodeOutput} */
+  let output
   switch (SIG_PREFIX[code]) {
     case 'RSA': {
-      return {
+      output = {
         alg: getPreset(bytes.readBytes(5), ['RS256']),
         enc: getEncoding(bytes.readBytes(1)),
       }
+      break
     }
     case 'EdDSA': {
-      return {
+      output = {
         alg: getPreset(bytes.readBytes(5), ['Ed25519']),
         enc: getEncoding(bytes.readBytes(1)),
       }
+      break
     }
     case 'ECDSA': {
       const isEIP191 = varint.decode(buf, 2 + 5)[0] === EIP191_ENCODING
-      if (isEIP191) {
-        return {
-          alg: getPreset(bytes.readBytes(8), ['EIP191']),
-          enc: getEncoding(bytes.readBytes(1)),
-        }
-      }
-
-      return {
-        alg: getPreset(bytes.readBytes(5), [
-          'ES256',
-          'ES256K',
-          'ES384',
-          'ES512',
-        ]),
-        enc: getEncoding(bytes.readBytes(1)),
-      }
+      output = isEIP191
+        ? {
+            alg: getPreset(bytes.readBytes(8), ['EIP191']),
+            enc: getEncoding(bytes.readBytes(1)),
+          }
+        : {
+            alg: getPreset(bytes.readBytes(5), [
+              'ES256',
+              'ES256K',
+              'ES384',
+              'ES512',
+            ]),
+            enc: getEncoding(bytes.readBytes(1)),
+          }
+      break
     }
     default:
       throw new TypeError(`Unsupported algorithm ${code}`)
   }
+
+  const trailing = buf.length - bytes.offset
+  if (trailing !== 0) {
+    throw new TypeError(
+      `Invalid varsig header ${trailing} trailing byte(s) after the payload encoding`
+    )
+  }
+
+  return output
 }
