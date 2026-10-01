@@ -6,6 +6,7 @@ import { sha256 } from 'multiformats/hashes/sha2'
 import { z } from 'zod/v4'
 
 import * as Envelope from './envelope.js'
+import { parseSelector } from './policy.js'
 import * as varsig from './varsig.js'
 
 /**
@@ -488,17 +489,32 @@ export const cborValue =
   })
 export const cborObject = z.record(z.string(), cborValue)
 
-export const selector = z.union([
-  z.literal('.'),
-  z.templateLiteral([z.literal('.'), z.string()]),
-])
+/**
+ * Policy selector, validated with {@link parseSelector}.
+ *
+ * @see https://github.com/ucan-wg/delegation#selectors
+ */
+export const selector = z.string().superRefine((value, ctx) => {
+  try {
+    parseSelector(value)
+  } catch (error) {
+    ctx.addIssue({
+      code: 'custom',
+      message: /** @type {Error} */ (error).message,
+    })
+  }
+})
 
 /**
  * @typedef {z.infer<typeof selector>} Selector
  */
 
 /**
- * Statement
+ * Statement, as defined by the spec's IPLD schema. Every statement is a tuple
+ * of exact arity. Inequality values are integers or floats; large integers
+ * decode from dag-cbor as `bigint`.
+ *
+ * @see https://github.com/ucan-wg/delegation#policy
  */
 export const statement =
   /** @type {typeof z.lazy<z.ZodType<import('../src/types.js').Statement<unknown>>>} */ (
@@ -509,7 +525,7 @@ export const statement =
       z.tuple([
         z.union([z.literal('=='), z.literal('!=')]),
         selector,
-        z.unknown(),
+        cborValue,
       ]), // Equality
       z.tuple([
         z.union([
@@ -519,14 +535,14 @@ export const statement =
           z.literal('>='),
         ]),
         selector,
-        z.number(),
+        z.union([z.number(), z.bigint()]),
       ]), // Inequality
       z.tuple([z.literal('like'), selector, z.string()]), // Like
       z.tuple([z.literal('not'), statement]),
       z.tuple([z.literal('and'), z.array(statement)]),
       z.tuple([z.literal('or'), z.array(statement)]),
-      z.tuple([z.literal('all'), z.string(), statement]),
-      z.tuple([z.literal('any'), z.string(), statement]),
+      z.tuple([z.literal('all'), selector, statement]),
+      z.tuple([z.literal('any'), selector, statement]),
     ])
   })
 

@@ -9,6 +9,7 @@ import {
   assertNonce,
   assertNotBefore,
   assertNotRevoked,
+  assertPolicy,
   cid,
   expOrTtl,
   verifySignature,
@@ -234,7 +235,7 @@ function assertStructure(payload, now) {
   assertExpiration(payload.exp, now)
   assertNonce(payload.nonce)
 
-  // assertPolicy(payload.pol)
+  assertPolicy(payload.pol)
 
   assertMeta(payload.meta)
 }

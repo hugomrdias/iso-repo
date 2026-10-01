@@ -24,7 +24,6 @@ type PathsToStringProps<T> = T extends
         | `[${number}:${number}]`
         | `[${number}:]`
         | `[:${number}]`
-        | `[:]`
         | PathsToStringProps<U>
     : T extends object
       ? {
@@ -73,7 +72,11 @@ type SelectorValue<T, S extends string> = S extends `.${infer K}`
 export type EqualityOp = '==' | '!='
 export type Equality<Args = unknown> = [EqualityOp, Selector<Args>, unknown]
 export type InequalityOp = '<' | '<=' | '>' | '>='
-export type Inequality<Args = unknown> = [InequalityOp, Selector<Args>, number]
+export type Inequality<Args = unknown> = [
+  InequalityOp,
+  Selector<Args>,
+  number | bigint,
+]
 
 export type NegateOp = 'not'
 export type Negate<Args = unknown> = [NegateOp, Statement<Args>]
