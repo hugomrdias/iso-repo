@@ -52,6 +52,29 @@ export async function cid(envelope) {
 }
 
 /**
+ * Assert that `bytes` is the canonical DAG-CBOR encoding of `envelope`.
+ *
+ * {@link cid} hashes the re-encoded envelope, and the DAG-CBOR decoder accepts
+ * some non-canonical input (e.g. unsorted map keys or short floats). Without
+ * this check, different byte strings would share a CID.
+ *
+ * @param {import('./types.js').DecodedEnvelope<PayloadSpec>} envelope
+ * @param {Uint8Array} bytes
+ */
+export function assertCanonical(envelope, bytes) {
+  const encoded = Envelope.encode({
+    signature: envelope.signature,
+    // @ts-expect-error
+    signaturePayload: signaturePayload(envelope),
+  })
+  if (!equals(encoded, bytes)) {
+    throw new TypeError(
+      'UCAN envelope is not canonical DAG-CBOR, re-encoding does not match the received bytes'
+    )
+  }
+}
+
+/**
  * Replay key of a UCAN: the CID of its signature payload, the exact bytes the
  * signature covers.
  *

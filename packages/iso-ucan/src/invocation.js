@@ -101,6 +101,13 @@ export class Invocation {
     if (iss.did !== envelope.payload.sub) {
       for (const proof of envelope.payload.prf) {
         const delegation = await options.resolveProof(proof)
+        // The signature covers the proof CIDs, so the resolved delegation
+        // must be exactly that one (not an ECDSA-equivalent re-encoding)
+        if (!delegation.cid.equals(proof)) {
+          throw new Error(
+            `UCAN Invocation proof CID mismatch, expected ${proof} but resolver returned ${delegation.cid}`
+          )
+        }
         await delegation.validate(options)
         proofs.push(delegation)
       }
