@@ -1,5 +1,6 @@
 import { parse as didParse } from 'iso-did'
 import { randomBytes } from 'iso-web/crypto'
+import { CID } from 'multiformats/cid'
 import * as Envelope from './envelope.js'
 import { validate } from './policy.js'
 import {
@@ -8,9 +9,11 @@ import {
   assertIsValidCommand,
   assertMeta,
   assertNonce,
+  assertTimestamp,
   cid,
   commandCovers,
   expOrTtl,
+  isObject,
   nowInSeconds,
   replayKey,
   verifySignature,
@@ -18,7 +21,6 @@ import {
 
 /**
  * @import {Delegation} from './delegation.js'
- * @import {CID} from 'multiformats'
  */
 
 /**
@@ -87,7 +89,7 @@ export class Invocation {
       )
     }
 
-    assertStructure(envelope.payload)
+    assertStructure(envelope.payload, options.now)
     await verifySignature(
       envelope,
       options.verifierResolver,
@@ -101,6 +103,13 @@ export class Invocation {
     if (iss.did !== envelope.payload.sub) {
       for (const proof of envelope.payload.prf) {
         const delegation = await options.resolveProof(proof)
+        // The signature covers the proof CIDs, so the resolved delegation
+        // must be exactly that one (not an ECDSA-equivalent re-encoding)
+        if (!delegation.cid.equals(proof)) {
+          throw new Error(
+            `UCAN Invocation proof CID mismatch, expected ${proof} but resolver returned ${delegation.cid}`
+          )
+        }
         await delegation.validate(options)
         proofs.push(delegation)
       }
@@ -151,17 +160,15 @@ export class Invocation {
     if (options.cause) {
       payload.cause = options.cause
     }
-    if (options.meta) {
+    // `meta` MUST be omitted when empty
+    if (options.meta && Object.keys(options.meta).length > 0) {
       payload.meta = options.meta
     }
-    if (options.iat) {
+    if (options.iat !== undefined) {
       payload.iat = options.iat
     }
-    if (options.nbf) {
-      payload.nbf = options.nbf
-    }
 
-    assertStructure(payload)
+    assertStructure(payload, options.now)
 
     if (options.iss.did !== options.sub) {
       for (const proof of options.prf) {
@@ -219,8 +226,9 @@ function assertMaxTtl(exp, maxTtl, now = nowInSeconds()) {
 
 /**
  * @param {import('./types.js').InvocationPayload} payload
+ * @param {number} [now]
  */
-function assertStructure(payload) {
+function assertStructure(payload, now) {
   didParse(payload.iss)
   didParse(payload.sub)
 
@@ -237,8 +245,29 @@ function assertStructure(payload) {
   assertIsValidCommand(payload.cmd)
   assertArgs(payload.args)
   assertMeta(payload.meta)
+  // Spec: `meta` MUST be a non-empty map, and omitted when empty
+  if (
+    payload.meta !== undefined &&
+    (!isObject(payload.meta) || Object.keys(payload.meta).length === 0)
+  ) {
+    throw new TypeError(
+      'UCAN Invocation meta must be a non-empty map, omit it when empty'
+    )
+  }
   assertNonce(payload.nonce)
-  assertExpiration(payload.exp)
+  assertExpiration(payload.exp, now)
+  assertTimestamp(payload.iat, 'iat')
+  // `nbf` is a delegation field, an invoker could wrongly expect it to delay execution
+  if ('nbf' in payload) {
+    throw new TypeError('UCAN Invocation must not have nbf')
+  }
+  // `prf` is required, even when empty for a self-issued invocation
+  if (
+    !Array.isArray(payload.prf) ||
+    !payload.prf.every((proof) => CID.asCID(proof) !== null)
+  ) {
+    throw new TypeError('UCAN Invocation prf must be an array of CIDs')
+  }
 }
 
 /**

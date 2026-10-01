@@ -3,12 +3,14 @@ import { parse as didParse } from 'iso-did'
 import { randomBytes } from 'iso-web/crypto'
 import * as Envelope from './envelope.js'
 import {
+  assertCanonical,
   assertExpiration,
   assertIsValidCommand,
   assertMeta,
   assertNonce,
   assertNotBefore,
   assertNotRevoked,
+  assertTimestamp,
   cid,
   expOrTtl,
   verifySignature,
@@ -84,6 +86,7 @@ export class Delegation {
       )
     }
 
+    assertCanonical(envelope, bytes)
     assertStructure(envelope.payload, options.now)
 
     await verifySignature(envelope, verifierResolver, didResolveOptions)
@@ -112,6 +115,7 @@ export class Delegation {
       )
     }
 
+    assertCanonical(envelope, bytes)
     assertStructure(envelope.payload, options.now)
     const _cid = await cid(envelope)
     return new Delegation(envelope, bytes, _cid)
@@ -232,6 +236,7 @@ function assertStructure(payload, now) {
 
   assertIsValidCommand(payload.cmd)
   assertExpiration(payload.exp, now)
+  assertTimestamp(payload.nbf, 'nbf')
   assertNonce(payload.nonce)
 
   // assertPolicy(payload.pol)

@@ -52,6 +52,29 @@ export async function cid(envelope) {
 }
 
 /**
+ * Assert that `bytes` is the canonical DAG-CBOR encoding of `envelope`.
+ *
+ * {@link cid} hashes the re-encoded envelope, and the DAG-CBOR decoder accepts
+ * some non-canonical input (e.g. unsorted map keys or short floats). Without
+ * this check, different byte strings would share a CID.
+ *
+ * @param {import('./types.js').DecodedEnvelope<PayloadSpec>} envelope
+ * @param {Uint8Array} bytes
+ */
+export function assertCanonical(envelope, bytes) {
+  const encoded = Envelope.encode({
+    signature: envelope.signature,
+    // @ts-expect-error
+    signaturePayload: signaturePayload(envelope),
+  })
+  if (!equals(encoded, bytes)) {
+    throw new TypeError(
+      'UCAN envelope is not canonical DAG-CBOR, re-encoding does not match the received bytes'
+    )
+  }
+}
+
+/**
  * Replay key of a UCAN: the CID of its signature payload, the exact bytes the
  * signature covers.
  *
@@ -125,13 +148,28 @@ export function assertExpiration(exp, now = nowInSeconds()) {
 }
 
 /**
+ * Validate an optional UCAN timestamp (e.g. `nbf` or `iat`): when present it
+ * must be an integer number of seconds within ±(2^53 − 1).
+ *
+ * @param {unknown} value
+ * @param {string} name - Field name used in the error message
+ */
+export function assertTimestamp(value, name) {
+  if (value !== undefined && !Number.isSafeInteger(value)) {
+    throw new TypeError(
+      `UCAN ${name} must be a safe integer. Received: ${value}`
+    )
+  }
+}
+
+/**
  * Validate the not before time of a UCAN
  *
  * @param {number} [nbf]
  * @param {number} [now]
  */
 export function assertNotBefore(nbf, now = nowInSeconds()) {
-  if (nbf && nbf > now) {
+  if (nbf !== undefined && nbf > now) {
     throw new Error('UCAN not valid yet')
   }
 }

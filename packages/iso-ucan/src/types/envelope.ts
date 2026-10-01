@@ -41,10 +41,6 @@ export interface PayloadBase {
    * Expiration UTC Unix Timestamp in seconds (valid until)
    */
   exp: number | null
-  /**
-   * "Not before" UTC Unix Timestamp in seconds (valid from)
-   */
-  nbf?: number
 }
 
 /**
@@ -83,6 +79,10 @@ export interface DelegationPayload<Args = unknown> extends PayloadBase {
    */
   sub: DID | null
   pol: Policy<Args>
+  /**
+   * "Not before" UTC Unix Timestamp in seconds (valid from)
+   */
+  nbf?: number
 }
 
 export type Payload<Args = unknown> =
