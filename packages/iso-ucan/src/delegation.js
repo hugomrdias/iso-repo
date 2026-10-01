@@ -10,6 +10,7 @@ import {
   assertNonce,
   assertNotBefore,
   assertNotRevoked,
+  assertPolicy,
   assertTimestamp,
   cid,
   expOrTtl,
@@ -239,7 +240,7 @@ function assertStructure(payload, now) {
   assertTimestamp(payload.nbf, 'nbf')
   assertNonce(payload.nonce)
 
-  // assertPolicy(payload.pol)
+  assertPolicy(payload.pol)
 
   assertMeta(payload.meta)
 }
