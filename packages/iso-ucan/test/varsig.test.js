@@ -158,3 +158,34 @@ test('EIP191+DAG-CBOR', () => {
   assert.deepEqual(decoded.alg, 'EIP191')
   assert.deepEqual(decoded.enc, 'DAG-CBOR')
 })
+
+test('should reject trailing bytes after the header', () => {
+  const header = encode({ alg: 'Ed25519', enc: 'DAG-CBOR' })
+  assert.deepEqual(decode(header), { alg: 'Ed25519', enc: 'DAG-CBOR' })
+
+  assert.throws(
+    () => decode(Uint8Array.from([...header, 0x00])),
+    /TypeError: Invalid varsig header 1 trailing byte\(s\)/
+  )
+  assert.throws(
+    () =>
+      decode(
+        Uint8Array.from([
+          ...encode({ alg: 'EIP191', enc: 'DAG-CBOR' }),
+          0x71,
+          0x71,
+        ])
+      ),
+    /TypeError: Invalid varsig header 2 trailing byte\(s\)/
+  )
+})
+
+test('should decode a header from a subarray', () => {
+  const header = encode({ alg: 'ES256', enc: 'DAG-CBOR' })
+  const buf = Uint8Array.from([0xff, ...header, 0xff])
+
+  assert.deepEqual(decode(buf.subarray(1, header.length + 1)), {
+    alg: 'ES256',
+    enc: 'DAG-CBOR',
+  })
+})

@@ -1,4 +1,5 @@
-import { base64 as base64pad } from 'iso-base/rfc4648'
+// Upstream vectors mix padded and unpadded base64, `base64` decodes both
+import { base64 } from 'iso-base/rfc4648'
 import { assert, suite } from 'playwright-test/taps'
 import { Delegation } from '../src/delegation.js'
 import { Invocation } from '../src/invocation.js'
@@ -8,7 +9,7 @@ import * as mocks from './mocks.js'
 const InvalidErrorMap: Record<string, string> = {
   'no proof': 'UCAN Invocation proofs are required',
   'missing proof':
-    'Delegation not found: bafyreibqr4bgivt4bb7mdst2ksbuaqyj7oslnomfeyznfo7crl6dlsaoni',
+    'Delegation not found: bafyreidyjy36xsnbklgotghkc2igi3ri4w3h5o7d6it3jkbexewc223zbe',
   'expired proof': 'UCAN expiration must be in the future.',
   'inactive proof': 'UCAN not valid yet',
   'proof principal alignment': 'UCAN Invocation principal alignment mismatch',
@@ -32,15 +33,18 @@ for (const fixture of data.valid) {
       const delegation = await Delegation.fromString(proof['/'].bytes)
       await delegation.validate({
         verifierResolver: mocks.verifierResolver,
+        now: fixture.time,
       })
       await mocks.defaultStore.add([delegation])
     }
     try {
-      await Invocation.from({
-        bytes: base64pad.decode(fixture.invocation['/'].bytes),
+      const invocation = await Invocation.from({
+        bytes: base64.decode(fixture.invocation['/'].bytes),
         verifierResolver: mocks.verifierResolver,
         resolveProof: (cid) => mocks.defaultStore.resolveProof(cid),
+        now: fixture.time,
       })
+      assert.equal(invocation.envelope.version, data.version)
     } catch (error) {
       assert.fail((error as Error).message)
     }
@@ -63,7 +67,7 @@ for (const fixture of data.invalid) {
           store.add([delegation])
         }
         await Invocation.from({
-          bytes: base64pad.decode(bytes),
+          bytes: base64.decode(bytes),
           verifierResolver: mocks.verifierResolver,
           resolveProof: (cid) => store.resolveProof(cid),
           now: fixture.time,
