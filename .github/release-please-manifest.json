@@ -4,7 +4,7 @@
   "packages/iso-did": "3.0.0",
   "packages/iso-signatures": "0.6.0",
   "packages/iso-web": "4.0.0",
-  "packages/iso-kv": "3.2.0",
+  "packages/iso-kv": "4.0.0",
   "packages/iso-websocket": "0.5.1",
   "packages/iso-ucan": "2.0.0",
   "packages/iso-ledger": "0.1.7",
