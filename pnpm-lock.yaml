@@ -567,15 +567,15 @@ importers:
 
   packages/iso-kv:
     dependencies:
-      conf:
-        specifier: ^15.1.0
-        version: 15.1.0
       idb-keyval:
         specifier: ^6.3.0
         version: 6.3.0
       iso-base:
         specifier: workspace:^
         version: link:../iso-base
+      iso-conf:
+        specifier: workspace:^
+        version: link:../iso-conf
       kysely:
         specifier: ^0.29.6
         version: 0.29.6

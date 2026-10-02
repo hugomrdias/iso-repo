@@ -1,5 +1,4 @@
-import Conf from 'conf'
-import { parse, stringify } from 'iso-base/json'
+import { Conf } from 'iso-conf'
 
 /**
  * @typedef {import('../types.js').DriverSync} DriverSync
@@ -11,13 +10,11 @@ import { parse, stringify } from 'iso-base/json'
  */
 export class FileDriver {
   /**
-   * @param {import('conf').Options<Record<string, unknown>>} [config]
+   * @param {Omit<import('iso-conf/types').Options, 'schema' | 'accessPropertiesByDotNotation'>} [config]
    */
   constructor(config = {}) {
     this.conf = new Conf({
       ...config,
-      serialize: (value) => stringify(value),
-      deserialize: (value) => parse(value),
       accessPropertiesByDotNotation: false,
     })
   }
@@ -55,9 +52,7 @@ export class FileDriver {
    * @returns {IterableIterator<[string, unknown]>}
    */
   *[Symbol.iterator]() {
-    const data = [...new Map(Object.entries(this.conf.store))].sort(
-      ([k1], [k2]) => k1.localeCompare(k2)
-    )
+    const data = [...this.conf].sort(([k1], [k2]) => k1.localeCompare(k2))
 
     for (const [key, value] of data) {
       yield [key, value]
