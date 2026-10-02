@@ -50,9 +50,9 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
   },
   "dependencies": {
-    "conf": "^15.1.0",
     "idb-keyval": "^6.3.0",
     "iso-base": "workspace:^",
+    "iso-conf": "workspace:^",
     "kysely": "^0.29.6"
   },
   "devDependencies": {

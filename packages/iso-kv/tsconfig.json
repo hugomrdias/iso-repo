@@ -7,6 +7,9 @@
   "references": [
     {
       "path": "../iso-base"
+    },
+    {
+      "path": "../iso-conf"
     }
   ],
   "include": ["src", "scripts", "test", "package.json"],
