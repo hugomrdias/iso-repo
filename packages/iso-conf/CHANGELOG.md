@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.4.1...iso-conf-v0.4.2) (2026-10-02)
+
+
+### Bug Fixes
+
+* **iso-conf:** write config atomically without installing signal handlers ([#657](https://github.com/hugomrdias/iso-repo/issues/657)) ([93f1015](https://github.com/hugomrdias/iso-repo/commit/93f1015e81dfa191383d7ed77e86f73a933c2521)), closes [#656](https://github.com/hugomrdias/iso-repo/issues/656)
+
 ## [0.4.1](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.4.0...iso-conf-v0.4.1) (2026-09-27)
 
 
