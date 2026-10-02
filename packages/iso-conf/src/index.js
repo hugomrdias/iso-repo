@@ -3,10 +3,10 @@ import path from 'node:path'
 import process from 'node:process'
 import { isDeepStrictEqual } from 'node:util'
 import { getDotPath, SchemaError } from '@standard-schema/utils'
-import { writeFileSync as atomicWriteFileSync } from 'atomically'
 import { deleteProperty, getProperty, hasProperty, setProperty } from 'dot-prop'
 import envPaths from 'env-paths'
 import { parse, stringify } from 'iso-base/json'
+import { writeFileAtomicSync } from './write-file-atomic.js'
 
 /**
  * @import {StandardSchemaV1} from '@standard-schema/spec'
@@ -35,7 +35,7 @@ const createPlainObject = () => /** @type {T} */ (Object.create(null))
 // any combination of spaces and punctuation characters
 // thanks to http://stackoverflow.com/a/25575009
 var wordSeparators =
-  /[\s\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]+/
+  /[\s\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]+/
 var capital_plus_lower = /[A-ZÀ-Ý\u00C0-\u00D6\u00D9-\u00DD][a-zà-ÿ]/g
 var capitals = /[A-ZÀ-Ý\u00C0-\u00D6\u00D9-\u00DD]+/g
 
@@ -721,20 +721,7 @@ export class Conf {
       return
     }
 
-    try {
-      atomicWriteFileSync(this.path, data, {
-        mode: this.#options.configFileMode,
-      })
-    } catch (error) {
-      if (/** @type {NodeJS.ErrnoException} */ (error).code === 'EXDEV') {
-        fs.writeFileSync(this.path, data, {
-          mode: this.#options.configFileMode,
-        })
-        return
-      }
-
-      throw error
-    }
+    writeFileAtomicSync(this.path, data, this.#options.configFileMode)
   }
 
   /**

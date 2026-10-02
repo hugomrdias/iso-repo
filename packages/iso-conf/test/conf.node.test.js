@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { EventEmitter } from 'node:events'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { setTimeout as sleep } from 'node:timers/promises'
+import { pathToFileURL } from 'node:url'
 import envPaths from 'env-paths'
 import { suite } from 'playwright-test/taps'
 import { z } from 'zod'
@@ -882,6 +884,181 @@ writeTest('uses configFileMode when set', () => {
   config.set('foo', 33)
 
   assert.equal(fs.statSync(config.path).mode & 0o777, 0o640)
+})
+
+writeTest('leaves no temporary file behind', () => {
+  const config = createConf()
+  config.set('foo', 33)
+  config.set('foo', 34)
+
+  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+})
+
+writeTest('removes the temporary file when the write fails', () => {
+  const config = createConf()
+  fs.rmSync(config.path)
+  fs.mkdirSync(config.path)
+
+  assert.throws(() => {
+    config.store = { foo: 33 }
+  })
+  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+  assert.equal(fs.statSync(config.path).isDirectory(), true)
+})
+
+writeTest(
+  'writes through a symlinked config file',
+  () => {
+    const directory = temporaryDirectory()
+    const target = path.join(directory, 'target.json')
+    fs.writeFileSync(target, '{}')
+    fs.symlinkSync(target, path.join(directory, 'config.json'))
+
+    const config = createConf({ cwd: directory })
+    config.set('foo', 33)
+
+    assert.equal(fs.lstatSync(config.path).isSymbolicLink(), true)
+    assert.match(fs.readFileSync(target, 'utf8'), /"foo": 33/)
+    assert.deepEqual(fs.readdirSync(directory).sort(), [
+      'config.json',
+      'target.json',
+    ])
+  }, // Creating symlinks on Windows needs Developer Mode or admin rights.
+  { skip: process.platform === 'win32' }
+)
+
+writeTest('does not install process signal handlers', () => {
+  const directory = temporaryDirectory()
+  // Tests are bundled, so resolve the source from the package directory. The
+  // test script runs from there, as its test file glob is relative too.
+  const entry = pathToFileURL(path.resolve('src/index.js')).href
+  const script = `
+    const signals = ['SIGINT', 'SIGTERM', 'SIGHUP', 'exit', 'beforeExit']
+    const count = () => signals.map((s) => process.listenerCount(s))
+    const before = count()
+    const { Conf } = await import(${JSON.stringify(entry)})
+    new Conf({ cwd: ${JSON.stringify(directory)} }).set('foo', 1)
+    console.log(JSON.stringify({ before, after: count() }))
+  `
+  const output = execFileSync(
+    process.execPath,
+    ['--input-type=module', '--eval', script],
+    { encoding: 'utf8' }
+  )
+  const { before, after } = JSON.parse(output)
+
+  assert.deepEqual(after, before)
+})
+
+/**
+ * Run `fn` with `fs[name]` replaced by `replacement`.
+ *
+ * @template {keyof typeof fs} Name
+ * @param {Name} name
+ * @param {(original: (typeof fs)[Name]) => (typeof fs)[Name]} replacement
+ * @param {() => void} fn
+ */
+function withFsStub(name, replacement, fn) {
+  const original = fs[name]
+  fs[name] = replacement(original)
+  try {
+    fn()
+  } finally {
+    fs[name] = original
+  }
+}
+
+/**
+ * @param {string} code
+ */
+function errnoError(code) {
+  return Object.assign(new Error(code), { code })
+}
+
+writeTest('ignores chmod on file systems without permissions', () => {
+  const config = createConf()
+
+  withFsStub(
+    'fchmodSync',
+    () => () => {
+      throw errnoError('ENOSYS')
+    },
+    () => config.set('foo', 33)
+  )
+
+  assert.equal(config.get('foo'), 33)
+})
+
+writeTest('retries a rename that fails with EBUSY', () => {
+  const config = createConf()
+  let calls = 0
+
+  withFsStub(
+    'renameSync',
+    (renameSync) => (from, to) => {
+      calls++
+      if (calls === 1) {
+        throw errnoError('EBUSY')
+      }
+      renameSync(from, to)
+    },
+    () => config.set('foo', 33)
+  )
+
+  assert.equal(calls, 2)
+  assert.equal(config.get('foo'), 33)
+  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+})
+
+writeTest('throws the write error when cleanup also fails', () => {
+  const config = createConf()
+
+  withFsStub(
+    'renameSync',
+    () => () => {
+      throw errnoError('EIO')
+    },
+    () =>
+      withFsStub(
+        'rmSync',
+        () => () => {
+          throw errnoError('EPERM')
+        },
+        () => assert.throws(() => config.set('foo', 33), { code: 'EIO' })
+      )
+  )
+})
+
+writeTest('writes files with long names', () => {
+  const config = createConf({ configName: 'c'.repeat(250) })
+  config.set('foo', 33)
+
+  assert.equal(config.get('foo'), 33)
+  assert.deepEqual(fs.readdirSync(pathFor(config)), [`${'c'.repeat(250)}.json`])
+})
+
+writeTest('removes stale temporary files from dead processes', () => {
+  const directory = temporaryDirectory()
+  const old = new Date(Date.now() - 120_000)
+  const stale = 'config.json.999999999.deadbeef.tmp'
+  const fresh = 'config.json.999999999.cafebabe.tmp'
+  const own = `config.json.${process.pid}.0badf00d.tmp`
+  const other = 'other.json.999999999.deadbeef.tmp'
+
+  for (const name of [stale, fresh, own, other]) {
+    fs.writeFileSync(path.join(directory, name), '{}')
+  }
+
+  for (const name of [stale, own, other]) {
+    fs.utimesSync(path.join(directory, name), old, old)
+  }
+
+  createConf({ cwd: directory }).set('foo', 33)
+
+  assert.deepEqual(
+    fs.readdirSync(directory).sort(),
+    ['config.json', fresh, own, other].sort()
+  )
 })
 
 const watchSuite = suite('Conf watch')
