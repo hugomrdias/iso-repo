@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.2.0...iso-kv-v4.0.0) (2026-10-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-kv:** FileDriver options are now iso-conf Options (without `schema` and `accessPropertiesByDotNotation`). conf-only options such as `encryptionKey`, `migrations` and `projectVersion` are no longer supported, and new config files are created with mode 0o600.
+
+### Features
+
+* **iso-kv:** replace conf with iso-conf in file driver ([#659](https://github.com/hugomrdias/iso-repo/issues/659)) ([cd26b01](https://github.com/hugomrdias/iso-repo/commit/cd26b01d54338945b3989f38892f333b0535693f))
+
 ## [3.2.0](https://github.com/hugomrdias/iso-repo/compare/iso-kv-v3.1.1...iso-kv-v3.2.0) (2026-05-29)
 
 
