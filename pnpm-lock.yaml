@@ -459,9 +459,6 @@ importers:
       '@standard-schema/utils':
         specifier: 'catalog:'
         version: 0.3.0
-      atomically:
-        specifier: ^2.1.1
-        version: 2.1.1
       dot-prop:
         specifier: ^10.2.0
         version: 10.2.0
