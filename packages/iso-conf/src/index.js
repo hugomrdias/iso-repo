@@ -889,19 +889,22 @@ export class Conf {
   /**
    * Write config data to disk atomically.
    *
+   * Snap packages get no special case. `sindresorhus/conf` wrote directly to
+   * the file when `SNAP` was set, to work around its old atomic writer under
+   * Snap confinement, but a direct write truncates the file first, so
+   * concurrent readers and writers see and leave corrupt files. The atomic
+   * writer only creates, syncs and renames a temporary file in the config
+   * folder, which confinement rules for the config file also cover, and it
+   * tolerates `chmod` and `chown` failures.
+   *
    * @param {StandardSchemaV1.InferOutput<Schema>} value - Config object to persist.
    */
   #write(value) {
-    const data = this.#serialize(value)
-
-    if (process.env.SNAP) {
-      fs.writeFileSync(this.path, data, {
-        mode: this.#options.configFileMode,
-      })
-      return
-    }
-
-    writeFileAtomicSync(this.path, data, this.#options.configFileMode)
+    writeFileAtomicSync(
+      this.path,
+      this.#serialize(value),
+      this.#options.configFileMode
+    )
   }
 
   /**

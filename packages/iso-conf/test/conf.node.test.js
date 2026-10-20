@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
+import { execFile, execFileSync } from 'node:child_process'
 import { EventEmitter } from 'node:events'
 import fs from 'node:fs'
 import os from 'node:os'
@@ -7,6 +7,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { pathToFileURL } from 'node:url'
+import { promisify } from 'node:util'
 import envPaths from 'env-paths'
 import { suite } from 'playwright-test/taps'
 import { z } from 'zod'
@@ -1503,6 +1504,95 @@ writeTest('removes stale temporary files from dead processes', () => {
     fs.readdirSync(directory).sort(),
     ['config.json', fresh, own, other].sort()
   )
+})
+
+/**
+ * Run `processes` child processes in parallel, each calling `set` `writes`
+ * times with its own keys on one config file.
+ *
+ * @param {{ processes: number, writes: number, env?: Record<string, string>, options?: object }} params
+ */
+async function raceWrites({ processes, writes, env = {}, options = {} }) {
+  const cwd = temporaryDirectory()
+  // Tests are bundled, so resolve the source from the package directory.
+  const entry = pathToFileURL(path.resolve('src/index.js')).href
+  const script = `
+    const { Conf } = await import(${JSON.stringify(entry)})
+    const [id, n] = process.argv.slice(1)
+    const c = new Conf({
+      cwd: ${JSON.stringify(cwd)},
+      accessPropertiesByDotNotation: false,
+      ...${JSON.stringify(options)},
+    })
+    const errors = []
+    for (let i = 0; i < Number(n); i++) {
+      try {
+        c.set(id + '-' + i, i)
+      } catch (error) {
+        errors.push(error.code ?? error.name)
+      }
+    }
+    console.log(JSON.stringify(errors))
+  `
+  const run = promisify(execFile)
+  const outputs = await Promise.all(
+    Array.from({ length: processes }, (_, id) =>
+      run(
+        process.execPath,
+        ['--input-type=module', '--eval', script, String(id), String(writes)],
+        { env: { ...process.env, ...env } }
+      )
+    )
+  )
+  const errors = outputs.flatMap(({ stdout }) => JSON.parse(stdout))
+  const raw = fs.readFileSync(path.join(cwd, 'config.json'), 'utf8')
+
+  return { cwd, errors, raw }
+}
+
+writeTest('writes atomically when SNAP is set', () => {
+  const config = createConf()
+  const snap = process.env.SNAP
+  let renames = 0
+  process.env.SNAP = '/snap/node/1'
+
+  try {
+    withFsStub(
+      'renameSync',
+      (renameSync) => (from, to) => {
+        renames++
+        renameSync(from, to)
+      },
+      () =>
+        withFsStub(
+          'writeFileSync',
+          () => () => {
+            throw new Error('writeFileSync must not be used')
+          },
+          () => config.set('foo', 33)
+        )
+    )
+  } finally {
+    if (snap === undefined) {
+      delete process.env.SNAP
+    } else {
+      process.env.SNAP = snap
+    }
+  }
+
+  assert.equal(renames, 1)
+  assert.equal(config.get('foo'), 33)
+})
+
+writeTest('concurrent writers with SNAP set keep the file valid', async () => {
+  const { errors, raw } = await raceWrites({
+    processes: 4,
+    writes: 200,
+    env: { SNAP: '/snap/node/1' },
+  })
+
+  assert.deepEqual(errors, [])
+  assert.doesNotThrow(() => JSON.parse(raw))
 })
 
 const watchSuite = suite('Conf watch')
