@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.4.2...iso-conf-v1.0.0) (2026-10-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* `new Conf()` no longer persists defaults or normalised schema output, and no longer rewrites a file cleared by `clearInvalidConfig`. Errors from a missing required field, a corrupt file or a schema violation are thrown from the first read instead of the constructor.
+
+### iso-conf
+
+* read-only opens, ConfError, atomic Snap writes, cross-process lock, fewer deps ([#670](https://github.com/hugomrdias/iso-repo/issues/670)) ([5880b18](https://github.com/hugomrdias/iso-repo/commit/5880b1888ca1fb84f76b3f6b6f3afc1598a03349))
+
 ## [0.4.2](https://github.com/hugomrdias/iso-repo/compare/iso-conf-v0.4.1...iso-conf-v0.4.2) (2026-10-02)
 
 
