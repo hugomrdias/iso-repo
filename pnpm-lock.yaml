@@ -456,15 +456,6 @@ importers:
       '@standard-schema/spec':
         specifier: 'catalog:'
         version: 1.1.0
-      '@standard-schema/utils':
-        specifier: 'catalog:'
-        version: 0.3.0
-      dot-prop:
-        specifier: ^10.2.0
-        version: 10.2.0
-      env-paths:
-        specifier: ^4.0.0
-        version: 4.0.0
       iso-base:
         specifier: workspace:^
         version: link:../iso-base
@@ -472,6 +463,12 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.2
+      dot-prop:
+        specifier: ^10.2.0
+        version: 10.2.0
+      env-paths:
+        specifier: ^4.0.0
+        version: 4.0.0
       playwright-test:
         specifier: 'catalog:'
         version: 15.0.1

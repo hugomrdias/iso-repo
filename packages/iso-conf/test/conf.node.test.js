@@ -8,9 +8,11 @@ import process from 'node:process'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
+import * as dotProp from 'dot-prop'
 import envPaths from 'env-paths'
 import { suite } from 'playwright-test/taps'
 import { z } from 'zod'
+import * as dotPath from '../src/dot-path.js'
 import { Conf, ConfError } from '../src/index.js'
 
 /**
@@ -221,6 +223,101 @@ test('projectName resolves the config directory', () => {
   }
 })
 
+test('projectName resolves like env-paths on every platform', () => {
+  const platform = Object.getOwnPropertyDescriptor(process, 'platform')
+  const { APPDATA, XDG_CONFIG_HOME } = process.env
+  /** Project names and their kebab case. */
+  const names = {
+    'My App': 'my-app',
+    myApp: 'my-app',
+    a: 'a',
+    éclair: 'éclair',
+    '..': '',
+    'a/b': 'a-b',
+  }
+  const envs = [
+    { APPDATA: undefined, XDG_CONFIG_HOME: undefined },
+    { APPDATA: 'C:\\Data', XDG_CONFIG_HOME: '/xdg' },
+  ]
+
+  /** @param {() => unknown} fn */
+  const outcome = (fn) => {
+    try {
+      return { value: fn() }
+    } catch (error) {
+      return { error: /** @type {Error} */ (error).message }
+    }
+  }
+
+  try {
+    for (const os of ['darwin', 'win32', 'linux', 'freebsd']) {
+      Object.defineProperty(process, 'platform', { value: os })
+
+      for (const env of envs) {
+        for (const [key, value] of Object.entries(env)) {
+          if (value === undefined) {
+            delete process.env[key]
+          } else {
+            process.env[key] = value
+          }
+        }
+
+        for (const [name, kebab] of Object.entries(names)) {
+          for (const projectSuffix of [undefined, '', 'cli', 'x/y']) {
+            const actual = outcome(
+              () =>
+                new Conf({ projectName: name, projectSuffix, configName: 'c' })
+                  .path
+            )
+            const expected = outcome(() =>
+              path.resolve(
+                envPaths(kebab, { suffix: projectSuffix ?? 'nodejs' }).config,
+                'c.json'
+              )
+            )
+            assert.deepEqual(actual, expected, `${os} ${name} ${projectSuffix}`)
+          }
+        }
+      }
+    }
+  } finally {
+    if (platform) {
+      Object.defineProperty(process, 'platform', platform)
+    }
+    for (const [key, value] of Object.entries({ APPDATA, XDG_CONFIG_HOME })) {
+      if (value === undefined) {
+        delete process.env[key]
+      } else {
+        process.env[key] = value
+      }
+    }
+  }
+})
+
+test('loads at most five modules', () => {
+  // Tests are bundled, so resolve the source from the package directory.
+  const entry = pathToFileURL(path.resolve('src/index.js')).href
+  const script = `
+    const { registerHooks } = await import('node:module')
+    const files = []
+    registerHooks({
+      load(url, context, next) {
+        if (url.startsWith('file:')) files.push(url)
+        return next(url, context)
+      },
+    })
+    await import(${JSON.stringify(entry)})
+    console.log(JSON.stringify(files))
+  `
+  const files = JSON.parse(
+    execFileSync(process.execPath, ['--input-type=module', '--eval', script], {
+      encoding: 'utf8',
+    })
+  )
+
+  assert.ok(files.length <= 5, files.join('\n'))
+})
+
 test('throws without projectName or cwd', () => {
   assert.throws(() => new Conf(), {
     name: 'Error',
@@ -228,11 +325,212 @@ test('throws without projectName or cwd', () => {
   })
 })
 
+const dotPathSuite = suite('Conf dot paths')
+const { test: dotPathTest } = dotPathSuite
+
+const dotPaths = [
+  '',
+  '.',
+  'a',
+  'a.b',
+  'a.b.c',
+  'a.',
+  '.a',
+  'a..b',
+  'a\\.b',
+  'a\\.b.c',
+  'a\\\\b',
+  'a\\',
+  'a.0',
+  'a.1.b',
+  'a.01',
+  'a.-1',
+  'a.1000000',
+  'a.1000001',
+  'a[0]',
+  'a[1].b',
+  'a[0][1]',
+  'a[01]',
+  'a[1000001]',
+  '[0]',
+  'a.[0]',
+  'a[]',
+  'a[]b',
+  'a]',
+  ']a',
+  'a[x]',
+  'a[0',
+  'a[0]b',
+  'a[0]\\b',
+  'a[\\0]',
+  'a[0]]',
+  'a[[0]',
+  '__proto__',
+  '__proto__.x',
+  'a.__proto__',
+  'a.__proto__.x',
+  '__proto__[0]',
+  'constructor',
+  'constructor.prototype',
+  'a.constructor.prototype.x',
+  'prototype',
+  'nested.value',
+  'nested.toString',
+  'list[0].name',
+  'list.0.name',
+  'str.length',
+  'nul.x',
+  'nul',
+  'undef',
+  'undef.x',
+  'émoji.🙂',
+]
+
+/** A fixture covering objects, arrays, primitives, null and undefined. */
+const dotPathFixture = () => ({
+  a: { b: { c: 1 }, 0: 'zero', 1: { b: 2 } },
+  'a.b': 'escaped',
+  'a\\b': 'backslash',
+  nested: { value: true },
+  list: [{ name: 'first' }, { name: 'second' }],
+  str: 'text',
+  nul: null,
+  undef: undefined,
+  émoji: { '🙂': 'smile' },
+})
+
+/** @param {() => unknown} fn */
+function settle(fn) {
+  try {
+    return { value: fn() }
+  } catch (error) {
+    return { error: /** @type {Error} */ (error).message }
+  }
+}
+
+dotPathTest('parsePath matches dot-prop', () => {
+  for (const key of dotPaths) {
+    assert.deepEqual(
+      settle(() => dotPath.parsePath(key)),
+      settle(() => dotProp.parsePath(key)),
+      key
+    )
+  }
+})
+
+dotPathTest('get, has, set and delete match dot-prop', () => {
+  for (const key of dotPaths) {
+    for (const fallback of [undefined, 'fallback']) {
+      assert.deepEqual(
+        settle(() => dotPath.getProperty(dotPathFixture(), key, fallback)),
+        settle(() => dotProp.getProperty(dotPathFixture(), key, fallback)),
+        `get ${key}`
+      )
+    }
+
+    assert.deepEqual(
+      settle(() => dotPath.hasProperty(dotPathFixture(), key)),
+      settle(() => dotProp.hasProperty(dotPathFixture(), key)),
+      `has ${key}`
+    )
+
+    /** @type {Array<{ name: string, ours: (o: any) => unknown, theirs: (o: any) => unknown }>} */
+    const writes = [
+      {
+        name: 'set',
+        ours: (o) => dotPath.setProperty(o, key, 'new'),
+        theirs: (o) => dotProp.setProperty(o, key, 'new'),
+      },
+      {
+        name: 'delete',
+        ours: (o) => dotPath.deleteProperty(o, key),
+        theirs: (o) => dotProp.deleteProperty(o, key),
+      },
+    ]
+
+    for (const { name, ours, theirs } of writes) {
+      const actual = dotPathFixture()
+      const expected = dotPathFixture()
+      const actualResult = settle(() => ours(actual))
+      const expectedResult = settle(() => theirs(expected))
+
+      if (name === 'delete') {
+        assert.deepEqual(actualResult, expectedResult, `${name} ${key}`)
+      } else {
+        assert.equal('error' in actualResult, 'error' in expectedResult)
+      }
+
+      assert.deepEqual(actual, expected, `${name} ${key}`)
+    }
+  }
+
+  assert.equal(/** @type {any} */ ({}).x, undefined, 'no prototype pollution')
+})
+
+dotPathTest('escaped dots address top-level keys', () => {
+  const config = createConf()
+  config.set('a\\.b', 1)
+  config.set('a.b', 2)
+
+  assert.equal(config.get('a\\.b'), 1)
+  assert.equal(config.has('a\\.b'), true)
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+    foo: 50,
+    'a.b': 1,
+    a: { b: 2 },
+  })
+
+  config.delete('a\\.b')
+  assert.equal(config.has('a\\.b'), false)
+  assert.equal(config.get('a.b'), 2)
+})
+
+dotPathTest('refuses prototype keys', () => {
+  const config = createConf()
+
+  for (const key of [
+    '__proto__.polluted',
+    'constructor.prototype.polluted',
+    'nested.__proto__.polluted',
+  ]) {
+    config.set(key, true)
+    assert.equal(config.get(key), undefined)
+    assert.equal(config.has(key), false)
+    config.delete(key)
+  }
+
+  assert.equal(/** @type {any} */ ({}).polluted, undefined)
+  assert.deepEqual({ ...config.store }, { foo: 50 })
+})
+
+dotPathTest('array indexes', () => {
+  const config = createConf()
+  config.set('items', [{ name: 'a' }, { name: 'b' }])
+
+  assert.equal(config.get('items[1].name'), 'b')
+  assert.equal(config.get('items.0.name'), 'a')
+  assert.equal(config.has('items[2]'), false)
+
+  config.set('items[1].name', 'c')
+  config.set('list[0]', 'x')
+  assert.deepEqual(config.get('items'), [{ name: 'a' }, { name: 'c' }])
+  assert.deepEqual(config.get('list'), ['x'])
+})
+
 const schemaSuite = suite('Conf schema')
 const { test: schemaTest } = schemaSuite
 
 schemaTest('rejects invalid values', () => {
   const config = createConf()
+
+  assert.throws(
+    // @ts-expect-error - runtime validation should reject schema-invalid values.
+    () => config.set({ items: [{ name: 1 }], nested: { value: 'x' } }),
+    {
+      message:
+        /^Config schema violation: `nested.value` .+; `items.0.name` .+$|^Config schema violation: `items.0.name` .+; `nested.value` .+$/,
+    }
+  )
 
   // @ts-expect-error - runtime validation should reject schema-invalid values.
   assert.throws(() => config.set('foo', 'nope'), {

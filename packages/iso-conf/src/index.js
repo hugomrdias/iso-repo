@@ -1,11 +1,15 @@
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { isDeepStrictEqual } from 'node:util'
-import { getDotPath } from '@standard-schema/utils'
-import { deleteProperty, getProperty, hasProperty, setProperty } from 'dot-prop'
-import envPaths from 'env-paths'
 import { parse, stringify } from 'iso-base/json'
+import {
+  deleteProperty,
+  getProperty,
+  hasProperty,
+  setProperty,
+} from './dot-path.js'
 import {
   isUnsupportedChange,
   lockSync,
@@ -68,6 +72,86 @@ const kebabCase = (str) => {
     .join('-')
     .replace(/^-/, '')
     .replace(/-\s*$/, '')
+}
+
+/**
+ * Throw when `name` can't be used as a single folder name.
+ *
+ * @param {string} name
+ */
+const assertSafeFilename = (name) => {
+  const trimmed = name.trim()
+
+  if (
+    trimmed === '' ||
+    trimmed === '.' ||
+    trimmed === '..' ||
+    name.includes('/') ||
+    name.includes('\\') ||
+    name.includes('\0')
+  ) {
+    throw new Error(`Unsafe filename: ${JSON.stringify(name)}`)
+  }
+}
+
+/**
+ * Platform config folder for an app, matching `env-paths`.
+ *
+ * - macOS: `~/Library/Preferences/<name>`
+ * - Windows: `%APPDATA%\\<name>\\Config`
+ * - Linux and others: `$XDG_CONFIG_HOME/<name>`, or `~/.config/<name>`
+ *
+ * @param {string} name - App name.
+ * @param {string} suffix - Appended to `name` with a dash, unless empty.
+ */
+const configDirectory = (name, suffix) => {
+  assertSafeFilename(name)
+
+  if (suffix) {
+    name += `-${suffix}`
+  }
+
+  assertSafeFilename(name)
+
+  const homedir = os.homedir()
+  const { env } = process
+
+  if (process.platform === 'darwin') {
+    return path.join(homedir, 'Library', 'Preferences', name)
+  }
+
+  if (process.platform === 'win32') {
+    const appData = env.APPDATA || path.join(homedir, 'AppData', 'Roaming')
+    return path.join(appData, name, 'Config')
+  }
+
+  return path.join(env.XDG_CONFIG_HOME || path.join(homedir, '.config'), name)
+}
+
+/**
+ * Dot path of a schema issue, such as `a.b.0`, or `null` when the issue has
+ * no path or a key that is not a string or number.
+ *
+ * @param {StandardSchemaV1.Issue} issue
+ */
+const getDotPath = (issue) => {
+  if (!issue.path?.length) {
+    return null
+  }
+
+  const keys = []
+
+  for (const item of issue.path) {
+    const key = typeof item === 'object' ? item.key : item
+
+    if (typeof key !== 'string' && typeof key !== 'number') {
+      return null
+    }
+
+    keys.push(key)
+  }
+
+  return keys.join('.')
 }
 
 /**
@@ -1071,9 +1155,10 @@ export class Conf {
         throw new Error('Please specify the `projectName` option.')
       }
 
-      options.cwd = envPaths(kebabCase(options.projectName), {
-        suffix: options.projectSuffix ?? 'nodejs',
-      }).config
+      options.cwd = configDirectory(
+        kebabCase(options.projectName),
+        options.projectSuffix ?? 'nodejs'
+      )
     }
 
     if (typeof options.fileExtension === 'string') {
