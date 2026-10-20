@@ -1,6 +1,19 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
 
 export type { StandardSchemaV1 } from '@standard-schema/spec'
+export type { ConfError } from './index.js'
+
+/**
+ * Code of a {@link ConfError}.
+ *
+ * - `ERR_CONF_PARSE`: the config file could not be deserialized.
+ * - `ERR_CONF_SCHEMA`: the config file failed schema validation.
+ * - `ERR_CONF_INVALID_VALUE`: a value being written failed schema validation.
+ */
+export type ConfErrorCode =
+  | 'ERR_CONF_PARSE'
+  | 'ERR_CONF_SCHEMA'
+  | 'ERR_CONF_INVALID_VALUE'
 
 /** Serializes a config value to a UTF-8 string. */
 export type Serialize = (value: unknown) => string
@@ -170,8 +183,9 @@ interface BaseOptions<Schema extends StandardSchemaV1> {
   accessPropertiesByDotNotation?: boolean
   /**
    * Read an empty config when the file cannot be deserialized or fails schema
-   * validation. The file is replaced on the next write. File system errors are
-   * still thrown. @default false
+   * validation, instead of throwing a {@link ConfError}. The next write copies
+   * the invalid file to `<name>.invalid-<timestamp>.<ext>` next to it, then
+   * replaces it. File system errors are still thrown. @default false
    */
   clearInvalidConfig?: boolean
   /**

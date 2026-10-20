@@ -63,6 +63,39 @@ Defaults, schema defaults and coerced values are applied in memory on every read
 
 The one exception is `watch: true`, which creates an empty config file (and its folder) when there is none, because `fs.watch` needs a target.
 
+### Errors
+
+A config file that can't be loaded throws a `ConfError`:
+
+| `code` | When |
+| --- | --- |
+| `ERR_CONF_PARSE` | The file could not be deserialized (corrupt JSON, a bad extended JSON value, or a custom `deserialize` that threw). `cause` is the original error. |
+| `ERR_CONF_SCHEMA` | The file failed schema validation. `issues` holds the Standard Schema issues. |
+| `ERR_CONF_INVALID_VALUE` | A value passed to a write method failed schema validation. Nothing is written. |
+
+Every `ConfError` has the config file `path`.
+
+File system errors are not wrapped. They are thrown as Node system errors with `code`, `syscall` and `path` set by `node:fs`. Reads can throw `EACCES`, `EPERM`, `EISDIR` or `ENOTDIR`. Writes can also throw `EROFS`, `ENOSPC` or `EDQUOT`, and leave no temporary file behind. Reading a missing file never throws.
+
+```js
+import { Conf, ConfError } from 'iso-conf'
+
+try {
+  config.get('foo')
+} catch (error) {
+  if (error instanceof ConfError) {
+    console.error(`Config file at ${error.path} is invalid: ${error.message}`)
+  }
+  throw error
+}
+```
+
+#### Recovering an invalid file
+
+`config.store = value` and `config.clear()` don't read the current file, so they replace a corrupt or schema-invalid file. Merging writes (`set`, `delete`, `reset`, `appendToArray`) load the file first and throw the same `ConfError` as a read.
+
+With `clearInvalidConfig: true`, an invalid file reads as an empty config instead of throwing. The next write copies the invalid file to `<name>.invalid-<timestamp>.<ext>` next to it (for example `config.invalid-1760000000000.json`), with mode `configFileMode`, and then replaces it.
+
 ## Docs
 
 Check <https://hugomrdias.github.io/iso-repo/modules/iso_conf.html>

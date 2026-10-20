@@ -1,7 +1,11 @@
 import { temporaryDirectory } from 'tempy'
 import { z } from 'zod'
-import { Conf } from '../src/index.js'
-import type { SchemaKeyPath } from '../src/types.js'
+import { Conf, ConfError } from '../src/index.js'
+import type {
+  ConfErrorCode,
+  ConfError as ConfErrorType,
+  SchemaKeyPath,
+} from '../src/types.js'
 
 declare function expectType<T>(value: T): void
 
@@ -143,3 +147,16 @@ untyped.onDidChange('foo', (newValue, oldValue) => {
   expectType<unknown>(newValue)
   expectType<unknown>(oldValue)
 })
+
+try {
+  config.get('foo')
+} catch (error) {
+  if (error instanceof ConfError) {
+    expectType<ConfErrorType>(error)
+    expectType<ConfErrorCode>(error.code)
+    expectType<string>(error.path)
+    expectType<readonly { message: string }[] | undefined>(error.issues)
+    // @ts-expect-error - codes are a closed set.
+    expectType<'ERR_OTHER'>(error.code)
+  }
+}

@@ -93,7 +93,7 @@ const attempt = (fn) => {
  *
  * @param {unknown} error
  */
-const isUnsupportedChange = (error) => {
+export const isUnsupportedChange = (error) => {
   const code = errorCode(error)
   const isRoot = process.geteuid?.() === 0
   return (

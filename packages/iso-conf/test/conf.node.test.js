@@ -10,7 +10,7 @@ import { pathToFileURL } from 'node:url'
 import envPaths from 'env-paths'
 import { suite } from 'playwright-test/taps'
 import { z } from 'zod'
-import { Conf } from '../src/index.js'
+import { Conf, ConfError } from '../src/index.js'
 
 /**
  * Importing `tempy` masks uncaught exceptions thrown from `EventTarget`
@@ -46,6 +46,10 @@ function createConf(options = {}) {
 function pathFor(config) {
   return path.dirname(config.path)
 }
+
+/** Permission checks don't apply to root, or on Windows. */
+const skipPermissions =
+  process.platform === 'win32' || process.geteuid?.() === 0
 
 const { test } = suite('Conf basics')
 
@@ -230,7 +234,13 @@ schemaTest('rejects invalid values', () => {
   const config = createConf()
 
   // @ts-expect-error - runtime validation should reject schema-invalid values.
-  assert.throws(() => config.set('foo', 'nope'), /Config schema violation/)
+  assert.throws(() => config.set('foo', 'nope'), {
+    name: 'ConfError',
+    code: 'ERR_CONF_INVALID_VALUE',
+    path: config.path,
+    message: /^Config schema violation: `foo` /,
+  })
+  assert.equal(fs.existsSync(config.path), false)
 })
 
 schemaTest('accepts valid values', () => {
@@ -852,10 +862,291 @@ invalidTest('clearInvalidConfig replaces a cleared file on write', () => {
   })
 })
 
-invalidTest('deserialize errors propagate without clearInvalidConfig', () => {
+invalidTest('deserialize errors throw ConfError ERR_CONF_PARSE', () => {
+  class CustomError extends Error {}
+  const custom = new CustomError('bad config')
+  const cases = [
+    { name: 'corrupt json', raw: '{invalid', cause: SyntaxError },
+    {
+      name: 'reviver error',
+      raw: JSON.stringify({ u: { $url: 'nope' } }),
+      cause: TypeError,
+    },
+    {
+      name: 'custom deserialize',
+      raw: 'bad',
+      cause: CustomError,
+      deserialize: () => {
+        throw custom
+      },
+    },
+  ]
+
+  for (const { name, raw, cause, deserialize } of cases) {
+    const config = createConf({ deserialize })
+    fs.writeFileSync(config.path, raw)
+    assert.throws(
+      () => config.store,
+      (/** @type {any} */ error) => {
+        assert.ok(error instanceof ConfError, name)
+        assert.equal(error.code, 'ERR_CONF_PARSE', name)
+        assert.equal(error.path, config.path, name)
+        assert.ok(error.cause instanceof cause, name)
+        assert.equal(error.issues, undefined, name)
+        return true
+      }
+    )
+    assert.throws(() => config.set('foo', 1), { code: 'ERR_CONF_PARSE' })
+    assert.equal(fs.readFileSync(config.path, 'utf8'), raw, name)
+  }
+})
+
+invalidTest('schema violations on load throw ConfError ERR_CONF_SCHEMA', () => {
   const config = createConf()
-  fs.writeFileSync(config.path, JSON.stringify({ u: { $url: 'nope' } }))
-  assert.throws(() => config.store, TypeError)
+  fs.writeFileSync(config.path, JSON.stringify({ foo: 'bad' }))
+  assert.throws(
+    () => config.get('foo'),
+    (/** @type {any} */ error) => {
+      assert.ok(error instanceof ConfError)
+      assert.equal(error.name, 'ConfError')
+      assert.equal(error.code, 'ERR_CONF_SCHEMA')
+      assert.equal(error.path, config.path)
+      assert.match(error.message, /^Config schema violation: `foo` /)
+      assert.deepEqual(
+        error.issues?.map((issue) => issue.path),
+        [['foo']]
+      )
+      return true
+    }
+  )
+})
+
+invalidTest(
+  'unreadable files throw the unwrapped fs error',
+  () => {
+    const config = createConf()
+    fs.writeFileSync(config.path, '{}', { mode: 0o000 })
+
+    try {
+      assert.throws(
+        () => config.store,
+        (/** @type {any} */ error) => {
+          assert.equal(error instanceof ConfError, false)
+          assert.equal(error.code, 'EACCES')
+          assert.equal(error.syscall, 'open')
+          assert.equal(error.path, config.path)
+          return true
+        }
+      )
+    } finally {
+      fs.chmodSync(config.path, 0o600)
+    }
+  },
+  { skip: skipPermissions }
+)
+
+invalidTest('a folder at the config path throws EISDIR', () => {
+  for (const clearInvalidConfig of [false, true]) {
+    const config = createConf({ clearInvalidConfig })
+    fs.mkdirSync(config.path)
+    assert.throws(
+      () => config.store,
+      (/** @type {any} */ error) => {
+        assert.equal(error instanceof ConfError, false)
+        assert.equal(error.code, 'EISDIR')
+        return true
+      }
+    )
+  }
+})
+
+invalidTest('store and clear replace a corrupt file', () => {
+  for (const raw of ['{invalid', JSON.stringify({ foo: 'bad' })]) {
+    const config = createConf()
+    fs.writeFileSync(config.path, raw)
+    config.store = { foo: 3 }
+    assert.equal(config.get('foo'), 3)
+
+    fs.writeFileSync(config.path, raw)
+    config.clear()
+    assert.deepEqual({ ...config.store }, { foo: 50 })
+    assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+  }
+})
+
+/**
+ * Backup files next to `config`.
+ *
+ * @param {Conf<any>} config
+ */
+function backups(config) {
+  return fs
+    .readdirSync(pathFor(config))
+    .filter((name) => /^config\.invalid-\d+(-\d+)?\.json$/.test(name))
+    .map((name) => path.join(pathFor(config), name))
+}
+
+invalidTest('clearInvalidConfig backs up the invalid file on write', () => {
+  const cwd = temporaryDirectory()
+  const raw = JSON.stringify({ foo: 'bad', sessions: { mainnet: 'secret' } })
+  fs.writeFileSync(path.join(cwd, 'config.json'), raw, { mode: 0o644 })
+  const config = createConf({ cwd, clearInvalidConfig: true })
+
+  assert.equal(config.get('foo'), 50)
+  assert.deepEqual(backups(config), [])
+
+  config.set('foo', 3)
+  const [backup, ...rest] = backups(config)
+  assert.deepEqual(rest, [])
+  assert.ok(backup)
+  assert.equal(fs.readFileSync(backup, 'utf8'), raw)
+  if (!skipPermissions) {
+    assert.equal(fs.statSync(backup).mode & 0o777, 0o600)
+  }
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+    foo: 3,
+  })
+
+  // A valid file is not backed up again.
+  config.set('foo', 4)
+  assert.equal(backups(config).length, 1)
+})
+
+invalidTest('clearInvalidConfig backs up before store and clear', () => {
+  for (const write of [
+    (/** @type {Conf<typeof schema>} */ c) => {
+      c.store = { foo: 3 }
+    },
+    (/** @type {Conf<typeof schema>} */ c) => c.clear(),
+  ]) {
+    const config = createConf({
+      clearInvalidConfig: true,
+      configFileMode: 0o640,
+    })
+    fs.writeFileSync(config.path, Buffer.from([0x7b, 0xff, 0xfe]))
+    write(config)
+
+    const [backup] = backups(config)
+    assert.ok(backup)
+    assert.deepEqual(fs.readFileSync(backup), Buffer.from([0x7b, 0xff, 0xfe]))
+    if (!skipPermissions) {
+      assert.equal(fs.statSync(backup).mode & 0o777, 0o640)
+    }
+  }
+})
+
+invalidTest('clearInvalidConfig store works on a missing file', () => {
+  const config = new Conf({
+    cwd: temporaryDirectory(),
+    schema: requiredSchema,
+    clearInvalidConfig: true,
+    // @ts-expect-error - `defaults` is required for this schema.
+    defaults: undefined,
+  })
+  config.store = { req: 1, foo: 2 }
+  assert.deepEqual({ ...config.store }, { req: 1, foo: 2 })
+})
+
+invalidTest('clearInvalidConfig keeps every backup', () => {
+  const config = createConf({ clearInvalidConfig: true })
+  fs.writeFileSync(config.path, '{one')
+  config.set('foo', 1)
+  fs.writeFileSync(config.path, '{two')
+  config.set('foo', 2)
+
+  const contents = backups(config)
+    .map((file) => fs.readFileSync(file, 'utf8'))
+    .sort()
+  assert.deepEqual(contents, ['{one', '{two'])
+})
+
+invalidTest('the clipact scenario never fails a caller', () => {
+  const FILE_ERRORS = new Set([
+    'ERR_CONF_PARSE',
+    'ERR_CONF_SCHEMA',
+    'EACCES',
+    'EPERM',
+    'EROFS',
+    'EISDIR',
+    'ENOTDIR',
+  ])
+  const clipactSchema = z.object({
+    telemetry: z.enum(['enabled', 'disabled']).optional(),
+    notice: z.boolean().optional(),
+    installId: z.string().optional(),
+  })
+  const appConfig = '{"network":"mainnet"}'
+
+  /**
+   * @param {() => unknown} fn
+   * @param {unknown} fallback
+   */
+  const bestEffort = (fn, fallback) => {
+    try {
+      return fn()
+    } catch (error) {
+      const code = /** @type {any} */ (error)?.code
+      assert.ok(FILE_ERRORS.has(code), `unexpected ${code}: ${error}`)
+      return fallback
+    }
+  }
+
+  /** @type {Array<{ name: string, setup: (cwd: string, file: string) => void, restore?: (cwd: string, file: string) => void, permissions?: boolean }>} */
+  const states = [
+    { name: 'corrupt', setup: (_cwd, file) => fs.writeFileSync(file, '{bad') },
+    {
+      name: 'schema-invalid',
+      setup: (_cwd, file) => fs.writeFileSync(file, '{"telemetry":42}'),
+    },
+    {
+      name: 'mode 000',
+      permissions: true,
+      setup: (_cwd, file) => fs.writeFileSync(file, '{}', { mode: 0o000 }),
+      restore: (_cwd, file) => fs.chmodSync(file, 0o600),
+    },
+    {
+      name: 'read-only folder',
+      permissions: true,
+      setup: (cwd) => fs.chmodSync(cwd, 0o555),
+      restore: (cwd) => fs.chmodSync(cwd, 0o755),
+    },
+  ]
+
+  for (const { name, setup, restore, permissions } of states) {
+    if (permissions && skipPermissions) {
+      continue
+    }
+
+    const cwd = temporaryDirectory()
+    const file = path.join(cwd, 'clipact.json')
+    fs.writeFileSync(path.join(cwd, 'config.json'), appConfig)
+    setup(cwd, file)
+
+    try {
+      const conf = new Conf({
+        cwd,
+        configName: 'clipact',
+        schema: clipactSchema,
+      })
+      const state = bestEffort(() => conf.store, {})
+      assert.ok(state, name)
+      bestEffort(() => conf.get('installId'), undefined)
+      bestEffort(() => conf.set('notice', true), undefined)
+      bestEffort(() => conf.delete('notice'), undefined)
+      assert.equal(
+        fs.readFileSync(path.join(cwd, 'config.json'), 'utf8'),
+        appConfig,
+        name
+      )
+      assert.deepEqual(
+        fs.readdirSync(cwd).filter((entry) => entry.endsWith('.tmp')),
+        [],
+        name
+      )
+    } finally {
+      restore?.(cwd, file)
+    }
+  }
 })
 
 invalidTest('clearInvalidConfig does not hide fs errors', () => {
@@ -892,10 +1183,6 @@ function fileState(file) {
 
   return { data: fs.readFileSync(file), mtimeMs: fs.statSync(file).mtimeMs }
 }
-
-/** Permission checks don't apply to root, or on Windows. */
-const skipPermissions =
-  process.platform === 'win32' || process.geteuid?.() === 0
 
 readOnlyTest('constructing on a missing directory creates nothing', () => {
   const parent = temporaryDirectory()
@@ -1387,7 +1674,9 @@ watchTest('invalid external writes dispatch a single error', async () => {
     await sleep(150)
 
     assert.equal(errors.length, 1)
-    assert.ok(errors[0] instanceof SyntaxError)
+    assert.ok(errors[0] instanceof ConfError)
+    assert.equal(errors[0].code, 'ERR_CONF_PARSE')
+    assert.ok(errors[0].cause instanceof SyntaxError)
     assert.deepEqual(values, [])
 
     fs.writeFileSync(config.path, JSON.stringify({ foo: 10 }))
