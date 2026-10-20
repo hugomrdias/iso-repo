@@ -55,6 +55,14 @@ config.clear() // => { token: '', retries: 3 }
 
 The schema output is what gets written to disk and validated again on the next read, so it must also be valid schema input. Transforms that change a value's type (e.g. `z.string().transform((s) => s.length)`) are rejected on write.
 
+### Reading never writes
+
+Creating a `Conf` and reading from it (`get`, `has`, `size`, `store`, iteration) never touches the disk beyond reading the config file. The file is read and validated on every access, so a missing, corrupt or schema-invalid file throws from the first read, not from the constructor. A missing file reads as defaults and its folder is not created, so reads work in read-only folders.
+
+Defaults, schema defaults and coerced values are applied in memory on every read, and reach the disk on the next write (`set`, `delete`, `reset`, `appendToArray`, `clear` or `store =`).
+
+The one exception is `watch: true`, which creates an empty config file (and its folder) when there is none, because `fs.watch` needs a target.
+
 ## Docs
 
 Check <https://hugomrdias.github.io/iso-repo/modules/iso_conf.html>

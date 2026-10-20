@@ -200,7 +200,6 @@ export class Conf {
     }
     this.events = new EventTarget()
     this.path = this.#resolvePath(options)
-    this.#initializeStore()
 
     if (options.watch) {
       this.#watch()
@@ -486,7 +485,6 @@ export class Conf {
       return fs.readFileSync(this.path, 'utf8')
     } catch (error) {
       if (/** @type {NodeJS.ErrnoException} */ (error).code === 'ENOENT') {
-        this.#ensureDirectory()
         return undefined
       }
 
@@ -495,31 +493,20 @@ export class Conf {
   }
 
   /**
-   * Build a new validated store object from raw file contents.
+   * Deserialize and validate raw config file contents into a new store object.
+   *
+   * A missing file, or one discarded by `clearInvalidConfig`, loads as an
+   * empty config with defaults applied.
    *
    * @param {string | undefined} data - Raw file contents from `#readFile`.
    * @returns {SchemaValues<Schema>}
    */
   #load(data) {
-    return this.#parse(data).value
-  }
-
-  /**
-   * Deserialize and validate raw config file contents.
-   *
-   * `raw` is the deserialized file, or an empty object when the file is
-   * missing or was discarded by `clearInvalidConfig` (then `cleared` is
-   * `true`). `value` is always the validated store.
-   *
-   * @param {string | undefined} data - Raw file contents from `#readFile`.
-   * @returns {{ raw: Record<string, unknown>, value: SchemaValues<Schema>, cleared?: boolean }}
-   */
-  #parse(data) {
     if (data !== undefined) {
       try {
-        /** @type {Record<string, unknown>} */
-        const raw = Object.assign(createPlainObject(), this.#deserialize(data))
-        return { raw, value: this.#validate(raw) }
+        return this.#validate(
+          Object.assign(createPlainObject(), this.#deserialize(data))
+        )
       } catch (error) {
         if (!this.#options.clearInvalidConfig) {
           throw error
@@ -527,9 +514,7 @@ export class Conf {
       }
     }
 
-    /** @type {Record<string, unknown>} */
-    const raw = createPlainObject()
-    return { raw, value: this.#validate(raw), cleared: data !== undefined }
+    return this.#validate(createPlainObject())
   }
 
   /**
@@ -829,23 +814,11 @@ export class Conf {
   }
 
   /**
-   * Persist defaults and normalised schema output into the on-disk config when
-   * needed, and replace a file discarded by `clearInvalidConfig`.
+   * Watch the config file for external changes.
+   *
+   * `fs.watch` needs an existing target, so this creates an empty config file
+   * when there is none. It is the only constructor option that writes.
    */
-  #initializeStore() {
-    const { raw, value, cleared } = this.#parse(this.#readFile())
-
-    // Schemas may return a plain object for our null-prototype input, so only
-    // compare the top level by own properties.
-    if (
-      cleared ||
-      !isDeepStrictEqual(raw, Object.assign(createPlainObject(), value))
-    ) {
-      this.#persist(value)
-    }
-  }
-
-  /** Watch the config file for external changes. */
   #watch() {
     this.#ensureDirectory()
 

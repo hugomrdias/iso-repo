@@ -210,7 +210,7 @@ test('projectName resolves the config directory', () => {
       config.path,
       path.join(envPaths(`iso-conf-test-${process.pid}`).config, 'config.json')
     )
-    assert.equal(fs.existsSync(path.dirname(config.path)), true)
+    assert.equal(fs.existsSync(path.dirname(config.path)), false)
   } finally {
     fs.rmSync(path.dirname(config.path), { recursive: true, force: true })
   }
@@ -246,17 +246,22 @@ schemaTest('defaults from schema', () => {
   assert.equal(config.get('foo'), 50)
 })
 
-schemaTest('persists schema defaults into an existing file', () => {
+schemaTest('persists schema defaults into an existing file on write', () => {
   const cwd = temporaryDirectory()
   fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({}))
 
   const config = createConf({ cwd })
+  assert.equal(config.get('foo'), 50)
+  assert.equal(fs.readFileSync(config.path, 'utf8'), '{}')
+
+  config.set('bar', 'https://example.com')
   assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
     foo: 50,
+    bar: 'https://example.com',
   })
 })
 
-schemaTest('persists coerced values', () => {
+schemaTest('persists coerced values on write', () => {
   const cwd = temporaryDirectory()
   fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ foo: '7' }))
 
@@ -265,8 +270,13 @@ schemaTest('persists coerced values', () => {
     schema: z.looseObject({ foo: z.coerce.number() }),
     defaults: { foo: 0 },
   })
+  assert.equal(config.get('foo'), 7)
+  assert.equal(fs.readFileSync(config.path, 'utf8'), '{"foo":"7"}')
+
+  config.set('other', 1)
   assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
     foo: 7,
+    other: 1,
   })
 })
 
@@ -307,6 +317,7 @@ schemaTest('reset leaves keys without a default unchanged', () => {
 
 schemaTest('defaults apply after the file is deleted', () => {
   const config = createConf()
+  config.set('foo', 10)
   fs.rmSync(config.path)
   assert.equal(config.get('foo'), 50)
 })
@@ -321,13 +332,11 @@ schemaTest('rejects async schemas', () => {
     },
   }
 
-  assert.throws(
-    () => new Conf({ cwd: temporaryDirectory(), schema: asyncSchema }),
-    {
-      name: 'TypeError',
-      message: /Async schemas are not supported/,
-    }
-  )
+  const config = new Conf({ cwd: temporaryDirectory(), schema: asyncSchema })
+  assert.throws(() => config.store, {
+    name: 'TypeError',
+    message: /Async schemas are not supported/,
+  })
 })
 
 const requiredSchema = z.looseObject({
@@ -338,13 +347,10 @@ const requiredSchema = z.looseObject({
 const requiredSuite = suite('Conf required fields')
 const { test: requiredTest } = requiredSuite
 
-requiredTest('throws on first run without defaults', () => {
-  assert.throws(
-    () =>
-      // @ts-expect-error - `defaults` is required for this schema.
-      new Conf({ cwd: temporaryDirectory(), schema: requiredSchema }),
-    /Config schema violation: `req`/
-  )
+requiredTest('throws on first read without defaults', () => {
+  // @ts-expect-error - `defaults` is required for this schema.
+  const config = new Conf({ cwd: temporaryDirectory(), schema: requiredSchema })
+  assert.throws(() => config.get('req'), /Config schema violation: `req`/)
 })
 
 requiredTest('uses defaults on first run', () => {
@@ -353,9 +359,13 @@ requiredTest('uses defaults on first run', () => {
     schema: requiredSchema,
     defaults: { req: 1 },
   })
+  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+  assert.equal(fs.existsSync(config.path), false)
+
+  config.set('foo', 2)
   assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
     req: 1,
-    foo: 50,
+    foo: 2,
   })
 })
 
@@ -817,20 +827,16 @@ invalidTest('clearInvalidConfig on custom deserialize error', () => {
   assert.deepEqual({ ...config.store }, { foo: 50 })
 })
 
-invalidTest('clearInvalidConfig recovers on init', () => {
+invalidTest('clearInvalidConfig recovers on read without writing', () => {
   const cwd = temporaryDirectory()
-  fs.writeFileSync(
-    path.join(cwd, 'config.json'),
-    JSON.stringify({ u: { $url: 'nope' } })
-  )
+  const raw = JSON.stringify({ u: { $url: 'nope' } })
+  fs.writeFileSync(path.join(cwd, 'config.json'), raw)
   const config = createConf({ cwd, clearInvalidConfig: true })
   assert.equal(config.get('foo'), 50)
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
-    foo: 50,
-  })
+  assert.equal(fs.readFileSync(config.path, 'utf8'), raw)
 })
 
-invalidTest('clearInvalidConfig rewrites a cleared file on init', () => {
+invalidTest('clearInvalidConfig replaces a cleared file on write', () => {
   const cwd = temporaryDirectory()
   fs.writeFileSync(path.join(cwd, 'config.json'), '{invalid')
   const config = new Conf({
@@ -838,7 +844,12 @@ invalidTest('clearInvalidConfig rewrites a cleared file on init', () => {
     schema: z.looseObject({ bar: z.string().optional() }),
     clearInvalidConfig: true,
   })
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {})
+  assert.equal(fs.readFileSync(config.path, 'utf8'), '{invalid')
+
+  config.set('bar', 'x')
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+    bar: 'x',
+  })
 })
 
 invalidTest('deserialize errors propagate without clearInvalidConfig', () => {
@@ -849,9 +860,156 @@ invalidTest('deserialize errors propagate without clearInvalidConfig', () => {
 
 invalidTest('clearInvalidConfig does not hide fs errors', () => {
   const config = createConf({ clearInvalidConfig: true })
-  fs.rmSync(config.path)
   fs.mkdirSync(config.path)
   assert.throws(() => config.store, { code: 'EISDIR' })
+})
+
+const readOnlySuite = suite('Conf read-only access')
+const { test: readOnlyTest } = readOnlySuite
+
+/**
+ * Run every read API on `config`.
+ *
+ * @param {Conf<any>} config
+ */
+function readAll(config) {
+  config.get('foo')
+  config.has('foo')
+  void config.size
+  void config.store
+  void [...config]
+}
+
+/**
+ * Snapshot a file's bytes and mtime, or `undefined` when it is missing.
+ *
+ * @param {string} file
+ */
+function fileState(file) {
+  if (!fs.existsSync(file)) {
+    return undefined
+  }
+
+  return { data: fs.readFileSync(file), mtimeMs: fs.statSync(file).mtimeMs }
+}
+
+/** Permission checks don't apply to root, or on Windows. */
+const skipPermissions =
+  process.platform === 'win32' || process.geteuid?.() === 0
+
+readOnlyTest('constructing on a missing directory creates nothing', () => {
+  const parent = temporaryDirectory()
+  const cwd = path.join(parent, 'app')
+  const config = createConf({ cwd })
+
+  readAll(config)
+  assert.equal(config.get('foo'), 50)
+  assert.equal(fs.existsSync(cwd), false)
+})
+
+readOnlyTest('reads leave the file unchanged', () => {
+  const cases = [
+    { name: 'missing schema defaults', raw: '{}', schema },
+    {
+      name: 'coercion',
+      raw: '{"foo":"7"}',
+      schema: z.looseObject({ foo: z.coerce.number().default(1) }),
+    },
+    {
+      name: 'stripped keys',
+      raw: '{"foo":1,"extra":true}',
+      schema: z.object({ foo: z.number() }),
+    },
+    { name: 'missing file', raw: undefined, schema },
+  ]
+
+  for (const { name, raw, schema: caseSchema } of cases) {
+    const cwd = temporaryDirectory()
+    const file = path.join(cwd, 'config.json')
+
+    if (raw !== undefined) {
+      fs.writeFileSync(file, raw)
+      const old = new Date(Date.now() - 60_000)
+      fs.utimesSync(file, old, old)
+    }
+
+    const before = fileState(file)
+    const config = new Conf({ cwd, schema: caseSchema })
+    readAll(config)
+    readAll(config)
+
+    assert.deepEqual(fileState(file), before, name)
+    assert.deepEqual(
+      fs.readdirSync(cwd),
+      raw === undefined ? [] : ['config.json'],
+      name
+    )
+  }
+})
+
+readOnlyTest(
+  'reads work in a read-only directory',
+  () => {
+    const cwd = temporaryDirectory()
+    fs.writeFileSync(path.join(cwd, 'config.json'), '{"foo":7}')
+    fs.chmodSync(cwd, 0o555)
+
+    try {
+      const config = createConf({ cwd })
+      readAll(config)
+      assert.equal(config.get('foo'), 7)
+      assert.throws(() => config.set('foo', 8), { code: 'EACCES' })
+      assert.deepEqual(fs.readdirSync(cwd), ['config.json'])
+    } finally {
+      fs.chmodSync(cwd, 0o755)
+    }
+  },
+  { skip: skipPermissions }
+)
+
+readOnlyTest(
+  'reads return defaults under a read-only parent',
+  () => {
+    const parent = temporaryDirectory()
+    fs.chmodSync(parent, 0o555)
+
+    try {
+      const config = createConf({ cwd: path.join(parent, 'app') })
+      readAll(config)
+      assert.equal(config.get('foo'), 50)
+      assert.throws(() => config.set('foo', 8), { code: 'EACCES' })
+      assert.deepEqual(fs.readdirSync(parent), [])
+    } finally {
+      fs.chmodSync(parent, 0o755)
+    }
+  },
+  { skip: skipPermissions }
+)
+
+readOnlyTest('invalid files throw on first read, not when constructed', () => {
+  for (const raw of ['{invalid', '{"foo":"bad"}']) {
+    const cwd = temporaryDirectory()
+    fs.writeFileSync(path.join(cwd, 'config.json'), raw)
+    const config = createConf({ cwd })
+    assert.throws(() => config.get('foo'))
+  }
+})
+
+readOnlyTest('the first write persists defaults and schema output', () => {
+  const cwd = temporaryDirectory()
+  fs.writeFileSync(path.join(cwd, 'config.json'), '{"extra":true}')
+  const config = new Conf({
+    cwd,
+    schema: z.object({
+      foo: z.number().default(1),
+      bar: z.string().optional(),
+    }),
+  })
+  config.set('bar', 'x')
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+    foo: 1,
+    bar: 'x',
+  })
 })
 
 const writeSuite = suite('Conf atomic write')
@@ -896,7 +1054,6 @@ writeTest('leaves no temporary file behind', () => {
 
 writeTest('removes the temporary file when the write fails', () => {
   const config = createConf()
-  fs.rmSync(config.path)
   fs.mkdirSync(config.path)
 
   assert.throws(() => {

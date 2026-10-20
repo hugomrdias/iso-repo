@@ -169,11 +169,15 @@ interface BaseOptions<Schema extends StandardSchemaV1> {
   /** Access nested properties using dot notation. @default true */
   accessPropertiesByDotNotation?: boolean
   /**
-   * Reset to an empty config when the file cannot be deserialized or fails
-   * schema validation. File system errors are still thrown. @default false
+   * Read an empty config when the file cannot be deserialized or fails schema
+   * validation. The file is replaced on the next write. File system errors are
+   * still thrown. @default false
    */
   clearInvalidConfig?: boolean
-  /** Watch the config file for external changes. @default false */
+  /**
+   * Watch the config file for external changes. Creates an empty config file
+   * when there is none, as the watcher needs a target. @default false
+   */
   watch?: boolean
   /** File mode used when creating the config file. @default 0o600 */
   configFileMode?: number
