@@ -1,6 +1,38 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec'
 
 export type { StandardSchemaV1 } from '@standard-schema/spec'
+export type { ConfError } from './index.js'
+
+/**
+ * Code of a {@link ConfError}.
+ *
+ * - `ERR_CONF_PARSE`: the config file could not be deserialized.
+ * - `ERR_CONF_SCHEMA`: the config file failed schema validation.
+ * - `ERR_CONF_INVALID_VALUE`: a value being written failed schema validation.
+ * - `ERR_CONF_LOCKED`: the `lock` option timed out waiting for another process
+ *   to release the lock.
+ */
+export type ConfErrorCode =
+  | 'ERR_CONF_PARSE'
+  | 'ERR_CONF_SCHEMA'
+  | 'ERR_CONF_INVALID_VALUE'
+  | 'ERR_CONF_LOCKED'
+
+/** Options for the `lock` option. */
+export interface LockOptions {
+  /**
+   * How long a write waits for another process to release the lock before
+   * throwing a `ConfError` with code `ERR_CONF_LOCKED`, in milliseconds.
+   * @default 1000
+   */
+  timeout?: number
+  /**
+   * Age after which a lock is considered left behind by a killed process and
+   * removed, in milliseconds. A lock whose process is gone is removed right
+   * away. @default 10000
+   */
+  stale?: number
+}
 
 /** Serializes a config value to a UTF-8 string. */
 export type Serialize = (value: unknown) => string
@@ -169,14 +201,25 @@ interface BaseOptions<Schema extends StandardSchemaV1> {
   /** Access nested properties using dot notation. @default true */
   accessPropertiesByDotNotation?: boolean
   /**
-   * Reset to an empty config when the file cannot be deserialized or fails
-   * schema validation. File system errors are still thrown. @default false
+   * Read an empty config when the file cannot be deserialized or fails schema
+   * validation, instead of throwing a {@link ConfError}. The next write copies
+   * the invalid file to `<name>.invalid-<timestamp>.<ext>` next to it, then
+   * replaces it. File system errors are still thrown. @default false
    */
   clearInvalidConfig?: boolean
-  /** Watch the config file for external changes. @default false */
+  /**
+   * Watch the config file for external changes. Creates an empty config file
+   * when there is none, as the watcher needs a target. @default false
+   */
   watch?: boolean
   /** File mode used when creating the config file. @default 0o600 */
   configFileMode?: number
+  /**
+   * Hold an exclusive lock file (`<path>.lock`) while reading, changing and
+   * writing the config, so concurrent processes don't lose each other's
+   * writes. Reads never lock. @default false
+   */
+  lock?: boolean | LockOptions
   /** Custom serializer. Defaults to extended JSON via `stringify`. */
   serialize?: Serialize
   /** Custom deserializer. Defaults to extended JSON via `parse`. */

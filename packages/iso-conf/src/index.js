@@ -1,16 +1,25 @@
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { isDeepStrictEqual } from 'node:util'
-import { getDotPath, SchemaError } from '@standard-schema/utils'
-import { deleteProperty, getProperty, hasProperty, setProperty } from 'dot-prop'
-import envPaths from 'env-paths'
 import { parse, stringify } from 'iso-base/json'
-import { writeFileAtomicSync } from './write-file-atomic.js'
+import {
+  deleteProperty,
+  getProperty,
+  hasProperty,
+  setProperty,
+} from './dot-path.js'
+import {
+  isUnsupportedChange,
+  lockSync,
+  writeFileAtomicSync,
+} from './write-file-atomic.js'
 
 /**
  * @import {StandardSchemaV1} from '@standard-schema/spec'
  * @import {
+ *   ConfErrorCode,
  *   Deserialize,
  *   OnDidAnyChangeCallback,
  *   OnDidChangeCallback,
@@ -66,6 +75,86 @@ const kebabCase = (str) => {
 }
 
 /**
+ * Throw when `name` can't be used as a single folder name.
+ *
+ * @param {string} name
+ */
+const assertSafeFilename = (name) => {
+  const trimmed = name.trim()
+
+  if (
+    trimmed === '' ||
+    trimmed === '.' ||
+    trimmed === '..' ||
+    name.includes('/') ||
+    name.includes('\\') ||
+    name.includes('\0')
+  ) {
+    throw new Error(`Unsafe filename: ${JSON.stringify(name)}`)
+  }
+}
+
+/**
+ * Platform config folder for an app, matching `env-paths`.
+ *
+ * - macOS: `~/Library/Preferences/<name>`
+ * - Windows: `%APPDATA%\\<name>\\Config`
+ * - Linux and others: `$XDG_CONFIG_HOME/<name>`, or `~/.config/<name>`
+ *
+ * @param {string} name - App name.
+ * @param {string} suffix - Appended to `name` with a dash, unless empty.
+ */
+const configDirectory = (name, suffix) => {
+  assertSafeFilename(name)
+
+  if (suffix) {
+    name += `-${suffix}`
+  }
+
+  assertSafeFilename(name)
+
+  const homedir = os.homedir()
+  const { env } = process
+
+  if (process.platform === 'darwin') {
+    return path.join(homedir, 'Library', 'Preferences', name)
+  }
+
+  if (process.platform === 'win32') {
+    const appData = env.APPDATA || path.join(homedir, 'AppData', 'Roaming')
+    return path.join(appData, name, 'Config')
+  }
+
+  return path.join(env.XDG_CONFIG_HOME || path.join(homedir, '.config'), name)
+}
+
+/**
+ * Dot path of a schema issue, such as `a.b.0`, or `null` when the issue has
+ * no path or a key that is not a string or number.
+ *
+ * @param {StandardSchemaV1.Issue} issue
+ */
+const getDotPath = (issue) => {
+  if (!issue.path?.length) {
+    return null
+  }
+
+  const keys = []
+
+  for (const item of issue.path) {
+    const key = typeof item === 'object' ? item.key : item
+
+    if (typeof key !== 'string' && typeof key !== 'number') {
+      return null
+    }
+
+    keys.push(key)
+  }
+
+  return keys.join('.')
+}
+
+/**
  * Describes a `set()` key for error messages.
  *
  * `typeof null` and `typeof []` are both `object`, which would accept them
@@ -104,12 +193,60 @@ const checkValueType = (key, value) => {
 }
 
 /**
+ * Error thrown when a config file can't be loaded or a value can't be stored.
+ *
+ * File system errors such as `EACCES` or `EISDIR` are not wrapped. They are
+ * thrown as Node system errors with `code`, `syscall` and `path` set.
+ */
+export class ConfError extends Error {
+  /**
+   * - `ERR_CONF_PARSE`: the config file could not be deserialized.
+   * - `ERR_CONF_SCHEMA`: the config file failed schema validation.
+   * - `ERR_CONF_INVALID_VALUE`: a value being written failed schema validation.
+   * - `ERR_CONF_LOCKED`: the `lock` option timed out waiting for another
+   *   process to release the lock.
+   *
+   * @type {ConfErrorCode}
+   */
+  code
+
+  /**
+   * Absolute path to the config file.
+   *
+   * @type {string}
+   */
+  path
+
+  /**
+   * Schema issues, for `ERR_CONF_SCHEMA` and `ERR_CONF_INVALID_VALUE`.
+   *
+   * @type {readonly StandardSchemaV1.Issue[] | undefined}
+   */
+  issues
+
+  /**
+   * @param {ConfErrorCode} code
+   * @param {string} message
+   * @param {{ path: string, issues?: readonly StandardSchemaV1.Issue[], cause?: unknown }} details
+   */
+  constructor(code, message, { path, issues, cause }) {
+    super(message, { cause })
+    this.name = 'ConfError'
+    this.code = code
+    this.path = path
+    this.issues = issues
+  }
+}
+
+/**
  * Validates a value against a Standard Schema.
  *
  * @param {StandardSchemaV1} schema - Schema to validate against.
  * @param {unknown} value - Value to validate.
+ * @param {ConfErrorCode} code - Error code for a validation failure.
+ * @param {string} filePath - Config file path for a validation failure.
  */
-const validateSchema = (schema, value) => {
+const validateSchema = (schema, value, code, filePath) => {
   const result = schema['~standard'].validate(value)
 
   if (result instanceof Promise) {
@@ -125,9 +262,10 @@ const validateSchema = (schema, value) => {
         return dotPath ? `\`${dotPath}\` ${issue.message}` : issue.message
       })
       .join('; ')
-    const error = new SchemaError(result.issues)
-    error.message = `Config schema violation: ${message}`
-    throw error
+    throw new ConfError(code, `Config schema violation: ${message}`, {
+      path: filePath,
+      issues: result.issues,
+    })
   }
 
   return result.value
@@ -200,7 +338,6 @@ export class Conf {
     }
     this.events = new EventTarget()
     this.path = this.#resolvePath(options)
-    this.#initializeStore()
 
     if (options.watch) {
       this.#watch()
@@ -266,17 +403,17 @@ export class Conf {
       throw new TypeError('Use `delete()` to clear values')
     }
 
-    const store = this.store
-
-    if (typeof key === 'object') {
-      for (const [itemKey, itemValue] of Object.entries(key)) {
-        this.#setIn(store, itemKey, itemValue)
+    this.#mutate((store) => {
+      if (typeof key === 'object') {
+        for (const [itemKey, itemValue] of Object.entries(key)) {
+          this.#setIn(store, itemKey, itemValue)
+        }
+      } else {
+        this.#setIn(store, key, value)
       }
-    } else {
-      this.#setIn(store, key, value)
-    }
 
-    this.store = store
+      return store
+    })
   }
 
   /**
@@ -307,17 +444,18 @@ export class Conf {
     const keyPath = String(key)
     checkValueType(keyPath, value)
 
-    const store = this.store
-    const array = this.#getIn(store, keyPath, [])
+    this.#mutate((store) => {
+      const array = this.#getIn(store, keyPath, [])
 
-    if (!Array.isArray(array)) {
-      throw new TypeError(
-        `The key \`${keyPath}\` is already set to a non-array value`
-      )
-    }
+      if (!Array.isArray(array)) {
+        throw new TypeError(
+          `The key \`${keyPath}\` is already set to a non-array value`
+        )
+      }
 
-    this.#setIn(store, keyPath, [...array, value])
-    this.store = store
+      this.#setIn(store, keyPath, [...array, value])
+      return store
+    })
   }
 
   /**
@@ -329,22 +467,21 @@ export class Conf {
    * @param {...SchemaKeyPath<Schema>} keys - Keys to reset. Supports dot notation when enabled.
    */
   reset(...keys) {
-    const store = this.store
-    let changed = false
+    this.#mutate((store) => {
+      let changed = false
 
-    for (const key of keys) {
-      const keyPath = String(key)
-      const value = this.#defaultFor(store, keyPath)
+      for (const key of keys) {
+        const keyPath = String(key)
+        const value = this.#defaultFor(store, keyPath)
 
-      if (value !== undefined) {
-        this.#setIn(store, keyPath, value)
-        changed = true
+        if (value !== undefined) {
+          this.#setIn(store, keyPath, value)
+          changed = true
+        }
       }
-    }
 
-    if (changed) {
-      this.store = store
-    }
+      return changed ? store : undefined
+    })
   }
 
   /**
@@ -354,22 +491,71 @@ export class Conf {
    */
   delete(key) {
     const keyPath = String(key)
-    const store = this.store
 
-    if (this.#options.accessPropertiesByDotNotation) {
-      deleteProperty(store, keyPath)
-    } else {
-      delete store[keyPath]
+    this.#mutate((store) => {
+      if (this.#options.accessPropertiesByDotNotation) {
+        deleteProperty(store, keyPath)
+      } else {
+        delete store[keyPath]
+      }
+
+      return store
+    })
+  }
+
+  /**
+   * Read, change and write the whole config in one step.
+   *
+   * `fn` gets a fresh copy of the stored config and returns the new config,
+   * which is validated and written. Nothing is written when it is unchanged.
+   * With the `lock` option, no other process can write between the read and
+   * the write, so a "set if missing" is safe across processes:
+   *
+   * ```js
+   * const { installId } = config.update((store) =>
+   *   store.installId ? store : { ...store, installId: randomUUID() }
+   * )
+   * ```
+   *
+   * @param {(store: SchemaValues<Schema>) => SchemaValues<Schema>} fn - Returns the new config.
+   * @returns {SchemaValues<Schema>} The stored config.
+   */
+  update(fn) {
+    if (typeof fn !== 'function') {
+      throw new TypeError(
+        `Expected \`fn\` to be of type \`function\`, got ${typeof fn}`
+      )
     }
 
-    this.store = store
+    /** @type {SchemaValues<Schema> | undefined} */
+    let result
+
+    this.#mutate((store) => {
+      const before = this.#serialize(store)
+      const next = fn(store)
+
+      if (next === null || typeof next !== 'object' || Array.isArray(next)) {
+        throw new TypeError(
+          `Expected \`fn\` to return the new config object, got ${setKeyType(next)}`
+        )
+      }
+
+      const output = this.#validate(next, 'ERR_CONF_INVALID_VALUE')
+      result = output
+      return this.#serialize(output) === before ? undefined : output
+    }, true)
+
+    return /** @type {SchemaValues<Schema>} */ (result)
   }
 
   /**
    * Reset the config to the `defaults` option and schema default values.
+   *
+   * Does not read the current file, so it also replaces a corrupt or
+   * schema-invalid file.
    */
   clear() {
-    this.store = createPlainObject()
+    this.#replace(createPlainObject())
   }
 
   /**
@@ -437,11 +623,13 @@ export class Conf {
    * Validates `value` and persists the schema output. Missing top-level keys
    * are filled from the `defaults` option and schema defaults.
    *
+   * Does not read the current file, so it also replaces a corrupt or
+   * schema-invalid file.
+   *
    * @param {SchemaValues<Schema>} value
    */
   set store(value) {
-    this.#persist(this.#validate(value))
-    this.events.dispatchEvent(new Event('change'))
+    this.#replace(value)
   }
 
   /**
@@ -486,7 +674,6 @@ export class Conf {
       return fs.readFileSync(this.path, 'utf8')
     } catch (error) {
       if (/** @type {NodeJS.ErrnoException} */ (error).code === 'ENOENT') {
-        this.#ensureDirectory()
         return undefined
       }
 
@@ -495,7 +682,7 @@ export class Conf {
   }
 
   /**
-   * Build a new validated store object from raw file contents.
+   * Deserialize and validate raw config file contents into a new store object.
    *
    * @param {string | undefined} data - Raw file contents from `#readFile`.
    * @returns {SchemaValues<Schema>}
@@ -507,29 +694,231 @@ export class Conf {
   /**
    * Deserialize and validate raw config file contents.
    *
-   * `raw` is the deserialized file, or an empty object when the file is
-   * missing or was discarded by `clearInvalidConfig` (then `cleared` is
-   * `true`). `value` is always the validated store.
+   * A missing file loads as an empty config with defaults applied. So does an
+   * invalid file when `clearInvalidConfig` is enabled, and then `invalid` is
+   * `true`.
    *
    * @param {string | undefined} data - Raw file contents from `#readFile`.
-   * @returns {{ raw: Record<string, unknown>, value: SchemaValues<Schema>, cleared?: boolean }}
+   * @returns {{ value: SchemaValues<Schema>, invalid: boolean }}
    */
   #parse(data) {
     if (data !== undefined) {
       try {
-        /** @type {Record<string, unknown>} */
-        const raw = Object.assign(createPlainObject(), this.#deserialize(data))
-        return { raw, value: this.#validate(raw) }
+        return { value: this.#parseFile(data), invalid: false }
       } catch (error) {
-        if (!this.#options.clearInvalidConfig) {
+        if (!(error instanceof ConfError && this.#options.clearInvalidConfig)) {
           throw error
         }
       }
     }
 
-    /** @type {Record<string, unknown>} */
-    const raw = createPlainObject()
-    return { raw, value: this.#validate(raw), cleared: data !== undefined }
+    return {
+      value: this.#validate(createPlainObject(), 'ERR_CONF_SCHEMA'),
+      invalid: data !== undefined,
+    }
+  }
+
+  /**
+   * Deserialize and validate existing config file contents.
+   *
+   * @param {string} data - Raw file contents from `#readFile`.
+   * @returns {SchemaValues<Schema>}
+   * @throws {ConfError} `ERR_CONF_PARSE` or `ERR_CONF_SCHEMA` when invalid.
+   */
+  #parseFile(data) {
+    /** @type {unknown} */
+    let raw
+
+    try {
+      raw = this.#deserialize(data)
+    } catch (error) {
+      throw new ConfError(
+        'ERR_CONF_PARSE',
+        `Config file ${this.path} could not be parsed: ${error instanceof Error ? error.message : String(error)}`,
+        { path: this.path, cause: error }
+      )
+    }
+
+    return this.#validate(
+      Object.assign(createPlainObject(), raw),
+      'ERR_CONF_SCHEMA'
+    )
+  }
+
+  /**
+   * Load the current store, pass it to `update` and persist the result.
+   *
+   * @param {(store: SchemaValues<Schema>) => SchemaValues<Schema> | undefined} update -
+   *   Returns the new store, or `undefined` to skip the write.
+   * @param {boolean} [validated] - Whether `update` returns schema output that
+   *   is persisted as is.
+   */
+  #mutate(update, validated = false) {
+    const written = this.#locked(() => {
+      const { value, invalid } = this.#parse(this.#readFile())
+      const next = update(value)
+
+      if (next === undefined) {
+        return false
+      }
+
+      this.#save(next, invalid, validated)
+      return true
+    })
+
+    if (written) {
+      this.events.dispatchEvent(new Event('change'))
+    }
+  }
+
+  /**
+   * Replace the store with `value` without loading the current file.
+   *
+   * With `clearInvalidConfig`, the file is still read to back it up when it
+   * is invalid.
+   *
+   * @param {SchemaValues<Schema>} value
+   */
+  #replace(value) {
+    this.#locked(() => {
+      let invalid = false
+      const data = this.#options.clearInvalidConfig
+        ? this.#readFile()
+        : undefined
+
+      if (data !== undefined) {
+        try {
+          this.#parseFile(data)
+        } catch (error) {
+          if (!(error instanceof ConfError)) {
+            throw error
+          }
+
+          invalid = true
+        }
+      }
+
+      this.#save(value, invalid)
+    })
+
+    this.events.dispatchEvent(new Event('change'))
+  }
+
+  /**
+   * Run `fn` while holding the lock file when the `lock` option is enabled.
+   *
+   * @template T
+   * @param {() => T} fn
+   * @returns {T}
+   */
+  #locked(fn) {
+    const { lock } = this.#options
+
+    if (!lock) {
+      return fn()
+    }
+
+    const { timeout = 1000, stale = 10_000 } = lock === true ? {} : lock
+    // The lock file lives next to the config file.
+    this.#ensureDirectory()
+    const release = lockSync(`${this.path}.lock`, { timeout, stale })
+
+    if (!release) {
+      throw new ConfError(
+        'ERR_CONF_LOCKED',
+        `Timed out after ${timeout} ms waiting for the lock on config file ${this.path}`,
+        { path: this.path }
+      )
+    }
+
+    try {
+      return fn()
+    } finally {
+      release()
+    }
+  }
+
+  /**
+   * Validate and persist `value`.
+   *
+   * @param {SchemaValues<Schema>} value
+   * @param {boolean} invalid - Whether the current file is invalid and must be
+   *   backed up before it is replaced.
+   * @param {boolean} [validated] - Whether `value` is already schema output,
+   *   so it is persisted without validating it again.
+   */
+  #save(value, invalid, validated = false) {
+    const output = validated
+      ? value
+      : this.#validate(value, 'ERR_CONF_INVALID_VALUE')
+
+    // The output is read back as schema input on the next load, so it must
+    // pass validation again or the file could never be loaded.
+    if (this.#schema) {
+      try {
+        this.#validate(output, 'ERR_CONF_INVALID_VALUE')
+      } catch (error) {
+        throw new TypeError(
+          `Schema output must be valid schema input to be stored. ${/** @type {Error} */ (error).message}`,
+          { cause: error }
+        )
+      }
+    }
+
+    if (invalid) {
+      this.#backup()
+    }
+
+    this.#ensureDirectory()
+    this.#write(output)
+  }
+
+  /**
+   * Copy the config file to `<name>.invalid-<timestamp>.<ext>` next to it,
+   * with mode `configFileMode`.
+   */
+  #backup() {
+    const extension = this.#options.fileExtension
+      ? `.${this.#options.fileExtension}`
+      : ''
+    const basename = path.basename(this.path)
+    const name = basename.slice(0, basename.length - extension.length)
+    const stamp = Date.now()
+
+    for (let attempt = 0; ; attempt++) {
+      const suffix = attempt === 0 ? '' : `-${attempt}`
+      const backupPath = path.join(
+        path.dirname(this.path),
+        `${name}.invalid-${stamp}${suffix}${extension}`
+      )
+
+      try {
+        fs.copyFileSync(this.path, backupPath, fs.constants.COPYFILE_EXCL)
+      } catch (error) {
+        const code = /** @type {NodeJS.ErrnoException} */ (error).code
+
+        if (code === 'EEXIST') {
+          continue
+        }
+
+        // Another process replaced the invalid file first.
+        if (code === 'ENOENT') {
+          return
+        }
+
+        throw error
+      }
+
+      try {
+        fs.chmodSync(backupPath, this.#options.configFileMode ?? 0o600)
+      } catch (error) {
+        if (!isUnsupportedChange(error)) {
+          throw error
+        }
+      }
+
+      return
+    }
   }
 
   /**
@@ -577,7 +966,7 @@ export class Conf {
     }
 
     try {
-      return this.#getIn(this.#validate(probe), key)
+      return this.#getIn(this.#validate(probe, 'ERR_CONF_SCHEMA'), key)
     } catch {
       // The key is required and has no default.
       return undefined
@@ -663,9 +1052,10 @@ export class Conf {
    * the schema when present.
    *
    * @param {object} data - Config object to validate.
+   * @param {ConfErrorCode} code - Error code for a validation failure.
    * @returns {SchemaValues<Schema>}
    */
-  #validate(data) {
+  #validate(data, code) {
     const input = Object.assign(this.#defaults(), data)
 
     if (!this.#schema) {
@@ -673,32 +1063,8 @@ export class Conf {
     }
 
     return /** @type {SchemaValues<Schema>} */ (
-      validateSchema(this.#schema, input)
+      validateSchema(this.#schema, input, code, this.path)
     )
-  }
-
-  /**
-   * Write validated schema output to disk.
-   *
-   * The output is read back as schema input on the next load, so it must pass
-   * validation again or the file could never be loaded.
-   *
-   * @param {SchemaValues<Schema>} value - Validated config object.
-   */
-  #persist(value) {
-    if (this.#schema) {
-      try {
-        this.#validate(value)
-      } catch (error) {
-        throw new TypeError(
-          `Schema output must be valid schema input to be stored. ${/** @type {Error} */ (error).message}`,
-          { cause: error }
-        )
-      }
-    }
-
-    this.#ensureDirectory()
-    this.#write(value)
   }
 
   /** Ensure the config directory exists. */
@@ -709,19 +1075,22 @@ export class Conf {
   /**
    * Write config data to disk atomically.
    *
+   * Snap packages get no special case. `sindresorhus/conf` wrote directly to
+   * the file when `SNAP` was set, to work around its old atomic writer under
+   * Snap confinement, but a direct write truncates the file first, so
+   * concurrent readers and writers see and leave corrupt files. The atomic
+   * writer only creates, syncs and renames a temporary file in the config
+   * folder, which confinement rules for the config file also cover, and it
+   * tolerates `chmod` and `chown` failures.
+   *
    * @param {StandardSchemaV1.InferOutput<Schema>} value - Config object to persist.
    */
   #write(value) {
-    const data = this.#serialize(value)
-
-    if (process.env.SNAP) {
-      fs.writeFileSync(this.path, data, {
-        mode: this.#options.configFileMode,
-      })
-      return
-    }
-
-    writeFileAtomicSync(this.path, data, this.#options.configFileMode)
+    writeFileAtomicSync(
+      this.path,
+      this.#serialize(value),
+      this.#options.configFileMode
+    )
   }
 
   /**
@@ -792,13 +1161,29 @@ export class Conf {
         throw new Error('Please specify the `projectName` option.')
       }
 
-      options.cwd = envPaths(kebabCase(options.projectName), {
-        suffix: options.projectSuffix ?? 'nodejs',
-      }).config
+      options.cwd = configDirectory(
+        kebabCase(options.projectName),
+        options.projectSuffix ?? 'nodejs'
+      )
     }
 
     if (typeof options.fileExtension === 'string') {
       options.fileExtension = options.fileExtension.replace(/^\.+/, '')
+    }
+
+    if (options.lock && options.lock !== true) {
+      for (const name of /** @type {const} */ (['timeout', 'stale'])) {
+        const value = options.lock[name]
+
+        if (
+          value !== undefined &&
+          (typeof value !== 'number' || Number.isNaN(value) || value < 0)
+        ) {
+          throw new TypeError(
+            `Expected \`lock.${name}\` to be a non-negative number, got ${String(value)}`
+          )
+        }
+      }
     }
 
     if (options.serialize) {
@@ -829,23 +1214,11 @@ export class Conf {
   }
 
   /**
-   * Persist defaults and normalised schema output into the on-disk config when
-   * needed, and replace a file discarded by `clearInvalidConfig`.
+   * Watch the config file for external changes.
+   *
+   * `fs.watch` needs an existing target, so this creates an empty config file
+   * when there is none. It is the only constructor option that writes.
    */
-  #initializeStore() {
-    const { raw, value, cleared } = this.#parse(this.#readFile())
-
-    // Schemas may return a plain object for our null-prototype input, so only
-    // compare the top level by own properties.
-    if (
-      cleared ||
-      !isDeepStrictEqual(raw, Object.assign(createPlainObject(), value))
-    ) {
-      this.#persist(value)
-    }
-  }
-
-  /** Watch the config file for external changes. */
   #watch() {
     this.#ensureDirectory()
 

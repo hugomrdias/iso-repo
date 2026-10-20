@@ -50,13 +50,12 @@
   },
   "dependencies": {
     "@standard-schema/spec": "catalog:",
-    "@standard-schema/utils": "catalog:",
-    "dot-prop": "^10.2.0",
-    "env-paths": "^4.0.0",
     "iso-base": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "dot-prop": "^10.2.0",
+    "env-paths": "^4.0.0",
     "playwright-test": "catalog:",
     "tempy": "catalog:",
     "typescript": "catalog:",
