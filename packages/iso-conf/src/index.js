@@ -543,7 +543,7 @@ export class Conf {
       const output = this.#validate(next, 'ERR_CONF_INVALID_VALUE')
       result = output
       return this.#serialize(output) === before ? undefined : output
-    })
+    }, true)
 
     return /** @type {SchemaValues<Schema>} */ (result)
   }
@@ -750,8 +750,10 @@ export class Conf {
    *
    * @param {(store: SchemaValues<Schema>) => SchemaValues<Schema> | undefined} update -
    *   Returns the new store, or `undefined` to skip the write.
+   * @param {boolean} [validated] - Whether `update` returns schema output that
+   *   is persisted as is.
    */
-  #mutate(update) {
+  #mutate(update, validated = false) {
     const written = this.#locked(() => {
       const { value, invalid } = this.#parse(this.#readFile())
       const next = update(value)
@@ -760,7 +762,7 @@ export class Conf {
         return false
       }
 
-      this.#save(next, invalid)
+      this.#save(next, invalid, validated)
       return true
     })
 
@@ -842,9 +844,13 @@ export class Conf {
    * @param {SchemaValues<Schema>} value
    * @param {boolean} invalid - Whether the current file is invalid and must be
    *   backed up before it is replaced.
+   * @param {boolean} [validated] - Whether `value` is already schema output,
+   *   so it is persisted without validating it again.
    */
-  #save(value, invalid) {
-    const output = this.#validate(value, 'ERR_CONF_INVALID_VALUE')
+  #save(value, invalid, validated = false) {
+    const output = validated
+      ? value
+      : this.#validate(value, 'ERR_CONF_INVALID_VALUE')
 
     // The output is read back as schema input on the next load, so it must
     // pass validation again or the file could never be loaded.
@@ -1163,6 +1169,21 @@ export class Conf {
 
     if (typeof options.fileExtension === 'string') {
       options.fileExtension = options.fileExtension.replace(/^\.+/, '')
+    }
+
+    if (options.lock && options.lock !== true) {
+      for (const name of /** @type {const} */ (['timeout', 'stale'])) {
+        const value = options.lock[name]
+
+        if (
+          value !== undefined &&
+          (typeof value !== 'number' || Number.isNaN(value) || value < 0)
+        ) {
+          throw new TypeError(
+            `Expected \`lock.${name}\` to be a non-negative number, got ${String(value)}`
+          )
+        }
+      }
     }
 
     if (options.serialize) {

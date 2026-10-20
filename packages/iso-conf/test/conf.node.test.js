@@ -2037,6 +2037,23 @@ lockTest('a live lock past timeout throws ERR_CONF_LOCKED', () => {
   ])
 })
 
+lockTest('rejects invalid lock durations', () => {
+  for (const lock of [
+    { timeout: Number.NaN },
+    { stale: Number.NaN },
+    { timeout: -1 },
+    { stale: '1000' },
+  ]) {
+    assert.throws(
+      // @ts-expect-error - runtime validation should reject bad durations.
+      () => createConf({ lock }),
+      { name: 'TypeError', message: /^Expected `lock\.(timeout|stale)` / }
+    )
+  }
+
+  createConf({ lock: { timeout: Number.POSITIVE_INFINITY, stale: 0 } })
+})
+
 lockTest('leaves no lock file after a successful or failed write', () => {
   const config = createConf({ lock: true })
   config.set('foo', 3)
@@ -2131,6 +2148,23 @@ updateTest('writes and returns the new store', () => {
     assert.equal(mutated.foo, 7)
     assert.equal(config.get('foo'), 7)
   }
+})
+
+updateTest('returns the value it writes', () => {
+  const config = new Conf({
+    cwd: temporaryDirectory(),
+    schema: z.object({
+      count: z
+        .number()
+        .transform((n) => n + 1)
+        .default(0),
+    }),
+  })
+
+  const stored = config.update((store) => ({ ...store, count: 1 }))
+  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+    count: stored.count,
+  })
 })
 
 updateTest('skips the write when nothing changed', () => {
