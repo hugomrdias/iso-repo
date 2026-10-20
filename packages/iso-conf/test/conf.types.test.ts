@@ -160,3 +160,13 @@ try {
     expectType<'ERR_OTHER'>(error.code)
   }
 }
+
+const updated = config.update((store) => ({ ...store, foo: store.foo + 1 }))
+expectType<z.infer<typeof schema>>(updated)
+// @ts-expect-error - `fn` returns the full store.
+config.update(() => ({ foo: 'bad' }))
+
+new Conf({ cwd: temporaryDirectory(), lock: true })
+new Conf({ cwd: temporaryDirectory(), lock: { timeout: 100, stale: 1000 } })
+// @ts-expect-error - lock options are numbers.
+new Conf({ cwd: temporaryDirectory(), lock: { timeout: '1s' } })

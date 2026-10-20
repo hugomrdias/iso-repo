@@ -1506,6 +1506,42 @@ writeTest('removes stale temporary files from dead processes', () => {
   )
 })
 
+/** Multi-process tests fsync hundreds of writes, which is slow on some disks. */
+const RACE_TIMEOUT = 60_000
+
+/**
+ * Run `body` in `processes` child processes in parallel. `body` is module
+ * code with `Conf`, `cwd` and the process index `id` in scope, and prints a
+ * JSON result.
+ *
+ * @param {{ cwd: string, processes: number, body: string, env?: Record<string, string> }} params
+ * @returns {Promise<any[]>} Each process's parsed output.
+ */
+async function runChildren({ cwd, processes, body, env = {} }) {
+  // Tests are bundled, so resolve the source from the package directory.
+  const entry = pathToFileURL(path.resolve('src/index.js')).href
+  const script = `
+    const { Conf } = await import(${JSON.stringify(entry)})
+    const cwd = ${JSON.stringify(cwd)}
+    const id = Number(process.argv[1])
+    ${body}
+  `
+  const run = promisify(execFile)
+  const outputs = await Promise.all(
+    Array.from({ length: processes }, (_, id) =>
+      run(
+        process.execPath,
+        ['--input-type=module', '--eval', script, `${id}`],
+        {
+          env: { ...process.env, ...env },
+        }
+      )
+    )
+  )
+
+  return outputs.map(({ stdout }) => JSON.parse(stdout))
+}
+
 /**
  * Run `processes` child processes in parallel, each calling `set` `writes`
  * times with its own keys on one config file.
@@ -1514,37 +1550,28 @@ writeTest('removes stale temporary files from dead processes', () => {
  */
 async function raceWrites({ processes, writes, env = {}, options = {} }) {
   const cwd = temporaryDirectory()
-  // Tests are bundled, so resolve the source from the package directory.
-  const entry = pathToFileURL(path.resolve('src/index.js')).href
-  const script = `
-    const { Conf } = await import(${JSON.stringify(entry)})
-    const [id, n] = process.argv.slice(1)
-    const c = new Conf({
-      cwd: ${JSON.stringify(cwd)},
-      accessPropertiesByDotNotation: false,
-      ...${JSON.stringify(options)},
-    })
-    const errors = []
-    for (let i = 0; i < Number(n); i++) {
-      try {
-        c.set(id + '-' + i, i)
-      } catch (error) {
-        errors.push(error.code ?? error.name)
+  const outputs = await runChildren({
+    cwd,
+    processes,
+    env,
+    body: `
+      const c = new Conf({
+        cwd,
+        accessPropertiesByDotNotation: false,
+        ...${JSON.stringify(options)},
+      })
+      const errors = []
+      for (let i = 0; i < ${writes}; i++) {
+        try {
+          c.set(id + '-' + i, i)
+        } catch (error) {
+          errors.push(error.code ?? error.name)
+        }
       }
-    }
-    console.log(JSON.stringify(errors))
-  `
-  const run = promisify(execFile)
-  const outputs = await Promise.all(
-    Array.from({ length: processes }, (_, id) =>
-      run(
-        process.execPath,
-        ['--input-type=module', '--eval', script, String(id), String(writes)],
-        { env: { ...process.env, ...env } }
-      )
-    )
-  )
-  const errors = outputs.flatMap(({ stdout }) => JSON.parse(stdout))
+      console.log(JSON.stringify(errors))
+    `,
+  })
+  const errors = outputs.flat()
   const raw = fs.readFileSync(path.join(cwd, 'config.json'), 'utf8')
 
   return { cwd, errors, raw }
@@ -1584,15 +1611,258 @@ writeTest('writes atomically when SNAP is set', () => {
   assert.equal(config.get('foo'), 33)
 })
 
-writeTest('concurrent writers with SNAP set keep the file valid', async () => {
-  const { errors, raw } = await raceWrites({
-    processes: 4,
-    writes: 200,
-    env: { SNAP: '/snap/node/1' },
+writeTest(
+  'concurrent writers with SNAP set keep the file valid',
+  async () => {
+    const { errors, raw } = await raceWrites({
+      processes: 4,
+      writes: 200,
+      env: { SNAP: '/snap/node/1' },
+    })
+
+    assert.deepEqual(errors, [])
+    assert.doesNotThrow(() => JSON.parse(raw))
+  },
+  { timeout: RACE_TIMEOUT }
+)
+
+const lockSuite = suite('Conf lock')
+const { test: lockTest } = lockSuite
+
+/**
+ * Write a lock file for `config` as if `pid` on this host held it.
+ *
+ * @param {Conf<any>} config
+ * @param {number} pid
+ * @param {number} [ageMs]
+ */
+function writeLock(config, pid, ageMs = 0) {
+  const lockPath = `${config.path}.lock`
+  fs.mkdirSync(path.dirname(lockPath), { recursive: true })
+  fs.writeFileSync(lockPath, `${pid} ${os.hostname()} 0123456789abcdef`)
+
+  if (ageMs > 0) {
+    const time = new Date(Date.now() - ageMs)
+    fs.utimesSync(lockPath, time, time)
+  }
+
+  return lockPath
+}
+
+lockTest(
+  'concurrent writers keep every key',
+  async () => {
+    const { cwd, errors, raw } = await raceWrites({
+      processes: 4,
+      writes: 200,
+      options: { lock: true },
+    })
+
+    assert.deepEqual(errors, [])
+    assert.equal(Object.keys(JSON.parse(raw)).length, 800)
+    assert.deepEqual(fs.readdirSync(cwd), ['config.json'])
+  },
+  { timeout: RACE_TIMEOUT }
+)
+
+lockTest(
+  'parallel first runs agree on one installId',
+  async () => {
+    const cwd = temporaryDirectory()
+    const ids = await runChildren({
+      cwd,
+      processes: 6,
+      body: `
+      const { randomUUID } = await import('node:crypto')
+      const c = new Conf({ cwd, configName: 'clipact', lock: true })
+      const { installId } = c.update((s) =>
+        s.installId ? s : { ...s, installId: randomUUID() }
+      )
+      console.log(JSON.stringify(installId))
+    `,
+    })
+
+    const stored = JSON.parse(
+      fs.readFileSync(path.join(cwd, 'clipact.json'), 'utf8')
+    ).installId
+    assert.equal(typeof stored, 'string')
+    assert.deepEqual(ids, Array(6).fill(stored))
+    assert.deepEqual(fs.readdirSync(cwd), ['clipact.json'])
+  },
+  { timeout: RACE_TIMEOUT }
+)
+
+lockTest('breaks a lock left by a dead process', () => {
+  const config = createConf({ lock: { timeout: 100 } })
+  const lockPath = writeLock(config, 999_999_999)
+
+  config.set('foo', 3)
+  assert.equal(config.get('foo'), 3)
+  assert.equal(fs.existsSync(lockPath), false)
+})
+
+lockTest('breaks a lock older than stale', () => {
+  const config = createConf({ lock: { timeout: 100, stale: 1000 } })
+  const lockPath = writeLock(config, process.ppid, 5000)
+
+  config.set('foo', 3)
+  assert.equal(config.get('foo'), 3)
+  assert.equal(fs.existsSync(lockPath), false)
+})
+
+lockTest('a live lock past timeout throws ERR_CONF_LOCKED', () => {
+  const config = createConf({ lock: { timeout: 50 } })
+  config.store = { foo: 3 }
+  const before = fs.readFileSync(config.path, 'utf8')
+  const lockPath = writeLock(config, process.ppid)
+  const start = Date.now()
+
+  for (const write of [
+    () => config.set('foo', 4),
+    () => config.clear(),
+    () => config.update((s) => ({ ...s, foo: 5 })),
+  ]) {
+    assert.throws(write, (/** @type {any} */ error) => {
+      assert.ok(error instanceof ConfError)
+      assert.equal(error.code, 'ERR_CONF_LOCKED')
+      assert.equal(error.path, config.path)
+      return true
+    })
+  }
+
+  assert.ok(Date.now() - start >= 150)
+  assert.equal(fs.readFileSync(config.path, 'utf8'), before)
+  assert.equal(fs.existsSync(lockPath), true)
+  assert.deepEqual(fs.readdirSync(pathFor(config)).sort(), [
+    'config.json',
+    'config.json.lock',
+  ])
+})
+
+lockTest('leaves no lock file after a successful or failed write', () => {
+  const config = createConf({ lock: true })
+  config.set('foo', 3)
+  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+
+  // @ts-expect-error - runtime validation should reject schema-invalid values.
+  assert.throws(() => config.set('foo', 'bad'), {
+    code: 'ERR_CONF_INVALID_VALUE',
+  })
+  assert.throws(
+    () =>
+      config.update(() => {
+        throw new Error('boom')
+      }),
+    { message: 'boom' }
+  )
+  fs.writeFileSync(config.path, '{bad')
+  assert.throws(() => config.set('foo', 4), { code: 'ERR_CONF_PARSE' })
+  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+})
+
+lockTest('reads never create or wait on the lock', () => {
+  const config = createConf({ lock: { timeout: 5000 } })
+  config.set('foo', 3)
+  const lockPath = writeLock(config, process.ppid)
+  const start = Date.now()
+
+  readAll(config)
+  assert.equal(config.get('foo'), 3)
+  assert.ok(Date.now() - start < 1000)
+  fs.rmSync(lockPath)
+
+  readAll(config)
+  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+})
+
+lockTest(
+  'a locked write in a read-only folder throws the fs error',
+  () => {
+    const cwd = temporaryDirectory()
+    fs.chmodSync(cwd, 0o555)
+
+    try {
+      const config = createConf({ cwd, lock: true })
+      assert.throws(
+        () => config.set('foo', 8),
+        (/** @type {any} */ error) => {
+          assert.equal(error instanceof ConfError, false)
+          assert.equal(error.code, 'EACCES')
+          return true
+        }
+      )
+      assert.deepEqual(fs.readdirSync(cwd), [])
+    } finally {
+      fs.chmodSync(cwd, 0o755)
+    }
+  },
+  { skip: skipPermissions }
+)
+
+lockTest('writes inside update do not wait for their own lock', () => {
+  const config = createConf({ lock: { timeout: 50 } })
+  const stored = config.update((store) => {
+    config.set('bar', 'https://example.com')
+    return store
   })
 
-  assert.deepEqual(errors, [])
-  assert.doesNotThrow(() => JSON.parse(raw))
+  assert.equal(stored.foo, 50)
+  assert.equal(config.get('bar'), 'https://example.com')
+  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+})
+
+const updateSuite = suite('Conf update')
+const { test: updateTest } = updateSuite
+
+updateTest('writes and returns the new store', () => {
+  for (const lock of [false, true]) {
+    const config = createConf({ lock })
+    /** @type {unknown[]} */
+    const changes = []
+    config.onDidChange('foo', (value) => changes.push(value))
+
+    const stored = config.update((store) => ({ ...store, foo: store.foo + 1 }))
+    assert.deepEqual({ ...stored }, { foo: 51 })
+    assert.equal(config.get('foo'), 51)
+    assert.deepEqual(changes, [51])
+
+    const mutated = config.update((store) => {
+      store.foo = 7
+      return store
+    })
+    assert.equal(mutated.foo, 7)
+    assert.equal(config.get('foo'), 7)
+  }
+})
+
+updateTest('skips the write when nothing changed', () => {
+  const config = createConf()
+  let changes = 0
+  config.events.addEventListener('change', () => changes++)
+
+  const stored = config.update((store) => store)
+  assert.deepEqual({ ...stored }, { foo: 50 })
+  assert.equal(fs.existsSync(config.path), false)
+  assert.equal(changes, 0)
+})
+
+updateTest('validates the new store', () => {
+  const config = createConf()
+  // @ts-expect-error - runtime validation should reject schema-invalid values.
+  assert.throws(() => config.update(() => ({ foo: 'bad' })), {
+    code: 'ERR_CONF_INVALID_VALUE',
+  })
+  assert.throws(
+    // @ts-expect-error - `fn` must return the new store.
+    () => config.update(() => undefined),
+    {
+      name: 'TypeError',
+      message: /return the new config object, got undefined/,
+    }
+  )
+  // @ts-expect-error - `fn` must be a function.
+  assert.throws(() => config.update(1), { name: 'TypeError' })
+  assert.equal(fs.existsSync(config.path), false)
 })
 
 const watchSuite = suite('Conf watch')

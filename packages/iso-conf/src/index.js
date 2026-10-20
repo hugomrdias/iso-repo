@@ -8,6 +8,7 @@ import envPaths from 'env-paths'
 import { parse, stringify } from 'iso-base/json'
 import {
   isUnsupportedChange,
+  lockSync,
   writeFileAtomicSync,
 } from './write-file-atomic.js'
 
@@ -118,6 +119,8 @@ export class ConfError extends Error {
    * - `ERR_CONF_PARSE`: the config file could not be deserialized.
    * - `ERR_CONF_SCHEMA`: the config file failed schema validation.
    * - `ERR_CONF_INVALID_VALUE`: a value being written failed schema validation.
+   * - `ERR_CONF_LOCKED`: the `lock` option timed out waiting for another
+   *   process to release the lock.
    *
    * @type {ConfErrorCode}
    */
@@ -417,6 +420,51 @@ export class Conf {
   }
 
   /**
+   * Read, change and write the whole config in one step.
+   *
+   * `fn` gets a fresh copy of the stored config and returns the new config,
+   * which is validated and written. Nothing is written when it is unchanged.
+   * With the `lock` option, no other process can write between the read and
+   * the write, so a "set if missing" is safe across processes:
+   *
+   * ```js
+   * const { installId } = config.update((store) =>
+   *   store.installId ? store : { ...store, installId: randomUUID() }
+   * )
+   * ```
+   *
+   * @param {(store: SchemaValues<Schema>) => SchemaValues<Schema>} fn - Returns the new config.
+   * @returns {SchemaValues<Schema>} The stored config.
+   */
+  update(fn) {
+    if (typeof fn !== 'function') {
+      throw new TypeError(
+        `Expected \`fn\` to be of type \`function\`, got ${typeof fn}`
+      )
+    }
+
+    /** @type {SchemaValues<Schema> | undefined} */
+    let result
+
+    this.#mutate((store) => {
+      const before = this.#serialize(store)
+      const next = fn(store)
+
+      if (next === null || typeof next !== 'object' || Array.isArray(next)) {
+        throw new TypeError(
+          `Expected \`fn\` to return the new config object, got ${setKeyType(next)}`
+        )
+      }
+
+      const output = this.#validate(next, 'ERR_CONF_INVALID_VALUE')
+      result = output
+      return this.#serialize(output) === before ? undefined : output
+    })
+
+    return /** @type {SchemaValues<Schema>} */ (result)
+  }
+
+  /**
    * Reset the config to the `defaults` option and schema default values.
    *
    * Does not read the current file, so it also replaces a corrupt or
@@ -620,11 +668,20 @@ export class Conf {
    *   Returns the new store, or `undefined` to skip the write.
    */
   #mutate(update) {
-    const { value, invalid } = this.#parse(this.#readFile())
-    const next = update(value)
+    const written = this.#locked(() => {
+      const { value, invalid } = this.#parse(this.#readFile())
+      const next = update(value)
 
-    if (next !== undefined) {
+      if (next === undefined) {
+        return false
+      }
+
       this.#save(next, invalid)
+      return true
+    })
+
+    if (written) {
+      this.events.dispatchEvent(new Event('change'))
     }
   }
 
@@ -637,26 +694,66 @@ export class Conf {
    * @param {SchemaValues<Schema>} value
    */
   #replace(value) {
-    let invalid = false
-    const data = this.#options.clearInvalidConfig ? this.#readFile() : undefined
+    this.#locked(() => {
+      let invalid = false
+      const data = this.#options.clearInvalidConfig
+        ? this.#readFile()
+        : undefined
 
-    if (data !== undefined) {
-      try {
-        this.#parseFile(data)
-      } catch (error) {
-        if (!(error instanceof ConfError)) {
-          throw error
+      if (data !== undefined) {
+        try {
+          this.#parseFile(data)
+        } catch (error) {
+          if (!(error instanceof ConfError)) {
+            throw error
+          }
+
+          invalid = true
         }
-
-        invalid = true
       }
-    }
 
-    this.#save(value, invalid)
+      this.#save(value, invalid)
+    })
+
+    this.events.dispatchEvent(new Event('change'))
   }
 
   /**
-   * Validate and persist `value`, then dispatch a `change` event.
+   * Run `fn` while holding the lock file when the `lock` option is enabled.
+   *
+   * @template T
+   * @param {() => T} fn
+   * @returns {T}
+   */
+  #locked(fn) {
+    const { lock } = this.#options
+
+    if (!lock) {
+      return fn()
+    }
+
+    const { timeout = 1000, stale = 10_000 } = lock === true ? {} : lock
+    // The lock file lives next to the config file.
+    this.#ensureDirectory()
+    const release = lockSync(`${this.path}.lock`, { timeout, stale })
+
+    if (!release) {
+      throw new ConfError(
+        'ERR_CONF_LOCKED',
+        `Timed out after ${timeout} ms waiting for the lock on config file ${this.path}`,
+        { path: this.path }
+      )
+    }
+
+    try {
+      return fn()
+    } finally {
+      release()
+    }
+  }
+
+  /**
+   * Validate and persist `value`.
    *
    * @param {SchemaValues<Schema>} value
    * @param {boolean} invalid - Whether the current file is invalid and must be
@@ -684,7 +781,6 @@ export class Conf {
 
     this.#ensureDirectory()
     this.#write(output)
-    this.events.dispatchEvent(new Event('change'))
   }
 
   /**

@@ -6,7 +6,8 @@
 
 - Fully typed via [Standard Schema](https://standardschema.dev) — works with Zod, Valibot, ArkType, and more
 - Extended JSON types (URL, Map, Set, bigint, RegExp, Uint8Array)
-- Atomic writes to disk
+- Atomic writes to disk, with an opt-in lock for concurrent processes
+- Reading never writes
 - Dot-notation access for nested properties
 - Change hooks (`onDidChange`, `onDidAnyChange`)
 - Defaults from schema
@@ -63,6 +64,34 @@ Defaults, schema defaults and coerced values are applied in memory on every read
 
 The one exception is `watch: true`, which creates an empty config file (and its folder) when there is none, because `fs.watch` needs a target.
 
+### Concurrent processes
+
+Writes are atomic, so readers always see a complete file. But every write reads the file, changes it and writes it back, so when two processes write at the same time the last one wins and the other's change is lost.
+
+Set `lock: true` to hold an exclusive lock file, `<path>.lock`, while a write reads, changes and writes the file. Writers in other processes wait for it. Reads never take or wait on the lock.
+
+```js
+const config = new Conf({ projectName: 'my-app', lock: true })
+```
+
+`lock` also takes `{ timeout, stale }`, in milliseconds:
+
+- `timeout` (default `1000`): how long a write waits for the lock before throwing a `ConfError` with code `ERR_CONF_LOCKED`. The file is left unchanged.
+- `stale` (default `10000`): age after which a lock left behind by a killed process is removed. A lock whose process is gone is removed right away when it was taken on the same host.
+
+Creating the lock file needs a writable folder, as writes do. In a read-only folder a locked write throws the file system error (`EACCES` or `EROFS`).
+
+Use `update(fn)` for a change that depends on the current value. `fn` gets a fresh copy of the stored config and returns the new one. With `lock`, no other process can write in between, and nothing is written when the config is unchanged.
+
+```js
+import { randomUUID } from 'node:crypto'
+
+// Every process ends up with the same id.
+const { installId } = config.update((store) =>
+  store.installId ? store : { ...store, installId: randomUUID() }
+)
+```
+
 ### Errors
 
 A config file that can't be loaded throws a `ConfError`:
@@ -72,6 +101,7 @@ A config file that can't be loaded throws a `ConfError`:
 | `ERR_CONF_PARSE` | The file could not be deserialized (corrupt JSON, a bad extended JSON value, or a custom `deserialize` that threw). `cause` is the original error. |
 | `ERR_CONF_SCHEMA` | The file failed schema validation. `issues` holds the Standard Schema issues. |
 | `ERR_CONF_INVALID_VALUE` | A value passed to a write method failed schema validation. Nothing is written. |
+| `ERR_CONF_LOCKED` | With `lock`, a write timed out waiting for another process to release the lock. Nothing is written. |
 
 Every `ConfError` has the config file `path`.
 

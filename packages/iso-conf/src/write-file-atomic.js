@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 
@@ -36,6 +37,14 @@ const STALE_TEMP_AGE = 60_000
 const sweptTargets = new Set()
 
 /**
+ * Lock files held by this process. A nested lock on the same path, such as a
+ * write inside `update()`, runs without waiting for itself.
+ *
+ * @type {Set<string>}
+ */
+const heldLocks = new Set()
+
+/**
  * Get the error code of a thrown value.
  *
  * @param {unknown} error
@@ -69,9 +78,18 @@ const retry = (fn) => {
         throw error
       }
 
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, delay)
+      sleepSync(delay)
     }
   }
+}
+
+/**
+ * Block the thread for `ms` milliseconds.
+ *
+ * @param {number} ms
+ */
+const sleepSync = (ms) => {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
 }
 
 /**
@@ -278,4 +296,136 @@ export const writeFileAtomicSync = (filePath, data, mode) => {
   }
 
   sweepStaleTempFiles(target)
+}
+
+/**
+ * Remove a lock file when it is stale: its process is gone, or it is older
+ * than `stale` milliseconds.
+ *
+ * The process check only applies to locks taken on this host, as process ids
+ * from other hosts or containers sharing the folder mean nothing here.
+ *
+ * @param {string} lockPath
+ * @param {number} stale
+ * @returns {boolean} Whether the lock is gone and taking it can be retried now.
+ */
+const breakStaleLock = (lockPath, stale) => {
+  /** @type {fs.Stats} */
+  let stats
+  /** @type {string} */
+  let content
+
+  try {
+    stats = fs.statSync(lockPath)
+    content = fs.readFileSync(lockPath, 'utf8')
+  } catch (error) {
+    return errorCode(error) === 'ENOENT'
+  }
+
+  const [pid, host] = content.split(' ')
+  const dead =
+    host === os.hostname() && Number(pid) > 0 && !isRunning(Number(pid))
+
+  if (!dead && Date.now() - stats.mtimeMs <= stale) {
+    return false
+  }
+
+  // Move the lock aside before removing it, so that of several processes
+  // breaking it at once only one succeeds.
+  const stalePath = `${lockPath}.${process.pid}.${randomBytes(4).toString('hex')}.stale`
+
+  try {
+    fs.renameSync(lockPath, stalePath)
+  } catch (error) {
+    return errorCode(error) === 'ENOENT'
+  }
+
+  attempt(() => {
+    const moved = fs.statSync(stalePath)
+
+    // Another process broke the stale lock and took a new one in between, so
+    // put that one back.
+    if (moved.ino !== stats.ino || moved.mtimeMs !== stats.mtimeMs) {
+      fs.linkSync(stalePath, lockPath)
+    }
+  })
+  attempt(() => fs.rmSync(stalePath, { force: true }))
+  return true
+}
+
+/**
+ * Take an exclusive lock file.
+ *
+ * Creates `lockPath` with the process id, host name and a random token. While
+ * another process holds it, retries every millisecond or two for up to
+ * `timeout` milliseconds, and breaks it when it is stale. File system errors other than
+ * the lock existing are thrown.
+ *
+ * @param {string} lockPath - Lock file path.
+ * @param {{ timeout: number, stale: number }} options
+ * @returns {(() => void) | undefined} Releases the lock, or `undefined` when
+ *   the lock could not be taken before the timeout.
+ */
+export const lockSync = (lockPath, { timeout, stale }) => {
+  if (heldLocks.has(lockPath)) {
+    return () => {
+      // The outer lock releases it.
+    }
+  }
+
+  const token = `${process.pid} ${os.hostname()} ${randomBytes(8).toString('hex')}`
+  const deadline = Date.now() + timeout
+
+  for (;;) {
+    try {
+      const fd = fs.openSync(lockPath, 'wx', 0o600)
+
+      try {
+        fs.writeSync(fd, token)
+      } catch (error) {
+        attempt(() => fs.closeSync(fd))
+        attempt(() => fs.rmSync(lockPath, { force: true }))
+        throw error
+      }
+
+      fs.closeSync(fd)
+      heldLocks.add(lockPath)
+
+      return () => {
+        heldLocks.delete(lockPath)
+
+        // Only remove the lock while it is still ours, as it may have been
+        // broken as stale and taken by another process.
+        attempt(() => {
+          if (fs.readFileSync(lockPath, 'utf8') === token) {
+            fs.rmSync(lockPath, { force: true })
+          }
+        })
+      }
+    } catch (error) {
+      const code = errorCode(error)
+
+      // Windows reports a lock file that is being deleted as EPERM.
+      if (
+        code !== 'EEXIST' &&
+        !(process.platform === 'win32' && code === 'EPERM')
+      ) {
+        throw error
+      }
+    }
+
+    if (breakStaleLock(lockPath, stale)) {
+      continue
+    }
+
+    const remaining = deadline - Date.now()
+
+    if (remaining <= 0) {
+      return undefined
+    }
+
+    // Poll often. A holder that writes again takes the lock back right after
+    // releasing it, so a waiter that sleeps longer rarely gets a turn.
+    sleepSync(Math.min(remaining, 1 + Math.random()))
+  }
 }
