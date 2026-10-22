@@ -39,6 +39,38 @@ describe('Verifier EdDSA', () => {
         did: signer,
       })
       assert.ok(verified)
+      assert.ok(
+        await EdDSA.verify({ signature, message, did: signer, strict: true })
+      )
     })
   }
+
+  it('should reject S + L', async () => {
+    const message = new TextEncoder().encode('hello world')
+    const signer = await EdDSASigner.generate()
+    const signature = await signer.sign(message)
+
+    // S is little-endian, S + L still fits in 32 bytes
+    const L = 2n ** 252n + 27742317777372353535851937790883648493n
+    let s = 0n
+    for (let i = 63; i >= 32; i--) s = (s << 8n) | BigInt(signature[i])
+    s += L
+    const malleated = new Uint8Array(signature)
+    for (let i = 32; i < 64; i++) {
+      malleated[i] = Number(s & 0xffn)
+      s >>= 8n
+    }
+
+    for (const strict of [false, true]) {
+      assert.equal(
+        await EdDSA.verify({
+          signature: malleated,
+          message,
+          did: signer,
+          strict,
+        }),
+        false
+      )
+    }
+  })
 })

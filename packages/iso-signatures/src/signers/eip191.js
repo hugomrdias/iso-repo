@@ -8,6 +8,41 @@ import { DIDPkh } from 'iso-did/pkh'
  * @typedef {import('eventemitter3').EventEmitter} EventEmitter
  */
 
+/** secp256k1 group order */
+const N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n
+
+/**
+ * Normalize an `r‖s‖v` EIP-191 signature to its canonical encoding: low S
+ * (`s <= n/2`) and `v` of 27 or 28.
+ *
+ * Wallets return `v` as 27 or 28, or as 0 or 1. Strict verifiers accept only
+ * the canonical encoding.
+ *
+ * @param {Uint8Array} signature
+ */
+export function normalizeSignature(signature) {
+  if (signature.length !== 65) {
+    throw new Error('Invalid signature length')
+  }
+  let v = signature[64]
+  if (v === 0 || v === 1) {
+    v += 27
+  }
+  if (v !== 27 && v !== 28) {
+    throw new Error('Invalid signature recovery byte')
+  }
+
+  const out = new Uint8Array(signature)
+  out[64] = v
+  const s = BigInt(`0x${hex.encode(signature.subarray(32, 64))}`)
+  if (s > N >> 1n) {
+    // (r, n - s) recovers the same key with the opposite y parity
+    out.set(hex.decode((N - s).toString(16).padStart(64, '0')), 32)
+    out[64] = v === 27 ? 28 : 27
+  }
+  return out
+}
+
 /**
  * EIP191 signer
  *
@@ -72,6 +107,8 @@ export class EIP191Signer extends DID {
   /**
    * Sign a message
    *
+   * Normalizes the wallet signature with {@link normalizeSignature}.
+   *
    * @param {Uint8Array} message
    */
   async sign(message) {
@@ -79,7 +116,7 @@ export class EIP191Signer extends DID {
       method: 'personal_sign',
       params: [`0x${hex.encode(message)}`, this.address],
     })
-    return hex.decode(result.slice(2))
+    return normalizeSignature(hex.decode(result.slice(2)))
   }
 
   /**

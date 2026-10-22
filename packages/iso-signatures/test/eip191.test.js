@@ -1,8 +1,10 @@
 import { Signature } from '@noble/secp256k1'
 import assert from 'assert'
+import { hex } from 'iso-base/rfc4648'
 import { utf8 } from 'iso-base/utf8'
 import { DIDPkh } from 'iso-did/pkh'
 import { privateKeyToAccount } from 'viem/accounts'
+import { EIP191Signer, normalizeSignature } from '../src/signers/eip191.js'
 import { ES256KSigner } from '../src/signers/es256k.js'
 import * as EIP191 from '../src/verifiers/eip191.js'
 import { Resolver } from '../src/verifiers/resolver.js'
@@ -236,6 +238,67 @@ describe('Verifier eip191', () => {
       assert.equal(
         await EIP191.verify({ signature, message: msg, did, strict: true }),
         false
+      )
+    })
+
+    it('should normalize every encoding to the strict one', async () => {
+      const signature = await sign(PRIVATE_KEY, msg)
+      const flipped = flipS(signature)
+      const variants = [
+        signature,
+        withV(signature, signature[64] - 27),
+        flipped,
+        withV(flipped, flipped[64] - 27),
+      ]
+
+      for (const variant of variants) {
+        const normalized = normalizeSignature(variant)
+        assert.deepEqual(normalized, signature, `v=${variant[64]}`)
+        assert.equal(
+          await EIP191.verify({
+            signature: normalized,
+            message: msg,
+            did,
+            strict: true,
+          }),
+          true
+        )
+      }
+    })
+
+    it('should reject invalid signatures when normalizing', () => {
+      assert.throws(
+        () => normalizeSignature(new Uint8Array(64)),
+        /Invalid signature length/
+      )
+      assert.throws(
+        () => normalizeSignature(new Uint8Array(65).fill(37, 64)),
+        /Invalid signature recovery byte/
+      )
+    })
+
+    it('EIP191Signer emits strict signatures from a wallet returning v 0/1', async () => {
+      const signer = new EIP191Signer(
+        /** @type {any} */ ({
+          /** @param {{params: [`0x${string}`, string]}} args */
+          request: async ({ params }) => {
+            const sig = await account.signMessage({
+              message: { raw: params[0] },
+            })
+            // high S and v as 0/1
+            const flipped = flipS(EIP191.hexToBytes(sig))
+            flipped[64] -= 27
+            return `0x${hex.encode(flipped)}`
+          },
+        }),
+        account.address
+      )
+
+      const signature = await signer.sign(msg)
+      assert.ok(signature[64] === 27 || signature[64] === 28)
+      assert.equal(
+        await EIP191.verify({ signature, message: msg, did, strict: true }),
+        true
       )
     })
   })
