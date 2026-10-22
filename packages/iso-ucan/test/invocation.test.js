@@ -7,12 +7,7 @@ import { assert, suite } from 'playwright-test/taps'
 import { Delegation } from '../src/delegation.js'
 import * as Envelope from '../src/envelope.js'
 import { Invocation } from '../src/invocation.js'
-import {
-  commandCovers,
-  equivalentSignatures,
-  nowInSeconds,
-  signaturePayload,
-} from '../src/utils.js'
+import { commandCovers, nowInSeconds, signaturePayload } from '../src/utils.js'
 import * as mocks from './mocks.js'
 
 const inv = suite('invocation')
@@ -268,44 +263,20 @@ inv('should fail when prf names a CID that is not the proof', async () => {
   )
 })
 
-inv(
-  'should fail when the resolver returns a malleated ECDSA proof',
-  async () => {
-    const es256 = await ECDSASigner.generate('P-256')
-    const { dlg } = await aliceProofFrom(es256, es256.did)
-    const [, flipped] = equivalentSignatures('ES256', dlg.envelope.signature)
-    const malleated = await Delegation.from({
-      bytes: Envelope.encode({
-        signature: flipped,
-        // @ts-expect-error - signaturePayload returns a generic record
-        signaturePayload: signaturePayload(dlg.envelope),
-      }),
-      verifierResolver: mocks.verifierResolver,
-    })
-    const invocation = await Invocation.create({
-      iss: mocks.alice,
-      sub: es256.did,
-      cmd: '/x',
-      args: {},
-      prf: [dlg],
-      verifierResolver: mocks.verifierResolver,
-    })
+inv('should reject a malleated ECDSA proof', async () => {
+  const es256 = await ECDSASigner.generate('P-256')
+  const { dlg } = await aliceProofFrom(es256, es256.did)
+  const bytes = Envelope.encode({
+    signature: mocks.flipS('ES256', dlg.envelope.signature),
+    // @ts-expect-error - signaturePayload returns a generic record
+    signaturePayload: signaturePayload(dlg.envelope),
+  })
 
-    await assert.rejects(
-      Invocation.from({
-        bytes: invocation.bytes,
-        verifierResolver: mocks.verifierResolver,
-        resolveProof: async () => malleated,
-      }),
-      /UCAN Invocation proof CID mismatch/
-    )
-    await Invocation.from({
-      bytes: invocation.bytes,
-      verifierResolver: mocks.verifierResolver,
-      resolveProof: async () => dlg,
-    })
-  }
-)
+  await assert.rejects(
+    Delegation.from({ bytes, verifierResolver: mocks.verifierResolver }),
+    { message: 'UCAN signature verification failed' }
+  )
+})
 
 inv('should fail from expired delegation', async () => {
   const store = mocks.createStore()

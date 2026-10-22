@@ -8,44 +8,13 @@ import * as mocks from './mocks.js'
 
 const replay = suite('replay')
 
-/** P-256 group order */
-const P256_N =
-  0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551n
-
-/**
- * @param {Uint8Array} bytes
- */
-function toBigInt(bytes) {
-  let hex = ''
-  for (const b of bytes) hex += b.toString(16).padStart(2, '0')
-  return BigInt(`0x${hex}`)
-}
-
-/**
- * @param {bigint} n
- * @param {number} length
- */
-function fromBigInt(n, length) {
-  const hex = n.toString(16).padStart(length * 2, '0')
-  const out = new Uint8Array(length)
-  for (let i = 0; i < length; i++) {
-    out[i] = Number.parseInt(hex.slice(i * 2, i * 2 + 2), 16)
-  }
-  return out
-}
-
 /**
  * Re-encode an ES256 invocation with the other valid signature `(r, n - s)`.
  *
  * @param {Invocation} inv
  */
 function malleate(inv) {
-  const sig = inv.envelope.signature
-  const s = toBigInt(sig.slice(32))
-  const signature = new Uint8Array([
-    ...sig.slice(0, 32),
-    ...fromBigInt(P256_N - s, 32),
-  ])
+  const signature = mocks.flipS('ES256', inv.envelope.signature)
   const decoded = Envelope.decode({ envelope: inv.bytes })
   return Envelope.encode({
     signature,
@@ -102,10 +71,10 @@ replay('should reject a replayed invocation', async () => {
   const replayStore = new KVReplayStore()
 
   const first = await from(inv.bytes, { replayStore })
-  assert.equal(first.replayKey, inv.replayKey)
+  assert.equal(first.cid.toString(), inv.cid.toString())
 
   await assert.rejects(from(inv.bytes, { replayStore }), {
-    message: `UCAN Invocation replay detected, already seen ${inv.replayKey}`,
+    message: `UCAN Invocation replay detected, already seen ${inv.cid}`,
   })
 })
 
@@ -120,7 +89,7 @@ replay('should accept distinct invocations of the same command', async () => {
     verifierResolver: mocks.verifierResolver,
   })
 
-  assert.notEqual(inv.replayKey, other.replayKey)
+  assert.notEqual(inv.cid.toString(), other.cid.toString())
   await from(inv.bytes, { replayStore })
   await from(other.bytes, { replayStore })
 })
@@ -137,7 +106,7 @@ replay('should not record invocations that fail validation', async () => {
     /Delegation not found/
   )
 
-  assert.equal(await replayStore.kv.has([inv.replayKey]), false)
+  assert.equal(await replayStore.kv.has([inv.cid.toString()]), false)
   await from(inv.bytes, { replayStore })
 })
 
@@ -146,15 +115,10 @@ replay('should reject a replay with a malleated ECDSA signature', async () => {
   const { inv, from } = await setup(es)
   const replayStore = new KVReplayStore()
 
-  const bytes = malleate(inv)
-  const malleated = await from(bytes)
-
-  // Same signed payload, different envelope CID
-  assert.notEqual(malleated.cid.toString(), inv.cid.toString())
-  assert.equal(malleated.replayKey, inv.replayKey)
-
   await from(inv.bytes, { replayStore })
-  await assert.rejects(from(bytes, { replayStore }), /replay detected/)
+  await assert.rejects(from(malleate(inv), { replayStore }), {
+    message: 'UCAN signature verification failed',
+  })
 })
 
 replay(
