@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v2.0.0...iso-ucan-v3.0.0) (2026-10-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-ucan:** remove RSA support ([#672](https://github.com/hugomrdias/iso-repo/issues/672))
+* **iso-ucan:** `Invocation#replayKey` and the `replayKey`, `equivalentSignatures` and `equivalentCids` helpers are removed. Use `Invocation#cid`. Replay stores populated by earlier versions hold payload CIDs, so they do not match the new keys. High-S ECDSA and EIP-191 signatures, and EIP-191 signatures with `v` of 0 or 1, are now rejected. P-256/384/521 UCANs signed before iso-signatures 0.6.0 may be high-S.
+
+### Features
+
+* **iso-ucan:** remove RSA support ([#672](https://github.com/hugomrdias/iso-repo/issues/672)) ([69a3ee5](https://github.com/hugomrdias/iso-repo/commit/69a3ee55557f9458809d93e8171b3cee88c308e8))
+
+
+### Bug Fixes
+
+* **iso-ucan:** verify signatures in strict mode and key replay and revocation on CID ([9e2dc59](https://github.com/hugomrdias/iso-repo/commit/9e2dc591904795675351038de25b511bdd96b84a))
+
 ## [2.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-ucan-v1.0.0...iso-ucan-v2.0.0) (2026-10-01)
 
 
