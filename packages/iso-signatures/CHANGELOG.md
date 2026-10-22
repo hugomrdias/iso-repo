@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.6.0...iso-signatures-v0.7.0) (2026-10-22)
+
+
+### Features
+
+* **iso-signatures:** normalize EIP-191 signatures and add Ed25519 strict mode ([731e9b3](https://github.com/hugomrdias/iso-repo/commit/731e9b3107f8da2d1e90974cca86c80d703e869a))
+
 ## [0.6.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.5.2...iso-signatures-v0.6.0) (2026-09-30)
 
 
