@@ -29,7 +29,7 @@ catalog:
   '@vitejs/plugin-react': ^6.1.1
   assert: ^2.1.0
   delay: ^7.0.0
-  globals: ^17.12.0
+  globals: ^17.13.0
   hono: ^4.13.9
   mocha: ^12.0.2
   msw: 2.14.6
