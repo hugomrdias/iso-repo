@@ -15,7 +15,6 @@ import {
   expOrTtl,
   isObject,
   nowInSeconds,
-  replayKey,
   verifySignature,
 } from './utils.js'
 
@@ -38,31 +37,18 @@ export class Invocation {
   cid
 
   /**
-   * Key to deduplicate this invocation on: the CID of its signature payload.
-   *
-   * Use this instead of {@link Invocation.cid} to detect replays. The CID
-   * covers the signature bytes, and some signature algorithms (e.g. ECDSA)
-   * accept more than one valid signature for the same payload.
-   *
-   * @type {string}
-   */
-  replayKey
-
-  /**
    *
    * @param {import("./types.js").DecodedEnvelope<'inv'>} envelope
    * @param {Uint8Array} bytes
    * @param {CID} cid
    * @param {Delegation[]} delegations
-   * @param {string} replayKey
    */
-  constructor(envelope, bytes, cid, delegations, replayKey) {
+  constructor(envelope, bytes, cid, delegations) {
     this.envelope = envelope
     this.payload = envelope.payload
     this.bytes = bytes
     this.cid = cid
     this.delegations = delegations
-    this.replayKey = replayKey
   }
 
   /**
@@ -104,7 +90,7 @@ export class Invocation {
       for (const proof of envelope.payload.prf) {
         const delegation = await options.resolveProof(proof)
         // The signature covers the proof CIDs, so the resolved delegation
-        // must be exactly that one (not an ECDSA-equivalent re-encoding)
+        // must be exactly that one
         if (!delegation.cid.equals(proof)) {
           throw new Error(
             `UCAN Invocation proof CID mismatch, expected ${proof} but resolver returned ${delegation.cid}`
@@ -121,20 +107,20 @@ export class Invocation {
       assertMaxTtl(envelope.payload.exp, options.maxTtl, options.now)
     }
 
-    const _replayKey = await replayKey(envelope)
+    const _cid = await cid(envelope)
 
     // Must run last, so only fully validated invocations are recorded
     if (
       options.replayStore &&
-      !(await options.replayStore.checkAndSet(_replayKey, envelope.payload.exp))
+      !(await options.replayStore.checkAndSet(
+        _cid.toString(),
+        envelope.payload.exp
+      ))
     ) {
-      throw new Error(
-        `UCAN Invocation replay detected, already seen ${_replayKey}`
-      )
+      throw new Error(`UCAN Invocation replay detected, already seen ${_cid}`)
     }
 
-    const _cid = await cid(envelope)
-    return new Invocation(envelope, bytes, _cid, proofs, _replayKey)
+    return new Invocation(envelope, bytes, _cid, proofs)
   }
 
   /**
@@ -196,13 +182,7 @@ export class Invocation {
       version: Envelope.VERSION,
     }
 
-    return new Invocation(
-      envelope,
-      bytes,
-      await cid(envelope),
-      options.prf,
-      await replayKey(envelope)
-    )
+    return new Invocation(envelope, bytes, await cid(envelope), options.prf)
   }
 }
 

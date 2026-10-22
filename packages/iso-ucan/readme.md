@@ -115,10 +115,11 @@ const invocation = await Invocation.from({
 })
 ```
 
-The store is keyed on `invocation.replayKey`, the CID of the signed payload.
-Do not deduplicate on `invocation.cid`: it also covers the signature, and
-some signature algorithms (such as ECDSA) accept more than one valid signature
-for the same payload.
+The store is keyed on `invocation.cid`. `iso-ucan` verifies signatures in
+strict mode, which accepts only the
+[canonical Varsig encoding](https://github.com/ChainAgnostic/varsig#canonical-signatures),
+for example low-S for ECDSA. An attacker can't re-encode an intercepted
+invocation under a different CID.
 
 `KVReplayStore` is atomic within one process only. When several processes or
 instances execute invocations, implement the `ReplayStore` interface on a
@@ -128,11 +129,9 @@ shared store with an atomic set-if-absent, such as Redis `SET NX` or SQL
 ## Revocation
 
 Pass `isRevoked` to `Delegation.from`, `Delegation#validate` or
-`Invocation.from` to reject revoked delegations by CID. Because ECDSA and
-EIP-191 signatures can be re-encoded into another valid signature, a revoked
-delegation can reappear under a different CID. `iso-ucan` therefore calls
-`isRevoked` with every CID the delegation could have been issued under (up to
-2 for ECDSA and 4 for EIP-191), and rejects it if any is revoked.
+`Invocation.from` to reject revoked delegations by CID. Strict verification
+rejects non-canonical signatures, so a revoked delegation can't come back under
+a different CID.
 
 ## EIP-191 wallet signing
 
