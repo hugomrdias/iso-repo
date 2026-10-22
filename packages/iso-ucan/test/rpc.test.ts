@@ -362,5 +362,5 @@ rpc('server uses the provided replay store and maxTtl', async () => {
 
   const { invocation, response } = await send(now() + 30)
   assert.equal(response.status, 200)
-  assert.equal(await replayStore.kv.has([invocation.replayKey]), true)
+  assert.equal(await replayStore.kv.has([invocation.cid.toString()]), true)
 })

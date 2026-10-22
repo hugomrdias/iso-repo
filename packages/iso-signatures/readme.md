@@ -54,11 +54,17 @@ const verified = await resolver.verify({
 
 ### Strict verification
 
-`ECDSASigner` always emits low S signatures (`s <= n/2`). Verifiers accept both
+`ECDSASigner` always emits low S signatures (`s <= n/2`). `EIP191Signer`
+converts wallet signatures to low S with a recovery byte of 27 or 28. Verifiers accept both
 low and high S by default, since other implementations produce high S
 signatures. If you control all your signers, enable `strict` to only accept the
 canonical encoding: ECDSA (P-256/384/521) and EIP-191 signatures with high S are
-rejected, and EIP-191 signatures must use 27/28 as the recovery byte.
+rejected, and EIP-191 signatures must use 27/28 as the recovery byte. In strict
+mode the Ed25519 verifier also decodes points with RFC 8032 rules instead of
+ZIP-215.
+
+The Ed25519 verifier always rejects `S >= L`, and the ES256K verifier always
+rejects high S.
 
 ```js
 import * as ECDSA from 'iso-signatures/verifiers/ecdsa'

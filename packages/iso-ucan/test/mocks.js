@@ -49,3 +49,37 @@ export const TopCap = Capability.from({
   schema: z.never(),
   cmd: '/',
 })
+
+/** Group orders of the ECDSA curves */
+const N = {
+  ES256: 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551n,
+  ES384:
+    0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973n,
+  ES512:
+    0x01fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa51868783bf2f966b7fcc0148f709a5d03bb5c9b8899c47aebb6fb71e91386409n,
+  ES256K: 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n,
+  EIP191: 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n,
+}
+
+/**
+ * The other valid ECDSA signature `(r, n - s)`. For EIP-191 the recovery byte
+ * is flipped too, so the signature recovers the same key.
+ *
+ * @param {keyof typeof N} alg
+ * @param {Uint8Array} signature
+ */
+export function flipS(alg, signature) {
+  const size = alg === 'EIP191' ? 32 : signature.length / 2
+  let s = 0n
+  for (const b of signature.subarray(size, size * 2)) s = (s << 8n) | BigInt(b)
+  let flipped = N[alg] - s
+  const out = new Uint8Array(signature)
+  for (let i = size * 2 - 1; i >= size; i--) {
+    out[i] = Number(flipped & 0xffn)
+    flipped >>= 8n
+  }
+  if (alg === 'EIP191') {
+    out[64] = signature[64] === 27 ? 28 : 27
+  }
+  return out
+}

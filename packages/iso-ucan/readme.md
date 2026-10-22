@@ -115,10 +115,11 @@ const invocation = await Invocation.from({
 })
 ```
 
-The store is keyed on `invocation.replayKey`, the CID of the signed payload.
-Do not deduplicate on `invocation.cid`: it also covers the signature, and
-some signature algorithms (such as ECDSA) accept more than one valid signature
-for the same payload.
+The store is keyed on `invocation.cid`. `iso-ucan` verifies signatures in
+strict mode, which accepts only the
+[canonical Varsig encoding](https://github.com/ChainAgnostic/varsig#canonical-signatures),
+for example low-S for ECDSA. An attacker can't re-encode an intercepted
+invocation under a different CID.
 
 `KVReplayStore` is atomic within one process only. When several processes or
 instances execute invocations, implement the `ReplayStore` interface on a
@@ -128,11 +129,58 @@ shared store with an atomic set-if-absent, such as Redis `SET NX` or SQL
 ## Revocation
 
 Pass `isRevoked` to `Delegation.from`, `Delegation#validate` or
-`Invocation.from` to reject revoked delegations by CID. Because ECDSA and
-EIP-191 signatures can be re-encoded into another valid signature, a revoked
-delegation can reappear under a different CID. `iso-ucan` therefore calls
-`isRevoked` with every CID the delegation could have been issued under (up to
-2 for ECDSA and 4 for EIP-191), and rejects it if any is revoked.
+`Invocation.from` to reject revoked delegations by CID. Strict verification
+rejects non-canonical signatures, so a revoked delegation can't come back under
+a different CID.
+
+### Migrate revocation lists from earlier versions
+
+Earlier versions accepted ECDSA (ES256, ES384, ES512) signatures with high S,
+and EIP-191 signatures with `v` of 0 or 1. If your revocation list holds the
+CID of such a delegation, anyone holding the delegation can convert it to the
+canonical encoding. The canonical CID is not in your list, so the revoked
+delegation passes `isRevoked`.
+
+To keep those revocations, add the canonical CID of each revoked delegation to
+your list. Compute it from the stored delegation bytes:
+
+```js
+import { Delegation } from 'iso-ucan/delegation'
+import * as Envelope from 'iso-ucan/envelope'
+import { normalizeS } from 'iso-signatures/signers/ecdsa.js'
+import { normalizeSignature } from 'iso-signatures/signers/eip191.js'
+
+const CURVES = { ES256: 'P-256', ES384: 'P-384', ES512: 'P-521' }
+
+/**
+ * @param {Uint8Array} bytes - Revoked delegation, as stored
+ * @param {import('iso-ucan/types').VerifierResolver} verifierResolver
+ */
+async function canonicalCid(bytes, verifierResolver) {
+  const envelope = Envelope.decode({ envelope: bytes })
+  let signature = envelope.signature
+  if (envelope.alg === 'EIP191') {
+    signature = normalizeSignature(signature)
+  } else if (envelope.alg in CURVES) {
+    signature = normalizeS(CURVES[envelope.alg], signature)
+  }
+
+  const canonical = Envelope.encode({
+    signature,
+    signaturePayload: Envelope.getSignaturePayload({
+      spec: envelope.spec,
+      version: envelope.version,
+      signatureType: envelope.alg,
+      payload: envelope.payload,
+    }),
+  })
+  const delegation = await Delegation.from({ bytes: canonical, verifierResolver })
+  return delegation.cid
+}
+```
+
+Ed25519 and ES256K signatures were already canonical, so their CIDs don't
+change.
 
 ## EIP-191 wallet signing
 
