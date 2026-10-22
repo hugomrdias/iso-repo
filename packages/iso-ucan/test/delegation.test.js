@@ -369,7 +369,9 @@ proofs(
 
     /** @type {import('../src/types.js').DecodedEnvelope<'dlg'>} */
     const envelope = {
-      alg: secp256k1.signatureType,
+      alg: /** @type {import('../src/types.js').VarsigAlgorithm} */ (
+        secp256k1.signatureType
+      ),
       enc: 'DAG-CBOR',
       signature,
       payload,
@@ -416,7 +418,9 @@ proofs('should fail to validate verify signature', async () => {
 
   /** @type {import('../src/types.js').DecodedEnvelope<'dlg'>} */
   const envelope = {
-    alg: owner.signatureType,
+    alg: /** @type {import('../src/types.js').VarsigAlgorithm} */ (
+      owner.signatureType
+    ),
     enc: 'DAG-CBOR',
     signature,
     payload,

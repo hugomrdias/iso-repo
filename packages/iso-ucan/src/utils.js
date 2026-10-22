@@ -118,9 +118,6 @@ export function isSigAndDidCompatible(did, sigType) {
     return true
   }
 
-  if (did.verifiableDid.type === 'RSA' && sigType === 'RS256') {
-    return true
-  }
   if (did.verifiableDid.type === 'secp256k1' && sigType === 'EIP191') {
     return true
   }
@@ -408,8 +405,8 @@ function bigIntToBytes(n, size) {
  * return as 27/28 or 0/1. Verifiers also accept EIP-155 style `v >= 35`,
  * but no signer issues those for `personal_sign`, so they are not listed.
  *
- * The result always includes `signature` itself. Other algorithms (Ed25519,
- * RSA) have a single valid signature.
+ * The result always includes `signature` itself. Ed25519 has a single valid
+ * signature.
  *
  * @param {import('iso-signatures/types').SignatureType} alg
  * @param {Uint8Array} signature

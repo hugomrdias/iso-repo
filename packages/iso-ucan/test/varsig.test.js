@@ -5,26 +5,15 @@ import { decode, encode, VARSIG, VERSION } from '../src/varsig.js'
 
 const test = suite('varsig')
 
-test('RS256+RAW', () => {
-  const varsig = encode({
-    alg: 'RS256',
-    enc: 'RAW',
-  })
-
-  const bytes = new IOBuffer(varsig)
-
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0x1205)[0], 'prefix')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x12)[0], 'hash')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(256)[0], 'key length')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding')
-
-  const rawVarsig = Uint8Array.from([52, 1, 133, 36, 18, 128, 2, 95])
-  const decoded = decode(rawVarsig)
-
-  assert.deepEqual(decoded.alg, 'RS256')
-  assert.deepEqual(decoded.enc, 'RAW')
+test('RS256 is not supported', () => {
+  assert.throws(
+    () => encode({ alg: 'RS256', enc: 'RAW' }),
+    /Unsupported algorithm RS256/
+  )
+  assert.throws(
+    () => decode(Uint8Array.from([52, 1, 133, 36, 18, 128, 2, 95])),
+    /Unsupported algorithm/
+  )
 })
 
 test('Ed25519+RAW', () => {
