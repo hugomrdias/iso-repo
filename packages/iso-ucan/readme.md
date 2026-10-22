@@ -133,6 +133,55 @@ Pass `isRevoked` to `Delegation.from`, `Delegation#validate` or
 rejects non-canonical signatures, so a revoked delegation can't come back under
 a different CID.
 
+### Migrate revocation lists from earlier versions
+
+Earlier versions accepted ECDSA (ES256, ES384, ES512) signatures with high S,
+and EIP-191 signatures with `v` of 0 or 1. If your revocation list holds the
+CID of such a delegation, anyone holding the delegation can convert it to the
+canonical encoding. The canonical CID is not in your list, so the revoked
+delegation passes `isRevoked`.
+
+To keep those revocations, add the canonical CID of each revoked delegation to
+your list. Compute it from the stored delegation bytes:
+
+```js
+import { Delegation } from 'iso-ucan/delegation'
+import * as Envelope from 'iso-ucan/envelope'
+import { normalizeS } from 'iso-signatures/signers/ecdsa.js'
+import { normalizeSignature } from 'iso-signatures/signers/eip191.js'
+
+const CURVES = { ES256: 'P-256', ES384: 'P-384', ES512: 'P-521' }
+
+/**
+ * @param {Uint8Array} bytes - Revoked delegation, as stored
+ * @param {import('iso-ucan/types').VerifierResolver} verifierResolver
+ */
+async function canonicalCid(bytes, verifierResolver) {
+  const envelope = Envelope.decode({ envelope: bytes })
+  let signature = envelope.signature
+  if (envelope.alg === 'EIP191') {
+    signature = normalizeSignature(signature)
+  } else if (envelope.alg in CURVES) {
+    signature = normalizeS(CURVES[envelope.alg], signature)
+  }
+
+  const canonical = Envelope.encode({
+    signature,
+    signaturePayload: Envelope.getSignaturePayload({
+      spec: envelope.spec,
+      version: envelope.version,
+      signatureType: envelope.alg,
+      payload: envelope.payload,
+    }),
+  })
+  const delegation = await Delegation.from({ bytes: canonical, verifierResolver })
+  return delegation.cid
+}
+```
+
+Ed25519, RSA, and ES256K signatures were already canonical, so their CIDs don't
+change.
+
 ## EIP-191 wallet signing
 
 `iso-ucan` can use EIP-191 wallet signatures through `EIP191Signer` from
