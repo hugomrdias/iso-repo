@@ -164,7 +164,7 @@ export class Invocation {
       assertProofs(payload, options.prf)
     }
 
-    const { signature, signaturePayload } = await Envelope.sign({
+    const { alg, signature, signaturePayload } = await Envelope.sign({
       spec: 'inv',
       signer: options.iss,
       payload,
@@ -174,7 +174,7 @@ export class Invocation {
 
     /** @type {import("./types.js").DecodedEnvelope<'inv'>} */
     const envelope = {
-      alg: options.iss.signatureType,
+      alg,
       enc: 'DAG-CBOR',
       signature,
       payload,

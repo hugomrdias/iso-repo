@@ -187,6 +187,10 @@ export async function sign(options) {
   })
   const signature = await signer.sign(cbor.encode(signaturePayload))
   return {
+    // getSignaturePayload throws for algorithms varsig does not support
+    alg: /** @type {import('./types.js').VarsigAlgorithm} */ (
+      signer.signatureType
+    ),
     signature,
     signaturePayload,
   }

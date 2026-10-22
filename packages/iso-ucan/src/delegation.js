@@ -151,7 +151,7 @@ export class Delegation {
 
     assertStructure(payload, options.now)
 
-    const { signature, signaturePayload } = await Envelope.sign({
+    const { alg, signature, signaturePayload } = await Envelope.sign({
       spec: 'dlg',
       signer: options.iss,
       payload,
@@ -161,7 +161,7 @@ export class Delegation {
 
     /** @type {import("./types.js").DecodedEnvelope<'dlg'>} */
     const envelope = {
-      alg: options.iss.signatureType,
+      alg,
       enc: 'DAG-CBOR',
       signature,
       payload,

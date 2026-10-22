@@ -102,9 +102,6 @@ export function isSigAndDidCompatible(did, sigType) {
     return true
   }
 
-  if (did.verifiableDid.type === 'RSA' && sigType === 'RS256') {
-    return true
-  }
   if (did.verifiableDid.type === 'secp256k1' && sigType === 'EIP191') {
     return true
   }

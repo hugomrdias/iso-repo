@@ -19,7 +19,6 @@ export const CODE_ENCODING = /** @types  {const} */ {
  * @type {Record<number, string>}
  */
 export const SIG_PREFIX = /** @type {const} */ ({
-  0x12_05: 'RSA',
   0xed: 'EdDSA',
   0xec: 'ECDSA',
 })
@@ -37,8 +36,6 @@ const VARINT = {
   'DAG-CBOR': [113],
 
   /** Presets */
-  // rsa(2b)+SHA2-256(1b)+256(1b)
-  RS256: [133, 36, 18, 128, 2],
   // eddsa(2b)+edwards25519(2b)+SHA2-512(1b)
   Ed25519: [237, 1, 237, 1, 19],
   // ECDSA(2b) + p256(2b)   + SHA2-256(1b)
@@ -54,7 +51,7 @@ const VARINT = {
 }
 
 /**
- * @param {import('./types.js').VarsigOptions} options
+ * @param {import('./types.js').VarsigEncodeOptions} options
  */
 export function encode(options) {
   const enc = VARINT[options.enc]
@@ -62,7 +59,9 @@ export function encode(options) {
     throw new TypeError(`Unsupported encoding ${options.enc}`)
   }
 
-  const alg = VARINT[options.alg]
+  const alg = /** @type {Partial<Record<string, number[]>>} */ (VARINT)[
+    options.alg
+  ]
   if (!alg) {
     throw new TypeError(`Unsupported algorithm ${options.alg}`)
   }
@@ -121,13 +120,6 @@ export function decode(buf) {
   /** @type {import('./types.js').DecodeOutput} */
   let output
   switch (SIG_PREFIX[code]) {
-    case 'RSA': {
-      output = {
-        alg: getPreset(bytes.readBytes(5), ['RS256']),
-        enc: getEncoding(bytes.readBytes(1)),
-      }
-      break
-    }
     case 'EdDSA': {
       output = {
         alg: getPreset(bytes.readBytes(5), ['Ed25519']),

@@ -179,7 +179,7 @@ async function canonicalCid(bytes, verifierResolver) {
 }
 ```
 
-Ed25519, RSA, and ES256K signatures were already canonical, so their CIDs don't
+Ed25519 and ES256K signatures were already canonical, so their CIDs don't
 change.
 
 ## EIP-191 wallet signing
