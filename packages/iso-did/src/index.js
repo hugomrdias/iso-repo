@@ -1,4 +1,3 @@
-import { Resolver } from 'did-resolver'
 import { base64url } from 'iso-base/rfc4648'
 import { concat } from 'iso-base/utils'
 import { varint } from 'iso-base/varint'
@@ -7,15 +6,16 @@ import { DIDCore } from './core.js'
 import * as DidKey from './key.js'
 import { CODE_KEY_TYPE, validateRawPublicKeyLength } from './key.js'
 import * as DidPkh from './pkh.js'
+import { Resolver } from './resolver.js'
 import * as T from './types.js'
 
-export { Resolver } from 'did-resolver'
+export { Resolver } from './resolver.js'
 
 /**
  * Default resolver for DID resolution.
  * Supports `did:key` and `did:pkh` methods.
  *
- * @type {import('did-resolver').Resolver}
+ * @type {Resolver}
  */
 export const defaultResolver = new Resolver(
   {
@@ -31,7 +31,7 @@ export const defaultResolver = new Resolver(
  * @see https://www.w3.org/TR/did-core/#resolution
  *
  * @param {string} did
- * @param {import('did-resolver').Resolver} [resolver]
+ * @param {import('./types.js').Resolvable} [resolver]
  */
 export async function resolve(did, resolver = defaultResolver) {
   const parsed = parse(did)
@@ -44,7 +44,10 @@ export async function resolve(did, resolver = defaultResolver) {
     throw new Error(r.didResolutionMetadata.error)
   }
 
-  return /** @type {T.DIDDocument} */ (r.didDocument)
+  if (!r.didDocument) {
+    throw new Error(`No DID Document found for ${parsed.did}`)
+  }
+  return r.didDocument
 }
 
 /**
@@ -63,14 +66,10 @@ export function parse(did) {
  *
  * @see https://www.w3.org/TR/did-core/#did-url-dereferencing
  * @param {T.DIDURLObject} didObject
- * @param {import('did-resolver').Resolver} [resolver]
+ * @param {import('./types.js').Resolvable} [resolver]
  */
 export async function dereference(didObject, resolver = defaultResolver) {
   const didDocument = await resolve(didObject.did, resolver)
-
-  if (!didDocument) {
-    throw new Error(`No DID Document found for ${didObject.did}`)
-  }
 
   return derefDocument(didObject, didDocument)
 }
@@ -134,7 +133,7 @@ export class DID {
   /**
    *
    * @param {string} did
-   * @param {import('did-resolver').Resolver} [resolver]
+   * @param {import('./types.js').Resolvable} [resolver]
    */
   static async fromString(did, resolver = defaultResolver) {
     const parsedDid = parse(did)

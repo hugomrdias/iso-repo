@@ -43,6 +43,24 @@ const did2 = DIDKey.fromPublicKey('ED25519', publicKeyBytes)
 
 ## Docs
 
+`iso-did` includes its own DID URL parser and method dispatcher. Import
+`Resolver` from `iso-did` to register custom methods; resolution types are
+available from `iso-did/types`.
+
+```js
+import { Resolver } from 'iso-did'
+import { didWebResolver } from 'iso-did/web'
+
+const resolver = new Resolver({ web: didWebResolver }, { cache: true })
+const result = await resolver.resolve('did:web:example.com')
+```
+
+Caching is disabled by default. Set `cache: true` to cache successful
+resolutions in memory. DID URLs containing `;no-cache=true` bypass the cache.
+
+The resolver accepts method functions that return a `DIDResolutionResult`.
+Legacy document-only resolvers and custom cache callbacks are no longer supported.
+
 Check <https://hugomrdias.github.io/iso-repo/modules/iso-did.html>
 
 ## License

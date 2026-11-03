@@ -2,7 +2,7 @@ import { request } from 'iso-web/http'
 // biome-ignore lint/correctness/noUnusedImports: needed
 import * as T from './types.js'
 
-/** @type {import('did-resolver').DIDResolver} */
+/** @type {import('./types.js').DIDResolver} */
 export async function didWebResolver(did, parsedDid) {
   let path = parsedDid.id.replaceAll(':', '/')
 
@@ -56,7 +56,7 @@ export async function didWebResolver(did, parsedDid) {
   }
 }
 
-/** @type {import('did-resolver').ResolverRegistry} */
+/** @type {import('./types.js').ResolverRegistry} */
 export const resolver = {
   web: didWebResolver,
 }

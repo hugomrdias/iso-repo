@@ -2,7 +2,7 @@ import { resolve } from 'iso-web/doh'
 
 import { parse } from './index.js'
 
-/** @type {import('did-resolver').DIDResolver} */
+/** @type {import('./types.js').DIDResolver} */
 export async function didFissionResolver(did, parsedDid) {
   const hostname = parsedDid.id.replaceAll('%3A', ':') // replace encoded colon with colon
   const server = hostname.includes('localhost')
@@ -55,7 +55,7 @@ export async function didFissionResolver(did, parsedDid) {
   }
 }
 
-/** @type {import('did-resolver').ResolverRegistry} */
+/** @type {import('./types.js').ResolverRegistry} */
 export const resolver = {
   fission: didFissionResolver,
 }

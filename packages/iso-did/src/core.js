@@ -1,4 +1,4 @@
-import { parse } from 'did-resolver'
+import { parseDIDURL } from './did-url.js'
 
 /**
  * @typedef {import('./types').DIDURLObject} DIDURLObject
@@ -30,7 +30,7 @@ export class DIDCore {
    * @param {string} did
    */
   static fromString(did) {
-    const parsedDid = /** @type {DIDURLObject} */ (parse(did))
+    const parsedDid = /** @type {DIDURLObject} */ (parseDIDURL(did))
     if (parsedDid) {
       return new DIDCore(parsedDid)
     }

@@ -11,7 +11,7 @@ import * as T from './types.js'
 export const DIRECTORY = 'https://plc.directory'
 
 export function createPlcResolver(directory = DIRECTORY) {
-  /** @type {import('did-resolver').DIDResolver} */
+  /** @type {import('./types.js').DIDResolver} */
   function didPlcResolver(_did, parsedDid, _resolver, options = {}) {
     return resolve({
       directory,
@@ -26,8 +26,8 @@ export function createPlcResolver(directory = DIRECTORY) {
 /**
  * @param {Object} options
  * @param {string} options.directory
- * @param {import('did-resolver').ParsedDID} options.parsed
- * @param {import('did-resolver').DIDResolutionOptions} options.options
+ * @param {import('./types.js').ParsedDID} options.parsed
+ * @param {import('./types.js').DIDResolutionOptions} options.options
  */
 export async function resolve(options) {
   const url = new URL(
@@ -73,7 +73,7 @@ export async function resolve(options) {
   }
 }
 
-/** @type {import('did-resolver').ResolverRegistry} */
+/** @type {import('./types.js').ResolverRegistry} */
 export const resolver = {
   plc: createPlcResolver(),
 }
