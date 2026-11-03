@@ -52,6 +52,9 @@ export class EIP191Signer extends DID {
   /** @type {import('../types.js').SignatureType} */
   signatureType
 
+  /** @type {Provider} */
+  provider
+
   /**
    * Create a DIDPkh from an address
    *
