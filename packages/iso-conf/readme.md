@@ -48,7 +48,11 @@ const schema = z.object({
   retries: z.number().default(3),
 })
 
-const config = new Conf({ projectName: 'my-app', schema, defaults: { token: '' } })
+const config = new Conf({
+  projectName: 'my-app',
+  schema,
+  defaults: { token: '' },
+})
 
 config.reset('token') // => ''
 config.clear() // => { token: '', retries: 3 }
@@ -96,12 +100,12 @@ const { installId } = config.update((store) =>
 
 A config file that can't be loaded throws a `ConfError`:
 
-| `code` | When |
-| --- | --- |
-| `ERR_CONF_PARSE` | The file could not be deserialized (corrupt JSON, a bad extended JSON value, or a custom `deserialize` that threw). `cause` is the original error. |
-| `ERR_CONF_SCHEMA` | The file failed schema validation. `issues` holds the Standard Schema issues. |
-| `ERR_CONF_INVALID_VALUE` | A value passed to a write method failed schema validation. Nothing is written. |
-| `ERR_CONF_LOCKED` | With `lock`, a write timed out waiting for another process to release the lock. Nothing is written. |
+| `code`                   | When                                                                                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ERR_CONF_PARSE`         | The file could not be deserialized (corrupt JSON, a bad extended JSON value, or a custom `deserialize` that threw). `cause` is the original error. |
+| `ERR_CONF_SCHEMA`        | The file failed schema validation. `issues` holds the Standard Schema issues.                                                                      |
+| `ERR_CONF_INVALID_VALUE` | A value passed to a write method failed schema validation. Nothing is written.                                                                     |
+| `ERR_CONF_LOCKED`        | With `lock`, a write timed out waiting for another process to release the lock. Nothing is written.                                                |
 
 Every `ConfError` has the config file `path`.
 
