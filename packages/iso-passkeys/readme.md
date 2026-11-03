@@ -8,6 +8,8 @@
 pnpm install iso-passkeys
 ```
 
+Requires Node.js 22.12.0 or newer when used outside the browser.
+
 ## Usage
 
 ```js
