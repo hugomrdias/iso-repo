@@ -90,10 +90,8 @@
     "@noble/ed25519": "catalog:",
     "@noble/hashes": "catalog:",
     "@noble/secp256k1": "^3.2.0",
-    "eventemitter3": "5.0.4",
     "iso-base": "workspace:^",
-    "iso-did": "workspace:^",
-    "ox": "^0.14.61"
+    "iso-did": "workspace:^"
   },
   "devDependencies": {
     "@types/assert": "catalog:",
@@ -117,8 +115,7 @@
       "@types/*",
       "assert",
       "type-fest",
-      "mocha",
-      "eventemitter3"
+      "mocha"
     ]
   }
 }

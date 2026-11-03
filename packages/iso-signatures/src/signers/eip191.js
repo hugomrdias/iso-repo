@@ -4,8 +4,7 @@ import { DIDPkh } from 'iso-did/pkh'
 
 /**
  * @typedef {import('../types.js').ISigner<string>} ISigner
- * @typedef {import('ox').Provider.Provider} Provider
- * @typedef {import('eventemitter3').EventEmitter} EventEmitter
+ * @typedef {import('../types.js').EIP191Provider} Provider
  */
 
 /** secp256k1 group order */
@@ -58,7 +57,7 @@ export class EIP191Signer extends DID {
   /**
    * Create a DIDPkh from an address
    *
-   * @param {Provider} provider -  https://oxlib.sh/guides/eip-1193#eip-1193-providers
+   * @param {Provider} provider - EIP-1193 wallet provider
    * @param {`0x${string}`} address
    * @param {number | `0x${string}`} [chainId]
    * @param {string} [namespace]
@@ -76,17 +75,15 @@ export class EIP191Signer extends DID {
    * Generate a new signer
    *
    * @param {object} options
-   * @param {Provider} options.provider -  https://oxlib.sh/guides/eip-1193#eip-1193-providers
+   * @param {Provider} options.provider - EIP-1193 wallet provider
    * @param {`0x${string}`} [options.address] - default: first account from provider
    * @param {number | `0x${string}`} [options.chainId] - default: 1
    * @param {string} [options.namespace] - default: eip155
    *
    * @example
    * ```ts twoslash
-   * import { Provider } from 'ox'
-   * const provider = Provider.from(window.ethereum)
-   * const signer = await EIP191Signer.generate({
-   *   provider,
+   * const signer = await EIP191Signer.from({
+   *   provider: window.ethereum,
    * })
    * ```
    */
