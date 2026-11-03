@@ -174,7 +174,10 @@ async function canonicalCid(bytes, verifierResolver) {
       payload: envelope.payload,
     }),
   })
-  const delegation = await Delegation.from({ bytes: canonical, verifierResolver })
+  const delegation = await Delegation.from({
+    bytes: canonical,
+    verifierResolver,
+  })
   return delegation.cid
 }
 ```
@@ -272,7 +275,11 @@ const store = new Store(new MemoryDriver())
 const handlers: ServerHandlers<typeof Protocol> = {
   '/todo/list': ({ invocation }) => ({
     cid: invocation.cid,
-    result: { todos: [/* ... */] },
+    result: {
+      todos: [
+        /* ... */
+      ],
+    },
   }),
   '/todo/add': ({ args, invocation }) => ({
     cid: invocation.cid,
