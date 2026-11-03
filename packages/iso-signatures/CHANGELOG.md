@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.7.0...iso-signatures-v0.7.1) (2026-11-03)
+
+
+### Bug Fixes
+
+* **iso-signatures:** preserve signer declarations with updated dependencies ([1a4b915](https://github.com/hugomrdias/iso-repo/commit/1a4b915959fc30629dcf992dc8842220efff4b5d))
+
 ## [0.7.0](https://github.com/hugomrdias/iso-repo/compare/iso-signatures-v0.6.0...iso-signatures-v0.7.0) (2026-10-22)
 
 
