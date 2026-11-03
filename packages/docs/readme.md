@@ -32,13 +32,13 @@ import { docsPlugin } from '@hugomrdias/docs/starlight-typedoc'
 docsPlugin({
   // Output directory relative to src/content/docs/
   outputDirectory: 'api', // default: 'api'
-  
+
   // Enable prev/next navigation links in footer
   pagination: false, // default: false
-  
+
   // Watch mode for development (auto-enabled in dev for non-package strategies)
   watch: false, // default: false (auto-enabled in dev)
-  
+
   // TypeDoc configuration options
   typeDocOptions: {
     entryPointStrategy: 'packages',
@@ -48,7 +48,7 @@ docsPlugin({
     excludePrivate: true,
     excludeProtected: true,
     // ... all other TypeDoc options
-  }
+  },
 })
 ```
 
@@ -102,31 +102,31 @@ import { llmsPlugin } from '@hugomrdias/docs/starlight-llms'
 llmsPlugin({
   // Prompt template for AI chat services (use {url} as placeholder)
   prompt: 'Read {url}. I want to ask questions about it.', // default shown
-  
+
   // Base URL for llms.txt generation (uses Astro site config if not provided)
   baseUrl: 'https://docs.dev',
-  
+
   // Site title (defaults to Starlight title)
   title: 'My Documentation',
-  
+
   // Site description (defaults to Starlight description)
   description: 'Documentation for my project',
-  
+
   // Configure which actions to display
   actions: {
-    chatgpt: true,    // default: true
-    claude: true,     // default: true
-    t3chat: false,    // default: false
-    v0: false,        // default: false
-    markdown: true,   // default: true
+    chatgpt: true, // default: true
+    claude: true, // default: true
+    t3chat: false, // default: false
+    v0: false, // default: false
+    markdown: true, // default: true
     custom: {
       // Add custom action links
       myService: {
         label: 'Open in My Service',
-        href: 'https://myservice.com/?query='
-      }
-    }
-  }
+        href: 'https://myservice.com/?query=',
+      },
+    },
+  },
 })
 ```
 
@@ -154,10 +154,10 @@ export default defineConfig({
             custom: {
               customAi: {
                 label: 'Open in Custom AI',
-                href: 'https://custom-ai.com/?q='
-              }
-            }
-          }
+                href: 'https://custom-ai.com/?q=',
+              },
+            },
+          },
         }),
       ],
     }),
