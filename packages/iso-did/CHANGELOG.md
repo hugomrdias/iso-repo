@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v3.0.0...iso-did-v4.0.0) (2026-11-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-did:** Resolver accepts boolean caching only; custom cache callbacks and legacyResolvers are removed. Replace ResolveOptions with ResolverOptions and pass method functions returning a full DIDResolutionResult. Resolution results use iso-did DIDDocument types, verification-method IDs and controllers are strings, and extension fields use unknown. Failed and empty resolutions are not cached, and resolve throws when a result has no document.
+
+### Features
+
+* **iso-did:** replace did-resolver with local resolution ([8e53fbd](https://github.com/hugomrdias/iso-repo/commit/8e53fbd034b7e0057f728db47bc1e6539762706f))
+
 ## [3.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-did-v2.1.1...iso-did-v3.0.0) (2026-09-27)
 
 
