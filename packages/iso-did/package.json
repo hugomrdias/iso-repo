@@ -98,7 +98,6 @@
     "test:browser": "playwright-test 'test/**/!(*.node).test.js' --assets test/mocks"
   },
   "dependencies": {
-    "did-resolver": "^5.0.1",
     "iso-base": "workspace:^",
     "iso-web": "workspace:^",
     "multiformats": "catalog:",

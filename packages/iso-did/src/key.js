@@ -174,7 +174,7 @@ export class DIDKey extends DIDCore {
   }
 }
 
-/** @type {import('did-resolver').DIDResolver} */
+/** @type {import('./types.js').DIDResolver} */
 // biome-ignore lint/suspicious/useAwait: needs to be async
 async function didKeyResolver(did, _parsedDid) {
   const didKey = DIDKey.fromString(did)
@@ -187,7 +187,7 @@ async function didKeyResolver(did, _parsedDid) {
   }
 }
 
-/** @type {import('did-resolver').ResolverRegistry} */
+/** @type {import('./types.js').ResolverRegistry} */
 export const resolver = {
   key: didKeyResolver,
 }

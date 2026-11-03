@@ -1,23 +1,73 @@
-import type {
-  ResolverOptions as _ResolverOptions,
-  KeyCapabilitySection,
-  ParsedDID,
-  ResolverRegistry,
-  Service,
-} from 'did-resolver'
 import type { Tagged } from 'type-fest'
-
 import type { JWK } from './jwk-types'
 import type { DIDKey } from './key'
 import type { DIDPkh } from './pkh'
 
 export type { KeyType, PublicKeyCode, SignatureAlgorithm } from './common'
-
 export * from './jwk-types'
 
-export interface ResolveOptions {
-  resolvers?: ResolverRegistry
-  cache?: _ResolverOptions['cache']
+export interface ParsedDID {
+  did: string
+  didUrl: string
+  method: string
+  id: string
+  params?: Record<string, string>
+  path?: string
+  query?: string
+  fragment?: string
+}
+
+export type KeyCapabilitySection =
+  | 'authentication'
+  | 'assertionMethod'
+  | 'keyAgreement'
+  | 'capabilityInvocation'
+  | 'capabilityDelegation'
+
+export interface Service {
+  id: string
+  type: string
+  serviceEndpoint:
+    | string
+    | Record<string, unknown>
+    | (string | Record<string, unknown>)[]
+  [key: string]: unknown
+}
+
+export interface DIDResolutionOptions {
+  accept?: string
+  [key: string]: unknown
+}
+
+export interface DIDResolutionResult {
+  didDocument: DIDDocument | null
+  didResolutionMetadata: {
+    contentType?: string
+    error?: string
+    message?: string
+    [key: string]: unknown
+  }
+  didDocumentMetadata: Record<string, unknown>
+}
+
+export interface Resolvable {
+  resolve: (
+    didUrl: string,
+    options?: DIDResolutionOptions
+  ) => Promise<DIDResolutionResult>
+}
+
+export type DIDResolver = (
+  did: string,
+  parsed: ParsedDID,
+  resolver: Resolvable,
+  options: DIDResolutionOptions
+) => Promise<DIDResolutionResult>
+
+export type ResolverRegistry = Record<string, DIDResolver>
+
+export interface ResolverOptions {
+  cache?: boolean
 }
 
 /**
@@ -58,8 +108,7 @@ export interface DIDURLObject extends Omit<ParsedDID, 'params'> {
 /**
  * Represents the properties of a Verification Method listed in a DID document.
  *
- * This data type includes public key representations that are no longer present in the spec but are still used by
- * several DID methods / resolvers and kept for backward compatibility.
+ * Supported public key representations used by DID verification.
  *
  * @see {@link https://www.w3.org/TR/cid-1.0/#verification-methods}
  */
@@ -72,8 +121,8 @@ export type VerificationMethod =
  * @see {@link https://www.w3.org/TR/cid-1.0/#dfn-verificationmethod}
  */
 export interface VerificationMethodBase {
-  id: DIDURL
-  controller: DID
+  id: string
+  controller: string
   /**
    * ISO date time string
    * @see {@link https://www.w3.org/TR/xmlschema11-2/#dateTimeStamp}
@@ -100,7 +149,7 @@ export interface MultiKeyMethod extends VerificationMethodBase {
  * @see https://www.w3.org/TR/cid-1.0/#JsonWebKey
  */
 export interface JsonWebKeyMethod extends VerificationMethodBase {
-  type: 'JsonWebKey2020' | 'JsonWebKey'
+  type: 'JsonWebKey2020' | 'JsonWebKey' | 'Ed25519VerificationKey2018'
   publicKeyJwk: JWK
 }
 

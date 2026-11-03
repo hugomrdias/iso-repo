@@ -9,7 +9,7 @@ const SUBDOMAIN = '_atproto'
 
 /**
  * @param {Object} options
- * @param {import('did-resolver').ParsedDID} options.parsed
+ * @param {import('./types.js').ParsedDID} options.parsed
  * @param {AbortSignal} [options.signal]
  */
 export async function resolveDNS(options) {
@@ -48,7 +48,7 @@ export async function resolveDNS(options) {
 
 /**
  * @param {Object} options
- * @param {import('did-resolver').ParsedDID} options.parsed
+ * @param {import('./types.js').ParsedDID} options.parsed
  * @param {AbortSignal} [options.signal]
  */
 export async function resolveHttp(options) {
@@ -73,7 +73,7 @@ export async function resolveHttp(options) {
 
 /**
  * @param {Object} options
- * @param {import('did-resolver').ParsedDID} options.parsed
+ * @param {import('./types.js').ParsedDID} options.parsed
  */
 export async function resolvePlcDid(options) {
   /** @type {string | undefined} */
@@ -96,9 +96,9 @@ export async function resolvePlcDid(options) {
  *
  * @param {object} options - Options for resolving the DID.
  * @param {string} options.directory - The directory to use for resolving did:plc DIDs.
- * @param {import('did-resolver').ParsedDID} options.parsed - The parsed DID object.
- * @param {import('did-resolver').DIDResolutionOptions} options.options - Options for the DID resolver.
- * @returns {Promise<import('did-resolver').DIDResolutionResult>} - A promise that resolves to the DID resolution result.
+ * @param {import('./types.js').ParsedDID} options.parsed - The parsed DID object.
+ * @param {import('./types.js').DIDResolutionOptions} options.options - Options for the DID resolver.
+ * @returns {Promise<import('./types.js').DIDResolutionResult>} - A promise that resolves to the DID resolution result.
  *
  * @example
  * ```ts twoslash
@@ -216,7 +216,7 @@ function isAtpDid(did) {
  * eventually resolving to a `did:plc` DID.
  *
  * @param {string} [directory=DIRECTORY] - The directory to use for resolving `did:plc` DIDs.
- * @returns {import('did-resolver').DIDResolver} A DID resolver for `did:atp` method.
+ * @returns {import('./types.js').DIDResolver} A DID resolver for `did:atp` method.
  *
  * @example
  * ```ts twoslash
@@ -233,7 +233,7 @@ function isAtpDid(did) {
  * ```
  */
 export function createAtpResolver(directory = DIRECTORY) {
-  /** @type {import('did-resolver').DIDResolver} */
+  /** @type {import('./types.js').DIDResolver} */
   function didAtpResolver(_did, parsedDid, _resolver, options) {
     return resolve({
       directory,

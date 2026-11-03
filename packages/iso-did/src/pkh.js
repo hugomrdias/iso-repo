@@ -100,7 +100,7 @@ export class DIDPkh extends DIDCore {
   }
 }
 
-/** @type {import('did-resolver').DIDResolver} */
+/** @type {import('./types.js').DIDResolver} */
 // biome-ignore lint/suspicious/useAwait: needs to be async
 async function didPkhResolver(did, _parsedDid) {
   const didPkh = DIDPkh.fromString(did)
@@ -113,7 +113,7 @@ async function didPkhResolver(did, _parsedDid) {
   }
 }
 
-/** @type {import('did-resolver').ResolverRegistry} */
+/** @type {import('./types.js').ResolverRegistry} */
 export const resolver = {
   pkh: didPkhResolver,
 }
