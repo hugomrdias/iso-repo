@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.3.2...iso-passkeys-v1.0.0) (2026-11-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-passkeys:** iso-passkeys now requires Node.js 22.12.0 or newer in Node.js environments.
+
+### Features
+
+* **iso-passkeys:** upgrade ASN.1 dependencies to v3 ([53f322c](https://github.com/hugomrdias/iso-repo/commit/53f322c8c59de25b9ec13bcb1edc93d073d257f6))
+
 ## [0.3.2](https://github.com/hugomrdias/iso-repo/compare/iso-passkeys-v0.3.1...iso-passkeys-v0.3.2) (2026-09-26)
 
 
