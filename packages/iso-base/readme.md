@@ -164,10 +164,16 @@ const key = await crypto.subtle.generateKey(
 ### Elliptic Curve Compression
 
 ```ts twoslash
-import { compress, decompress, decompressSecp256k1, isCompressed, isUncompressed } from 'iso-base/ec-compression'
+import {
+  compress,
+  decompress,
+  decompressSecp256k1,
+  isCompressed,
+  isUncompressed,
+} from 'iso-base/ec-compression'
 
 // Compress uncompressed public key (0x04 prefix)
-const uncompressed = new Uint8Array([0x04, /* x and y coordinates */])
+const uncompressed = new Uint8Array([0x04 /* x and y coordinates */])
 const compressed = compress(uncompressed)
 // Uint8Array [0x02 or 0x03, /* x coordinate */]
 
@@ -186,14 +192,14 @@ const secp256k1Decompressed = decompressSecp256k1(compressed)
 ### Utils
 
 ```ts twoslash
-import { 
-  u8, 
-  concat, 
-  equals, 
-  isUint8Array, 
-  isBufferSource, 
+import {
+  u8,
+  concat,
+  equals,
+  isUint8Array,
+  isBufferSource,
   isTypedArray,
-  assertUint8Array 
+  assertUint8Array,
 } from 'iso-base/utils'
 
 // Convert any TypedArray to Uint8Array
@@ -201,17 +207,11 @@ const uint8 = u8(new Int8Array([1, 2, 3]))
 // Uint8Array [1, 2, 3]
 
 // Concatenate arrays
-const combined = concat([
-  new Uint8Array([1, 2]),
-  new Uint8Array([3, 4])
-])
+const combined = concat([new Uint8Array([1, 2]), new Uint8Array([3, 4])])
 // Uint8Array [1, 2, 3, 4]
 
 // Check equality
-const isEqual = equals(
-  new Uint8Array([1, 2, 3]),
-  new Uint8Array([1, 2, 3])
-)
+const isEqual = equals(new Uint8Array([1, 2, 3]), new Uint8Array([1, 2, 3]))
 // true
 
 // Type guards
@@ -261,15 +261,15 @@ const data = new Uint8Array([0x01, 0x02, 0x03, 0x04])
 const buf = new ISOBuffer(data)
 
 // Cursor navigation
-buf.skip(2)           // Move forward 2 bytes
-buf.back(1)           // Move back 1 byte
-buf.seek(0)           // Jump to offset 0
-buf.rewind()          // Same as seek(0)
+buf.skip(2) // Move forward 2 bytes
+buf.back(1) // Move back 1 byte
+buf.seek(0) // Jump to offset 0
+buf.rewind() // Same as seek(0)
 
 // Bookmarking with mark stack
-buf.pushMark()        // Save current position
+buf.pushMark() // Save current position
 buf.skip(3)
-buf.popMark()         // Restore saved position
+buf.popMark() // Restore saved position
 
 // Endianness control (default: little-endian)
 buf.setBigEndian()
@@ -294,8 +294,8 @@ buf.rewind()
 const big = buf.readLeb128() // 123456789012345678901234567890n
 
 // Clone and deep clone
-const shallow = buf.clone()     // Shares underlying ArrayBuffer
-const deep = buf.deepClone()    // Independent copy
+const shallow = buf.clone() // Shares underlying ArrayBuffer
+const deep = buf.deepClone() // Independent copy
 ```
 
 ### Main Entrypoint
