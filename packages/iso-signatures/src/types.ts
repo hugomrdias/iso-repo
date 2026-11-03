@@ -1,5 +1,17 @@
 import type { VerifiableDID } from 'iso-did/types'
 
+/** The EIP-1193 wallet requests used by the EIP-191 signer. */
+export interface EIP191Provider {
+  request: {
+    (args: { method: 'eth_requestAccounts' }): Promise<readonly `0x${string}`[]>
+    (args: { method: 'eth_chainId' }): Promise<`0x${string}`>
+    (args: {
+      method: 'personal_sign'
+      params: readonly [`0x${string}`, `0x${string}`]
+    }): Promise<`0x${string}`>
+  }
+}
+
 export type SignatureType =
   | 'Ed25519'
   | 'ES256'

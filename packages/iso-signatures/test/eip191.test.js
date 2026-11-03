@@ -84,6 +84,31 @@ describe('Verifier eip191', () => {
     assert.equal(verified, true)
   })
 
+  it('should verify when the did:pkh address uses uppercase hex digits', async () => {
+    const did = DIDPkh.fromAddress(
+      `0x${account.address.slice(2).toUpperCase()}`
+    )
+    const signature = await sign(PRIVATE_KEY, msg)
+
+    assert.equal(await EIP191.verify({ signature, message: msg, did }), true)
+  })
+
+  for (const address of [
+    account.address.slice(0, -1),
+    `${account.address}00`,
+    `0x${'g'.repeat(40)}`,
+  ]) {
+    it(`should reject an invalid Ethereum address ${address}`, async () => {
+      const did = DIDPkh.fromAddress(/** @type {`0x${string}`} */ (address))
+      const signature = await sign(PRIVATE_KEY, msg)
+
+      await assert.rejects(
+        EIP191.verify({ signature, message: msg, did }),
+        /Invalid Ethereum address/
+      )
+    })
+  }
+
   it('should not verify a signature from a different address', async () => {
     const did = DIDPkh.fromAddress(account.address)
     const signature = await sign(OTHER_PRIVATE_KEY, msg)
@@ -151,8 +176,7 @@ describe('Verifier eip191', () => {
     }
   }
 
-  // EIP-155 style values decode to a valid y parity in ox's vToYParity,
-  // but are not valid for personal messages
+  // EIP-155 transaction recovery values are not valid for personal messages.
   for (const v of [35, 36, 37, 255]) {
     it(`should reject a signature with v = ${v}`, async () => {
       const did = DIDPkh.fromAddress(account.address)

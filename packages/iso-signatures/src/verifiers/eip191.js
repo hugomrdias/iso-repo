@@ -4,8 +4,6 @@ import { hex } from 'iso-base/rfc4648'
 import { utf8 } from 'iso-base/utf8'
 import { concat } from 'iso-base/utils'
 import { DIDPkh } from 'iso-did/pkh'
-import * as Address from 'ox/Address'
-import * as PublicKey from 'ox/PublicKey'
 
 const PREFIX = '\x19Ethereum Signed Message:\n'
 
@@ -52,12 +50,15 @@ export async function verify({ signature, message, did, strict }) {
     getSignPayload(message),
     { prehash: false }
   )
-  // noble returns a compressed key, address derivation needs it uncompressed
-  const address = Address.fromPublicKey(
-    PublicKey.fromBytes(Point.fromBytes(pubKey).toBytes(false))
-  )
+  // Ethereum addresses are the last 20 bytes of Keccak-256(x || y), without
+  // the uncompressed SEC1 public key's 0x04 prefix.
+  const publicKey = Point.fromBytes(pubKey).toBytes(false).subarray(1)
+  const address = `0x${hex.encode(keccak_256(publicKey).subarray(-20))}`
 
-  return Address.isEqual(address, didPkh.address)
+  if (!/^0x[\da-fA-F]{40}$/.test(didPkh.address)) {
+    throw new TypeError(`Invalid Ethereum address "${didPkh.address}"`)
+  }
+  return address === didPkh.address.toLowerCase()
 }
 
 /** @type {import('../types').Verifier<'EIP191'>} */
