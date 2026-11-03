@@ -17,11 +17,9 @@ pnpm install @biomejs/biome -w -D
 `biome.json`
 
 ```json
-
 {
   "extends": ["@hugomrdias/configs/biome"]
 }
-
 ```
 
 `package.json`
