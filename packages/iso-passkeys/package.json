@@ -1,6 +1,9 @@
 {
   "name": "iso-passkeys",
   "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "version": "0.3.2",
   "description": "Passkeys tooling.",
   "author": "Hugo Dias <hugomrdias@gmail.com> (hugodias.me)",
@@ -51,8 +54,8 @@
   },
   "dependencies": {
     "@noble/ed25519": "catalog:",
-    "@peculiar/asn1-ecc": "^2.11.1",
-    "@peculiar/asn1-schema": "^2.11.1",
+    "@peculiar/asn1-ecc": "^3.0.0",
+    "@peculiar/asn1-schema": "^3.0.0",
     "cbor-x": "^1.6.9",
     "iso-base": "workspace:^",
     "iso-did": "workspace:^"
