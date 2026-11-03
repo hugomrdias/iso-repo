@@ -484,9 +484,6 @@ importers:
 
   packages/iso-did:
     dependencies:
-      did-resolver:
-        specifier: ^5.0.1
-        version: 5.0.1
       iso-base:
         specifier: workspace:^
         version: link:../iso-base
@@ -3240,9 +3237,6 @@ packages:
 
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
-
-  did-resolver@5.0.1:
-    resolution: {integrity: sha512-AtbIfBt/D9Z6GeNKhm1AzCbF7y5PhsNukgmVYnsdxbIX8UAsquQpbm8ECfPwDRXAOM3EsGdHheK5WMojcPlAPg==}
 
   diff@9.0.0:
     resolution: {integrity: sha512-svtcdpS8CgJyqAjEQIXdb3OjhFVVYjzGAPO8WGCmRbrml64SPw/jJD4GoE98aR7r25A0XcgrK3F02yw9R/vhQw==}
@@ -7893,8 +7887,6 @@ snapshots:
   devlop@1.1.0:
     dependencies:
       dequal: 2.0.3
-
-  did-resolver@5.0.1: {}
 
   diff@9.0.0: {}
 
