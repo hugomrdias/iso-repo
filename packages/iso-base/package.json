@@ -138,7 +138,7 @@
     "assert": "catalog:",
     "mocha": "catalog:",
     "playwright-test": "catalog:",
-    "tinybench": "^6.2.0",
+    "tinybench": "^6.2.3",
     "typescript": "catalog:"
   },
   "publishConfig": {
