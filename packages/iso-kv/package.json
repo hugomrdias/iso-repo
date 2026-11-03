@@ -53,7 +53,7 @@
     "idb-keyval": "^6.3.0",
     "iso-base": "workspace:^",
     "iso-conf": "workspace:^",
-    "kysely": "^0.29.6"
+    "kysely": "^0.29.8"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
