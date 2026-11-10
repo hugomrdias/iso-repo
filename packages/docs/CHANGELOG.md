@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/hugomrdias/iso-repo/compare/docs-v0.2.0...docs-v0.2.1) (2026-11-10)
+
+
+### Bug Fixes
+
+* **@hugomrdias/docs:** respect packageOptions and fail build on TypeDoc errors ([#688](https://github.com/hugomrdias/iso-repo/issues/688)) ([e27d601](https://github.com/hugomrdias/iso-repo/commit/e27d601fe3e224cf85763350a8ef9ff4e5ac2176))
+
 ## [0.2.0](https://github.com/hugomrdias/iso-repo/compare/docs-v0.1.11...docs-v0.2.0) (2026-04-15)
 
 
