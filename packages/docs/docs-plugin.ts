@@ -94,102 +94,102 @@ export function docsPlugin(options: DocsPluginOptions = {}): StarlightPlugin {
         }
 
         const directory = options.outputDirectory ?? 'api'
-        try {
-          const output = {
-            base: astroConfig.base,
-            directory,
-            path: path.join(
-              url.fileURLToPath(astroConfig.srcDir),
-              'content/docs',
-              directory
-            ),
-            urlPath: getUrlPath(directory, astroConfig.base),
+        const output = {
+          base: astroConfig.base,
+          directory,
+          path: path.join(
+            url.fileURLToPath(astroConfig.srcDir),
+            'content/docs',
+            directory
+          ),
+          urlPath: getUrlPath(directory, astroConfig.base),
+        }
+
+        const projectRoot = url.fileURLToPath(astroConfig.root)
+        const _require = createRequire(path.join(projectRoot, 'package.json'))
+        const resolvedPlugins = (options.typeDocOptions?.plugin ?? []).map(
+          (p) => {
+            try {
+              return _require.resolve(p.toString())
+            } catch {
+              logger.warn(
+                `Could not resolve TypeDoc plugin "${p}", using as-is`
+              )
+              return p
+            }
+          }
+        )
+
+        const app = await Application.bootstrapWithPlugins({
+          ..._defaultTypeDocOptions,
+          ...options.typeDocOptions,
+          plugin: [...resolvedPlugins, 'typedoc-plugin-markdown'],
+          outputs: [{ name: 'markdown', path: output.path }],
+          readme: 'none',
+          packageOptions: {
+            ...options.typeDocOptions?.packageOptions,
+            readme: 'none',
+          },
+        })
+
+        app.logger = new StarlightTypeDocLogger(logger)
+        app.options.addDeclaration({
+          defaultValue: output.urlPath,
+          help: 'The starlight-typedoc output directory containing the generated documentation markdown files relative to the `src/content/docs/` directory.',
+          name: 'docs-plugin-url-path',
+          type: ParameterType.String,
+        })
+
+        app.options.addReader(new TSConfigReader())
+        app.renderer.defineTheme('starlight-typedoc', StarlightTypeDocTheme)
+        app.renderer.on(PageEvent.END, (_event) => {
+          const event = _event as MarkdownPageEvent
+          const frontmatter: Record<string, unknown> = {
+            title: event.model.name,
+            next: options.pagination,
+            prev: options.pagination,
+            editUrl: false,
           }
 
-          const projectRoot = url.fileURLToPath(astroConfig.root)
-          const _require = createRequire(path.join(projectRoot, 'package.json'))
-          const resolvedPlugins = (options.typeDocOptions?.plugin ?? []).map(
-            (p) => {
-              try {
-                return _require.resolve(p.toString())
-              } catch {
-                logger.warn(
-                  `Could not resolve TypeDoc plugin "${p}", using as-is`
-                )
-                return p
-              }
-            }
-          )
+          if (event.url.includes('toc.md')) {
+            frontmatter.sidebar = { order: 0 }
+          }
 
-          const app = await Application.bootstrapWithPlugins({
-            ..._defaultTypeDocOptions,
-            ...options.typeDocOptions,
-            plugin: [...resolvedPlugins, 'typedoc-plugin-markdown'],
-            outputs: [{ name: 'markdown', path: output.path }],
-            readme: 'none',
-            packageOptions: {
-              readme: 'none',
-            },
-          })
-
-          app.logger = new StarlightTypeDocLogger(logger)
-          app.options.addDeclaration({
-            defaultValue: output.urlPath,
-            help: 'The starlight-typedoc output directory containing the generated documentation markdown files relative to the `src/content/docs/` directory.',
-            name: 'docs-plugin-url-path',
-            type: ParameterType.String,
-          })
-
-          app.options.addReader(new TSConfigReader())
-          app.renderer.defineTheme('starlight-typedoc', StarlightTypeDocTheme)
-          app.renderer.on(PageEvent.END, (_event) => {
-            const event = _event as MarkdownPageEvent
-            const frontmatter: Record<string, unknown> = {
-              title: event.model.name,
-              next: options.pagination,
-              prev: options.pagination,
-              editUrl: false,
-            }
-
-            if (event.url.includes('toc.md')) {
-              frontmatter.sidebar = { order: 0 }
-            }
-
-            if (!event.frontmatter) {
-              event.contents = `---
+          if (!event.frontmatter) {
+            event.contents = `---
 ${stringify(frontmatter)}
 ---
 
 ${event.contents}`
-            }
-          })
-
-          let reflections: ProjectReflection | undefined
-
-          if (options.watch) {
-            reflections = await new Promise<ProjectReflection>((resolve) => {
-              void app.convertAndWatch(async (reflections) => {
-                await app.generateOutputs(reflections)
-                resolve(reflections)
-              })
-            })
-          } else {
-            reflections = await app.convert()
-
-            if (
-              (!reflections?.groups || reflections.groups.length === 0) &&
-              !reflections?.children?.some(
-                (child) => (child.groups ?? []).length > 0
-              )
-            ) {
-              throw new Error('No reflections found')
-            }
-
-            await app.generateOutputs(reflections)
           }
-        } catch (error) {
-          // biome-ignore lint/suspicious/noConsole: log error
-          console.error(error)
+        })
+
+        let reflections: ProjectReflection | undefined
+
+        if (options.watch) {
+          reflections = await new Promise<ProjectReflection>((resolve) => {
+            void app.convertAndWatch(async (reflections) => {
+              await app.generateOutputs(reflections)
+              resolve(reflections)
+            })
+          })
+        } else {
+          reflections = await app.convert()
+
+          if (app.logger.hasErrors()) {
+            throw new Error('TypeDoc conversion reported errors')
+          }
+
+          if (
+            (!reflections?.groups || reflections.groups.length === 0) &&
+            !reflections?.children?.some(
+              (child) => (child.groups ?? []).length > 0
+            )
+          ) {
+            throw new Error('No reflections found')
+          }
+
+          await app.generateOutputs(reflections)
         }
       },
     },
