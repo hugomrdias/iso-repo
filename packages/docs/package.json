@@ -40,7 +40,7 @@
     "@astrojs/starlight": "^0.42.8",
     "@biomejs/biome": "catalog:",
     "@types/node": "catalog:",
-    "astro": "^7.4.5",
+    "astro": "^7.4.7",
     "typescript": "catalog:"
   },
   "publishConfig": {
