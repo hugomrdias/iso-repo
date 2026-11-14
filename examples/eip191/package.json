@@ -22,7 +22,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "viem": "catalog:",
-    "wagmi": "^3.7.9",
+    "wagmi": "^3.7.11",
     "zod": "catalog:"
   },
   "devDependencies": {
