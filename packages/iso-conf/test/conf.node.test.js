@@ -5,12 +5,12 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
+import { describe, it } from 'node:test'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 import * as dotProp from 'dot-prop'
 import envPaths from 'env-paths'
-import { suite } from 'playwright-test/taps'
 import { z } from 'zod'
 import * as dotPath from '../src/dot-path.js'
 import { Conf, ConfError } from '../src/index.js'
@@ -54,250 +54,263 @@ function pathFor(config) {
 const skipPermissions =
   process.platform === 'win32' || process.geteuid?.() === 0
 
-const { test } = suite('Conf basics')
+describe('Conf basics', () => {
+  it('get/set/has/delete/clear', () => {
+    const config = createConf()
 
-test('get/set/has/delete/clear', () => {
-  const config = createConf()
+    config.set('foo', 10)
+    assert.equal(config.get('foo'), 10)
+    assert.equal(config.has('foo'), true)
 
-  config.set('foo', 10)
-  assert.equal(config.get('foo'), 10)
-  assert.equal(config.has('foo'), true)
+    config.delete('foo')
+    assert.equal(config.get('foo'), 50)
+    assert.equal(config.has('foo'), true)
 
-  config.delete('foo')
-  assert.equal(config.get('foo'), 50)
-  assert.equal(config.has('foo'), true)
-
-  config.set('foo', 20)
-  config.clear()
-  assert.equal(config.get('foo'), 50)
-})
-
-test('dot notation', () => {
-  const config = createConf()
-
-  config.set('nested.value', true)
-  assert.deepEqual(config.get('nested'), { value: true })
-
-  const flat = createConf({ accessPropertiesByDotNotation: false })
-  flat.set('nested.value', true)
-  assert.equal(flat.get('nested.value'), true)
-})
-
-test('flat keys for has, delete and appendToArray', () => {
-  const config = createConf({ accessPropertiesByDotNotation: false })
-
-  config.set('nested.value', true)
-  assert.equal(config.has('nested.value'), true)
-  assert.equal(config.has('nested'), false)
-
-  config.appendToArray('list.items', 'a')
-  config.appendToArray('list.items', 'b')
-  assert.deepEqual(config.get('list.items'), ['a', 'b'])
-  assert.equal(config.has('list'), false)
-
-  config.delete('nested.value')
-  assert.equal(config.has('nested.value'), false)
-  assert.deepEqual({ ...config.store }, { foo: 50, 'list.items': ['a', 'b'] })
-})
-
-test('set object', () => {
-  const config = createConf()
-  config.set({ foo: 25 })
-  assert.equal(config.get('foo'), 25)
-})
-
-test('set rejects keys that are not strings or objects', () => {
-  const config = createConf()
-
-  assert.throws(
-    // @ts-expect-error - runtime validation should reject number keys.
-    () => config.set(1, 'a'),
-    {
-      name: 'TypeError',
-      message: 'Expected `key` to be of type `string` or `object`, got number',
-    }
-  )
-
-  assert.throws(
-    // @ts-expect-error - runtime validation should reject null keys.
-    () => config.set(null),
-    {
-      name: 'TypeError',
-      message: 'Expected `key` to be of type `string` or `object`, got null',
-    }
-  )
-
-  assert.throws(
-    // @ts-expect-error - runtime validation should reject array keys.
-    () => config.set(['a', 'b']),
-    {
-      name: 'TypeError',
-      message: 'Expected `key` to be of type `string` or `object`, got array',
-    }
-  )
-
-  assert.equal(config.has('0'), false)
-  assert.equal(config.has('1'), false)
-})
-
-test('appendToArray', () => {
-  const config = createConf()
-  config.set('items', [{ name: 'foo' }])
-  config.appendToArray('items', { name: 'bar' })
-  assert.deepEqual(config.get('items'), [{ name: 'foo' }, { name: 'bar' }])
-
-  config.appendToArray('newItems', 'first')
-  assert.deepEqual(config.get('newItems'), ['first'])
-})
-
-test('path and iteration', () => {
-  const config = createConf()
-  config.set('foo', 10)
-
-  assert.ok(config.path.endsWith('config.json'))
-  assert.equal(config.size, 1)
-
-  const entries = [...config]
-  assert.deepEqual(entries, [['foo', 10]])
-})
-
-test('fileExtension', () => {
-  assert.equal(
-    path.basename(createConf({ fileExtension: '.json' }).path),
-    'config.json'
-  )
-  assert.equal(
-    path.basename(createConf({ fileExtension: 'yaml' }).path),
-    'config.yaml'
-  )
-  assert.equal(
-    path.basename(createConf({ fileExtension: '.yaml' }).path),
-    'config.yaml'
-  )
-  assert.equal(path.basename(createConf({ fileExtension: '' }).path), 'config')
-  assert.equal(
-    path.basename(createConf({ fileExtension: '...' }).path),
-    'config'
-  )
-})
-
-test('custom serialize and deserialize', () => {
-  const cwd = temporaryDirectory()
-  /** @type {import('../src/types.js').Serialize} */
-  const serialize = (value) =>
-    Buffer.from(JSON.stringify(value)).toString('base64')
-  /** @type {import('../src/types.js').Deserialize} */
-  const deserialize = (value) =>
-    JSON.parse(Buffer.from(value, 'base64').toString('utf8'))
-  const options = {
-    cwd,
-    defaults: { bar: 'https://example.com' },
-    serialize,
-    deserialize,
-  }
-
-  const config = createConf(options)
-  config.set('foo', 10)
-
-  assert.deepEqual(deserialize(fs.readFileSync(config.path, 'utf8')), {
-    foo: 10,
-    bar: 'https://example.com',
+    config.set('foo', 20)
+    config.clear()
+    assert.equal(config.get('foo'), 50)
   })
-  assert.deepEqual(
-    { ...createConf(options).store },
-    { foo: 10, bar: 'https://example.com' }
-  )
-})
 
-test('projectName resolves the config directory', () => {
-  const config = new Conf({ projectName: `IsoConf Test ${process.pid}` })
+  it('dot notation', () => {
+    const config = createConf()
 
-  try {
-    assert.equal(
-      config.path,
-      path.join(envPaths(`iso-conf-test-${process.pid}`).config, 'config.json')
+    config.set('nested.value', true)
+    assert.deepEqual(config.get('nested'), { value: true })
+
+    const flat = createConf({ accessPropertiesByDotNotation: false })
+    flat.set('nested.value', true)
+    assert.equal(flat.get('nested.value'), true)
+  })
+
+  it('flat keys for has, delete and appendToArray', () => {
+    const config = createConf({ accessPropertiesByDotNotation: false })
+
+    config.set('nested.value', true)
+    assert.equal(config.has('nested.value'), true)
+    assert.equal(config.has('nested'), false)
+
+    config.appendToArray('list.items', 'a')
+    config.appendToArray('list.items', 'b')
+    assert.deepEqual(config.get('list.items'), ['a', 'b'])
+    assert.equal(config.has('list'), false)
+
+    config.delete('nested.value')
+    assert.equal(config.has('nested.value'), false)
+    assert.deepEqual({ ...config.store }, { foo: 50, 'list.items': ['a', 'b'] })
+  })
+
+  it('set object', () => {
+    const config = createConf()
+    config.set({ foo: 25 })
+    assert.equal(config.get('foo'), 25)
+  })
+
+  it('set rejects keys that are not strings or objects', () => {
+    const config = createConf()
+
+    assert.throws(
+      // @ts-expect-error - runtime validation should reject number keys.
+      () => config.set(1, 'a'),
+      {
+        name: 'TypeError',
+        message:
+          'Expected `key` to be of type `string` or `object`, got number',
+      }
     )
-    assert.equal(fs.existsSync(path.dirname(config.path)), false)
-  } finally {
-    fs.rmSync(path.dirname(config.path), { recursive: true, force: true })
-  }
-})
 
-test('projectName resolves like env-paths on every platform', () => {
-  const platform = Object.getOwnPropertyDescriptor(process, 'platform')
-  const { APPDATA, XDG_CONFIG_HOME } = process.env
-  /** Project names and their kebab case. */
-  const names = {
-    'My App': 'my-app',
-    myApp: 'my-app',
-    a: 'a',
-    éclair: 'éclair',
-    '..': '',
-    'a/b': 'a-b',
-  }
-  const envs = [
-    { APPDATA: undefined, XDG_CONFIG_HOME: undefined },
-    { APPDATA: 'C:\\Data', XDG_CONFIG_HOME: '/xdg' },
-  ]
+    assert.throws(
+      // @ts-expect-error - runtime validation should reject null keys.
+      () => config.set(null),
+      {
+        name: 'TypeError',
+        message: 'Expected `key` to be of type `string` or `object`, got null',
+      }
+    )
 
-  /** @param {() => unknown} fn */
-  const outcome = (fn) => {
+    assert.throws(
+      // @ts-expect-error - runtime validation should reject array keys.
+      () => config.set(['a', 'b']),
+      {
+        name: 'TypeError',
+        message: 'Expected `key` to be of type `string` or `object`, got array',
+      }
+    )
+
+    assert.equal(config.has('0'), false)
+    assert.equal(config.has('1'), false)
+  })
+
+  it('appendToArray', () => {
+    const config = createConf()
+    config.set('items', [{ name: 'foo' }])
+    config.appendToArray('items', { name: 'bar' })
+    assert.deepEqual(config.get('items'), [{ name: 'foo' }, { name: 'bar' }])
+
+    config.appendToArray('newItems', 'first')
+    assert.deepEqual(config.get('newItems'), ['first'])
+  })
+
+  it('path and iteration', () => {
+    const config = createConf()
+    config.set('foo', 10)
+
+    assert.ok(config.path.endsWith('config.json'))
+    assert.equal(config.size, 1)
+
+    const entries = [...config]
+    assert.deepEqual(entries, [['foo', 10]])
+  })
+
+  it('fileExtension', () => {
+    assert.equal(
+      path.basename(createConf({ fileExtension: '.json' }).path),
+      'config.json'
+    )
+    assert.equal(
+      path.basename(createConf({ fileExtension: 'yaml' }).path),
+      'config.yaml'
+    )
+    assert.equal(
+      path.basename(createConf({ fileExtension: '.yaml' }).path),
+      'config.yaml'
+    )
+    assert.equal(
+      path.basename(createConf({ fileExtension: '' }).path),
+      'config'
+    )
+    assert.equal(
+      path.basename(createConf({ fileExtension: '...' }).path),
+      'config'
+    )
+  })
+
+  it('custom serialize and deserialize', () => {
+    const cwd = temporaryDirectory()
+    /** @type {import('../src/types.js').Serialize} */
+    const serialize = (value) =>
+      Buffer.from(JSON.stringify(value)).toString('base64')
+    /** @type {import('../src/types.js').Deserialize} */
+    const deserialize = (value) =>
+      JSON.parse(Buffer.from(value, 'base64').toString('utf8'))
+    const options = {
+      cwd,
+      defaults: { bar: 'https://example.com' },
+      serialize,
+      deserialize,
+    }
+
+    const config = createConf(options)
+    config.set('foo', 10)
+
+    assert.deepEqual(deserialize(fs.readFileSync(config.path, 'utf8')), {
+      foo: 10,
+      bar: 'https://example.com',
+    })
+    assert.deepEqual(
+      { ...createConf(options).store },
+      { foo: 10, bar: 'https://example.com' }
+    )
+  })
+
+  it('projectName resolves the config directory', () => {
+    const config = new Conf({ projectName: `IsoConf Test ${process.pid}` })
+
     try {
-      return { value: fn() }
-    } catch (error) {
-      return { error: /** @type {Error} */ (error).message }
+      assert.equal(
+        config.path,
+        path.join(
+          envPaths(`iso-conf-test-${process.pid}`).config,
+          'config.json'
+        )
+      )
+      assert.equal(fs.existsSync(path.dirname(config.path)), false)
+    } finally {
+      fs.rmSync(path.dirname(config.path), { recursive: true, force: true })
     }
-  }
+  })
 
-  try {
-    for (const os of ['darwin', 'win32', 'linux', 'freebsd']) {
-      Object.defineProperty(process, 'platform', { value: os })
+  it('projectName resolves like env-paths on every platform', () => {
+    const platform = Object.getOwnPropertyDescriptor(process, 'platform')
+    const { APPDATA, XDG_CONFIG_HOME } = process.env
+    /** Project names and their kebab case. */
+    const names = {
+      'My App': 'my-app',
+      myApp: 'my-app',
+      a: 'a',
+      éclair: 'éclair',
+      '..': '',
+      'a/b': 'a-b',
+    }
+    const envs = [
+      { APPDATA: undefined, XDG_CONFIG_HOME: undefined },
+      { APPDATA: 'C:\\Data', XDG_CONFIG_HOME: '/xdg' },
+    ]
 
-      for (const env of envs) {
-        for (const [key, value] of Object.entries(env)) {
-          if (value === undefined) {
-            delete process.env[key]
-          } else {
-            process.env[key] = value
+    /** @param {() => unknown} fn */
+    const outcome = (fn) => {
+      try {
+        return { value: fn() }
+      } catch (error) {
+        return { error: /** @type {Error} */ (error).message }
+      }
+    }
+
+    try {
+      for (const os of ['darwin', 'win32', 'linux', 'freebsd']) {
+        Object.defineProperty(process, 'platform', { value: os })
+
+        for (const env of envs) {
+          for (const [key, value] of Object.entries(env)) {
+            if (value === undefined) {
+              delete process.env[key]
+            } else {
+              process.env[key] = value
+            }
           }
-        }
 
-        for (const [name, kebab] of Object.entries(names)) {
-          for (const projectSuffix of [undefined, '', 'cli', 'x/y']) {
-            const actual = outcome(
-              () =>
-                new Conf({ projectName: name, projectSuffix, configName: 'c' })
-                  .path
-            )
-            const expected = outcome(() =>
-              path.resolve(
-                envPaths(kebab, { suffix: projectSuffix ?? 'nodejs' }).config,
-                'c.json'
+          for (const [name, kebab] of Object.entries(names)) {
+            for (const projectSuffix of [undefined, '', 'cli', 'x/y']) {
+              const actual = outcome(
+                () =>
+                  new Conf({
+                    projectName: name,
+                    projectSuffix,
+                    configName: 'c',
+                  }).path
               )
-            )
-            assert.deepEqual(actual, expected, `${os} ${name} ${projectSuffix}`)
+              const expected = outcome(() =>
+                path.resolve(
+                  envPaths(kebab, { suffix: projectSuffix ?? 'nodejs' }).config,
+                  'c.json'
+                )
+              )
+              assert.deepEqual(
+                actual,
+                expected,
+                `${os} ${name} ${projectSuffix}`
+              )
+            }
           }
         }
       }
-    }
-  } finally {
-    if (platform) {
-      Object.defineProperty(process, 'platform', platform)
-    }
-    for (const [key, value] of Object.entries({ APPDATA, XDG_CONFIG_HOME })) {
-      if (value === undefined) {
-        delete process.env[key]
-      } else {
-        process.env[key] = value
+    } finally {
+      if (platform) {
+        Object.defineProperty(process, 'platform', platform)
+      }
+      for (const [key, value] of Object.entries({ APPDATA, XDG_CONFIG_HOME })) {
+        if (value === undefined) {
+          delete process.env[key]
+        } else {
+          process.env[key] = value
+        }
       }
     }
-  }
-})
+  })
 
-test('loads at most five modules', () => {
-  // Tests are bundled, so resolve the source from the package directory.
-  const entry = pathToFileURL(path.resolve('src/index.js')).href
-  const script = `
+  it('loads at most five modules', () => {
+    // Tests are bundled, so resolve the source from the package directory.
+    const entry = pathToFileURL(path.resolve('src/index.js')).href
+    const script = `
     const { registerHooks } = await import('node:module')
     const files = []
     registerHooks({
@@ -309,24 +322,26 @@ test('loads at most five modules', () => {
     await import(${JSON.stringify(entry)})
     console.log(JSON.stringify(files))
   `
-  const files = JSON.parse(
-    execFileSync(process.execPath, ['--input-type=module', '--eval', script], {
-      encoding: 'utf8',
+    const files = JSON.parse(
+      execFileSync(
+        process.execPath,
+        ['--input-type=module', '--eval', script],
+        {
+          encoding: 'utf8',
+        }
+      )
+    )
+
+    assert.ok(files.length <= 5, files.join('\n'))
+  })
+
+  it('throws without projectName or cwd', () => {
+    assert.throws(() => new Conf(), {
+      name: 'Error',
+      message: 'Please specify the `projectName` option.',
     })
-  )
-
-  assert.ok(files.length <= 5, files.join('\n'))
-})
-
-test('throws without projectName or cwd', () => {
-  assert.throws(() => new Conf(), {
-    name: 'Error',
-    message: 'Please specify the `projectName` option.',
   })
 })
-
-const dotPathSuite = suite('Conf dot paths')
-const { test: dotPathTest } = dotPathSuite
 
 const dotPaths = [
   '',
@@ -408,243 +423,247 @@ function settle(fn) {
   }
 }
 
-dotPathTest('parsePath matches dot-prop', () => {
-  for (const key of dotPaths) {
-    assert.deepEqual(
-      settle(() => dotPath.parsePath(key)),
-      settle(() => dotProp.parsePath(key)),
-      key
-    )
-  }
-})
-
-dotPathTest('get, has, set and delete match dot-prop', () => {
-  for (const key of dotPaths) {
-    for (const fallback of [undefined, 'fallback']) {
+describe('Conf dot paths', () => {
+  it('parsePath matches dot-prop', () => {
+    for (const key of dotPaths) {
       assert.deepEqual(
-        settle(() => dotPath.getProperty(dotPathFixture(), key, fallback)),
-        settle(() => dotProp.getProperty(dotPathFixture(), key, fallback)),
-        `get ${key}`
+        settle(() => dotPath.parsePath(key)),
+        settle(() => dotProp.parsePath(key)),
+        key
       )
     }
+  })
 
-    assert.deepEqual(
-      settle(() => dotPath.hasProperty(dotPathFixture(), key)),
-      settle(() => dotProp.hasProperty(dotPathFixture(), key)),
-      `has ${key}`
-    )
-
-    /** @type {Array<{ name: string, ours: (o: any) => unknown, theirs: (o: any) => unknown }>} */
-    const writes = [
-      {
-        name: 'set',
-        ours: (o) => dotPath.setProperty(o, key, 'new'),
-        theirs: (o) => dotProp.setProperty(o, key, 'new'),
-      },
-      {
-        name: 'delete',
-        ours: (o) => dotPath.deleteProperty(o, key),
-        theirs: (o) => dotProp.deleteProperty(o, key),
-      },
-    ]
-
-    for (const { name, ours, theirs } of writes) {
-      const actual = dotPathFixture()
-      const expected = dotPathFixture()
-      const actualResult = settle(() => ours(actual))
-      const expectedResult = settle(() => theirs(expected))
-
-      if (name === 'delete') {
-        assert.deepEqual(actualResult, expectedResult, `${name} ${key}`)
-      } else {
-        assert.equal('error' in actualResult, 'error' in expectedResult)
+  it('get, has, set and delete match dot-prop', () => {
+    for (const key of dotPaths) {
+      for (const fallback of [undefined, 'fallback']) {
+        assert.deepEqual(
+          settle(() => dotPath.getProperty(dotPathFixture(), key, fallback)),
+          settle(() => dotProp.getProperty(dotPathFixture(), key, fallback)),
+          `get ${key}`
+        )
       }
 
-      assert.deepEqual(actual, expected, `${name} ${key}`)
+      assert.deepEqual(
+        settle(() => dotPath.hasProperty(dotPathFixture(), key)),
+        settle(() => dotProp.hasProperty(dotPathFixture(), key)),
+        `has ${key}`
+      )
+
+      /** @type {Array<{ name: string, ours: (o: any) => unknown, theirs: (o: any) => unknown }>} */
+      const writes = [
+        {
+          name: 'set',
+          ours: (o) => dotPath.setProperty(o, key, 'new'),
+          theirs: (o) => dotProp.setProperty(o, key, 'new'),
+        },
+        {
+          name: 'delete',
+          ours: (o) => dotPath.deleteProperty(o, key),
+          theirs: (o) => dotProp.deleteProperty(o, key),
+        },
+      ]
+
+      for (const { name, ours, theirs } of writes) {
+        const actual = dotPathFixture()
+        const expected = dotPathFixture()
+        const actualResult = settle(() => ours(actual))
+        const expectedResult = settle(() => theirs(expected))
+
+        if (name === 'delete') {
+          assert.deepEqual(actualResult, expectedResult, `${name} ${key}`)
+        } else {
+          assert.equal('error' in actualResult, 'error' in expectedResult)
+        }
+
+        assert.deepEqual(actual, expected, `${name} ${key}`)
+      }
     }
-  }
 
-  assert.equal(/** @type {any} */ ({}).x, undefined, 'no prototype pollution')
-})
-
-dotPathTest('escaped dots address top-level keys', () => {
-  const config = createConf()
-  config.set('a\\.b', 1)
-  config.set('a.b', 2)
-
-  assert.equal(config.get('a\\.b'), 1)
-  assert.equal(config.has('a\\.b'), true)
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
-    foo: 50,
-    'a.b': 1,
-    a: { b: 2 },
+    assert.equal(/** @type {any} */ ({}).x, undefined, 'no prototype pollution')
   })
 
-  config.delete('a\\.b')
-  assert.equal(config.has('a\\.b'), false)
-  assert.equal(config.get('a.b'), 2)
+  it('escaped dots address top-level keys', () => {
+    const config = createConf()
+    config.set('a\\.b', 1)
+    config.set('a.b', 2)
+
+    assert.equal(config.get('a\\.b'), 1)
+    assert.equal(config.has('a\\.b'), true)
+    assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+      foo: 50,
+      'a.b': 1,
+      a: { b: 2 },
+    })
+
+    config.delete('a\\.b')
+    assert.equal(config.has('a\\.b'), false)
+    assert.equal(config.get('a.b'), 2)
+  })
+
+  it('refuses prototype keys', () => {
+    const config = createConf()
+
+    for (const key of [
+      '__proto__.polluted',
+      'constructor.prototype.polluted',
+      'nested.__proto__.polluted',
+    ]) {
+      config.set(key, true)
+      assert.equal(config.get(key), undefined)
+      assert.equal(config.has(key), false)
+      config.delete(key)
+    }
+
+    assert.equal(/** @type {any} */ ({}).polluted, undefined)
+    assert.deepEqual({ ...config.store }, { foo: 50 })
+  })
+
+  it('array indexes', () => {
+    const config = createConf()
+    config.set('items', [{ name: 'a' }, { name: 'b' }])
+
+    assert.equal(config.get('items[1].name'), 'b')
+    assert.equal(config.get('items.0.name'), 'a')
+    assert.equal(config.has('items[2]'), false)
+
+    config.set('items[1].name', 'c')
+    config.set('list[0]', 'x')
+    assert.deepEqual(config.get('items'), [{ name: 'a' }, { name: 'c' }])
+    assert.deepEqual(config.get('list'), ['x'])
+  })
 })
 
-dotPathTest('refuses prototype keys', () => {
-  const config = createConf()
+describe('Conf schema', () => {
+  it('rejects invalid values', () => {
+    const config = createConf()
 
-  for (const key of [
-    '__proto__.polluted',
-    'constructor.prototype.polluted',
-    'nested.__proto__.polluted',
-  ]) {
-    config.set(key, true)
-    assert.equal(config.get(key), undefined)
-    assert.equal(config.has(key), false)
-    config.delete(key)
-  }
+    assert.throws(
+      // @ts-expect-error - runtime validation should reject schema-invalid values.
+      () => config.set({ items: [{ name: 1 }], nested: { value: 'x' } }),
+      {
+        message:
+          /^Config schema violation: `nested.value` .+; `items.0.name` .+$|^Config schema violation: `items.0.name` .+; `nested.value` .+$/,
+      }
+    )
 
-  assert.equal(/** @type {any} */ ({}).polluted, undefined)
-  assert.deepEqual({ ...config.store }, { foo: 50 })
-})
-
-dotPathTest('array indexes', () => {
-  const config = createConf()
-  config.set('items', [{ name: 'a' }, { name: 'b' }])
-
-  assert.equal(config.get('items[1].name'), 'b')
-  assert.equal(config.get('items.0.name'), 'a')
-  assert.equal(config.has('items[2]'), false)
-
-  config.set('items[1].name', 'c')
-  config.set('list[0]', 'x')
-  assert.deepEqual(config.get('items'), [{ name: 'a' }, { name: 'c' }])
-  assert.deepEqual(config.get('list'), ['x'])
-})
-
-const schemaSuite = suite('Conf schema')
-const { test: schemaTest } = schemaSuite
-
-schemaTest('rejects invalid values', () => {
-  const config = createConf()
-
-  assert.throws(
     // @ts-expect-error - runtime validation should reject schema-invalid values.
-    () => config.set({ items: [{ name: 1 }], nested: { value: 'x' } }),
-    {
-      message:
-        /^Config schema violation: `nested.value` .+; `items.0.name` .+$|^Config schema violation: `items.0.name` .+; `nested.value` .+$/,
+    assert.throws(() => config.set('foo', 'nope'), {
+      name: 'ConfError',
+      code: 'ERR_CONF_INVALID_VALUE',
+      path: config.path,
+      message: /^Config schema violation: `foo` /,
+    })
+    assert.equal(fs.existsSync(config.path), false)
+  })
+
+  it('accepts valid values', () => {
+    const config = createConf()
+    config.set('foo', 42)
+    config.set('bar', 'https://example.com')
+    assert.equal(config.get('foo'), 42)
+    assert.equal(config.get('bar'), 'https://example.com')
+  })
+
+  it('defaults from schema', () => {
+    const config = createConf()
+    assert.equal(config.get('foo'), 50)
+  })
+
+  it('persists schema defaults into an existing file on write', () => {
+    const cwd = temporaryDirectory()
+    fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({}))
+
+    const config = createConf({ cwd })
+    assert.equal(config.get('foo'), 50)
+    assert.equal(fs.readFileSync(config.path, 'utf8'), '{}')
+
+    config.set('bar', 'https://example.com')
+    assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+      foo: 50,
+      bar: 'https://example.com',
+    })
+  })
+
+  it('persists coerced values on write', () => {
+    const cwd = temporaryDirectory()
+    fs.writeFileSync(
+      path.join(cwd, 'config.json'),
+      JSON.stringify({ foo: '7' })
+    )
+
+    const config = new Conf({
+      cwd,
+      schema: z.looseObject({ foo: z.coerce.number() }),
+      defaults: { foo: 0 },
+    })
+    assert.equal(config.get('foo'), 7)
+    assert.equal(fs.readFileSync(config.path, 'utf8'), '{"foo":"7"}')
+
+    config.set('other', 1)
+    assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+      foo: 7,
+      other: 1,
+    })
+  })
+
+  it('does not rewrite an unchanged file', () => {
+    const cwd = temporaryDirectory()
+    const raw = JSON.stringify({ foo: 10, nested: { value: true } })
+    fs.writeFileSync(path.join(cwd, 'config.json'), raw)
+
+    const config = createConf({ cwd })
+    assert.equal(fs.readFileSync(config.path, 'utf8'), raw)
+  })
+
+  it('reset restores defaults', () => {
+    const config = createConf()
+    config.set('foo', 99)
+    config.reset('foo')
+    assert.equal(config.get('foo'), 50)
+  })
+
+  it('reset restores nested defaults with dot notation', () => {
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      schema: z.looseObject({
+        n: z.object({ v: z.number().default(7) }).default({ v: 7 }),
+      }),
+    })
+    config.set('n.v', 1)
+    config.reset('n.v')
+    assert.equal(config.get('n.v'), 7)
+  })
+
+  it('reset leaves keys without a default unchanged', () => {
+    const config = createConf()
+    config.set('bar', 'https://example.com')
+    config.reset('bar')
+    assert.equal(config.get('bar'), 'https://example.com')
+  })
+
+  it('defaults apply after the file is deleted', () => {
+    const config = createConf()
+    config.set('foo', 10)
+    fs.rmSync(config.path)
+    assert.equal(config.get('foo'), 50)
+  })
+
+  it('rejects async schemas', () => {
+    /** @type {import('@standard-schema/spec').StandardSchemaV1} */
+    const asyncSchema = {
+      '~standard': {
+        version: 1,
+        vendor: 'test',
+        validate: async (value) => ({ value }),
+      },
     }
-  )
 
-  // @ts-expect-error - runtime validation should reject schema-invalid values.
-  assert.throws(() => config.set('foo', 'nope'), {
-    name: 'ConfError',
-    code: 'ERR_CONF_INVALID_VALUE',
-    path: config.path,
-    message: /^Config schema violation: `foo` /,
-  })
-  assert.equal(fs.existsSync(config.path), false)
-})
-
-schemaTest('accepts valid values', () => {
-  const config = createConf()
-  config.set('foo', 42)
-  config.set('bar', 'https://example.com')
-  assert.equal(config.get('foo'), 42)
-  assert.equal(config.get('bar'), 'https://example.com')
-})
-
-schemaTest('defaults from schema', () => {
-  const config = createConf()
-  assert.equal(config.get('foo'), 50)
-})
-
-schemaTest('persists schema defaults into an existing file on write', () => {
-  const cwd = temporaryDirectory()
-  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({}))
-
-  const config = createConf({ cwd })
-  assert.equal(config.get('foo'), 50)
-  assert.equal(fs.readFileSync(config.path, 'utf8'), '{}')
-
-  config.set('bar', 'https://example.com')
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
-    foo: 50,
-    bar: 'https://example.com',
-  })
-})
-
-schemaTest('persists coerced values on write', () => {
-  const cwd = temporaryDirectory()
-  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ foo: '7' }))
-
-  const config = new Conf({
-    cwd,
-    schema: z.looseObject({ foo: z.coerce.number() }),
-    defaults: { foo: 0 },
-  })
-  assert.equal(config.get('foo'), 7)
-  assert.equal(fs.readFileSync(config.path, 'utf8'), '{"foo":"7"}')
-
-  config.set('other', 1)
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
-    foo: 7,
-    other: 1,
-  })
-})
-
-schemaTest('does not rewrite an unchanged file', () => {
-  const cwd = temporaryDirectory()
-  const raw = JSON.stringify({ foo: 10, nested: { value: true } })
-  fs.writeFileSync(path.join(cwd, 'config.json'), raw)
-
-  const config = createConf({ cwd })
-  assert.equal(fs.readFileSync(config.path, 'utf8'), raw)
-})
-
-schemaTest('reset restores defaults', () => {
-  const config = createConf()
-  config.set('foo', 99)
-  config.reset('foo')
-  assert.equal(config.get('foo'), 50)
-})
-
-schemaTest('reset restores nested defaults with dot notation', () => {
-  const config = new Conf({
-    cwd: temporaryDirectory(),
-    schema: z.looseObject({
-      n: z.object({ v: z.number().default(7) }).default({ v: 7 }),
-    }),
-  })
-  config.set('n.v', 1)
-  config.reset('n.v')
-  assert.equal(config.get('n.v'), 7)
-})
-
-schemaTest('reset leaves keys without a default unchanged', () => {
-  const config = createConf()
-  config.set('bar', 'https://example.com')
-  config.reset('bar')
-  assert.equal(config.get('bar'), 'https://example.com')
-})
-
-schemaTest('defaults apply after the file is deleted', () => {
-  const config = createConf()
-  config.set('foo', 10)
-  fs.rmSync(config.path)
-  assert.equal(config.get('foo'), 50)
-})
-
-schemaTest('rejects async schemas', () => {
-  /** @type {import('@standard-schema/spec').StandardSchemaV1} */
-  const asyncSchema = {
-    '~standard': {
-      version: 1,
-      vendor: 'test',
-      validate: async (value) => ({ value }),
-    },
-  }
-
-  const config = new Conf({ cwd: temporaryDirectory(), schema: asyncSchema })
-  assert.throws(() => config.store, {
-    name: 'TypeError',
-    message: /Async schemas are not supported/,
+    const config = new Conf({ cwd: temporaryDirectory(), schema: asyncSchema })
+    assert.throws(() => config.store, {
+      name: 'TypeError',
+      message: /Async schemas are not supported/,
+    })
   })
 })
 
@@ -653,141 +672,144 @@ const requiredSchema = z.looseObject({
   foo: z.number().default(50),
 })
 
-const requiredSuite = suite('Conf required fields')
-const { test: requiredTest } = requiredSuite
-
-requiredTest('throws on first read without defaults', () => {
-  // @ts-expect-error - `defaults` is required for this schema.
-  const config = new Conf({ cwd: temporaryDirectory(), schema: requiredSchema })
-  assert.throws(() => config.get('req'), /Config schema violation: `req`/)
-})
-
-requiredTest('uses defaults on first run', () => {
-  const config = new Conf({
-    cwd: temporaryDirectory(),
-    schema: requiredSchema,
-    defaults: { req: 1 },
+describe('Conf required fields', () => {
+  it('throws on first read without defaults', () => {
+    // @ts-expect-error - `defaults` is required for this schema.
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      schema: requiredSchema,
+    })
+    assert.throws(() => config.get('req'), /Config schema violation: `req`/)
   })
-  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
-  assert.equal(fs.existsSync(config.path), false)
 
-  config.set('foo', 2)
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
-    req: 1,
-    foo: 2,
+  it('uses defaults on first run', () => {
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      schema: requiredSchema,
+      defaults: { req: 1 },
+    })
+    assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+    assert.equal(fs.existsSync(config.path), false)
+
+    config.set('foo', 2)
+    assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+      req: 1,
+      foo: 2,
+    })
+  })
+
+  it('fills new required fields in an existing file', () => {
+    const cwd = temporaryDirectory()
+    fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ foo: 3 }))
+    const config = new Conf({
+      cwd,
+      schema: requiredSchema,
+      defaults: { req: 1 },
+    })
+    assert.equal(config.get('req'), 1)
+    assert.equal(config.get('foo'), 3)
+  })
+
+  it('throws after the file is deleted without defaults', () => {
+    const cwd = temporaryDirectory()
+    fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ req: 1 }))
+    // @ts-expect-error - `defaults` is required for this schema.
+    const config = new Conf({ cwd, schema: requiredSchema })
+
+    fs.rmSync(config.path)
+    assert.throws(() => config.get('req'), /Config schema violation: `req`/)
+  })
+
+  it('defaults apply after the file is deleted or cleared', () => {
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      schema: requiredSchema,
+      defaults: { req: 1 },
+      clearInvalidConfig: true,
+    })
+    config.set({ req: 2, foo: 3 })
+
+    fs.rmSync(config.path)
+    assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+
+    fs.writeFileSync(config.path, '{invalid')
+    assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+
+    fs.writeFileSync(config.path, JSON.stringify({ req: 'bad' }))
+    assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+  })
+
+  it('reset and clear use defaults and schema defaults', () => {
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      schema: requiredSchema,
+      defaults: { req: 1 },
+    })
+    config.set({ req: 2, foo: 3 })
+    config.reset('req', 'foo')
+    assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+
+    config.set({ req: 2, foo: 3, extra: true })
+    config.clear()
+    assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
+  })
+
+  it('reset works per key when other keys are required', () => {
+    const cwd = temporaryDirectory()
+    fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ req: 1 }))
+    // @ts-expect-error - `defaults` is required for this schema.
+    const config = new Conf({ cwd, schema: requiredSchema })
+    config.set('foo', 1)
+    config.reset('foo')
+    assert.equal(config.get('foo'), 50)
+    config.reset('req')
+    assert.equal(config.get('req'), 1)
+  })
+
+  it('defaults work without a schema', () => {
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      defaults: { nested: { a: 1 } },
+    })
+    config.set('nested.a', 2)
+    config.reset('nested.a')
+    assert.deepEqual(config.get('nested'), { a: 1 })
+    config.clear()
+    assert.deepEqual({ ...config.store }, { nested: { a: 1 } })
   })
 })
 
-requiredTest('fills new required fields in an existing file', () => {
-  const cwd = temporaryDirectory()
-  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ foo: 3 }))
-  const config = new Conf({ cwd, schema: requiredSchema, defaults: { req: 1 } })
-  assert.equal(config.get('req'), 1)
-  assert.equal(config.get('foo'), 3)
-})
-
-requiredTest('throws after the file is deleted without defaults', () => {
-  const cwd = temporaryDirectory()
-  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ req: 1 }))
-  // @ts-expect-error - `defaults` is required for this schema.
-  const config = new Conf({ cwd, schema: requiredSchema })
-
-  fs.rmSync(config.path)
-  assert.throws(() => config.get('req'), /Config schema violation: `req`/)
-})
-
-requiredTest('defaults apply after the file is deleted or cleared', () => {
-  const config = new Conf({
-    cwd: temporaryDirectory(),
-    schema: requiredSchema,
-    defaults: { req: 1 },
-    clearInvalidConfig: true,
+describe('Conf schema output', () => {
+  it('writes the validated output', () => {
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      schema: z.object({ a: z.number().default(1) }),
+    })
+    config.set('extra', 5)
+    assert.equal(config.get('extra'), undefined)
+    assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), { a: 1 })
   })
-  config.set({ req: 2, foo: 3 })
 
-  fs.rmSync(config.path)
-  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
-
-  fs.writeFileSync(config.path, '{invalid')
-  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
-
-  fs.writeFileSync(config.path, JSON.stringify({ req: 'bad' }))
-  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
-})
-
-requiredTest('reset and clear use defaults and schema defaults', () => {
-  const config = new Conf({
-    cwd: temporaryDirectory(),
-    schema: requiredSchema,
-    defaults: { req: 1 },
+  it('rejects writes whose output is not valid input', () => {
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      schema: z.looseObject({
+        s: z
+          .string()
+          .transform((v) => v.length)
+          .optional(),
+      }),
+    })
+    // @ts-expect-error - `s` is typed as the transformed output.
+    assert.throws(() => config.set('s', 'abc'), {
+      name: 'TypeError',
+      message: /Schema output must be valid schema input/,
+    })
+    assert.equal(config.get('s'), undefined)
+    config.set('other', 1)
+    assert.equal(config.get('other'), 1)
   })
-  config.set({ req: 2, foo: 3 })
-  config.reset('req', 'foo')
-  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
-
-  config.set({ req: 2, foo: 3, extra: true })
-  config.clear()
-  assert.deepEqual({ ...config.store }, { req: 1, foo: 50 })
 })
-
-requiredTest('reset works per key when other keys are required', () => {
-  const cwd = temporaryDirectory()
-  fs.writeFileSync(path.join(cwd, 'config.json'), JSON.stringify({ req: 1 }))
-  // @ts-expect-error - `defaults` is required for this schema.
-  const config = new Conf({ cwd, schema: requiredSchema })
-  config.set('foo', 1)
-  config.reset('foo')
-  assert.equal(config.get('foo'), 50)
-  config.reset('req')
-  assert.equal(config.get('req'), 1)
-})
-
-requiredTest('defaults work without a schema', () => {
-  const config = new Conf({
-    cwd: temporaryDirectory(),
-    defaults: { nested: { a: 1 } },
-  })
-  config.set('nested.a', 2)
-  config.reset('nested.a')
-  assert.deepEqual(config.get('nested'), { a: 1 })
-  config.clear()
-  assert.deepEqual({ ...config.store }, { nested: { a: 1 } })
-})
-
-const outputSuite = suite('Conf schema output')
-const { test: outputTest } = outputSuite
-
-outputTest('writes the validated output', () => {
-  const config = new Conf({
-    cwd: temporaryDirectory(),
-    schema: z.object({ a: z.number().default(1) }),
-  })
-  config.set('extra', 5)
-  assert.equal(config.get('extra'), undefined)
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), { a: 1 })
-})
-
-outputTest('rejects writes whose output is not valid input', () => {
-  const config = new Conf({
-    cwd: temporaryDirectory(),
-    schema: z.looseObject({
-      s: z
-        .string()
-        .transform((v) => v.length)
-        .optional(),
-    }),
-  })
-  // @ts-expect-error - `s` is typed as the transformed output.
-  assert.throws(() => config.set('s', 'abc'), {
-    name: 'TypeError',
-    message: /Schema output must be valid schema input/,
-  })
-  assert.equal(config.get('s'), undefined)
-  config.set('other', 1)
-  assert.equal(config.get('other'), 1)
-})
-
-const jsonTest = suite('Conf json')
 
 /**
  * @param {Conf<typeof schema>} config
@@ -801,145 +823,143 @@ function reloadConf(config) {
   })
 }
 
-jsonTest('persists extended types through Conf', () => {
-  const config = createConf()
-  const url = new URL('https://example.com/path')
-  const map = new Map([['a', 1n]])
-  const bytes = new Uint8Array([1, 2, 3])
-  const arrayBuffer = new ArrayBuffer(3)
-  new Uint8Array(arrayBuffer).set([7, 8, 9])
-  const nodeBuffer = { type: 'Buffer', data: [4, 5, 6] }
-  const tags = new Set([1, 2])
-  const pattern = /foo/i
+describe('Conf json', () => {
+  it('persists extended types through Conf', () => {
+    const config = createConf()
+    const url = new URL('https://example.com/path')
+    const map = new Map([['a', 1n]])
+    const bytes = new Uint8Array([1, 2, 3])
+    const arrayBuffer = new ArrayBuffer(3)
+    new Uint8Array(arrayBuffer).set([7, 8, 9])
+    const nodeBuffer = { type: 'Buffer', data: [4, 5, 6] }
+    const tags = new Set([1, 2])
+    const pattern = /foo/i
 
-  config.set('website', url)
-  config.set('mapping', map)
-  config.set('bytes', bytes)
-  config.set('arrayBuffer', arrayBuffer)
-  config.set('nodeBuffer', nodeBuffer)
-  config.set('big', 1n)
-  config.set('tags', tags)
-  config.set('pattern', pattern)
+    config.set('website', url)
+    config.set('mapping', map)
+    config.set('bytes', bytes)
+    config.set('arrayBuffer', arrayBuffer)
+    config.set('nodeBuffer', nodeBuffer)
+    config.set('big', 1n)
+    config.set('tags', tags)
+    config.set('pattern', pattern)
 
-  const next = reloadConf(config)
+    const next = reloadConf(config)
 
-  assert.equal(String(next.get('website')), 'https://example.com/path')
-  assert.deepEqual(next.get('mapping'), map)
-  assert.deepEqual(next.get('bytes'), bytes)
-  assert.deepEqual(next.get('arrayBuffer'), new Uint8Array([7, 8, 9]))
-  assert.deepEqual(next.get('nodeBuffer'), new Uint8Array([4, 5, 6]))
-  assert.equal(next.get('big'), 1n)
-  assert.deepEqual(next.get('tags'), tags)
-  assert.deepEqual(next.get('pattern'), pattern)
-})
-
-jsonTest('persists nested extended types through Conf', () => {
-  const config = createConf()
-  const value = {
-    nested: { big: 2n },
-    tags: new Set(['a', 1, new Set(['c', 'd'])]),
-    pattern: /^[\s\w!,?àáâãçèéêíïñóôõöú-]+$/,
-  }
-
-  config.set('extended', value)
-  const next = reloadConf(config)
-
-  assert.deepEqual(next.get('extended'), value)
-})
-
-const hooksSuite = suite('Conf change hooks')
-const { test: hooksTest } = hooksSuite
-
-hooksTest('onDidChange', () => {
-  const config = createConf()
-  /** @type {Array<{ newValue: unknown, oldValue: unknown }>} */
-  const values = []
-
-  const unsubscribe = config.onDidChange('foo', (newValue, oldValue) => {
-    values.push({ newValue, oldValue })
+    assert.equal(String(next.get('website')), 'https://example.com/path')
+    assert.deepEqual(next.get('mapping'), map)
+    assert.deepEqual(next.get('bytes'), bytes)
+    assert.deepEqual(next.get('arrayBuffer'), new Uint8Array([7, 8, 9]))
+    assert.deepEqual(next.get('nodeBuffer'), new Uint8Array([4, 5, 6]))
+    assert.equal(next.get('big'), 1n)
+    assert.deepEqual(next.get('tags'), tags)
+    assert.deepEqual(next.get('pattern'), pattern)
   })
 
-  config.set('foo', 10)
-  config.set('foo', 20)
-  config.delete('foo')
-  unsubscribe()
-  config.set('foo', 30)
+  it('persists nested extended types through Conf', () => {
+    const config = createConf()
+    const value = {
+      nested: { big: 2n },
+      tags: new Set(['a', 1, new Set(['c', 'd'])]),
+      pattern: /^[\s\w!,?àáâãçèéêíïñóôõöú-]+$/,
+    }
 
-  assert.deepEqual(values, [
-    { newValue: 10, oldValue: 50 },
-    { newValue: 20, oldValue: 10 },
-    { newValue: 50, oldValue: 20 },
-  ])
+    config.set('extended', value)
+    const next = reloadConf(config)
+
+    assert.deepEqual(next.get('extended'), value)
+  })
 })
 
-hooksTest('onDidAnyChange', () => {
-  const config = createConf()
-  /** @type {Array<{ newValue: Record<string, unknown>, oldValue: Record<string, unknown> }>} */
-  const snapshots = []
+describe('Conf change hooks', () => {
+  it('onDidChange', () => {
+    const config = createConf()
+    /** @type {Array<{ newValue: unknown, oldValue: unknown }>} */
+    const values = []
 
-  const unsubscribe = config.onDidAnyChange((newValue, oldValue) => {
-    snapshots.push({ newValue, oldValue })
+    const unsubscribe = config.onDidChange('foo', (newValue, oldValue) => {
+      values.push({ newValue, oldValue })
+    })
+
+    config.set('foo', 10)
+    config.set('foo', 20)
+    config.delete('foo')
+    unsubscribe()
+    config.set('foo', 30)
+
+    assert.deepEqual(values, [
+      { newValue: 10, oldValue: 50 },
+      { newValue: 20, oldValue: 10 },
+      { newValue: 50, oldValue: 20 },
+    ])
   })
 
-  config.set('foo', 10)
-  unsubscribe()
-  config.set('foo', 20)
+  it('onDidAnyChange', () => {
+    const config = createConf()
+    /** @type {Array<{ newValue: Record<string, unknown>, oldValue: Record<string, unknown> }>} */
+    const snapshots = []
 
-  assert.equal(snapshots.length, 1)
-  assert.equal(snapshots[0]?.newValue.foo, 10)
-  assert.equal(snapshots[0]?.oldValue.foo, 50)
-})
+    const unsubscribe = config.onDidAnyChange((newValue, oldValue) => {
+      snapshots.push({ newValue, oldValue })
+    })
 
-hooksTest('callback errors dispatch error events', async () => {
-  const config = createConf()
-  /** @type {unknown[]} */
-  const errors = []
-  /** @type {unknown[]} */
-  const values = []
-  const error = new Error('listener boom')
+    config.set('foo', 10)
+    unsubscribe()
+    config.set('foo', 20)
 
-  config.events.addEventListener('error', (event) => {
-    errors.push(/** @type {CustomEvent} */ (event).detail)
+    assert.equal(snapshots.length, 1)
+    assert.equal(snapshots[0]?.newValue.foo, 10)
+    assert.equal(snapshots[0]?.oldValue.foo, 50)
   })
-  config.onDidChange('foo', () => {
-    throw error
+
+  it('callback errors dispatch error events', async () => {
+    const config = createConf()
+    /** @type {unknown[]} */
+    const errors = []
+    /** @type {unknown[]} */
+    const values = []
+    const error = new Error('listener boom')
+
+    config.events.addEventListener('error', (event) => {
+      errors.push(/** @type {CustomEvent} */ (event).detail)
+    })
+    config.onDidChange('foo', () => {
+      throw error
+    })
+    config.onDidChange('foo', (newValue) => values.push(newValue))
+
+    config.set('foo', 10)
+    config.set('foo', 20)
+    await sleep(0)
+
+    assert.deepEqual(errors, [error, error])
+    assert.deepEqual(values, [10, 20])
   })
-  config.onDidChange('foo', (newValue) => values.push(newValue))
 
-  config.set('foo', 10)
-  config.set('foo', 20)
-  await sleep(0)
+  it('onDidAnyChange callback errors dispatch error events', async () => {
+    const config = createConf()
+    /** @type {unknown[]} */
+    const errors = []
+    /** @type {unknown[]} */
+    const values = []
+    const error = new Error('any listener boom')
 
-  assert.deepEqual(errors, [error, error])
-  assert.deepEqual(values, [10, 20])
-})
+    config.events.addEventListener('error', (event) => {
+      errors.push(/** @type {CustomEvent} */ (event).detail)
+    })
+    config.onDidAnyChange(() => {
+      throw error
+    })
+    config.onDidAnyChange((newValue) => values.push(newValue.foo))
 
-hooksTest('onDidAnyChange callback errors dispatch error events', async () => {
-  const config = createConf()
-  /** @type {unknown[]} */
-  const errors = []
-  /** @type {unknown[]} */
-  const values = []
-  const error = new Error('any listener boom')
+    config.set('foo', 10)
+    await sleep(0)
 
-  config.events.addEventListener('error', (event) => {
-    errors.push(/** @type {CustomEvent} */ (event).detail)
+    assert.deepEqual(errors, [error])
+    assert.deepEqual(values, [10])
   })
-  config.onDidAnyChange(() => {
-    throw error
-  })
-  config.onDidAnyChange((newValue) => values.push(newValue.foo))
 
-  config.set('foo', 10)
-  await sleep(0)
-
-  assert.deepEqual(errors, [error])
-  assert.deepEqual(values, [10])
-})
-
-hooksTest(
-  'callback errors without an error listener do not escape',
-  async () => {
+  it('callback errors without an error listener do not escape', async () => {
     const config = createConf()
     /** @type {unknown[]} */
     const values = []
@@ -957,11 +977,8 @@ hooksTest(
 
     assert.deepEqual(values, [10])
     assert.equal(config.get('foo'), 10)
-  }
-)
-
-const readsSuite = suite('Conf disk reads')
-const { test: readsTest } = readsSuite
+  })
+})
 
 /**
  * Count config file reads from disk while running `fn`.
@@ -991,238 +1008,238 @@ function countDiskReads(config, fn) {
   return reads
 }
 
-readsTest('appendToArray reads the store once', () => {
-  for (const accessPropertiesByDotNotation of [true, false]) {
-    const config = createConf({ accessPropertiesByDotNotation })
-    config.set('items', [{ name: 'foo' }])
+describe('Conf disk reads', () => {
+  it('appendToArray reads the store once', () => {
+    for (const accessPropertiesByDotNotation of [true, false]) {
+      const config = createConf({ accessPropertiesByDotNotation })
+      config.set('items', [{ name: 'foo' }])
+
+      const reads = countDiskReads(config, () => {
+        config.appendToArray('items', { name: 'bar' })
+      })
+
+      assert.equal(reads, 1)
+      assert.deepEqual(config.get('items'), [{ name: 'foo' }, { name: 'bar' }])
+    }
+  })
+
+  it('reset reads the store once for multiple keys', () => {
+    const config = createConf()
+    config.set('foo', 99)
+
+    /** @type {unknown[]} */
+    const changes = []
+    config.onDidAnyChange((newValue) => changes.push(newValue.foo))
 
     const reads = countDiskReads(config, () => {
-      config.appendToArray('items', { name: 'bar' })
+      config.reset('foo', 'foo')
+    })
+
+    assert.equal(reads, 2, 'one read for reset, one for listeners')
+    assert.deepEqual(changes, [50])
+  })
+
+  it('listeners share one disk read per change', () => {
+    const config = createConf()
+
+    /** @type {unknown[]} */
+    const fooChanges = []
+    /** @type {unknown[]} */
+    const barChanges = []
+    /** @type {unknown[]} */
+    const anyChanges = []
+    config.onDidChange('foo', (newValue, oldValue) =>
+      fooChanges.push([newValue, oldValue])
+    )
+    config.onDidChange('bar', (newValue, oldValue) =>
+      barChanges.push([newValue, oldValue])
+    )
+    config.onDidAnyChange((newValue) => anyChanges.push(newValue.foo))
+
+    const reads = countDiskReads(config, () => {
+      config.set('foo', 10)
+    })
+
+    assert.equal(reads, 2, 'one read for set, one for listeners')
+    assert.deepEqual(fooChanges, [[10, 50]])
+    assert.deepEqual(barChanges, [])
+    assert.deepEqual(anyChanges, [10])
+  })
+
+  it('listeners handle manually dispatched change events', () => {
+    const config = createConf()
+
+    /** @type {unknown[]} */
+    const changes = []
+    config.onDidChange('foo', (newValue) => changes.push(newValue))
+    config.onDidAnyChange((newValue) => changes.push(newValue.foo))
+
+    fs.writeFileSync(config.path, JSON.stringify({ foo: 7 }))
+    const reads = countDiskReads(config, () => {
+      config.events.dispatchEvent(new Event('change'))
     })
 
     assert.equal(reads, 1)
-    assert.deepEqual(config.get('items'), [{ name: 'foo' }, { name: 'bar' }])
-  }
-})
-
-readsTest('reset reads the store once for multiple keys', () => {
-  const config = createConf()
-  config.set('foo', 99)
-
-  /** @type {unknown[]} */
-  const changes = []
-  config.onDidAnyChange((newValue) => changes.push(newValue.foo))
-
-  const reads = countDiskReads(config, () => {
-    config.reset('foo', 'foo')
+    assert.deepEqual(changes, [7, 7])
   })
 
-  assert.equal(reads, 2, 'one read for reset, one for listeners')
-  assert.deepEqual(changes, [50])
+  it('each listener gets its own copy', () => {
+    const config = createConf()
+
+    /** @type {Array<{ newValue: unknown, oldValue: unknown }>} */
+    const nestedChanges = []
+    /** @type {unknown[]} */
+    const anyNested = []
+    /** @type {unknown[]} */
+    const fooChanges = []
+
+    config.onDidChange('nested', (newValue) => {
+      if (newValue) {
+        newValue.value = false
+      }
+    })
+    config.onDidAnyChange((newValue) => {
+      anyNested.push(structuredClone(newValue.nested))
+      newValue.foo = 1
+    })
+    config.onDidChange('nested', (newValue, oldValue) => {
+      nestedChanges.push({ newValue, oldValue })
+    })
+    config.onDidChange('foo', (newValue) => fooChanges.push(newValue))
+
+    config.set('nested', { value: true })
+
+    assert.deepEqual(anyNested, [{ value: true }])
+    assert.deepEqual(nestedChanges, [
+      { newValue: { value: true }, oldValue: undefined },
+    ])
+    assert.deepEqual(fooChanges, [])
+    assert.deepEqual(config.get('nested'), { value: true })
+    assert.equal(config.get('foo'), 50)
+  })
 })
 
-readsTest('listeners share one disk read per change', () => {
-  const config = createConf()
-
-  /** @type {unknown[]} */
-  const fooChanges = []
-  /** @type {unknown[]} */
-  const barChanges = []
-  /** @type {unknown[]} */
-  const anyChanges = []
-  config.onDidChange('foo', (newValue, oldValue) =>
-    fooChanges.push([newValue, oldValue])
-  )
-  config.onDidChange('bar', (newValue, oldValue) =>
-    barChanges.push([newValue, oldValue])
-  )
-  config.onDidAnyChange((newValue) => anyChanges.push(newValue.foo))
-
-  const reads = countDiskReads(config, () => {
-    config.set('foo', 10)
+describe('Conf invalid config', () => {
+  it('clearInvalidConfig on corrupt json', () => {
+    const config = createConf({ clearInvalidConfig: true })
+    fs.writeFileSync(config.path, '{invalid')
+    assert.deepEqual({ ...config.store }, { foo: 50 })
   })
 
-  assert.equal(reads, 2, 'one read for set, one for listeners')
-  assert.deepEqual(fooChanges, [[10, 50]])
-  assert.deepEqual(barChanges, [])
-  assert.deepEqual(anyChanges, [10])
-})
-
-readsTest('listeners handle manually dispatched change events', () => {
-  const config = createConf()
-
-  /** @type {unknown[]} */
-  const changes = []
-  config.onDidChange('foo', (newValue) => changes.push(newValue))
-  config.onDidAnyChange((newValue) => changes.push(newValue.foo))
-
-  fs.writeFileSync(config.path, JSON.stringify({ foo: 7 }))
-  const reads = countDiskReads(config, () => {
-    config.events.dispatchEvent(new Event('change'))
+  it('clearInvalidConfig on schema violation', () => {
+    const config = createConf({ clearInvalidConfig: true })
+    fs.writeFileSync(config.path, JSON.stringify({ foo: 'bad' }))
+    assert.deepEqual({ ...config.store }, { foo: 50 })
   })
 
-  assert.equal(reads, 1)
-  assert.deepEqual(changes, [7, 7])
-})
+  it('clearInvalidConfig on extended JSON reviver error', () => {
+    const config = createConf({ clearInvalidConfig: true })
+    fs.writeFileSync(config.path, JSON.stringify({ u: { $url: 'nope' } }))
+    assert.deepEqual({ ...config.store }, { foo: 50 })
+  })
 
-readsTest('each listener gets its own copy', () => {
-  const config = createConf()
+  it('clearInvalidConfig on custom deserialize error', () => {
+    class CustomError extends Error {}
+    const config = createConf({
+      clearInvalidConfig: true,
+      deserialize: (value) => {
+        if (value.includes('bad')) {
+          throw new CustomError('bad config')
+        }
+        return JSON.parse(value)
+      },
+    })
+    fs.writeFileSync(config.path, 'bad')
+    assert.deepEqual({ ...config.store }, { foo: 50 })
+  })
 
-  /** @type {Array<{ newValue: unknown, oldValue: unknown }>} */
-  const nestedChanges = []
-  /** @type {unknown[]} */
-  const anyNested = []
-  /** @type {unknown[]} */
-  const fooChanges = []
+  it('clearInvalidConfig recovers on read without writing', () => {
+    const cwd = temporaryDirectory()
+    const raw = JSON.stringify({ u: { $url: 'nope' } })
+    fs.writeFileSync(path.join(cwd, 'config.json'), raw)
+    const config = createConf({ cwd, clearInvalidConfig: true })
+    assert.equal(config.get('foo'), 50)
+    assert.equal(fs.readFileSync(config.path, 'utf8'), raw)
+  })
 
-  config.onDidChange('nested', (newValue) => {
-    if (newValue) {
-      newValue.value = false
+  it('clearInvalidConfig replaces a cleared file on write', () => {
+    const cwd = temporaryDirectory()
+    fs.writeFileSync(path.join(cwd, 'config.json'), '{invalid')
+    const config = new Conf({
+      cwd,
+      schema: z.looseObject({ bar: z.string().optional() }),
+      clearInvalidConfig: true,
+    })
+    assert.equal(fs.readFileSync(config.path, 'utf8'), '{invalid')
+
+    config.set('bar', 'x')
+    assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+      bar: 'x',
+    })
+  })
+
+  it('deserialize errors throw ConfError ERR_CONF_PARSE', () => {
+    class CustomError extends Error {}
+    const custom = new CustomError('bad config')
+    const cases = [
+      { name: 'corrupt json', raw: '{invalid', cause: SyntaxError },
+      {
+        name: 'reviver error',
+        raw: JSON.stringify({ u: { $url: 'nope' } }),
+        cause: TypeError,
+      },
+      {
+        name: 'custom deserialize',
+        raw: 'bad',
+        cause: CustomError,
+        deserialize: () => {
+          throw custom
+        },
+      },
+    ]
+
+    for (const { name, raw, cause, deserialize } of cases) {
+      const config = createConf({ deserialize })
+      fs.writeFileSync(config.path, raw)
+      assert.throws(
+        () => config.store,
+        (/** @type {any} */ error) => {
+          assert.ok(error instanceof ConfError, name)
+          assert.equal(error.code, 'ERR_CONF_PARSE', name)
+          assert.equal(error.path, config.path, name)
+          assert.ok(error.cause instanceof cause, name)
+          assert.equal(error.issues, undefined, name)
+          return true
+        }
+      )
+      assert.throws(() => config.set('foo', 1), { code: 'ERR_CONF_PARSE' })
+      assert.equal(fs.readFileSync(config.path, 'utf8'), raw, name)
     }
   })
-  config.onDidAnyChange((newValue) => {
-    anyNested.push(structuredClone(newValue.nested))
-    newValue.foo = 1
-  })
-  config.onDidChange('nested', (newValue, oldValue) => {
-    nestedChanges.push({ newValue, oldValue })
-  })
-  config.onDidChange('foo', (newValue) => fooChanges.push(newValue))
 
-  config.set('nested', { value: true })
-
-  assert.deepEqual(anyNested, [{ value: true }])
-  assert.deepEqual(nestedChanges, [
-    { newValue: { value: true }, oldValue: undefined },
-  ])
-  assert.deepEqual(fooChanges, [])
-  assert.deepEqual(config.get('nested'), { value: true })
-  assert.equal(config.get('foo'), 50)
-})
-
-const invalidSuite = suite('Conf invalid config')
-const { test: invalidTest } = invalidSuite
-
-invalidTest('clearInvalidConfig on corrupt json', () => {
-  const config = createConf({ clearInvalidConfig: true })
-  fs.writeFileSync(config.path, '{invalid')
-  assert.deepEqual({ ...config.store }, { foo: 50 })
-})
-
-invalidTest('clearInvalidConfig on schema violation', () => {
-  const config = createConf({ clearInvalidConfig: true })
-  fs.writeFileSync(config.path, JSON.stringify({ foo: 'bad' }))
-  assert.deepEqual({ ...config.store }, { foo: 50 })
-})
-
-invalidTest('clearInvalidConfig on extended JSON reviver error', () => {
-  const config = createConf({ clearInvalidConfig: true })
-  fs.writeFileSync(config.path, JSON.stringify({ u: { $url: 'nope' } }))
-  assert.deepEqual({ ...config.store }, { foo: 50 })
-})
-
-invalidTest('clearInvalidConfig on custom deserialize error', () => {
-  class CustomError extends Error {}
-  const config = createConf({
-    clearInvalidConfig: true,
-    deserialize: (value) => {
-      if (value.includes('bad')) {
-        throw new CustomError('bad config')
-      }
-      return JSON.parse(value)
-    },
-  })
-  fs.writeFileSync(config.path, 'bad')
-  assert.deepEqual({ ...config.store }, { foo: 50 })
-})
-
-invalidTest('clearInvalidConfig recovers on read without writing', () => {
-  const cwd = temporaryDirectory()
-  const raw = JSON.stringify({ u: { $url: 'nope' } })
-  fs.writeFileSync(path.join(cwd, 'config.json'), raw)
-  const config = createConf({ cwd, clearInvalidConfig: true })
-  assert.equal(config.get('foo'), 50)
-  assert.equal(fs.readFileSync(config.path, 'utf8'), raw)
-})
-
-invalidTest('clearInvalidConfig replaces a cleared file on write', () => {
-  const cwd = temporaryDirectory()
-  fs.writeFileSync(path.join(cwd, 'config.json'), '{invalid')
-  const config = new Conf({
-    cwd,
-    schema: z.looseObject({ bar: z.string().optional() }),
-    clearInvalidConfig: true,
-  })
-  assert.equal(fs.readFileSync(config.path, 'utf8'), '{invalid')
-
-  config.set('bar', 'x')
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
-    bar: 'x',
-  })
-})
-
-invalidTest('deserialize errors throw ConfError ERR_CONF_PARSE', () => {
-  class CustomError extends Error {}
-  const custom = new CustomError('bad config')
-  const cases = [
-    { name: 'corrupt json', raw: '{invalid', cause: SyntaxError },
-    {
-      name: 'reviver error',
-      raw: JSON.stringify({ u: { $url: 'nope' } }),
-      cause: TypeError,
-    },
-    {
-      name: 'custom deserialize',
-      raw: 'bad',
-      cause: CustomError,
-      deserialize: () => {
-        throw custom
-      },
-    },
-  ]
-
-  for (const { name, raw, cause, deserialize } of cases) {
-    const config = createConf({ deserialize })
-    fs.writeFileSync(config.path, raw)
+  it('schema violations on load throw ConfError ERR_CONF_SCHEMA', () => {
+    const config = createConf()
+    fs.writeFileSync(config.path, JSON.stringify({ foo: 'bad' }))
     assert.throws(
-      () => config.store,
+      () => config.get('foo'),
       (/** @type {any} */ error) => {
-        assert.ok(error instanceof ConfError, name)
-        assert.equal(error.code, 'ERR_CONF_PARSE', name)
-        assert.equal(error.path, config.path, name)
-        assert.ok(error.cause instanceof cause, name)
-        assert.equal(error.issues, undefined, name)
+        assert.ok(error instanceof ConfError)
+        assert.equal(error.name, 'ConfError')
+        assert.equal(error.code, 'ERR_CONF_SCHEMA')
+        assert.equal(error.path, config.path)
+        assert.match(error.message, /^Config schema violation: `foo` /)
+        assert.deepEqual(
+          error.issues?.map((issue) => issue.path),
+          [['foo']]
+        )
         return true
       }
     )
-    assert.throws(() => config.set('foo', 1), { code: 'ERR_CONF_PARSE' })
-    assert.equal(fs.readFileSync(config.path, 'utf8'), raw, name)
-  }
-})
+  })
 
-invalidTest('schema violations on load throw ConfError ERR_CONF_SCHEMA', () => {
-  const config = createConf()
-  fs.writeFileSync(config.path, JSON.stringify({ foo: 'bad' }))
-  assert.throws(
-    () => config.get('foo'),
-    (/** @type {any} */ error) => {
-      assert.ok(error instanceof ConfError)
-      assert.equal(error.name, 'ConfError')
-      assert.equal(error.code, 'ERR_CONF_SCHEMA')
-      assert.equal(error.path, config.path)
-      assert.match(error.message, /^Config schema violation: `foo` /)
-      assert.deepEqual(
-        error.issues?.map((issue) => issue.path),
-        [['foo']]
-      )
-      return true
-    }
-  )
-})
-
-invalidTest(
-  'unreadable files throw the unwrapped fs error',
-  () => {
+  it('unreadable files throw the unwrapped fs error', {
+    skip: skipPermissions,
+  }, () => {
     const config = createConf()
     fs.writeFileSync(config.path, '{}', { mode: 0o000 })
 
@@ -1240,222 +1257,221 @@ invalidTest(
     } finally {
       fs.chmodSync(config.path, 0o600)
     }
-  },
-  { skip: skipPermissions }
-)
-
-invalidTest('a folder at the config path throws EISDIR', () => {
-  for (const clearInvalidConfig of [false, true]) {
-    const config = createConf({ clearInvalidConfig })
-    fs.mkdirSync(config.path)
-    assert.throws(
-      () => config.store,
-      (/** @type {any} */ error) => {
-        assert.equal(error instanceof ConfError, false)
-        assert.equal(error.code, 'EISDIR')
-        return true
-      }
-    )
-  }
-})
-
-invalidTest('store and clear replace a corrupt file', () => {
-  for (const raw of ['{invalid', JSON.stringify({ foo: 'bad' })]) {
-    const config = createConf()
-    fs.writeFileSync(config.path, raw)
-    config.store = { foo: 3 }
-    assert.equal(config.get('foo'), 3)
-
-    fs.writeFileSync(config.path, raw)
-    config.clear()
-    assert.deepEqual({ ...config.store }, { foo: 50 })
-    assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
-  }
-})
-
-/**
- * Backup files next to `config`.
- *
- * @param {Conf<any>} config
- */
-function backups(config) {
-  return fs
-    .readdirSync(pathFor(config))
-    .filter((name) => /^config\.invalid-\d+(-\d+)?\.json$/.test(name))
-    .map((name) => path.join(pathFor(config), name))
-}
-
-invalidTest('clearInvalidConfig backs up the invalid file on write', () => {
-  const cwd = temporaryDirectory()
-  const raw = JSON.stringify({ foo: 'bad', sessions: { mainnet: 'secret' } })
-  fs.writeFileSync(path.join(cwd, 'config.json'), raw, { mode: 0o644 })
-  const config = createConf({ cwd, clearInvalidConfig: true })
-
-  assert.equal(config.get('foo'), 50)
-  assert.deepEqual(backups(config), [])
-
-  config.set('foo', 3)
-  const [backup, ...rest] = backups(config)
-  assert.deepEqual(rest, [])
-  assert.ok(backup)
-  assert.equal(fs.readFileSync(backup, 'utf8'), raw)
-  if (!skipPermissions) {
-    assert.equal(fs.statSync(backup).mode & 0o777, 0o600)
-  }
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
-    foo: 3,
   })
 
-  // A valid file is not backed up again.
-  config.set('foo', 4)
-  assert.equal(backups(config).length, 1)
-})
-
-invalidTest('clearInvalidConfig backs up before store and clear', () => {
-  for (const write of [
-    (/** @type {Conf<typeof schema>} */ c) => {
-      c.store = { foo: 3 }
-    },
-    (/** @type {Conf<typeof schema>} */ c) => c.clear(),
-  ]) {
-    const config = createConf({
-      clearInvalidConfig: true,
-      configFileMode: 0o640,
-    })
-    fs.writeFileSync(config.path, Buffer.from([0x7b, 0xff, 0xfe]))
-    write(config)
-
-    const [backup] = backups(config)
-    assert.ok(backup)
-    assert.deepEqual(fs.readFileSync(backup), Buffer.from([0x7b, 0xff, 0xfe]))
-    if (!skipPermissions) {
-      assert.equal(fs.statSync(backup).mode & 0o777, 0o640)
+  it('a folder at the config path throws EISDIR', () => {
+    for (const clearInvalidConfig of [false, true]) {
+      const config = createConf({ clearInvalidConfig })
+      fs.mkdirSync(config.path)
+      assert.throws(
+        () => config.store,
+        (/** @type {any} */ error) => {
+          assert.equal(error instanceof ConfError, false)
+          assert.equal(error.code, 'EISDIR')
+          return true
+        }
+      )
     }
-  }
-})
-
-invalidTest('clearInvalidConfig store works on a missing file', () => {
-  const config = new Conf({
-    cwd: temporaryDirectory(),
-    schema: requiredSchema,
-    clearInvalidConfig: true,
-    // @ts-expect-error - `defaults` is required for this schema.
-    defaults: undefined,
   })
-  config.store = { req: 1, foo: 2 }
-  assert.deepEqual({ ...config.store }, { req: 1, foo: 2 })
-})
 
-invalidTest('clearInvalidConfig keeps every backup', () => {
-  const config = createConf({ clearInvalidConfig: true })
-  fs.writeFileSync(config.path, '{one')
-  config.set('foo', 1)
-  fs.writeFileSync(config.path, '{two')
-  config.set('foo', 2)
+  it('store and clear replace a corrupt file', () => {
+    for (const raw of ['{invalid', JSON.stringify({ foo: 'bad' })]) {
+      const config = createConf()
+      fs.writeFileSync(config.path, raw)
+      config.store = { foo: 3 }
+      assert.equal(config.get('foo'), 3)
 
-  const contents = backups(config)
-    .map((file) => fs.readFileSync(file, 'utf8'))
-    .sort()
-  assert.deepEqual(contents, ['{one', '{two'])
-})
-
-invalidTest('the clipact scenario never fails a caller', () => {
-  const FILE_ERRORS = new Set([
-    'ERR_CONF_PARSE',
-    'ERR_CONF_SCHEMA',
-    'EACCES',
-    'EPERM',
-    'EROFS',
-    'EISDIR',
-    'ENOTDIR',
-  ])
-  const clipactSchema = z.object({
-    telemetry: z.enum(['enabled', 'disabled']).optional(),
-    notice: z.boolean().optional(),
-    installId: z.string().optional(),
+      fs.writeFileSync(config.path, raw)
+      config.clear()
+      assert.deepEqual({ ...config.store }, { foo: 50 })
+      assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+    }
   })
-  const appConfig = '{"network":"mainnet"}'
 
   /**
-   * @param {() => unknown} fn
-   * @param {unknown} fallback
+   * Backup files next to `config`.
+   *
+   * @param {Conf<any>} config
    */
-  const bestEffort = (fn, fallback) => {
-    try {
-      return fn()
-    } catch (error) {
-      const code = /** @type {any} */ (error)?.code
-      assert.ok(FILE_ERRORS.has(code), `unexpected ${code}: ${error}`)
-      return fallback
-    }
+  function backups(config) {
+    return fs
+      .readdirSync(pathFor(config))
+      .filter((name) => /^config\.invalid-\d+(-\d+)?\.json$/.test(name))
+      .map((name) => path.join(pathFor(config), name))
   }
 
-  /** @type {Array<{ name: string, setup: (cwd: string, file: string) => void, restore?: (cwd: string, file: string) => void, permissions?: boolean }>} */
-  const states = [
-    { name: 'corrupt', setup: (_cwd, file) => fs.writeFileSync(file, '{bad') },
-    {
-      name: 'schema-invalid',
-      setup: (_cwd, file) => fs.writeFileSync(file, '{"telemetry":42}'),
-    },
-    {
-      name: 'mode 000',
-      permissions: true,
-      setup: (_cwd, file) => fs.writeFileSync(file, '{}', { mode: 0o000 }),
-      restore: (_cwd, file) => fs.chmodSync(file, 0o600),
-    },
-    {
-      name: 'read-only folder',
-      permissions: true,
-      setup: (cwd) => fs.chmodSync(cwd, 0o555),
-      restore: (cwd) => fs.chmodSync(cwd, 0o755),
-    },
-  ]
-
-  for (const { name, setup, restore, permissions } of states) {
-    if (permissions && skipPermissions) {
-      continue
-    }
-
+  it('clearInvalidConfig backs up the invalid file on write', () => {
     const cwd = temporaryDirectory()
-    const file = path.join(cwd, 'clipact.json')
-    fs.writeFileSync(path.join(cwd, 'config.json'), appConfig)
-    setup(cwd, file)
+    const raw = JSON.stringify({ foo: 'bad', sessions: { mainnet: 'secret' } })
+    fs.writeFileSync(path.join(cwd, 'config.json'), raw, { mode: 0o644 })
+    const config = createConf({ cwd, clearInvalidConfig: true })
 
-    try {
-      const conf = new Conf({
-        cwd,
-        configName: 'clipact',
-        schema: clipactSchema,
-      })
-      const state = bestEffort(() => conf.store, {})
-      assert.ok(state, name)
-      bestEffort(() => conf.get('installId'), undefined)
-      bestEffort(() => conf.set('notice', true), undefined)
-      bestEffort(() => conf.delete('notice'), undefined)
-      assert.equal(
-        fs.readFileSync(path.join(cwd, 'config.json'), 'utf8'),
-        appConfig,
-        name
-      )
-      assert.deepEqual(
-        fs.readdirSync(cwd).filter((entry) => entry.endsWith('.tmp')),
-        [],
-        name
-      )
-    } finally {
-      restore?.(cwd, file)
+    assert.equal(config.get('foo'), 50)
+    assert.deepEqual(backups(config), [])
+
+    config.set('foo', 3)
+    const [backup, ...rest] = backups(config)
+    assert.deepEqual(rest, [])
+    assert.ok(backup)
+    assert.equal(fs.readFileSync(backup, 'utf8'), raw)
+    if (!skipPermissions) {
+      assert.equal(fs.statSync(backup).mode & 0o777, 0o600)
     }
-  }
-})
+    assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+      foo: 3,
+    })
 
-invalidTest('clearInvalidConfig does not hide fs errors', () => {
-  const config = createConf({ clearInvalidConfig: true })
-  fs.mkdirSync(config.path)
-  assert.throws(() => config.store, { code: 'EISDIR' })
-})
+    // A valid file is not backed up again.
+    config.set('foo', 4)
+    assert.equal(backups(config).length, 1)
+  })
 
-const readOnlySuite = suite('Conf read-only access')
-const { test: readOnlyTest } = readOnlySuite
+  it('clearInvalidConfig backs up before store and clear', () => {
+    for (const write of [
+      (/** @type {Conf<typeof schema>} */ c) => {
+        c.store = { foo: 3 }
+      },
+      (/** @type {Conf<typeof schema>} */ c) => c.clear(),
+    ]) {
+      const config = createConf({
+        clearInvalidConfig: true,
+        configFileMode: 0o640,
+      })
+      fs.writeFileSync(config.path, Buffer.from([0x7b, 0xff, 0xfe]))
+      write(config)
+
+      const [backup] = backups(config)
+      assert.ok(backup)
+      assert.deepEqual(fs.readFileSync(backup), Buffer.from([0x7b, 0xff, 0xfe]))
+      if (!skipPermissions) {
+        assert.equal(fs.statSync(backup).mode & 0o777, 0o640)
+      }
+    }
+  })
+
+  it('clearInvalidConfig store works on a missing file', () => {
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      schema: requiredSchema,
+      clearInvalidConfig: true,
+      // @ts-expect-error - `defaults` is required for this schema.
+      defaults: undefined,
+    })
+    config.store = { req: 1, foo: 2 }
+    assert.deepEqual({ ...config.store }, { req: 1, foo: 2 })
+  })
+
+  it('clearInvalidConfig keeps every backup', () => {
+    const config = createConf({ clearInvalidConfig: true })
+    fs.writeFileSync(config.path, '{one')
+    config.set('foo', 1)
+    fs.writeFileSync(config.path, '{two')
+    config.set('foo', 2)
+
+    const contents = backups(config)
+      .map((file) => fs.readFileSync(file, 'utf8'))
+      .sort()
+    assert.deepEqual(contents, ['{one', '{two'])
+  })
+
+  it('the clipact scenario never fails a caller', () => {
+    const FILE_ERRORS = new Set([
+      'ERR_CONF_PARSE',
+      'ERR_CONF_SCHEMA',
+      'EACCES',
+      'EPERM',
+      'EROFS',
+      'EISDIR',
+      'ENOTDIR',
+    ])
+    const clipactSchema = z.object({
+      telemetry: z.enum(['enabled', 'disabled']).optional(),
+      notice: z.boolean().optional(),
+      installId: z.string().optional(),
+    })
+    const appConfig = '{"network":"mainnet"}'
+
+    /**
+     * @param {() => unknown} fn
+     * @param {unknown} fallback
+     */
+    const bestEffort = (fn, fallback) => {
+      try {
+        return fn()
+      } catch (error) {
+        const code = /** @type {any} */ (error)?.code
+        assert.ok(FILE_ERRORS.has(code), `unexpected ${code}: ${error}`)
+        return fallback
+      }
+    }
+
+    /** @type {Array<{ name: string, setup: (cwd: string, file: string) => void, restore?: (cwd: string, file: string) => void, permissions?: boolean }>} */
+    const states = [
+      {
+        name: 'corrupt',
+        setup: (_cwd, file) => fs.writeFileSync(file, '{bad'),
+      },
+      {
+        name: 'schema-invalid',
+        setup: (_cwd, file) => fs.writeFileSync(file, '{"telemetry":42}'),
+      },
+      {
+        name: 'mode 000',
+        permissions: true,
+        setup: (_cwd, file) => fs.writeFileSync(file, '{}', { mode: 0o000 }),
+        restore: (_cwd, file) => fs.chmodSync(file, 0o600),
+      },
+      {
+        name: 'read-only folder',
+        permissions: true,
+        setup: (cwd) => fs.chmodSync(cwd, 0o555),
+        restore: (cwd) => fs.chmodSync(cwd, 0o755),
+      },
+    ]
+
+    for (const { name, setup, restore, permissions } of states) {
+      if (permissions && skipPermissions) {
+        continue
+      }
+
+      const cwd = temporaryDirectory()
+      const file = path.join(cwd, 'clipact.json')
+      fs.writeFileSync(path.join(cwd, 'config.json'), appConfig)
+      setup(cwd, file)
+
+      try {
+        const conf = new Conf({
+          cwd,
+          configName: 'clipact',
+          schema: clipactSchema,
+        })
+        const state = bestEffort(() => conf.store, {})
+        assert.ok(state, name)
+        bestEffort(() => conf.get('installId'), undefined)
+        bestEffort(() => conf.set('notice', true), undefined)
+        bestEffort(() => conf.delete('notice'), undefined)
+        assert.equal(
+          fs.readFileSync(path.join(cwd, 'config.json'), 'utf8'),
+          appConfig,
+          name
+        )
+        assert.deepEqual(
+          fs.readdirSync(cwd).filter((entry) => entry.endsWith('.tmp')),
+          [],
+          name
+        )
+      } finally {
+        restore?.(cwd, file)
+      }
+    }
+  })
+
+  it('clearInvalidConfig does not hide fs errors', () => {
+    const config = createConf({ clearInvalidConfig: true })
+    fs.mkdirSync(config.path)
+    assert.throws(() => config.store, { code: 'EISDIR' })
+  })
+})
 
 /**
  * Run every read API on `config`.
@@ -1483,59 +1499,58 @@ function fileState(file) {
   return { data: fs.readFileSync(file), mtimeMs: fs.statSync(file).mtimeMs }
 }
 
-readOnlyTest('constructing on a missing directory creates nothing', () => {
-  const parent = temporaryDirectory()
-  const cwd = path.join(parent, 'app')
-  const config = createConf({ cwd })
+describe('Conf read-only access', () => {
+  it('constructing on a missing directory creates nothing', () => {
+    const parent = temporaryDirectory()
+    const cwd = path.join(parent, 'app')
+    const config = createConf({ cwd })
 
-  readAll(config)
-  assert.equal(config.get('foo'), 50)
-  assert.equal(fs.existsSync(cwd), false)
-})
+    readAll(config)
+    assert.equal(config.get('foo'), 50)
+    assert.equal(fs.existsSync(cwd), false)
+  })
 
-readOnlyTest('reads leave the file unchanged', () => {
-  const cases = [
-    { name: 'missing schema defaults', raw: '{}', schema },
-    {
-      name: 'coercion',
-      raw: '{"foo":"7"}',
-      schema: z.looseObject({ foo: z.coerce.number().default(1) }),
-    },
-    {
-      name: 'stripped keys',
-      raw: '{"foo":1,"extra":true}',
-      schema: z.object({ foo: z.number() }),
-    },
-    { name: 'missing file', raw: undefined, schema },
-  ]
+  it('reads leave the file unchanged', () => {
+    const cases = [
+      { name: 'missing schema defaults', raw: '{}', schema },
+      {
+        name: 'coercion',
+        raw: '{"foo":"7"}',
+        schema: z.looseObject({ foo: z.coerce.number().default(1) }),
+      },
+      {
+        name: 'stripped keys',
+        raw: '{"foo":1,"extra":true}',
+        schema: z.object({ foo: z.number() }),
+      },
+      { name: 'missing file', raw: undefined, schema },
+    ]
 
-  for (const { name, raw, schema: caseSchema } of cases) {
-    const cwd = temporaryDirectory()
-    const file = path.join(cwd, 'config.json')
+    for (const { name, raw, schema: caseSchema } of cases) {
+      const cwd = temporaryDirectory()
+      const file = path.join(cwd, 'config.json')
 
-    if (raw !== undefined) {
-      fs.writeFileSync(file, raw)
-      const old = new Date(Date.now() - 60_000)
-      fs.utimesSync(file, old, old)
+      if (raw !== undefined) {
+        fs.writeFileSync(file, raw)
+        const old = new Date(Date.now() - 60_000)
+        fs.utimesSync(file, old, old)
+      }
+
+      const before = fileState(file)
+      const config = new Conf({ cwd, schema: caseSchema })
+      readAll(config)
+      readAll(config)
+
+      assert.deepEqual(fileState(file), before, name)
+      assert.deepEqual(
+        fs.readdirSync(cwd),
+        raw === undefined ? [] : ['config.json'],
+        name
+      )
     }
+  })
 
-    const before = fileState(file)
-    const config = new Conf({ cwd, schema: caseSchema })
-    readAll(config)
-    readAll(config)
-
-    assert.deepEqual(fileState(file), before, name)
-    assert.deepEqual(
-      fs.readdirSync(cwd),
-      raw === undefined ? [] : ['config.json'],
-      name
-    )
-  }
-})
-
-readOnlyTest(
-  'reads work in a read-only directory',
-  () => {
+  it('reads work in a read-only directory', { skip: skipPermissions }, () => {
     const cwd = temporaryDirectory()
     fs.writeFileSync(path.join(cwd, 'config.json'), '{"foo":7}')
     fs.chmodSync(cwd, 0o555)
@@ -1549,13 +1564,11 @@ readOnlyTest(
     } finally {
       fs.chmodSync(cwd, 0o755)
     }
-  },
-  { skip: skipPermissions }
-)
+  })
 
-readOnlyTest(
-  'reads return defaults under a read-only parent',
-  () => {
+  it('reads return defaults under a read-only parent', {
+    skip: skipPermissions,
+  }, () => {
     const parent = temporaryDirectory()
     fs.chmodSync(parent, 0o555)
 
@@ -1568,240 +1581,33 @@ readOnlyTest(
     } finally {
       fs.chmodSync(parent, 0o755)
     }
-  },
-  { skip: skipPermissions }
-)
+  })
 
-readOnlyTest('invalid files throw on first read, not when constructed', () => {
-  for (const raw of ['{invalid', '{"foo":"bad"}']) {
+  it('invalid files throw on first read, not when constructed', () => {
+    for (const raw of ['{invalid', '{"foo":"bad"}']) {
+      const cwd = temporaryDirectory()
+      fs.writeFileSync(path.join(cwd, 'config.json'), raw)
+      const config = createConf({ cwd })
+      assert.throws(() => config.get('foo'))
+    }
+  })
+
+  it('the first write persists defaults and schema output', () => {
     const cwd = temporaryDirectory()
-    fs.writeFileSync(path.join(cwd, 'config.json'), raw)
-    const config = createConf({ cwd })
-    assert.throws(() => config.get('foo'))
-  }
-})
-
-readOnlyTest('the first write persists defaults and schema output', () => {
-  const cwd = temporaryDirectory()
-  fs.writeFileSync(path.join(cwd, 'config.json'), '{"extra":true}')
-  const config = new Conf({
-    cwd,
-    schema: z.object({
-      foo: z.number().default(1),
-      bar: z.string().optional(),
-    }),
+    fs.writeFileSync(path.join(cwd, 'config.json'), '{"extra":true}')
+    const config = new Conf({
+      cwd,
+      schema: z.object({
+        foo: z.number().default(1),
+        bar: z.string().optional(),
+      }),
+    })
+    config.set('bar', 'x')
+    assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+      foo: 1,
+      bar: 'x',
+    })
   })
-  config.set('bar', 'x')
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
-    foo: 1,
-    bar: 'x',
-  })
-})
-
-const writeSuite = suite('Conf atomic write')
-const { test: writeTest } = writeSuite
-
-writeTest('writes and reads back', () => {
-  const config = createConf()
-  config.set('foo', 33)
-
-  const raw = fs.readFileSync(config.path, 'utf8')
-  assert.match(raw, /"foo"/)
-
-  const reloaded = new Conf({
-    projectName: 'iso-conf-test',
-    cwd: pathFor(config),
-    schema,
-  })
-  assert.equal(reloaded.get('foo'), 33)
-})
-
-writeTest('defaults config files to owner read-write', () => {
-  const config = createConf()
-  config.set('foo', 33)
-
-  assert.equal(fs.statSync(config.path).mode & 0o777, 0o600)
-})
-
-writeTest('uses configFileMode when set', () => {
-  const config = createConf({ configFileMode: 0o640 })
-  config.set('foo', 33)
-
-  assert.equal(fs.statSync(config.path).mode & 0o777, 0o640)
-})
-
-writeTest('leaves no temporary file behind', () => {
-  const config = createConf()
-  config.set('foo', 33)
-  config.set('foo', 34)
-
-  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
-})
-
-writeTest('removes the temporary file when the write fails', () => {
-  const config = createConf()
-  fs.mkdirSync(config.path)
-
-  assert.throws(() => {
-    config.store = { foo: 33 }
-  })
-  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
-  assert.equal(fs.statSync(config.path).isDirectory(), true)
-})
-
-writeTest(
-  'writes through a symlinked config file',
-  () => {
-    const directory = temporaryDirectory()
-    const target = path.join(directory, 'target.json')
-    fs.writeFileSync(target, '{}')
-    fs.symlinkSync(target, path.join(directory, 'config.json'))
-
-    const config = createConf({ cwd: directory })
-    config.set('foo', 33)
-
-    assert.equal(fs.lstatSync(config.path).isSymbolicLink(), true)
-    assert.match(fs.readFileSync(target, 'utf8'), /"foo": 33/)
-    assert.deepEqual(fs.readdirSync(directory).sort(), [
-      'config.json',
-      'target.json',
-    ])
-  }, // Creating symlinks on Windows needs Developer Mode or admin rights.
-  { skip: process.platform === 'win32' }
-)
-
-writeTest('does not install process signal handlers', () => {
-  const directory = temporaryDirectory()
-  // Tests are bundled, so resolve the source from the package directory. The
-  // test script runs from there, as its test file glob is relative too.
-  const entry = pathToFileURL(path.resolve('src/index.js')).href
-  const script = `
-    const signals = ['SIGINT', 'SIGTERM', 'SIGHUP', 'exit', 'beforeExit']
-    const count = () => signals.map((s) => process.listenerCount(s))
-    const before = count()
-    const { Conf } = await import(${JSON.stringify(entry)})
-    new Conf({ cwd: ${JSON.stringify(directory)} }).set('foo', 1)
-    console.log(JSON.stringify({ before, after: count() }))
-  `
-  const output = execFileSync(
-    process.execPath,
-    ['--input-type=module', '--eval', script],
-    { encoding: 'utf8' }
-  )
-  const { before, after } = JSON.parse(output)
-
-  assert.deepEqual(after, before)
-})
-
-/**
- * Run `fn` with `fs[name]` replaced by `replacement`.
- *
- * @template {keyof typeof fs} Name
- * @param {Name} name
- * @param {(original: (typeof fs)[Name]) => (typeof fs)[Name]} replacement
- * @param {() => void} fn
- */
-function withFsStub(name, replacement, fn) {
-  const original = fs[name]
-  fs[name] = replacement(original)
-  try {
-    fn()
-  } finally {
-    fs[name] = original
-  }
-}
-
-/**
- * @param {string} code
- */
-function errnoError(code) {
-  return Object.assign(new Error(code), { code })
-}
-
-writeTest('ignores chmod on file systems without permissions', () => {
-  const config = createConf()
-
-  withFsStub(
-    'fchmodSync',
-    () => () => {
-      throw errnoError('ENOSYS')
-    },
-    () => config.set('foo', 33)
-  )
-
-  assert.equal(config.get('foo'), 33)
-})
-
-writeTest('retries a rename that fails with EBUSY', () => {
-  const config = createConf()
-  let calls = 0
-
-  withFsStub(
-    'renameSync',
-    (renameSync) => (from, to) => {
-      calls++
-      if (calls === 1) {
-        throw errnoError('EBUSY')
-      }
-      renameSync(from, to)
-    },
-    () => config.set('foo', 33)
-  )
-
-  assert.equal(calls, 2)
-  assert.equal(config.get('foo'), 33)
-  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
-})
-
-writeTest('throws the write error when cleanup also fails', () => {
-  const config = createConf()
-
-  withFsStub(
-    'renameSync',
-    () => () => {
-      throw errnoError('EIO')
-    },
-    () =>
-      withFsStub(
-        'rmSync',
-        () => () => {
-          throw errnoError('EPERM')
-        },
-        () => assert.throws(() => config.set('foo', 33), { code: 'EIO' })
-      )
-  )
-})
-
-writeTest('writes files with long names', () => {
-  const config = createConf({ configName: 'c'.repeat(250) })
-  config.set('foo', 33)
-
-  assert.equal(config.get('foo'), 33)
-  assert.deepEqual(fs.readdirSync(pathFor(config)), [`${'c'.repeat(250)}.json`])
-})
-
-writeTest('removes stale temporary files from dead processes', () => {
-  const directory = temporaryDirectory()
-  const old = new Date(Date.now() - 120_000)
-  const stale = 'config.json.999999999.deadbeef.tmp'
-  const fresh = 'config.json.999999999.cafebabe.tmp'
-  const own = `config.json.${process.pid}.0badf00d.tmp`
-  const other = 'other.json.999999999.deadbeef.tmp'
-
-  for (const name of [stale, fresh, own, other]) {
-    fs.writeFileSync(path.join(directory, name), '{}')
-  }
-
-  for (const name of [stale, own, other]) {
-    fs.utimesSync(path.join(directory, name), old, old)
-  }
-
-  createConf({ cwd: directory }).set('foo', 33)
-
-  assert.deepEqual(
-    fs.readdirSync(directory).sort(),
-    ['config.json', fresh, own, other].sort()
-  )
 })
 
 /** Multi-process tests fsync hundreds of writes, which is slow on some disks. */
@@ -1816,8 +1622,7 @@ const RACE_TIMEOUT = 60_000
  * @returns {Promise<any[]>} Each process's parsed output.
  */
 async function runChildren({ cwd, processes, body, env = {} }) {
-  // Tests are bundled, so resolve the source from the package directory.
-  const entry = pathToFileURL(path.resolve('src/index.js')).href
+  const entry = new URL('../src/index.js', import.meta.url).href
   const script = `
     const { Conf } = await import(${JSON.stringify(entry)})
     const cwd = ${JSON.stringify(cwd)}
@@ -1875,43 +1680,247 @@ async function raceWrites({ processes, writes, env = {}, options = {} }) {
   return { cwd, errors, raw }
 }
 
-writeTest('writes atomically when SNAP is set', () => {
-  const config = createConf()
-  const snap = process.env.SNAP
-  let renames = 0
-  process.env.SNAP = '/snap/node/1'
+describe('Conf atomic write', () => {
+  it('writes and reads back', () => {
+    const config = createConf()
+    config.set('foo', 33)
 
-  try {
-    withFsStub(
-      'renameSync',
-      (renameSync) => (from, to) => {
-        renames++
-        renameSync(from, to)
-      },
-      () =>
-        withFsStub(
-          'writeFileSync',
-          () => () => {
-            throw new Error('writeFileSync must not be used')
-          },
-          () => config.set('foo', 33)
-        )
+    const raw = fs.readFileSync(config.path, 'utf8')
+    assert.match(raw, /"foo"/)
+
+    const reloaded = new Conf({
+      projectName: 'iso-conf-test',
+      cwd: pathFor(config),
+      schema,
+    })
+    assert.equal(reloaded.get('foo'), 33)
+  })
+
+  it('defaults config files to owner read-write', () => {
+    const config = createConf()
+    config.set('foo', 33)
+
+    assert.equal(fs.statSync(config.path).mode & 0o777, 0o600)
+  })
+
+  it('uses configFileMode when set', () => {
+    const config = createConf({ configFileMode: 0o640 })
+    config.set('foo', 33)
+
+    assert.equal(fs.statSync(config.path).mode & 0o777, 0o640)
+  })
+
+  it('leaves no temporary file behind', () => {
+    const config = createConf()
+    config.set('foo', 33)
+    config.set('foo', 34)
+
+    assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+  })
+
+  it('removes the temporary file when the write fails', () => {
+    const config = createConf()
+    fs.mkdirSync(config.path)
+
+    assert.throws(() => {
+      config.store = { foo: 33 }
+    })
+    assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+    assert.equal(fs.statSync(config.path).isDirectory(), true)
+  })
+
+  it('writes through a symlinked config file', {
+    skip: process.platform === 'win32',
+  }, () => {
+    const directory = temporaryDirectory()
+    const target = path.join(directory, 'target.json')
+    fs.writeFileSync(target, '{}')
+    fs.symlinkSync(target, path.join(directory, 'config.json'))
+
+    const config = createConf({ cwd: directory })
+    config.set('foo', 33)
+
+    assert.equal(fs.lstatSync(config.path).isSymbolicLink(), true)
+    assert.match(fs.readFileSync(target, 'utf8'), /"foo": 33/)
+    assert.deepEqual(fs.readdirSync(directory).sort(), [
+      'config.json',
+      'target.json',
+    ])
+  })
+
+  it('does not install process signal handlers', () => {
+    const directory = temporaryDirectory()
+    // Tests are bundled, so resolve the source from the package directory. The
+    // test script runs from there, as its test file glob is relative too.
+    const entry = pathToFileURL(path.resolve('src/index.js')).href
+    const script = `
+    const signals = ['SIGINT', 'SIGTERM', 'SIGHUP', 'exit', 'beforeExit']
+    const count = () => signals.map((s) => process.listenerCount(s))
+    const before = count()
+    const { Conf } = await import(${JSON.stringify(entry)})
+    new Conf({ cwd: ${JSON.stringify(directory)} }).set('foo', 1)
+    console.log(JSON.stringify({ before, after: count() }))
+  `
+    const output = execFileSync(
+      process.execPath,
+      ['--input-type=module', '--eval', script],
+      { encoding: 'utf8' }
     )
-  } finally {
-    if (snap === undefined) {
-      delete process.env.SNAP
-    } else {
-      process.env.SNAP = snap
+    const { before, after } = JSON.parse(output)
+
+    assert.deepEqual(after, before)
+  })
+
+  /**
+   * Run `fn` with `fs[name]` replaced by `replacement`.
+   *
+   * @template {keyof typeof fs} Name
+   * @param {Name} name
+   * @param {(original: (typeof fs)[Name]) => (typeof fs)[Name]} replacement
+   * @param {() => void} fn
+   */
+  function withFsStub(name, replacement, fn) {
+    const original = fs[name]
+    fs[name] = replacement(original)
+    try {
+      fn()
+    } finally {
+      fs[name] = original
     }
   }
 
-  assert.equal(renames, 1)
-  assert.equal(config.get('foo'), 33)
-})
+  /**
+   * @param {string} code
+   */
+  function errnoError(code) {
+    return Object.assign(new Error(code), { code })
+  }
 
-writeTest(
-  'concurrent writers with SNAP set keep the file valid',
-  async () => {
+  it('ignores chmod on file systems without permissions', () => {
+    const config = createConf()
+
+    withFsStub(
+      'fchmodSync',
+      () => () => {
+        throw errnoError('ENOSYS')
+      },
+      () => config.set('foo', 33)
+    )
+
+    assert.equal(config.get('foo'), 33)
+  })
+
+  it('retries a rename that fails with EBUSY', () => {
+    const config = createConf()
+    let calls = 0
+
+    withFsStub(
+      'renameSync',
+      (renameSync) => (from, to) => {
+        calls++
+        if (calls === 1) {
+          throw errnoError('EBUSY')
+        }
+        renameSync(from, to)
+      },
+      () => config.set('foo', 33)
+    )
+
+    assert.equal(calls, 2)
+    assert.equal(config.get('foo'), 33)
+    assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+  })
+
+  it('throws the write error when cleanup also fails', () => {
+    const config = createConf()
+
+    withFsStub(
+      'renameSync',
+      () => () => {
+        throw errnoError('EIO')
+      },
+      () =>
+        withFsStub(
+          'rmSync',
+          () => () => {
+            throw errnoError('EPERM')
+          },
+          () => assert.throws(() => config.set('foo', 33), { code: 'EIO' })
+        )
+    )
+  })
+
+  it('writes files with long names', () => {
+    const config = createConf({ configName: 'c'.repeat(250) })
+    config.set('foo', 33)
+
+    assert.equal(config.get('foo'), 33)
+    assert.deepEqual(fs.readdirSync(pathFor(config)), [
+      `${'c'.repeat(250)}.json`,
+    ])
+  })
+
+  it('removes stale temporary files from dead processes', () => {
+    const directory = temporaryDirectory()
+    const old = new Date(Date.now() - 120_000)
+    const stale = 'config.json.999999999.deadbeef.tmp'
+    const fresh = 'config.json.999999999.cafebabe.tmp'
+    const own = `config.json.${process.pid}.0badf00d.tmp`
+    const other = 'other.json.999999999.deadbeef.tmp'
+
+    for (const name of [stale, fresh, own, other]) {
+      fs.writeFileSync(path.join(directory, name), '{}')
+    }
+
+    for (const name of [stale, own, other]) {
+      fs.utimesSync(path.join(directory, name), old, old)
+    }
+
+    createConf({ cwd: directory }).set('foo', 33)
+
+    assert.deepEqual(
+      fs.readdirSync(directory).sort(),
+      ['config.json', fresh, own, other].sort()
+    )
+  })
+
+  it('writes atomically when SNAP is set', () => {
+    const config = createConf()
+    const snap = process.env.SNAP
+    let renames = 0
+    process.env.SNAP = '/snap/node/1'
+
+    try {
+      withFsStub(
+        'renameSync',
+        (renameSync) => (from, to) => {
+          renames++
+          renameSync(from, to)
+        },
+        () =>
+          withFsStub(
+            'writeFileSync',
+            () => () => {
+              throw new Error('writeFileSync must not be used')
+            },
+            () => config.set('foo', 33)
+          )
+      )
+    } finally {
+      if (snap === undefined) {
+        delete process.env.SNAP
+      } else {
+        process.env.SNAP = snap
+      }
+    }
+
+    assert.equal(renames, 1)
+    assert.equal(config.get('foo'), 33)
+  })
+
+  it('concurrent writers with SNAP set keep the file valid', {
+    timeout: RACE_TIMEOUT,
+  }, async () => {
     const { errors, raw } = await raceWrites({
       processes: 4,
       writes: 200,
@@ -1920,12 +1929,8 @@ writeTest(
 
     assert.deepEqual(errors, [])
     assert.doesNotThrow(() => JSON.parse(raw))
-  },
-  { timeout: RACE_TIMEOUT }
-)
-
-const lockSuite = suite('Conf lock')
-const { test: lockTest } = lockSuite
+  })
+})
 
 /**
  * Write a lock file for `config` as if `pid` on this host held it.
@@ -1947,9 +1952,10 @@ function writeLock(config, pid, ageMs = 0) {
   return lockPath
 }
 
-lockTest(
-  'concurrent writers keep every key',
-  async () => {
+describe('Conf lock', () => {
+  it('concurrent writers keep every key', {
+    timeout: RACE_TIMEOUT,
+  }, async () => {
     const { cwd, errors, raw } = await raceWrites({
       processes: 4,
       writes: 200,
@@ -1959,13 +1965,11 @@ lockTest(
     assert.deepEqual(errors, [])
     assert.equal(Object.keys(JSON.parse(raw)).length, 800)
     assert.deepEqual(fs.readdirSync(cwd), ['config.json'])
-  },
-  { timeout: RACE_TIMEOUT }
-)
+  })
 
-lockTest(
-  'parallel first runs agree on one installId',
-  async () => {
+  it('parallel first runs agree on one installId', {
+    timeout: RACE_TIMEOUT,
+  }, async () => {
     const cwd = temporaryDirectory()
     const ids = await runChildren({
       cwd,
@@ -1986,113 +1990,111 @@ lockTest(
     assert.equal(typeof stored, 'string')
     assert.deepEqual(ids, Array(6).fill(stored))
     assert.deepEqual(fs.readdirSync(cwd), ['clipact.json'])
-  },
-  { timeout: RACE_TIMEOUT }
-)
-
-lockTest('breaks a lock left by a dead process', () => {
-  const config = createConf({ lock: { timeout: 100 } })
-  const lockPath = writeLock(config, 999_999_999)
-
-  config.set('foo', 3)
-  assert.equal(config.get('foo'), 3)
-  assert.equal(fs.existsSync(lockPath), false)
-})
-
-lockTest('breaks a lock older than stale', () => {
-  const config = createConf({ lock: { timeout: 100, stale: 1000 } })
-  const lockPath = writeLock(config, process.ppid, 5000)
-
-  config.set('foo', 3)
-  assert.equal(config.get('foo'), 3)
-  assert.equal(fs.existsSync(lockPath), false)
-})
-
-lockTest('a live lock past timeout throws ERR_CONF_LOCKED', () => {
-  const config = createConf({ lock: { timeout: 50 } })
-  config.store = { foo: 3 }
-  const before = fs.readFileSync(config.path, 'utf8')
-  const lockPath = writeLock(config, process.ppid)
-  const start = Date.now()
-
-  for (const write of [
-    () => config.set('foo', 4),
-    () => config.clear(),
-    () => config.update((s) => ({ ...s, foo: 5 })),
-  ]) {
-    assert.throws(write, (/** @type {any} */ error) => {
-      assert.ok(error instanceof ConfError)
-      assert.equal(error.code, 'ERR_CONF_LOCKED')
-      assert.equal(error.path, config.path)
-      return true
-    })
-  }
-
-  assert.ok(Date.now() - start >= 150)
-  assert.equal(fs.readFileSync(config.path, 'utf8'), before)
-  assert.equal(fs.existsSync(lockPath), true)
-  assert.deepEqual(fs.readdirSync(pathFor(config)).sort(), [
-    'config.json',
-    'config.json.lock',
-  ])
-})
-
-lockTest('rejects invalid lock durations', () => {
-  for (const lock of [
-    { timeout: Number.NaN },
-    { stale: Number.NaN },
-    { timeout: -1 },
-    { stale: '1000' },
-  ]) {
-    assert.throws(
-      // @ts-expect-error - runtime validation should reject bad durations.
-      () => createConf({ lock }),
-      { name: 'TypeError', message: /^Expected `lock\.(timeout|stale)` / }
-    )
-  }
-
-  createConf({ lock: { timeout: Number.POSITIVE_INFINITY, stale: 0 } })
-})
-
-lockTest('leaves no lock file after a successful or failed write', () => {
-  const config = createConf({ lock: true })
-  config.set('foo', 3)
-  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
-
-  // @ts-expect-error - runtime validation should reject schema-invalid values.
-  assert.throws(() => config.set('foo', 'bad'), {
-    code: 'ERR_CONF_INVALID_VALUE',
   })
-  assert.throws(
-    () =>
-      config.update(() => {
-        throw new Error('boom')
-      }),
-    { message: 'boom' }
-  )
-  fs.writeFileSync(config.path, '{bad')
-  assert.throws(() => config.set('foo', 4), { code: 'ERR_CONF_PARSE' })
-  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
-})
 
-lockTest('reads never create or wait on the lock', () => {
-  const config = createConf({ lock: { timeout: 5000 } })
-  config.set('foo', 3)
-  const lockPath = writeLock(config, process.ppid)
-  const start = Date.now()
+  it('breaks a lock left by a dead process', () => {
+    const config = createConf({ lock: { timeout: 100 } })
+    const lockPath = writeLock(config, 999_999_999)
 
-  readAll(config)
-  assert.equal(config.get('foo'), 3)
-  assert.ok(Date.now() - start < 1000)
-  fs.rmSync(lockPath)
+    config.set('foo', 3)
+    assert.equal(config.get('foo'), 3)
+    assert.equal(fs.existsSync(lockPath), false)
+  })
 
-  readAll(config)
-  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
-})
+  it('breaks a lock older than stale', () => {
+    const config = createConf({ lock: { timeout: 100, stale: 1000 } })
+    const lockPath = writeLock(config, process.ppid, 5000)
 
-lockTest(
-  'a locked write in a read-only folder throws the fs error',
-  () => {
+    config.set('foo', 3)
+    assert.equal(config.get('foo'), 3)
+    assert.equal(fs.existsSync(lockPath), false)
+  })
+
+  it('a live lock past timeout throws ERR_CONF_LOCKED', () => {
+    const config = createConf({ lock: { timeout: 50 } })
+    config.store = { foo: 3 }
+    const before = fs.readFileSync(config.path, 'utf8')
+    const lockPath = writeLock(config, process.ppid)
+    const start = Date.now()
+
+    for (const write of [
+      () => config.set('foo', 4),
+      () => config.clear(),
+      () => config.update((s) => ({ ...s, foo: 5 })),
+    ]) {
+      assert.throws(write, (/** @type {any} */ error) => {
+        assert.ok(error instanceof ConfError)
+        assert.equal(error.code, 'ERR_CONF_LOCKED')
+        assert.equal(error.path, config.path)
+        return true
+      })
+    }
+
+    assert.ok(Date.now() - start >= 150)
+    assert.equal(fs.readFileSync(config.path, 'utf8'), before)
+    assert.equal(fs.existsSync(lockPath), true)
+    assert.deepEqual(fs.readdirSync(pathFor(config)).sort(), [
+      'config.json',
+      'config.json.lock',
+    ])
+  })
+
+  it('rejects invalid lock durations', () => {
+    for (const lock of [
+      { timeout: Number.NaN },
+      { stale: Number.NaN },
+      { timeout: -1 },
+      { stale: '1000' },
+    ]) {
+      assert.throws(
+        // @ts-expect-error - runtime validation should reject bad durations.
+        () => createConf({ lock }),
+        { name: 'TypeError', message: /^Expected `lock\.(timeout|stale)` / }
+      )
+    }
+
+    createConf({ lock: { timeout: Number.POSITIVE_INFINITY, stale: 0 } })
+  })
+
+  it('leaves no lock file after a successful or failed write', () => {
+    const config = createConf({ lock: true })
+    config.set('foo', 3)
+    assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+
+    // @ts-expect-error - runtime validation should reject schema-invalid values.
+    assert.throws(() => config.set('foo', 'bad'), {
+      code: 'ERR_CONF_INVALID_VALUE',
+    })
+    assert.throws(
+      () =>
+        config.update(() => {
+          throw new Error('boom')
+        }),
+      { message: 'boom' }
+    )
+    fs.writeFileSync(config.path, '{bad')
+    assert.throws(() => config.set('foo', 4), { code: 'ERR_CONF_PARSE' })
+    assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+  })
+
+  it('reads never create or wait on the lock', () => {
+    const config = createConf({ lock: { timeout: 5000 } })
+    config.set('foo', 3)
+    const lockPath = writeLock(config, process.ppid)
+    const start = Date.now()
+
+    readAll(config)
+    assert.equal(config.get('foo'), 3)
+    assert.ok(Date.now() - start < 1000)
+    fs.rmSync(lockPath)
+
+    readAll(config)
+    assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
+  })
+
+  it('a locked write in a read-only folder throws the fs error', {
+    skip: skipPermissions,
+  }, () => {
     const cwd = temporaryDirectory()
     fs.chmodSync(cwd, 0o555)
 
@@ -2110,95 +2112,93 @@ lockTest(
     } finally {
       fs.chmodSync(cwd, 0o755)
     }
-  },
-  { skip: skipPermissions }
-)
-
-lockTest('writes inside update do not wait for their own lock', () => {
-  const config = createConf({ lock: { timeout: 50 } })
-  const stored = config.update((store) => {
-    config.set('bar', 'https://example.com')
-    return store
   })
 
-  assert.equal(stored.foo, 50)
-  assert.equal(config.get('bar'), 'https://example.com')
-  assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
-})
-
-const updateSuite = suite('Conf update')
-const { test: updateTest } = updateSuite
-
-updateTest('writes and returns the new store', () => {
-  for (const lock of [false, true]) {
-    const config = createConf({ lock })
-    /** @type {unknown[]} */
-    const changes = []
-    config.onDidChange('foo', (value) => changes.push(value))
-
-    const stored = config.update((store) => ({ ...store, foo: store.foo + 1 }))
-    assert.deepEqual({ ...stored }, { foo: 51 })
-    assert.equal(config.get('foo'), 51)
-    assert.deepEqual(changes, [51])
-
-    const mutated = config.update((store) => {
-      store.foo = 7
+  it('writes inside update do not wait for their own lock', () => {
+    const config = createConf({ lock: { timeout: 50 } })
+    const stored = config.update((store) => {
+      config.set('bar', 'https://example.com')
       return store
     })
-    assert.equal(mutated.foo, 7)
-    assert.equal(config.get('foo'), 7)
-  }
-})
 
-updateTest('returns the value it writes', () => {
-  const config = new Conf({
-    cwd: temporaryDirectory(),
-    schema: z.object({
-      count: z
-        .number()
-        .transform((n) => n + 1)
-        .default(0),
-    }),
-  })
-
-  const stored = config.update((store) => ({ ...store, count: 1 }))
-  assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
-    count: stored.count,
+    assert.equal(stored.foo, 50)
+    assert.equal(config.get('bar'), 'https://example.com')
+    assert.deepEqual(fs.readdirSync(pathFor(config)), ['config.json'])
   })
 })
 
-updateTest('skips the write when nothing changed', () => {
-  const config = createConf()
-  let changes = 0
-  config.events.addEventListener('change', () => changes++)
+describe('Conf update', () => {
+  it('writes and returns the new store', () => {
+    for (const lock of [false, true]) {
+      const config = createConf({ lock })
+      /** @type {unknown[]} */
+      const changes = []
+      config.onDidChange('foo', (value) => changes.push(value))
 
-  const stored = config.update((store) => store)
-  assert.deepEqual({ ...stored }, { foo: 50 })
-  assert.equal(fs.existsSync(config.path), false)
-  assert.equal(changes, 0)
-})
+      const stored = config.update((store) => ({
+        ...store,
+        foo: store.foo + 1,
+      }))
+      assert.deepEqual({ ...stored }, { foo: 51 })
+      assert.equal(config.get('foo'), 51)
+      assert.deepEqual(changes, [51])
 
-updateTest('validates the new store', () => {
-  const config = createConf()
-  // @ts-expect-error - runtime validation should reject schema-invalid values.
-  assert.throws(() => config.update(() => ({ foo: 'bad' })), {
-    code: 'ERR_CONF_INVALID_VALUE',
-  })
-  assert.throws(
-    // @ts-expect-error - `fn` must return the new store.
-    () => config.update(() => undefined),
-    {
-      name: 'TypeError',
-      message: /return the new config object, got undefined/,
+      const mutated = config.update((store) => {
+        store.foo = 7
+        return store
+      })
+      assert.equal(mutated.foo, 7)
+      assert.equal(config.get('foo'), 7)
     }
-  )
-  // @ts-expect-error - `fn` must be a function.
-  assert.throws(() => config.update(1), { name: 'TypeError' })
-  assert.equal(fs.existsSync(config.path), false)
-})
+  })
 
-const watchSuite = suite('Conf watch')
-const { test: watchTest } = watchSuite
+  it('returns the value it writes', () => {
+    const config = new Conf({
+      cwd: temporaryDirectory(),
+      schema: z.object({
+        count: z
+          .number()
+          .transform((n) => n + 1)
+          .default(0),
+      }),
+    })
+
+    const stored = config.update((store) => ({ ...store, count: 1 }))
+    assert.deepEqual(JSON.parse(fs.readFileSync(config.path, 'utf8')), {
+      count: stored.count,
+    })
+  })
+
+  it('skips the write when nothing changed', () => {
+    const config = createConf()
+    let changes = 0
+    config.events.addEventListener('change', () => changes++)
+
+    const stored = config.update((store) => store)
+    assert.deepEqual({ ...stored }, { foo: 50 })
+    assert.equal(fs.existsSync(config.path), false)
+    assert.equal(changes, 0)
+  })
+
+  it('validates the new store', () => {
+    const config = createConf()
+    // @ts-expect-error - runtime validation should reject schema-invalid values.
+    assert.throws(() => config.update(() => ({ foo: 'bad' })), {
+      code: 'ERR_CONF_INVALID_VALUE',
+    })
+    assert.throws(
+      // @ts-expect-error - `fn` must return the new store.
+      () => config.update(() => undefined),
+      {
+        name: 'TypeError',
+        message: /return the new config object, got undefined/,
+      }
+    )
+    // @ts-expect-error - `fn` must be a function.
+    assert.throws(() => config.update(1), { name: 'TypeError' })
+    assert.equal(fs.existsSync(config.path), false)
+  })
+})
 
 /**
  * Run `fn` with `fs.watch` replaced by a fake watcher on the `fs.watch` code
@@ -2245,61 +2245,60 @@ async function withFakeWatcher(fn) {
   }
 }
 
-watchTest('dispatches change after the debounce delay', async () => {
-  await withFakeWatcher(async ({ emitChange }) => {
-    const config = createConf({ watch: true })
-    let changes = 0
-    config.events.addEventListener('change', () => changes++)
+describe('Conf watch', () => {
+  it('dispatches change after the debounce delay', async () => {
+    await withFakeWatcher(async ({ emitChange }) => {
+      const config = createConf({ watch: true })
+      let changes = 0
+      config.events.addEventListener('change', () => changes++)
 
-    emitChange()
-    emitChange()
-    await sleep(150)
-    config._closeWatcher()
+      emitChange()
+      emitChange()
+      await sleep(150)
+      config._closeWatcher()
 
-    assert.equal(changes, 1)
-  })
-})
-
-watchTest('_closeWatcher cancels a pending change', async () => {
-  await withFakeWatcher(async ({ watcher, emitChange }) => {
-    const config = createConf({ watch: true })
-    let changes = 0
-    config.events.addEventListener('change', () => changes++)
-
-    emitChange()
-    config._closeWatcher()
-    await sleep(150)
-
-    assert.equal(watcher.closed, true)
-    assert.equal(changes, 0)
-  })
-})
-
-watchTest('watcher errors close the watcher and dispatch error', async () => {
-  await withFakeWatcher(async ({ watcher, emitChange }) => {
-    const config = createConf({ watch: true })
-    /** @type {unknown[]} */
-    const errors = []
-    let changes = 0
-    config.events.addEventListener('error', (event) => {
-      errors.push(/** @type {CustomEvent} */ (event).detail)
+      assert.equal(changes, 1)
     })
-    config.events.addEventListener('change', () => changes++)
-
-    const error = new Error('EPERM')
-    emitChange()
-    watcher.emit('error', error)
-    await sleep(150)
-
-    assert.equal(watcher.closed, true)
-    assert.deepEqual(errors, [error])
-    assert.equal(changes, 0)
   })
-})
 
-watchTest(
-  'watchFile triggers onDidChange and _closeWatcher unwatches',
-  async () => {
+  it('_closeWatcher cancels a pending change', async () => {
+    await withFakeWatcher(async ({ watcher, emitChange }) => {
+      const config = createConf({ watch: true })
+      let changes = 0
+      config.events.addEventListener('change', () => changes++)
+
+      emitChange()
+      config._closeWatcher()
+      await sleep(150)
+
+      assert.equal(watcher.closed, true)
+      assert.equal(changes, 0)
+    })
+  })
+
+  it('watcher errors close the watcher and dispatch error', async () => {
+    await withFakeWatcher(async ({ watcher, emitChange }) => {
+      const config = createConf({ watch: true })
+      /** @type {unknown[]} */
+      const errors = []
+      let changes = 0
+      config.events.addEventListener('error', (event) => {
+        errors.push(/** @type {CustomEvent} */ (event).detail)
+      })
+      config.events.addEventListener('change', () => changes++)
+
+      const error = new Error('EPERM')
+      emitChange()
+      watcher.emit('error', error)
+      await sleep(150)
+
+      assert.equal(watcher.closed, true)
+      assert.deepEqual(errors, [error])
+      assert.equal(changes, 0)
+    })
+  })
+
+  it('watchFile triggers onDidChange and _closeWatcher unwatches', async () => {
     const { watchFile, unwatchFile } = fs
     const platform = Object.getOwnPropertyDescriptor(process, 'platform')
     /** @type {(() => void) | undefined} */
@@ -2345,38 +2344,38 @@ watchTest(
         Object.defineProperty(process, 'platform', platform)
       }
     }
-  }
-)
+  })
 
-watchTest('invalid external writes dispatch a single error', async () => {
-  await withFakeWatcher(async ({ emitChange }) => {
-    const config = createConf({ watch: true })
-    /** @type {unknown[]} */
-    const errors = []
-    /** @type {unknown[]} */
-    const values = []
-    config.events.addEventListener('error', (event) => {
-      errors.push(/** @type {CustomEvent} */ (event).detail)
+  it('invalid external writes dispatch a single error', async () => {
+    await withFakeWatcher(async ({ emitChange }) => {
+      const config = createConf({ watch: true })
+      /** @type {unknown[]} */
+      const errors = []
+      /** @type {unknown[]} */
+      const values = []
+      config.events.addEventListener('error', (event) => {
+        errors.push(/** @type {CustomEvent} */ (event).detail)
+      })
+      config.onDidChange('foo', (newValue) => values.push(newValue))
+      config.onDidAnyChange((newValue) => values.push(newValue.foo))
+
+      fs.writeFileSync(config.path, '{partial')
+      emitChange()
+      await sleep(150)
+
+      assert.equal(errors.length, 1)
+      assert.ok(errors[0] instanceof ConfError)
+      assert.equal(errors[0].code, 'ERR_CONF_PARSE')
+      assert.ok(errors[0].cause instanceof SyntaxError)
+      assert.deepEqual(values, [])
+
+      fs.writeFileSync(config.path, JSON.stringify({ foo: 10 }))
+      emitChange()
+      await sleep(150)
+      config._closeWatcher()
+
+      assert.equal(errors.length, 1)
+      assert.deepEqual(values, [10, 10])
     })
-    config.onDidChange('foo', (newValue) => values.push(newValue))
-    config.onDidAnyChange((newValue) => values.push(newValue.foo))
-
-    fs.writeFileSync(config.path, '{partial')
-    emitChange()
-    await sleep(150)
-
-    assert.equal(errors.length, 1)
-    assert.ok(errors[0] instanceof ConfError)
-    assert.equal(errors[0].code, 'ERR_CONF_PARSE')
-    assert.ok(errors[0].cause instanceof SyntaxError)
-    assert.deepEqual(values, [])
-
-    fs.writeFileSync(config.path, JSON.stringify({ foo: 10 }))
-    emitChange()
-    await sleep(150)
-    config._closeWatcher()
-
-    assert.equal(errors.length, 1)
-    assert.deepEqual(values, [10, 10])
   })
 })
