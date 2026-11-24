@@ -59,7 +59,7 @@ Keep each commit scoped to a single package. Avoid commits that change multiple 
 
 ## Cursor Cloud specific instructions
 
-`package.json` `devEngines.runtime` is Node `^24.21.0` (`onFail: download`). `examples/rpc-todo` also requires Node `>= 24` so TypeScript can run with Node's built-in type stripping. After `pnpm install`, `pnpm exec node -v` should print `v24.21.0`. Login shells prepend `~/.nvm/versions/node/v24.21.0/bin` so `node` is that runtime.
+`package.json` `devEngines.runtime` is Node `^26.13.1` (`onFail: download`). `examples/rpc-todo` also requires Node `>= 24` so TypeScript can run with Node's built-in type stripping. After `pnpm install`, `pnpm exec node -v` should print `v26.13.1`. Login shells prepend `~/.nvm/versions/node/v24.21.0/bin` so `node` is that runtime.
 
 Browser tests use `playwright-test` with Chromium. The environment install command installs the matching `playwright-core` browser. If a browser is missing, reinstall it:
 
