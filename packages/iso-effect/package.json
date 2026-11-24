@@ -64,13 +64,5 @@
   },
   "publishConfig": {
     "provenance": true
-  },
-  "depcheck": {
-    "specials": [
-      "bin"
-    ],
-    "ignores": [
-      "@types/*"
-    ]
   }
 }
