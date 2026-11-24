@@ -1,4 +1,4 @@
-# iso-base [![NPM Version](https://img.shields.io/npm/v/iso-base.svg)](https://www.npmjs.com/package/iso-base) [![License](https://img.shields.io/npm/l/iso-base.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-base](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-base.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-base.yml)
+# iso-base [![NPM Version](https://img.shields.io/npm/v/iso-base.svg)](https://www.npmjs.com/package/iso-base) [![License](https://img.shields.io/npm/l/iso-base.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![CI](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml)
 
 > Isomorphic utilities for webcrypto, RFC4648 encoding, LEB128 encoding, UTF-8 encoding, base-x encoding, varint encoding, elliptic curve compression, binary buffer I/O, and buffer manipulation.
 
