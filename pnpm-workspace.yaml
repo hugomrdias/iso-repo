@@ -15,7 +15,7 @@ allowBuilds:
   workerd: true
 
 catalog:
-  "@biomejs/biome": ^2.6.4
+  "@biomejs/biome": ^2.6.8
   "@noble/ed25519": ^3.2.0
   "@noble/hashes": ^2.4.0
   "@standard-schema/spec": ^1.1.0
@@ -24,21 +24,21 @@ catalog:
   "@types/node": ^26.6.6
   "@types/react": ^19.3.0
   "@types/react-dom": ^19.3.0
-  "@vitejs/plugin-react": ^6.2.1
+  "@vitejs/plugin-react": ^6.3.0
   delay: ^7.0.0
   globals: ^17.14.0
-  hono: ^4.13.16
+  hono: ^4.13.21
   msw: ^3.0.7
-  multiformats: ^14.0.5
+  multiformats: ^14.0.7
   playwright-test: ^16.0.0
   react: ^19.3.1
   react-dom: ^19.3.1
   tempy: ^3.2.0
   type-fest: ^5.10.0
   typescript: ^6.0.3
-  viem: ~2.57.14
-  vite: ^8.3.5
-  wrangler: ^4.156.1
+  viem: ~2.58.4
+  vite: ^8.3.8
+  wrangler: ^4.167.0
   zod: ^4.6.7
 
 minimumReleaseAgeExclude:
