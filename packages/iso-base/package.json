@@ -124,19 +124,15 @@
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
-    "test:node": "mocha 'test/**/!(*.browser).test.js'",
-    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node --test-timeout 60000",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js' --test-timeout 60000"
   },
   "dependencies": {
     "bigint-mod-arith": "^3.3.1"
   },
   "devDependencies": {
     "@scure/base": "^2.4.0",
-    "@types/assert": "catalog:",
-    "@types/mocha": "catalog:",
     "@types/node": "catalog:",
-    "assert": "catalog:",
-    "mocha": "catalog:",
     "playwright-test": "catalog:",
     "tinybench": "^6.2.3",
     "typescript": "catalog:"
@@ -149,8 +145,7 @@
       "bin"
     ],
     "ignores": [
-      "@types/*",
-      "assert"
+      "@types/*"
     ]
   }
 }

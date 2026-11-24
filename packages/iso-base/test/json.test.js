@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { parse, stringify } from '../src/json.js'
 
 describe('json', () => {

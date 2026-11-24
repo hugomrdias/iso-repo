@@ -5,7 +5,7 @@
     "outDir": "dist",
     "target": "es2024",
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
-    "types": ["node", "mocha"]
+    "types": ["node"]
   },
   "include": ["src", "scripts", "test", "package.json"],
   "exclude": ["node_modules", "dist", "out"],
