@@ -114,15 +114,6 @@
   "publishConfig": {
     "provenance": true
   },
-  "depcheck": {
-    "specials": [
-      "bin"
-    ],
-    "ignores": [
-      "@types/*",
-      "type-fest"
-    ]
-  },
   "msw": {
     "workerDirectory": "test/mocks"
   }
