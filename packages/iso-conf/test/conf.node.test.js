@@ -1959,7 +1959,9 @@ describe('Conf lock', () => {
     const { cwd, errors, raw } = await raceWrites({
       processes: 4,
       writes: 200,
-      options: { lock: true },
+      // The lock isn't fair, on a slow disk a writer can wait for longer than
+      // the default timeout.
+      options: { lock: { timeout: RACE_TIMEOUT } },
     })
 
     assert.deepEqual(errors, [])
