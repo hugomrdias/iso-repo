@@ -53,12 +53,12 @@
     "idb-keyval": "^6.3.0",
     "iso-base": "workspace:^",
     "iso-conf": "workspace:^",
-    "kysely": "^0.29.8"
+    "kysely": "^0.29.9"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "catalog:",
-    "better-sqlite3": "^13.0.3",
+    "better-sqlite3": "^13.2.0",
     "delay": "catalog:",
     "playwright-test": "catalog:",
     "quick-lru": "^7.3.0",
