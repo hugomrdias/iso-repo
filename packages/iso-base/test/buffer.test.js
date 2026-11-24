@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { ISOBuffer } from '../src/buffer.js'
 
 describe('ISOBuffer', () => {

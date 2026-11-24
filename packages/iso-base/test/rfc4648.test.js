@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import * as BASES from '../src/rfc4648.js'
 import { utf8 } from '../src/utf8.js'
 
@@ -85,10 +86,7 @@ describe('encode/decode', () => {
 })
 
 describe('others', () => {
-  it('hex matches node', function () {
-    if (!globalThis.Buffer) {
-      this.skip()
-    }
+  it('hex matches node', { skip: !globalThis.Buffer }, () => {
     const vector = ['foobar', '666F6F626172']
 
     assert.deepStrictEqual(
@@ -101,10 +99,7 @@ describe('others', () => {
     assert.deepStrictEqual(BASES.hex.encode(vector[0]), vector[1].toLowerCase())
   })
 
-  it('base64url matches node', function () {
-    if (!globalThis.Buffer) {
-      this.skip()
-    }
+  it('base64url matches node', { skip: !globalThis.Buffer }, () => {
     const vector = ['÷ïÿo', 'w7fDr8O_bw']
 
     assert.deepStrictEqual(BASES.base64url.encode(vector[0]), vector[1])

@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import * as leb128 from '../src/leb128.js'
 import { base16 } from '../src/rfc4648.js'
 
