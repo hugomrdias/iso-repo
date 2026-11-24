@@ -1,3 +1,5 @@
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import * as dagCbor from '@ipld/dag-cbor'
 import { ECDSASigner } from 'iso-signatures/signers/ecdsa.js'
 import { EIP191Signer } from 'iso-signatures/signers/eip191.js'
@@ -5,14 +7,11 @@ import { ES256KSigner } from 'iso-signatures/signers/es256k.js'
 import * as ECDSA from 'iso-signatures/verifiers/ecdsa.js'
 import * as EIP191 from 'iso-signatures/verifiers/eip191.js'
 import { Resolver } from 'iso-signatures/verifiers/resolver.js'
-import { assert, suite } from 'playwright-test/taps'
 import { privateKeyToAccount } from 'viem/accounts'
 import { Delegation } from '../src/delegation.js'
 import * as Envelope from '../src/envelope.js'
 import { signaturePayload } from '../src/utils.js'
 import * as mocks from './mocks.js'
-
-const revocation = suite('revocation')
 
 const verifierResolver = new Resolver({
   ...ECDSA.verifier,
@@ -82,16 +81,15 @@ function verifies(dlg, signature, strict) {
   })
 }
 
-for (const alg of /** @type {const} */ ([
-  'ES256',
-  'ES384',
-  'ES512',
-  'ES256K',
-  'EIP191',
-])) {
-  revocation(
-    `should reject a revoked ${alg} delegation re-encoded with high S`,
-    async () => {
+describe('revocation', () => {
+  for (const alg of /** @type {const} */ ([
+    'ES256',
+    'ES384',
+    'ES512',
+    'ES256K',
+    'EIP191',
+  ])) {
+    it(`should reject a revoked ${alg} delegation re-encoded with high S`, async () => {
       const dlg = await delegate(signers[alg])
       const flipped = mocks.flipS(alg, dlg.envelope.signature)
       const bytes = reencode(dlg, flipped)
@@ -106,32 +104,32 @@ for (const alg of /** @type {const} */ ([
       await assert.rejects(Delegation.from({ bytes, verifierResolver }), {
         message: 'UCAN signature verification failed',
       })
-    }
-  )
-}
+    })
+  }
 
-revocation('should reject an EIP191 delegation with v as 0/1', async () => {
-  const dlg = await delegate(signers.EIP191)
-  const signature = new Uint8Array(dlg.envelope.signature)
-  assert.ok(signature[64] === 27 || signature[64] === 28)
-  signature[64] -= 27
+  it('should reject an EIP191 delegation with v as 0/1', async () => {
+    const dlg = await delegate(signers.EIP191)
+    const signature = new Uint8Array(dlg.envelope.signature)
+    assert.ok(signature[64] === 27 || signature[64] === 28)
+    signature[64] -= 27
 
-  await assert.rejects(
-    Delegation.from({ bytes: reencode(dlg, signature), verifierResolver }),
-    { message: 'UCAN signature verification failed' }
-  )
-})
+    await assert.rejects(
+      Delegation.from({ bytes: reencode(dlg, signature), verifierResolver }),
+      { message: 'UCAN signature verification failed' }
+    )
+  })
 
-revocation('should reject a revoked delegation by CID', async () => {
-  const dlg = await delegate(signers.ES256)
-  /** @param {import('multiformats').CID} c */
-  const isRevoked = async (c) => c.equals(dlg.cid)
+  it('should reject a revoked delegation by CID', async () => {
+    const dlg = await delegate(signers.ES256)
+    /** @param {import('multiformats').CID} c */
+    const isRevoked = async (c) => c.equals(dlg.cid)
 
-  await assert.rejects(
-    Delegation.from({ bytes: dlg.bytes, verifierResolver, isRevoked }),
-    { message: 'UCAN revoked' }
-  )
-  await assert.rejects(dlg.validate({ verifierResolver, isRevoked }), {
-    message: 'UCAN revoked',
+    await assert.rejects(
+      Delegation.from({ bytes: dlg.bytes, verifierResolver, isRevoked }),
+      { message: 'UCAN revoked' }
+    )
+    await assert.rejects(dlg.validate({ verifierResolver, isRevoked }), {
+      message: 'UCAN revoked',
+    })
   })
 })

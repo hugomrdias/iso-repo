@@ -1,180 +1,189 @@
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { IOBuffer } from 'iobuffer'
 import { varint } from 'iso-base/varint'
-import { assert, suite } from 'playwright-test/taps'
 import { decode, encode, VARSIG, VERSION } from '../src/varsig.js'
 
-const test = suite('varsig')
-
-test('RS256 is not supported', () => {
-  assert.throws(
-    () => encode({ alg: 'RS256', enc: 'RAW' }),
-    /Unsupported algorithm RS256/
-  )
-  assert.throws(
-    () => decode(Uint8Array.from([52, 1, 133, 36, 18, 128, 2, 95])),
-    /Unsupported algorithm/
-  )
-})
-
-test('Ed25519+RAW', () => {
-  const varsig = encode({
-    alg: 'Ed25519',
-    enc: 'RAW',
+describe('varsig', () => {
+  it('RS256 is not supported', () => {
+    assert.throws(
+      () => encode({ alg: 'RS256', enc: 'RAW' }),
+      /Unsupported algorithm RS256/
+    )
+    assert.throws(
+      () => decode(Uint8Array.from([52, 1, 133, 36, 18, 128, 2, 95])),
+      /Unsupported algorithm/
+    )
   })
 
-  const bytes = new IOBuffer(varsig)
+  it('Ed25519+RAW', () => {
+    const varsig = encode({
+      alg: 'Ed25519',
+      enc: 'RAW',
+    })
 
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xed)[0], 'prefix')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xed)[0], 'curve')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x13)[0], 'hash')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding')
+    const bytes = new IOBuffer(varsig)
 
-  const decoded = decode(Uint8Array.from([52, 1, 237, 1, 237, 1, 19, 95]))
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xed)[0], 'prefix')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xed)[0], 'curve')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x13)[0], 'hash')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding')
 
-  assert.deepEqual(decoded.alg, 'Ed25519')
-  assert.deepEqual(decoded.enc, 'RAW')
-})
+    const decoded = decode(Uint8Array.from([52, 1, 237, 1, 237, 1, 19, 95]))
 
-test('ES256+RAW', () => {
-  const varsig = encode({
-    alg: 'ES256',
-    enc: 'RAW',
+    assert.deepEqual(decoded.alg, 'Ed25519')
+    assert.deepEqual(decoded.enc, 'RAW')
   })
 
-  const bytes = new IOBuffer(varsig)
+  it('ES256+RAW', () => {
+    const varsig = encode({
+      alg: 'ES256',
+      enc: 'RAW',
+    })
 
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0x1200)[0], 'curve')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x12)[0], 'hash')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding')
+    const bytes = new IOBuffer(varsig)
 
-  const decoded = decode(Uint8Array.from([52, 1, 236, 1, 128, 36, 18, 95]))
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0x1200)[0], 'curve')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x12)[0], 'hash')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding')
 
-  assert.deepEqual(decoded.alg, 'ES256')
-  assert.deepEqual(decoded.enc, 'RAW')
-})
+    const decoded = decode(Uint8Array.from([52, 1, 236, 1, 128, 36, 18, 95]))
 
-test('ES512+RAW', () => {
-  const varsig = encode({
-    alg: 'ES512',
-    enc: 'RAW',
+    assert.deepEqual(decoded.alg, 'ES256')
+    assert.deepEqual(decoded.enc, 'RAW')
   })
 
-  const bytes = new IOBuffer(varsig)
+  it('ES512+RAW', () => {
+    const varsig = encode({
+      alg: 'ES512',
+      enc: 'RAW',
+    })
 
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0x1202)[0], 'curve')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x13)[0], 'hash')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding')
+    const bytes = new IOBuffer(varsig)
 
-  const decoded = decode(Uint8Array.from([52, 1, 236, 1, 130, 36, 19, 95]))
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0x1202)[0], 'curve')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x13)[0], 'hash')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding')
 
-  assert.deepEqual(decoded.alg, 'ES512')
-  assert.deepEqual(decoded.enc, 'RAW')
-})
+    const decoded = decode(Uint8Array.from([52, 1, 236, 1, 130, 36, 19, 95]))
 
-test('ES256K+RAW', () => {
-  const varsig = encode({
-    alg: 'ES256K',
-    enc: 'RAW',
+    assert.deepEqual(decoded.alg, 'ES512')
+    assert.deepEqual(decoded.enc, 'RAW')
   })
 
-  const bytes = new IOBuffer(varsig)
+  it('ES256K+RAW', () => {
+    const varsig = encode({
+      alg: 'ES256K',
+      enc: 'RAW',
+    })
 
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xe7)[0], 'curve')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x12)[0], 'hash')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding')
+    const bytes = new IOBuffer(varsig)
 
-  const decoded = decode(Uint8Array.from([52, 1, 236, 1, 231, 1, 18, 95]))
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xe7)[0], 'curve')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x12)[0], 'hash')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding')
 
-  assert.deepEqual(decoded.alg, 'ES256K')
-  assert.deepEqual(decoded.enc, 'RAW')
-})
+    const decoded = decode(Uint8Array.from([52, 1, 236, 1, 231, 1, 18, 95]))
 
-test('EIP191+RAW', () => {
-  const varsig = encode({
-    alg: 'EIP191',
-    enc: 'RAW',
+    assert.deepEqual(decoded.alg, 'ES256K')
+    assert.deepEqual(decoded.enc, 'RAW')
   })
 
-  const bytes = new IOBuffer(varsig)
+  it('EIP191+RAW', () => {
+    const varsig = encode({
+      alg: 'EIP191',
+      enc: 'RAW',
+    })
 
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xe7)[0], 'curve')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x1b)[0], 'hash')
-  assert.deepEqual(bytes.readBytes(3), varint.encode(0xe191)[0], 'encoding')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x5f)[0], 'encoding-info')
+    const bytes = new IOBuffer(varsig)
 
-  const decoded = decode(
-    Uint8Array.from([52, 1, 236, 1, 231, 1, 27, 145, 195, 3, 95])
-  )
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xe7)[0], 'curve')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x1b)[0], 'hash')
+    assert.deepEqual(bytes.readBytes(3), varint.encode(0xe191)[0], 'encoding')
+    assert.deepEqual(
+      bytes.readBytes(1),
+      varint.encode(0x5f)[0],
+      'encoding-info'
+    )
 
-  assert.deepEqual(decoded.alg, 'EIP191')
-  assert.deepEqual(decoded.enc, 'RAW')
-})
+    const decoded = decode(
+      Uint8Array.from([52, 1, 236, 1, 231, 1, 27, 145, 195, 3, 95])
+    )
 
-test('EIP191+DAG-CBOR', () => {
-  const varsig = encode({
-    alg: 'EIP191',
-    enc: 'DAG-CBOR',
+    assert.deepEqual(decoded.alg, 'EIP191')
+    assert.deepEqual(decoded.enc, 'RAW')
   })
 
-  const bytes = new IOBuffer(varsig)
+  it('EIP191+DAG-CBOR', () => {
+    const varsig = encode({
+      alg: 'EIP191',
+      enc: 'DAG-CBOR',
+    })
 
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
-  assert.deepEqual(bytes.readBytes(2), varint.encode(0xe7)[0], 'curve')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x1b)[0], 'hash')
-  assert.deepEqual(bytes.readBytes(3), varint.encode(0xe191)[0], 'encoding')
-  assert.deepEqual(bytes.readBytes(1), varint.encode(0x71)[0], 'encoding-info')
+    const bytes = new IOBuffer(varsig)
 
-  const decoded = decode(
-    Uint8Array.from([52, 1, 236, 1, 231, 1, 27, 145, 195, 3, 113])
-  )
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VARSIG)[0], 'VARSIG')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(VERSION)[0], 'VERSION')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xec)[0], 'prefix')
+    assert.deepEqual(bytes.readBytes(2), varint.encode(0xe7)[0], 'curve')
+    assert.deepEqual(bytes.readBytes(1), varint.encode(0x1b)[0], 'hash')
+    assert.deepEqual(bytes.readBytes(3), varint.encode(0xe191)[0], 'encoding')
+    assert.deepEqual(
+      bytes.readBytes(1),
+      varint.encode(0x71)[0],
+      'encoding-info'
+    )
 
-  assert.deepEqual(decoded.alg, 'EIP191')
-  assert.deepEqual(decoded.enc, 'DAG-CBOR')
-})
+    const decoded = decode(
+      Uint8Array.from([52, 1, 236, 1, 231, 1, 27, 145, 195, 3, 113])
+    )
 
-test('should reject trailing bytes after the header', () => {
-  const header = encode({ alg: 'Ed25519', enc: 'DAG-CBOR' })
-  assert.deepEqual(decode(header), { alg: 'Ed25519', enc: 'DAG-CBOR' })
+    assert.deepEqual(decoded.alg, 'EIP191')
+    assert.deepEqual(decoded.enc, 'DAG-CBOR')
+  })
 
-  assert.throws(
-    () => decode(Uint8Array.from([...header, 0x00])),
-    /TypeError: Invalid varsig header 1 trailing byte\(s\)/
-  )
-  assert.throws(
-    () =>
-      decode(
-        Uint8Array.from([
-          ...encode({ alg: 'EIP191', enc: 'DAG-CBOR' }),
-          0x71,
-          0x71,
-        ])
-      ),
-    /TypeError: Invalid varsig header 2 trailing byte\(s\)/
-  )
-})
+  it('should reject trailing bytes after the header', () => {
+    const header = encode({ alg: 'Ed25519', enc: 'DAG-CBOR' })
+    assert.deepEqual(decode(header), { alg: 'Ed25519', enc: 'DAG-CBOR' })
 
-test('should decode a header from a subarray', () => {
-  const header = encode({ alg: 'ES256', enc: 'DAG-CBOR' })
-  const buf = Uint8Array.from([0xff, ...header, 0xff])
+    assert.throws(
+      () => decode(Uint8Array.from([...header, 0x00])),
+      /TypeError: Invalid varsig header 1 trailing byte\(s\)/
+    )
+    assert.throws(
+      () =>
+        decode(
+          Uint8Array.from([
+            ...encode({ alg: 'EIP191', enc: 'DAG-CBOR' }),
+            0x71,
+            0x71,
+          ])
+        ),
+      /TypeError: Invalid varsig header 2 trailing byte\(s\)/
+    )
+  })
 
-  assert.deepEqual(decode(buf.subarray(1, header.length + 1)), {
-    alg: 'ES256',
-    enc: 'DAG-CBOR',
+  it('should decode a header from a subarray', () => {
+    const header = encode({ alg: 'ES256', enc: 'DAG-CBOR' })
+    const buf = Uint8Array.from([0xff, ...header, 0xff])
+
+    assert.deepEqual(decode(buf.subarray(1, header.length + 1)), {
+      alg: 'ES256',
+      enc: 'DAG-CBOR',
+    })
   })
 })
