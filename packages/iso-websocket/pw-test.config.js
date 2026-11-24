@@ -1,3 +1,4 @@
+import { once } from 'node:events'
 import { WebSocketServer } from 'ws'
 
 /**
@@ -7,9 +8,9 @@ let server
 
 /** @type {Partial<import('playwright-test').RunnerOptions>} */
 const config = {
-  beforeTests() {
+  async beforeTests(env) {
     server = new WebSocketServer({
-      port: 8080,
+      port: 0,
       verifyClient: (info, cb) => {
         // @ts-expect-error
         const url = new URL(info.req.url, `http://${info.req.headers.host}`)
@@ -62,7 +63,12 @@ const config = {
         }
       })
     })
-    return Promise.resolve()
+
+    await once(server, 'listening')
+    const { port } = /** @type {import('node:net').AddressInfo} */ (
+      server.address()
+    )
+    env.WS_URL = `ws://localhost:${port}`
   },
 
   afterTests() {

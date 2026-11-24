@@ -7,7 +7,8 @@ import * as Client from 'playwright-test/client'
 /* eslint-disable unicorn/prefer-add-event-listener */
 import { WS } from '../src/index.js'
 
-const URL = 'ws://localhost:8080'
+// set in pw-test.config.js
+const URL = /** @type {string} */ (process.env.WS_URL)
 
 /**
  * @param {() => void | Promise<void>} fn
