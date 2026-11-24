@@ -1,4 +1,4 @@
-# iso-passkeys [![NPM Version](https://img.shields.io/npm/v/iso-passkeys.svg)](https://www.npmjs.com/package/iso-passkeys) [![License](https://img.shields.io/npm/l/iso-passkeys.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-passkeys](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-passkeys.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-passkeys.yml)
+# iso-passkeys [![NPM Version](https://img.shields.io/npm/v/iso-passkeys.svg)](https://www.npmjs.com/package/iso-passkeys) [![License](https://img.shields.io/npm/l/iso-passkeys.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![CI](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml)
 
 > Isomorphic passkeys tooling
 
