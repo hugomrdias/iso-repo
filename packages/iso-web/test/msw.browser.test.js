@@ -38,4 +38,27 @@ describe('msw browser', () => {
 
     assert.deepEqual(rejections.map(String), [])
   })
+
+  it('should settle overlapping stops before restarting', async () => {
+    await server.start()
+    const stops = [server.stop(), server.stop()]
+    await server.start()
+
+    const settled = await Promise.race([
+      Promise.all(stops).then(() => true),
+      new Promise((resolve) => setTimeout(() => resolve(false), 1000)),
+    ])
+    assert.equal(settled, true)
+
+    // the next cycle still stops and restarts
+    await server.stop()
+    await server.start()
+    server.use(
+      http.get('https://msw-restart.test/ping', () => HttpResponse.text('pong'))
+    )
+    const response = await fetch('https://msw-restart.test/ping')
+    assert.equal(await response.text(), 'pong')
+    await server.stop()
+    server.resetHandlers()
+  })
 })

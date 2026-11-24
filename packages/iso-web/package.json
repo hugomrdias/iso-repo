@@ -144,6 +144,14 @@
     "typescript": "catalog:",
     "zod": "catalog:"
   },
+  "peerDependencies": {
+    "msw": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "msw": {
+      "optional": true
+    }
+  },
   "publishConfig": {
     "provenance": true
   },

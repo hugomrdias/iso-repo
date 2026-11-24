@@ -35,7 +35,13 @@ export function setup() {
       // start() wait for it. Don't unregister here, pages that are still
       // controlled by the worker keep the registration alive, and registering
       // again revives it without controlling the new page.
-      worker.stopping = Promise.resolve(server.stop()).catch(() => undefined)
+      // Overlapping calls share the shutdown in flight, msw rejects the second
+      // and an early start() would drop the listener the first waits on.
+      worker.stopping ??= Promise.resolve(server.stop())
+        .catch(() => undefined)
+        .finally(() => {
+          worker.stopping = undefined
+        })
       return worker.stopping
     },
     resetHandlers: server.resetHandlers.bind(server),
