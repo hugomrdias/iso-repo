@@ -5,14 +5,14 @@
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "pnpm@12.6.0",
+  "packageManager": "pnpm@12.23.0",
   "engines": {
     "node": ">=22.12.0"
   },
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": "^24.21.0",
+      "version": "^26.13.1",
       "onFail": "download"
     }
   },
@@ -29,7 +29,6 @@
   "devDependencies": {
     "@biomejs/biome": "catalog:",
     "@hugomrdias/configs": "workspace:^",
-    "depcheck": "^1.4.7",
     "simple-git-hooks": "^2.14.0",
     "typedoc": "^0.28.20",
     "typedoc-plugin-missing-exports": "^4.1.4",
