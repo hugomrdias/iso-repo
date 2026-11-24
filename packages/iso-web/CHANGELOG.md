@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v4.0.0...iso-web-v5.0.0) (2026-11-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iso-web:** the browser build of iso-web/msw needs msw 3, whose stop() resolves once the worker is done. Regenerate mockServiceWorker.js with `msw init`.
+
+### Bug Fixes
+
+* **iso-web:** keep the msw shutdown in flight when stop() overlaps ([b63eed2](https://github.com/hugomrdias/iso-repo/commit/b63eed2ff60266e90a92aff10bd6c5895ca669b3))
+* **iso-web:** let the msw worker unregister itself in the browser ([2890c82](https://github.com/hugomrdias/iso-repo/commit/2890c82e564abbbdb2e558b4cfdee01511e67c4b))
+
 ## [4.0.0](https://github.com/hugomrdias/iso-repo/compare/iso-web-v3.1.2...iso-web-v4.0.0) (2026-09-27)
 
 
