@@ -73,15 +73,6 @@
   "publishConfig": {
     "provenance": true
   },
-  "depcheck": {
-    "specials": [
-      "bin"
-    ],
-    "ignores": [
-      "@types/*",
-      "assert"
-    ]
-  },
   "peerDependencies": {
     "@ledgerhq/hw-transport-webhid": "6.x",
     "@wagmi/core": "3.x",
