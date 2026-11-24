@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { EdDSASigner } from '../src/signers/eddsa.js'
 import { RSASigner } from '../src/signers/rsa.js'
 import * as ECDSA from '../src/verifiers/ecdsa.js'

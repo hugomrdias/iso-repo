@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { base64url } from 'iso-base/rfc4648'
 import { encodeInt, encodeSequence } from '../src/asn1.js'
 import { RSASigner } from '../src/signers/rsa.js'

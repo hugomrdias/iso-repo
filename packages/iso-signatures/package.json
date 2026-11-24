@@ -83,8 +83,8 @@
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
-    "test:node": "pw-test 'test/**/!(*.browser).test.js' --mode node",
-    "test:browser": "pw-test 'test/**/!(*.node).test.js'"
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node --test-timeout 60000",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js' --test-timeout 60000"
   },
   "dependencies": {
     "@noble/ed25519": "catalog:",
@@ -94,11 +94,7 @@
     "iso-did": "workspace:^"
   },
   "devDependencies": {
-    "@types/assert": "catalog:",
-    "@types/mocha": "catalog:",
     "@types/node": "catalog:",
-    "assert": "catalog:",
-    "mocha": "catalog:",
     "playwright-test": "catalog:",
     "type-fest": "catalog:",
     "typescript": "catalog:",
@@ -113,9 +109,7 @@
     ],
     "ignores": [
       "@types/*",
-      "assert",
-      "type-fest",
-      "mocha"
+      "type-fest"
     ]
   }
 }
