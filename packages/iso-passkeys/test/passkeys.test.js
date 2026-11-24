@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { hex } from 'iso-base/rfc4648'
 import { utf8 } from 'iso-base/utf8'
 import { unwrapEC2Signature, validateAuth } from '../src/validation.js'
