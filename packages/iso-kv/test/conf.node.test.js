@@ -1,4 +1,3 @@
-import { suite } from 'playwright-test/taps'
 import { temporaryDirectory } from 'tempy'
 import { FileDriver } from '../src/drivers/file.js'
 import { KV } from '../src/index.js'
@@ -10,4 +9,4 @@ const kv = new KV({
   }),
 })
 
-baseTests(kv, suite('File'))
+baseTests('File', kv)

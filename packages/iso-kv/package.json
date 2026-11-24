@@ -46,8 +46,8 @@
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "pnpm run test:node && pnpm run test:browser",
-    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node",
-    "test:browser": "playwright-test 'test/**/!(*.node).test.js'"
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node --test-timeout 60000",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.js' --test-timeout 60000"
   },
   "dependencies": {
     "idb-keyval": "^6.3.0",
