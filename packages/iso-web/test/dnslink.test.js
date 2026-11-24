@@ -1,6 +1,7 @@
+import assert from 'node:assert/strict'
+import { after, before, beforeEach, describe, it } from 'node:test'
 import { KV } from 'iso-kv'
 import { http } from 'msw'
-import { assert, suite } from 'playwright-test/taps'
 import { DohError, NetworkError, resolve } from '../src/doh/dnslink.js'
 import { setup } from '../src/msw/msw.js'
 
@@ -148,129 +149,130 @@ const handlers = [
   }),
 ]
 
-const test = suite('dnslink')
 const server = setup()
-test.before(async () => {
-  await server.start()
-})
-
-test.beforeEach(() => {
-  server.resetHandlers()
-  server.use(...handlers)
-})
-
-test.after(() => {
-  server.stop()
-})
-
-test('should resolve ipfs path on _dnslink', async () => {
-  const { error, result } = await resolve('docs.ipfs.tech')
-
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(result, ['/ipfs/Qdocsipfstech'])
-  }
-})
-
-test('should resolve ipns path on _dnslink', async () => {
-  const { error, result } = await resolve('ipfs.io')
-
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(result, ['/ipns/ipns/path/here'])
-  }
-})
-
-test('should resolve on main domain as fallback of an error', async () => {
-  const { error, result } = await resolve('maindomainerror.io')
-
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(result, ['/ipns/ipns/path/here'])
-  }
-})
-
-test('should resolve on main domain as fallback of empty records', async () => {
-  const { error, result } = await resolve('empty.io')
-
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(result, ['/ipns/ipns/path/here'])
-  }
-})
-
-test('should return empty array for no records', async () => {
-  const { result } = await resolve('no-records.io')
-
-  assert.deepEqual(result, [])
-})
-
-test('should return empty with records without start /', async () => {
-  const { result } = await resolve('no-slash.io')
-
-  assert.deepEqual(result, [])
-})
-
-test('should ignore invalid and sort valid', async () => {
-  const { result } = await resolve('invalid.io')
-
-  assert.deepEqual(result, [
-    '/testnamespace/ UVWX',
-    '/testnamespace/QRST',
-    '/testnamespace/Z123 ',
-    '/testnamespace/lowercase',
-  ])
-})
-
-test('should return valid', async () => {
-  const { result } = await resolve('valid.io')
-
-  assert.deepEqual(result, [
-    '/ /AAFG',
-    '/ testnamespace/AAJK/LM',
-    '/%E3%81%B5%E3%81%92/AA45',
-    '/dnslink/AA89',
-    '/ns_1/4567',
-    '/ns_1/890A',
-    '/ns_2/AADE',
-    '/ns_3/AABC',
-    '/testnamespace / AAHI ',
-    '/testnamespace%/AA67%',
-    '/testnamespace/ ',
-    '/testnamespace/%E3%83%9B%E3%82%AC',
-    '/testnamespace/AANO/PQ?RS=TU',
-    '/testnamespace/AAVW/ XY/ ?Z1=23 ',
-  ])
-})
-
-test('should not mutate cached TXT records', async () => {
-  const cache = new KV()
-  const { result } = await resolve('unsorted.io', { cache })
-
-  assert.deepEqual(result, ['/ipfs/aaa', '/ipfs/bbb', '/ipfs/ccc'])
-
-  const cached = await cache.get([
-    'https://cloudflare-dns.com/dns-query?name=_dnslink.unsorted.io&type=TXT',
-  ])
-  assert.deepEqual(cached, {
-    result: ['dnslink=/ipfs/ccc', 'dnslink=/ipfs/aaa', 'dnslink=/ipfs/bbb'],
+describe('dnslink', () => {
+  before(async () => {
+    await server.start()
   })
-})
 
-test('should return doh error', async () => {
-  const { error } = await resolve('doh-error.io')
+  beforeEach(() => {
+    server.resetHandlers()
+    server.use(...handlers)
+  })
 
-  assert.ok(DohError.is(error))
-  assert.deepEqual(error.message, 'Server failed to complete the DNS request')
-})
+  after(() => {
+    server.stop()
+  })
 
-test('should return fetch error', async () => {
-  const { error } = await resolve('fetch-error.io')
+  it('should resolve ipfs path on _dnslink', async () => {
+    const { error, result } = await resolve('docs.ipfs.tech')
 
-  assert.ok(NetworkError.is(error))
-  assert.deepEqual(error.message, 'Network request failed')
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(result, ['/ipfs/Qdocsipfstech'])
+    }
+  })
+
+  it('should resolve ipns path on _dnslink', async () => {
+    const { error, result } = await resolve('ipfs.io')
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(result, ['/ipns/ipns/path/here'])
+    }
+  })
+
+  it('should resolve on main domain as fallback of an error', async () => {
+    const { error, result } = await resolve('maindomainerror.io')
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(result, ['/ipns/ipns/path/here'])
+    }
+  })
+
+  it('should resolve on main domain as fallback of empty records', async () => {
+    const { error, result } = await resolve('empty.io')
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(result, ['/ipns/ipns/path/here'])
+    }
+  })
+
+  it('should return empty array for no records', async () => {
+    const { result } = await resolve('no-records.io')
+
+    assert.deepEqual(result, [])
+  })
+
+  it('should return empty with records without start /', async () => {
+    const { result } = await resolve('no-slash.io')
+
+    assert.deepEqual(result, [])
+  })
+
+  it('should ignore invalid and sort valid', async () => {
+    const { result } = await resolve('invalid.io')
+
+    assert.deepEqual(result, [
+      '/testnamespace/ UVWX',
+      '/testnamespace/QRST',
+      '/testnamespace/Z123 ',
+      '/testnamespace/lowercase',
+    ])
+  })
+
+  it('should return valid', async () => {
+    const { result } = await resolve('valid.io')
+
+    assert.deepEqual(result, [
+      '/ /AAFG',
+      '/ testnamespace/AAJK/LM',
+      '/%E3%81%B5%E3%81%92/AA45',
+      '/dnslink/AA89',
+      '/ns_1/4567',
+      '/ns_1/890A',
+      '/ns_2/AADE',
+      '/ns_3/AABC',
+      '/testnamespace / AAHI ',
+      '/testnamespace%/AA67%',
+      '/testnamespace/ ',
+      '/testnamespace/%E3%83%9B%E3%82%AC',
+      '/testnamespace/AANO/PQ?RS=TU',
+      '/testnamespace/AAVW/ XY/ ?Z1=23 ',
+    ])
+  })
+
+  it('should not mutate cached TXT records', async () => {
+    const cache = new KV()
+    const { result } = await resolve('unsorted.io', { cache })
+
+    assert.deepEqual(result, ['/ipfs/aaa', '/ipfs/bbb', '/ipfs/ccc'])
+
+    const cached = await cache.get([
+      'https://cloudflare-dns.com/dns-query?name=_dnslink.unsorted.io&type=TXT',
+    ])
+    assert.deepEqual(cached, {
+      result: ['dnslink=/ipfs/ccc', 'dnslink=/ipfs/aaa', 'dnslink=/ipfs/bbb'],
+    })
+  })
+
+  it('should return doh error', async () => {
+    const { error } = await resolve('doh-error.io')
+
+    assert.ok(DohError.is(error))
+    assert.deepEqual(error.message, 'Server failed to complete the DNS request')
+  })
+
+  it('should return fetch error', async () => {
+    const { error } = await resolve('fetch-error.io')
+
+    assert.ok(NetworkError.is(error))
+    assert.deepEqual(error.message, 'Network request failed')
+  })
 })

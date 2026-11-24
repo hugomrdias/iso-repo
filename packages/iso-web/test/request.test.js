@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict'
+import { after, before, beforeEach, describe, it } from 'node:test'
 import { delay, HttpResponse, http } from 'msw'
-import { assert, suite } from 'playwright-test/taps'
 import { z } from 'zod'
 import {
   HttpError,
@@ -10,8 +11,6 @@ import {
   SchemaError,
 } from '../src/http.js'
 import { setup } from '../src/msw/msw.js'
-
-const test = suite('request')
 
 const server = setup()
 
@@ -30,303 +29,306 @@ const handlers = [
   }),
 ]
 
-test.before(async () => {
-  await server.start()
-})
-
-test.beforeEach(() => {
-  server.resetHandlers()
-  server.use(...handlers)
-})
-
-test.after(() => {
-  server.stop()
-})
-
-test('should request 200', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return HttpResponse.json({ hello: 'world' }, { status: 200 })
-    })
-  )
-  const { error, result } = await request('https://local.dev')
-
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(await result.json(), { hello: 'world' })
-  }
-})
-
-test('should request 200 with URL object ', async () => {
-  server.use(
-    http.get('https://local.dev/url', () => {
-      return HttpResponse.json({ hello: 'world' }, { status: 200 })
-    })
-  )
-  const { error, result } = await request(new URL('/url', 'https://local.dev'))
-
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(await result.json(), { hello: 'world' })
-  }
-})
-
-test('should post json', async () => {
-  server.use(
-    http.post('https://local.dev/post', async ({ request }) => {
-      return Response.json(await request.json(), { status: 200 })
-    })
-  )
-  const { error, result } = await request('https://local.dev/post', {
-    method: 'POST',
-    body: JSON.stringify({ hello: 'world' }),
+describe('request', () => {
+  before(async () => {
+    await server.start()
   })
 
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(await result.json(), { hello: 'world' })
-  }
-})
+  beforeEach(() => {
+    server.resetHandlers()
+    server.use(...handlers)
+  })
 
-test('should not mutate options when posting json', async () => {
-  server.use(
-    http.post('https://local.dev/post', async ({ request }) => {
-      return Response.json(await request.json(), { status: 200 })
+  after(() => {
+    server.stop()
+  })
+
+  it('should request 200', async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return HttpResponse.json({ hello: 'world' }, { status: 200 })
+      })
+    )
+    const { error, result } = await request('https://local.dev')
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(await result.json(), { hello: 'world' })
+    }
+  })
+
+  it('should request 200 with URL object ', async () => {
+    server.use(
+      http.get('https://local.dev/url', () => {
+        return HttpResponse.json({ hello: 'world' }, { status: 200 })
+      })
+    )
+    const { error, result } = await request(
+      new URL('/url', 'https://local.dev')
+    )
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(await result.json(), { hello: 'world' })
+    }
+  })
+
+  it('should post json', async () => {
+    server.use(
+      http.post('https://local.dev/post', async ({ request }) => {
+        return Response.json(await request.json(), { status: 200 })
+      })
+    )
+    const { error, result } = await request('https://local.dev/post', {
+      method: 'POST',
+      body: JSON.stringify({ hello: 'world' }),
     })
-  )
-  /** @type {import('../src/types.js').RequestOptions} */
-  const options = { method: 'POST', json: { hello: 'world' } }
-  const { error, result } = await request('https://local.dev/post', options)
 
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(await result.json(), { hello: 'world' })
-    assert.deepEqual(options, { method: 'POST', json: { hello: 'world' } })
-  }
-})
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(await result.json(), { hello: 'world' })
+    }
+  })
 
-test('should request 500', async () => {
-  const { error } = await request('https://local.dev/error?status=500')
+  it('should not mutate options when posting json', async () => {
+    server.use(
+      http.post('https://local.dev/post', async ({ request }) => {
+        return Response.json(await request.json(), { status: 200 })
+      })
+    )
+    /** @type {import('../src/types.js').RequestOptions} */
+    const options = { method: 'POST', json: { hello: 'world' } }
+    const { error, result } = await request('https://local.dev/post', options)
 
-  if (HttpError.is(error)) {
-    assert.equal(error.message, '500 - Internal Server Error')
-    assert.equal(error.code, 500)
-  } else {
-    assert.fail('should fail')
-  }
-})
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(await result.json(), { hello: 'world' })
+      assert.deepEqual(options, { method: 'POST', json: { hello: 'world' } })
+    }
+  })
 
-test('should fail with bad resource', async () => {
-  // @ts-expect-error - tests bad resource
-  const { error } = await request(1000)
+  it('should request 500', async () => {
+    const { error } = await request('https://local.dev/error?status=500')
 
-  if (RequestError.is(error)) {
-    assert.equal(error.message, '`resource` must be a string or URL object')
-  } else {
-    assert.fail('should fail')
-  }
-})
+    if (HttpError.is(error)) {
+      assert.equal(error.message, '500 - Internal Server Error')
+      assert.equal(error.code, 500)
+    } else {
+      assert.fail('should fail')
+    }
+  })
 
-test('should request 501', async () => {
-  const { error } = await request('https://local.dev/error?status=501')
+  it('should fail with bad resource', async () => {
+    // @ts-expect-error - tests bad resource
+    const { error } = await request(1000)
 
-  if (HttpError.is(error)) {
-    assert.equal(error.message, '501 - Not Implemented')
-    assert.equal(error.code, 501)
-    assert.ok(error.response)
-  } else {
-    assert.fail('should fail')
-  }
-})
+    if (RequestError.is(error)) {
+      assert.equal(error.message, '`resource` must be a string or URL object')
+    } else {
+      assert.fail('should fail')
+    }
+  })
 
-test('should request 500 with json body', async () => {
-  server.use(
-    http.get('https://local.dev/error-json', ({ request }) => {
-      const params = Object.fromEntries(new URL(request.url).searchParams)
-      return HttpResponse.json(
-        { error: 'error' },
-        { status: Number(params.status) }
+  it('should request 501', async () => {
+    const { error } = await request('https://local.dev/error?status=501')
+
+    if (HttpError.is(error)) {
+      assert.equal(error.message, '501 - Not Implemented')
+      assert.equal(error.code, 501)
+      assert.ok(error.response)
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should request 500 with json body', async () => {
+    server.use(
+      http.get('https://local.dev/error-json', ({ request }) => {
+        const params = Object.fromEntries(new URL(request.url).searchParams)
+        return HttpResponse.json(
+          { error: 'error' },
+          { status: Number(params.status) }
+        )
+      })
+    )
+    const { error } = await request('https://local.dev/error-json?status=500')
+
+    if (HttpError.is(error)) {
+      assert.equal(error.message, '500 - Internal Server Error')
+      assert.equal(error.code, 500)
+      assert.equal(error.cause, undefined)
+      assert.ok(error.response)
+
+      const errorData = await error.response.json()
+
+      assert.deepEqual(errorData, { error: 'error' })
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should handle network error', async () => {
+    let count = 0
+    server.use(
+      http.get('https://local.dev/network-error', () => {
+        count++
+        return Response.error()
+      })
+    )
+    const { error } = await request('https://local.dev/network-error')
+
+    if (error) {
+      assert.equal(error.message, 'Network request failed')
+      assert.equal(error.name, 'NetworkError')
+      assert.equal(count, 1)
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should keep the fetch error as NetworkError cause', async () => {
+    server.use(
+      http.get('https://local.dev/network-error', () => {
+        return Response.error()
+      })
+    )
+    const { error } = await request('https://local.dev/network-error')
+
+    assert.ok(NetworkError.is(error))
+    assert.ok(error.cause instanceof TypeError)
+  })
+
+  it('should keep a browser-style fetch TypeError as NetworkError cause', async () => {
+    const fetchError = new TypeError('Failed to fetch')
+    const { error } = await request('https://local.dev', {
+      fetch: () => Promise.reject(fetchError),
+    })
+
+    assert.ok(NetworkError.is(error))
+    assert.equal(error.cause, fetchError)
+  })
+
+  it('should return RequestError when onResponse throws', async () => {
+    server.use(
+      http.get('https://local.dev', () =>
+        HttpResponse.text('ok', { status: 200 })
       )
-    })
-  )
-  const { error } = await request('https://local.dev/error-json?status=500')
-
-  if (HttpError.is(error)) {
-    assert.equal(error.message, '500 - Internal Server Error')
-    assert.equal(error.code, 500)
-    assert.equal(error.cause, undefined)
-    assert.ok(error.response)
-
-    const errorData = await error.response.json()
-
-    assert.deepEqual(errorData, { error: 'error' })
-  } else {
-    assert.fail('should fail')
-  }
-})
-
-test('should handle network error', async () => {
-  let count = 0
-  server.use(
-    http.get('https://local.dev/network-error', () => {
-      count++
-      return Response.error()
-    })
-  )
-  const { error } = await request('https://local.dev/network-error')
-
-  if (error) {
-    assert.equal(error.message, 'Network request failed')
-    assert.equal(error.name, 'NetworkError')
-    assert.equal(count, 1)
-  } else {
-    assert.fail('should fail')
-  }
-})
-
-test('should keep the fetch error as NetworkError cause', async () => {
-  server.use(
-    http.get('https://local.dev/network-error', () => {
-      return Response.error()
-    })
-  )
-  const { error } = await request('https://local.dev/network-error')
-
-  assert.ok(NetworkError.is(error))
-  assert.ok(error.cause instanceof TypeError)
-})
-
-test('should keep a browser-style fetch TypeError as NetworkError cause', async () => {
-  const fetchError = new TypeError('Failed to fetch')
-  const { error } = await request('https://local.dev', {
-    fetch: () => Promise.reject(fetchError),
-  })
-
-  assert.ok(NetworkError.is(error))
-  assert.equal(error.cause, fetchError)
-})
-
-test('should return RequestError when onResponse throws', async () => {
-  server.use(
-    http.get('https://local.dev', () =>
-      HttpResponse.text('ok', { status: 200 })
     )
-  )
-  const hookError = new Error('post-error')
-  const { error } = await request('https://local.dev', {
-    onResponse: () => {
-      throw hookError
-    },
-  })
-
-  assert.ok(RequestError.is(error))
-  assert.equal(error.message, 'Request failed: post-error')
-  assert.equal(error.cause, hookError)
-})
-
-test('should return RequestError when onResponse throws and retries are exhausted', async () => {
-  let count = 0
-  server.use(
-    http.get('https://local.dev', () => {
-      count++
-      return HttpResponse.text('ok', { status: 200 })
-    })
-  )
-  const hookError = new Error('post-error')
-  const { error } = await request('https://local.dev', {
-    retry: { retries: 1, minTimeout: 1, shouldRetry: () => true },
-    onResponse: () => {
-      throw hookError
-    },
-  })
-
-  assert.ok(RequestError.is(error))
-  assert.equal(error.cause, hookError)
-  assert.equal(count, 2)
-})
-
-test('should return RequestError when shouldPoll throws', async () => {
-  server.use(
-    http.get('https://local.dev', () =>
-      HttpResponse.json({ status: 'processing' }, { status: 202 })
-    )
-  )
-  const hookError = new RangeError('hook bug')
-  const { error } = await request('https://local.dev', {
-    poll: {
-      interval: 1,
-      shouldPoll: () => {
+    const hookError = new Error('post-error')
+    const { error } = await request('https://local.dev', {
+      onResponse: () => {
         throw hookError
       },
-    },
-  })
-
-  assert.ok(RequestError.is(error))
-  assert.equal(error.cause, hookError)
-})
-
-test('should timeout after 100ms', async () => {
-  const { error } = await request('https://local.dev/timeout', {
-    timeout: 10,
-  })
-
-  if (error) {
-    assert.equal(error.message, 'Request timed out after 10ms')
-    assert.ok(error.cause)
-    assert.equal(error.name, 'TimeoutError')
-  } else {
-    assert.fail('should fail')
-  }
-})
-
-test('should abort manually', async () => {
-  const controller = new AbortController()
-  const rsp = request('https://local.dev/timeout', {
-    signal: controller.signal,
-  })
-
-  controller.abort('reason')
-  const { error } = await rsp
-  if (error) {
-    assert.equal(error.message, 'Request aborted: reason')
-    assert.ok(error.cause)
-    assert.equal(error.name, 'AbortError')
-  } else {
-    assert.fail('should fail')
-  }
-})
-
-test('should retry failed network error', async () => {
-  let count = 0
-  server.use(
-    http.get('https://local.dev/network-error', () => {
-      count++
-      return Response.error()
     })
-  )
-  const { error } = await request('https://local.dev/network-error', {
-    retry: {
-      retries: 2,
-      factor: 1,
-      minTimeout: 10,
-    },
+
+    assert.ok(RequestError.is(error))
+    assert.equal(error.message, 'Request failed: post-error')
+    assert.equal(error.cause, hookError)
   })
 
-  if (error) {
-    assert.equal(error.message, 'Network request failed')
-    assert.equal(count, 3)
-  } else {
-    assert.fail('should fail')
-  }
-})
+  it('should return RequestError when onResponse throws and retries are exhausted', async () => {
+    let count = 0
+    server.use(
+      http.get('https://local.dev', () => {
+        count++
+        return HttpResponse.text('ok', { status: 200 })
+      })
+    )
+    const hookError = new Error('post-error')
+    const { error } = await request('https://local.dev', {
+      retry: { retries: 1, minTimeout: 1, shouldRetry: () => true },
+      onResponse: () => {
+        throw hookError
+      },
+    })
 
-test(
-  'should retry with default options when retry is true',
-  async () => {
+    assert.ok(RequestError.is(error))
+    assert.equal(error.cause, hookError)
+    assert.equal(count, 2)
+  })
+
+  it('should return RequestError when shouldPoll throws', async () => {
+    server.use(
+      http.get('https://local.dev', () =>
+        HttpResponse.json({ status: 'processing' }, { status: 202 })
+      )
+    )
+    const hookError = new RangeError('hook bug')
+    const { error } = await request('https://local.dev', {
+      poll: {
+        interval: 1,
+        shouldPoll: () => {
+          throw hookError
+        },
+      },
+    })
+
+    assert.ok(RequestError.is(error))
+    assert.equal(error.cause, hookError)
+  })
+
+  it('should timeout after 100ms', async () => {
+    const { error } = await request('https://local.dev/timeout', {
+      timeout: 10,
+    })
+
+    if (error) {
+      assert.equal(error.message, 'Request timed out after 10ms')
+      assert.ok(error.cause)
+      assert.equal(error.name, 'TimeoutError')
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should abort manually', async () => {
+    const controller = new AbortController()
+    const rsp = request('https://local.dev/timeout', {
+      signal: controller.signal,
+    })
+
+    controller.abort('reason')
+    const { error } = await rsp
+    if (error) {
+      assert.equal(error.message, 'Request aborted: reason')
+      assert.ok(error.cause)
+      assert.equal(error.name, 'AbortError')
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should retry failed network error', async () => {
+    let count = 0
+    server.use(
+      http.get('https://local.dev/network-error', () => {
+        count++
+        return Response.error()
+      })
+    )
+    const { error } = await request('https://local.dev/network-error', {
+      retry: {
+        retries: 2,
+        factor: 1,
+        minTimeout: 10,
+      },
+    })
+
+    if (error) {
+      assert.equal(error.message, 'Network request failed')
+      assert.equal(count, 3)
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should retry with default options when retry is true', {
+    timeout: 10_000,
+  }, async () => {
     let count = 0
     server.use(
       http.get('https://local.dev/retry-true', () => {
@@ -349,35 +351,31 @@ test(
       assert.deepEqual(await result.json(), { data: 'ready' })
       assert.equal(count, 2)
     }
-  },
-  { timeout: 10_000 }
-)
-
-test('should force retry and failed', async () => {
-  let count = 0
-  const { error } = await request('https://local.dev/error?status=501', {
-    retry: {
-      retries: 1,
-      factor: 1,
-      minTimeout: 10,
-      shouldRetry: () => {
-        count++
-        return true
-      },
-    },
   })
 
-  if (error) {
-    assert.equal(error.message, '501 - Not Implemented')
-    assert.equal(count, 1)
-  } else {
-    assert.fail('should fail')
-  }
-})
+  it('should force retry and failed', async () => {
+    let count = 0
+    const { error } = await request('https://local.dev/error?status=501', {
+      retry: {
+        retries: 1,
+        factor: 1,
+        minTimeout: 10,
+        shouldRetry: () => {
+          count++
+          return true
+        },
+      },
+    })
 
-test(
-  'should timeout with retries',
-  async () => {
+    if (error) {
+      assert.equal(error.message, '501 - Not Implemented')
+      assert.equal(count, 1)
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should timeout with retries', { timeout: 10_000 }, async () => {
     server.use(
       http.get('https://local.dev/network-error', () => {
         return HttpResponse.text('error', { status: 500 })
@@ -397,33 +395,31 @@ test(
     } else {
       assert.fail('should fail')
     }
-  },
-  { timeout: 10_000 }
-)
-
-test('should abort manually with retries', async () => {
-  const controller = new AbortController()
-  const rsp = request('https://local.dev/timeout', {
-    retry: {
-      retries: 5,
-    },
-    signal: controller.signal,
   })
 
-  controller.abort('reason')
-  const { error } = await rsp
-  if (error) {
-    assert.equal(error.message, 'Request aborted: reason')
-    assert.ok(error.cause)
-    assert.equal(error.name, 'AbortError')
-  } else {
-    assert.fail('should fail')
-  }
-})
+  it('should abort manually with retries', async () => {
+    const controller = new AbortController()
+    const rsp = request('https://local.dev/timeout', {
+      retry: {
+        retries: 5,
+      },
+      signal: controller.signal,
+    })
 
-test(
-  'should not wait for a retry after header longer than the timeout',
-  async () => {
+    controller.abort('reason')
+    const { error } = await rsp
+    if (error) {
+      assert.equal(error.message, 'Request aborted: reason')
+      assert.ok(error.cause)
+      assert.equal(error.name, 'AbortError')
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should not wait for a retry after header longer than the timeout', {
+    timeout: 10_000,
+  }, async () => {
     server.use(
       http.get('https://local.dev/retry-after', () => {
         return HttpResponse.json(
@@ -447,13 +443,11 @@ test(
     } else {
       assert.fail('should fail with an HTTP error')
     }
-  },
-  { timeout: 10_000 }
-)
+  })
 
-test(
-  'should retry POST requests with custom onResponse and shouldRetry',
-  async () => {
+  it('should retry POST requests with custom onResponse and shouldRetry', {
+    timeout: 10_000,
+  }, async () => {
     let count = 0
     server.use(
       http.post('https://local.dev/processing', () => {
@@ -493,13 +487,9 @@ test(
       assert.deepEqual(await result.json(), { data: 'ready' })
       assert.equal(count, 3)
     }
-  },
-  { timeout: 10_000 }
-)
+  })
 
-test(
-  'should poll on 202 status codes',
-  async () => {
+  it('should poll on 202 status codes', { timeout: 10_000 }, async () => {
     let count = 0
     server.use(
       http.get('https://local.dev/polling', () => {
@@ -524,35 +514,33 @@ test(
       assert.deepEqual(await result.json(), { data: 'ready' })
       assert.equal(count, 3)
     }
-  },
-  { timeout: 10_000 }
-)
+  })
 
-test('should not poll by default', async () => {
-  let count = 0
-  server.use(
-    http.get('https://local.dev/polling-default-false', () => {
-      count++
-      return HttpResponse.json({ status: 'processing' }, { status: 202 })
-    })
-  )
+  it('should not poll by default', async () => {
+    let count = 0
+    server.use(
+      http.get('https://local.dev/polling-default-false', () => {
+        count++
+        return HttpResponse.json({ status: 'processing' }, { status: 202 })
+      })
+    )
 
-  const { error, result } = await request(
-    'https://local.dev/polling-default-false'
-  )
+    const { error, result } = await request(
+      'https://local.dev/polling-default-false'
+    )
 
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.equal(result.status, 202)
-    assert.deepEqual(await result.json(), { status: 'processing' })
-    assert.equal(count, 1)
-  }
-})
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.equal(result.status, 202)
+      assert.deepEqual(await result.json(), { status: 'processing' })
+      assert.equal(count, 1)
+    }
+  })
 
-test(
-  'should poll with default options when poll is true',
-  async () => {
+  it('should poll with default options when poll is true', {
+    timeout: 10_000,
+  }, async () => {
     let count = 0
     server.use(
       http.get('https://local.dev/polling-true', () => {
@@ -575,13 +563,11 @@ test(
       assert.deepEqual(await result.json(), { data: 'ready' })
       assert.equal(count, 2)
     }
-  },
-  { timeout: 10_000 }
-)
+  })
 
-test(
-  'should retry network errors before polling recovered responses',
-  async () => {
+  it('should retry network errors before polling recovered responses', {
+    timeout: 10_000,
+  }, async () => {
     let count = 0
     server.use(
       http.get('https://local.dev/retry-then-poll', () => {
@@ -617,13 +603,11 @@ test(
       assert.deepEqual(await result.json(), { data: 'ready' })
       assert.equal(count, 3)
     }
-  },
-  { timeout: 10_000 }
-)
+  })
 
-test(
-  'should retry retry-after responses before polling recovered responses',
-  async () => {
+  it('should retry retry-after responses before polling recovered responses', {
+    timeout: 10_000,
+  }, async () => {
     let count = 0
     server.use(
       http.get('https://local.dev/retry-after-then-poll', () => {
@@ -662,13 +646,11 @@ test(
       assert.deepEqual(await result.json(), { data: 'ready' })
       assert.equal(count, 3)
     }
-  },
-  { timeout: 10_000 }
-)
+  })
 
-test(
-  'should stop polling when shouldPoll returns false',
-  async () => {
+  it('should stop polling when shouldPoll returns false', {
+    timeout: 10_000,
+  }, async () => {
     let count = 0
     server.use(
       http.get('https://local.dev/polling-stop', () => {
@@ -704,13 +686,11 @@ test(
       })
       assert.equal(count, 1)
     }
-  },
-  { timeout: 10_000 }
-)
+  })
 
-test(
-  'should continue polling when shouldPoll returns true',
-  async () => {
+  it('should continue polling when shouldPoll returns true', {
+    timeout: 10_000,
+  }, async () => {
     let count = 0
     let shouldPollCount = 0
     server.use(
@@ -745,13 +725,11 @@ test(
       assert.equal(count, 10)
       assert.equal(shouldPollCount, 10)
     }
-  },
-  { timeout: 10_000 }
-)
+  })
 
-test(
-  'should timeout during polling interval',
-  async () => {
+  it('should timeout during polling interval', {
+    timeout: 10_000,
+  }, async () => {
     let count = 0
     server.use(
       http.get('https://local.dev/polling-timeout', () => {
@@ -776,64 +754,63 @@ test(
     } else {
       assert.fail('should fail')
     }
-  },
-  { timeout: 10_000 }
-)
-
-test('should set content-type json', async () => {
-  const { error } = await request('https://local.dev/error?status=500', {
-    method: 'POST',
-    json: { hello: 'world' },
   })
 
-  if (HttpError.is(error)) {
-    assert.equal(error.message, '500 - Internal Server Error')
-    assert.equal(error.code, 500)
-    assert.equal(error.request.headers.get('content-type'), 'application/json')
-  } else {
-    assert.fail('should fail')
-  }
-})
-
-test('should be able to overide with custom json content-type ', async () => {
-  const { error } = await request('https://local.dev/error?status=500', {
-    method: 'POST',
-    json: { hello: 'world' },
-    headers: {
-      'Content-Type': 'application/custom+json',
-    },
-  })
-
-  if (HttpError.is(error)) {
-    assert.equal(error.message, '500 - Internal Server Error')
-    assert.equal(error.code, 500)
-    assert.equal(
-      error.request.headers.get('content-type'),
-      'application/custom+json'
-    )
-  } else {
-    assert.fail('should fail')
-  }
-})
-
-test('should request json', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return HttpResponse.json({ hello: 'world' }, { status: 200 })
+  it('should set content-type json', async () => {
+    const { error } = await request('https://local.dev/error?status=500', {
+      method: 'POST',
+      json: { hello: 'world' },
     })
-  )
-  const { error, result } = await request.json('https://local.dev')
 
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(result, { hello: 'world' })
-  }
-})
+    if (HttpError.is(error)) {
+      assert.equal(error.message, '500 - Internal Server Error')
+      assert.equal(error.code, 500)
+      assert.equal(
+        error.request.headers.get('content-type'),
+        'application/json'
+      )
+    } else {
+      assert.fail('should fail')
+    }
+  })
 
-test(
-  'should request json after polling',
-  async () => {
+  it('should be able to overide with custom json content-type ', async () => {
+    const { error } = await request('https://local.dev/error?status=500', {
+      method: 'POST',
+      json: { hello: 'world' },
+      headers: {
+        'Content-Type': 'application/custom+json',
+      },
+    })
+
+    if (HttpError.is(error)) {
+      assert.equal(error.message, '500 - Internal Server Error')
+      assert.equal(error.code, 500)
+      assert.equal(
+        error.request.headers.get('content-type'),
+        'application/custom+json'
+      )
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should request json', async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return HttpResponse.json({ hello: 'world' }, { status: 200 })
+      })
+    )
+    const { error, result } = await request.json('https://local.dev')
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(result, { hello: 'world' })
+    }
+  })
+
+  it('should request json after polling', { timeout: 10_000 }, async () => {
     let count = 0
     server.use(
       http.get('https://local.dev/json-polling', () => {
@@ -860,225 +837,228 @@ test(
       assert.deepEqual(result, { data: 'ready' })
       assert.equal(count, 3)
     }
-  },
-  { timeout: 10_000 }
-)
+  })
 
-test('should request json with schema', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return HttpResponse.json({ hello: 'world' }, { status: 200 })
-    })
-  )
-
-  const schema = z.object({ hello: z.literal('world') }).transform((value) => ({
-    greeting: value.hello,
-  }))
-
-  const { error, result } = await request.json('https://local.dev', { schema })
-
-  if (error) {
-    assert.fail(error.message)
-  } else {
-    assert.deepEqual(result, { greeting: 'world' })
-  }
-})
-
-test('should fail request json with schema issues', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return HttpResponse.json({ hello: 'world' }, { status: 200 })
-    })
-  )
-
-  const schema = z.object({ count: z.number() })
-
-  z.prettifyError
-
-  const { error } = await request.json('https://local.dev', { schema })
-
-  if (SchemaError.is(error)) {
-    assert.equal(error.message, 'Schema validation failed')
-    assert.equal(
-      error.issues[0]?.message,
-      'Invalid input: expected number, received undefined'
-    )
-    assert.equal(error.response.status, 200)
-  } else {
-    assert.fail('should fail')
-  }
-})
-
-test('should request json and error', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return HttpResponse.json({ hello: 'world' }, { status: 500 })
-    })
-  )
-
-  const { error } = await request.json('https://local.dev')
-
-  assert.ok(JsonError.is(error))
-  assert.deepEqual(error.cause, { hello: 'world' })
-})
-
-for (const status of [404, 429, 500]) {
-  test(`should keep status, response and request on JsonError for ${status}`, async () => {
+  it('should request json with schema', async () => {
     server.use(
       http.get('https://local.dev', () => {
-        return HttpResponse.json({ message: 'nope' }, { status })
+        return HttpResponse.json({ hello: 'world' }, { status: 200 })
+      })
+    )
+
+    const schema = z
+      .object({ hello: z.literal('world') })
+      .transform((value) => ({
+        greeting: value.hello,
+      }))
+
+    const { error, result } = await request.json('https://local.dev', {
+      schema,
+    })
+
+    if (error) {
+      assert.fail(error.message)
+    } else {
+      assert.deepEqual(result, { greeting: 'world' })
+    }
+  })
+
+  it('should fail request json with schema issues', async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return HttpResponse.json({ hello: 'world' }, { status: 200 })
+      })
+    )
+
+    const schema = z.object({ count: z.number() })
+
+    z.prettifyError
+
+    const { error } = await request.json('https://local.dev', { schema })
+
+    if (SchemaError.is(error)) {
+      assert.equal(error.message, 'Schema validation failed')
+      assert.equal(
+        error.issues[0]?.message,
+        'Invalid input: expected number, received undefined'
+      )
+      assert.equal(error.response.status, 200)
+    } else {
+      assert.fail('should fail')
+    }
+  })
+
+  it('should request json and error', async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return HttpResponse.json({ hello: 'world' }, { status: 500 })
       })
     )
 
     const { error } = await request.json('https://local.dev')
 
     assert.ok(JsonError.is(error))
-    assert.equal(error.code, status)
-    assert.deepEqual(error.cause, { message: 'nope' })
-    assert.equal(error.response.status, status)
-    assert.deepEqual(await error.response.json(), { message: 'nope' })
-    assert.equal(error.request.method, 'GET')
-    assert.equal(error.request.url, 'https://local.dev/')
-  })
-}
-
-test('should return RequestError for an invalid url', async () => {
-  const { error } = await request('http://')
-
-  assert.ok(RequestError.is(error))
-  assert.ok(error.cause instanceof TypeError)
-})
-
-test('should return RequestError for a GET with a body', async () => {
-  const { error } = await request.json.get('https://local.dev', {
-    body: { a: 1 },
+    assert.deepEqual(error.cause, { hello: 'world' })
   })
 
-  assert.ok(RequestError.is(error))
-  assert.ok(error.cause instanceof TypeError)
-})
+  for (const status of [404, 429, 500]) {
+    it(`should keep status, response and request on JsonError for ${status}`, async () => {
+      server.use(
+        http.get('https://local.dev', () => {
+          return HttpResponse.json({ message: 'nope' }, { status })
+        })
+      )
 
-test('should return RequestError for an invalid header name', async () => {
-  const { error } = await request('https://local.dev', {
-    headers: { 'bad header': 'x' },
-  })
+      const { error } = await request.json('https://local.dev')
 
-  assert.ok(RequestError.is(error))
-  assert.ok(error.cause instanceof TypeError)
-})
+      assert.ok(JsonError.is(error))
+      assert.equal(error.code, status)
+      assert.deepEqual(error.cause, { message: 'nope' })
+      assert.equal(error.response.status, status)
+      assert.deepEqual(await error.response.json(), { message: 'nope' })
+      assert.equal(error.request.method, 'GET')
+      assert.equal(error.request.url, 'https://local.dev/')
+    })
+  }
 
-test('should return RequestError for an invalid timeout', async () => {
-  const { error } = await request('https://local.dev', { timeout: -1 })
-
-  assert.ok(RequestError.is(error))
-  // RangeError in Node, TypeError in browsers
-  assert.ok(error.cause instanceof Error)
-})
-
-test('should return RequestError when fetch is missing', async () => {
-  const fetch = globalThis.fetch
-  // @ts-expect-error - tests a runtime without fetch
-  globalThis.fetch = undefined
-  try {
-    const { error } = await request('https://local.dev')
+  it('should return RequestError for an invalid url', async () => {
+    const { error } = await request('http://')
 
     assert.ok(RequestError.is(error))
     assert.ok(error.cause instanceof TypeError)
-  } finally {
-    globalThis.fetch = fetch
-  }
-})
-
-test('should return RequestError for malformed json', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return new HttpResponse('{bad', {
-        headers: { 'content-type': 'application/json' },
-      })
-    })
-  )
-
-  const { error } = await request.json('https://local.dev')
-
-  assert.ok(RequestError.is(error))
-  assert.equal(error.message, 'Response body is not valid JSON')
-  assert.ok(error.cause instanceof SyntaxError)
-})
-
-test('should return RequestError for malformed json with schema', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return new HttpResponse('{bad', {
-        headers: { 'content-type': 'application/json' },
-      })
-    })
-  )
-
-  const { error } = await request.json('https://local.dev', {
-    schema: z.object({ hello: z.string() }),
   })
 
-  assert.ok(RequestError.is(error))
-  assert.ok(error.cause instanceof SyntaxError)
-})
+  it('should return RequestError for a GET with a body', async () => {
+    const { error } = await request.json.get('https://local.dev', {
+      body: { a: 1 },
+    })
 
-test('should return RequestError for a malformed json error body', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return new HttpResponse('{bad', {
-        status: 500,
-        headers: { 'content-type': 'application/json' },
+    assert.ok(RequestError.is(error))
+    assert.ok(error.cause instanceof TypeError)
+  })
+
+  it('should return RequestError for an invalid header name', async () => {
+    const { error } = await request('https://local.dev', {
+      headers: { 'bad header': 'x' },
+    })
+
+    assert.ok(RequestError.is(error))
+    assert.ok(error.cause instanceof TypeError)
+  })
+
+  it('should return RequestError for an invalid timeout', async () => {
+    const { error } = await request('https://local.dev', { timeout: -1 })
+
+    assert.ok(RequestError.is(error))
+    // RangeError in Node, TypeError in browsers
+    assert.ok(error.cause instanceof Error)
+  })
+
+  it('should return RequestError when fetch is missing', async () => {
+    const fetch = globalThis.fetch
+    // @ts-expect-error - tests a runtime without fetch
+    globalThis.fetch = undefined
+    try {
+      const { error } = await request('https://local.dev')
+
+      assert.ok(RequestError.is(error))
+      assert.ok(error.cause instanceof TypeError)
+    } finally {
+      globalThis.fetch = fetch
+    }
+  })
+
+  it('should return RequestError for malformed json', async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return new HttpResponse('{bad', {
+          headers: { 'content-type': 'application/json' },
+        })
       })
+    )
+
+    const { error } = await request.json('https://local.dev')
+
+    assert.ok(RequestError.is(error))
+    assert.equal(error.message, 'Response body is not valid JSON')
+    assert.ok(error.cause instanceof SyntaxError)
+  })
+
+  it('should return RequestError for malformed json with schema', async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return new HttpResponse('{bad', {
+          headers: { 'content-type': 'application/json' },
+        })
+      })
+    )
+
+    const { error } = await request.json('https://local.dev', {
+      schema: z.object({ hello: z.string() }),
     })
-  )
 
-  const { error } = await request.json('https://local.dev')
+    assert.ok(RequestError.is(error))
+    assert.ok(error.cause instanceof SyntaxError)
+  })
 
-  assert.ok(RequestError.is(error))
-  assert.equal(error.message, 'Response body is not valid JSON')
-  assert.ok(error.cause instanceof SyntaxError)
-})
+  it('should return RequestError for a malformed json error body', async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return new HttpResponse('{bad', {
+          status: 500,
+          headers: { 'content-type': 'application/json' },
+        })
+      })
+    )
 
-test('should return RequestError when schema validation throws', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return HttpResponse.json({ hello: 'world' })
-    })
-  )
-  const validateError = new Error('boom')
+    const { error } = await request.json('https://local.dev')
 
-  const { error } = await request.json('https://local.dev', {
-    schema: {
-      '~standard': {
-        version: 1,
-        vendor: 'test',
-        validate: () => {
-          throw validateError
+    assert.ok(RequestError.is(error))
+    assert.equal(error.message, 'Response body is not valid JSON')
+    assert.ok(error.cause instanceof SyntaxError)
+  })
+
+  it('should return RequestError when schema validation throws', async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return HttpResponse.json({ hello: 'world' })
+      })
+    )
+    const validateError = new Error('boom')
+
+    const { error } = await request.json('https://local.dev', {
+      schema: {
+        '~standard': {
+          version: 1,
+          vendor: 'test',
+          validate: () => {
+            throw validateError
+          },
         },
       },
-    },
+    })
+
+    assert.ok(RequestError.is(error))
+    assert.equal(error.cause, validateError)
   })
 
-  assert.ok(RequestError.is(error))
-  assert.equal(error.cause, validateError)
-})
-
-test('should return RequestError for an empty json response', async () => {
-  server.use(
-    http.get('https://local.dev', () => {
-      return new HttpResponse(null, {
-        status: 204,
-        headers: { 'content-type': 'application/json' },
+  it('should return RequestError for an empty json response', async () => {
+    server.use(
+      http.get('https://local.dev', () => {
+        return new HttpResponse(null, {
+          status: 204,
+          headers: { 'content-type': 'application/json' },
+        })
       })
-    })
-  )
+    )
 
-  const { error } = await request.json('https://local.dev')
+    const { error } = await request.json('https://local.dev')
 
-  assert.ok(RequestError.is(error))
-  assert.ok(error.cause instanceof SyntaxError)
-})
+    assert.ok(RequestError.is(error))
+    assert.ok(error.cause instanceof SyntaxError)
+  })
 
-test('should not have request.json.head', () => {
-  assert.equal('head' in request.json, false)
+  it('should not have request.json.head', () => {
+    assert.equal('head' in request.json, false)
+  })
 })
