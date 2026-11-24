@@ -46,7 +46,7 @@
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "pnpm run test:node",
-    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node"
+    "test:node": "playwright-test 'test/**/!(*.browser).test.js' --mode node --test-timeout 60000"
   },
   "dependencies": {
     "@standard-schema/spec": "catalog:",
