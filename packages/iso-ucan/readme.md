@@ -1,4 +1,4 @@
-# iso-ucan [![NPM Version](https://img.shields.io/npm/v/iso-ucan.svg)](https://www.npmjs.com/package/iso-ucan) [![License](https://img.shields.io/npm/l/iso-ucan.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-ucan](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-ucan.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-ucan.yml)
+# iso-ucan [![NPM Version](https://img.shields.io/npm/v/iso-ucan.svg)](https://www.npmjs.com/package/iso-ucan) [![License](https://img.shields.io/npm/l/iso-ucan.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![CI](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml)
 
 > Isomorphic UCAN primitives for delegations, invocations, proof storage, and
 > typed RPC.
