@@ -1,4 +1,4 @@
-# iso-signatures [![NPM Version](https://img.shields.io/npm/v/iso-signatures.svg)](https://www.npmjs.com/package/iso-signatures) [![License](https://img.shields.io/npm/l/iso-signatures.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-did](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-signatures.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-signatures.yml)
+# iso-signatures [![NPM Version](https://img.shields.io/npm/v/iso-signatures.svg)](https://www.npmjs.com/package/iso-signatures) [![License](https://img.shields.io/npm/l/iso-signatures.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![CI](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml)
 
 > Isomorphic signatures tooling
 
