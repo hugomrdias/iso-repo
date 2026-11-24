@@ -1,4 +1,4 @@
-# iso-websocket [![NPM Version](https://img.shields.io/npm/v/iso-websocket.svg)](https://www.npmjs.com/package/iso-websocket) [![License](https://img.shields.io/npm/l/iso-websocket.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-websocket](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-websocket.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-websocket.yml)
+# iso-websocket [![NPM Version](https://img.shields.io/npm/v/iso-websocket.svg)](https://www.npmjs.com/package/iso-websocket) [![License](https://img.shields.io/npm/l/iso-websocket.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![CI](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml)
 
 `iso-websocket` implements the [Websocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) interface and is compatible with the browser, node.js and any other engine that implements basic Web APIs.
 
