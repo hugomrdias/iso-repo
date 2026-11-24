@@ -1,4 +1,4 @@
-# iso-conf [![NPM Version](https://img.shields.io/npm/v/iso-conf.svg)](https://www.npmjs.com/package/iso-conf) [![License](https://img.shields.io/npm/l/iso-conf.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![iso-conf](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-conf.yml/badge.svg)](https://github.com/hugomrdias/iso-repo/actions/workflows/iso-conf.yml)
+# iso-conf [![NPM Version](https://img.shields.io/npm/v/iso-conf.svg)](https://www.npmjs.com/package/iso-conf) [![License](https://img.shields.io/npm/l/iso-conf.svg)](https://github.com/hugomrdias/iso-repo/blob/main/license) [![CI](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hugomrdias/iso-repo/actions/workflows/ci.yml)
 
 > Simple config handling for your app or module with [Standard Schema](https://standardschema.dev) validation and extended JSON serialization
 
