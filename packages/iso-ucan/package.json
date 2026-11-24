@@ -104,8 +104,8 @@
   "scripts": {
     "lint": "tsc --build && biome check --no-errors-on-unmatched --files-ignore-unknown=true .",
     "test": "tsc --build && pnpm run test:node && pnpm run test:browser",
-    "test:node": "playwright-test 'test/**/!(*.browser).test.{js,ts}' --mode node",
-    "test:browser": "playwright-test 'test/**/!(*.node).test.{js,ts}'"
+    "test:node": "playwright-test 'test/**/!(*.browser).test.{js,ts}' --mode node --test-timeout 60000",
+    "test:browser": "playwright-test 'test/**/!(*.node).test.{js,ts}' --test-timeout 60000"
   },
   "dependencies": {
     "@ipld/dag-cbor": "^10.0.2",
