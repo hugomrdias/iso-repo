@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/suspicious/useAwait: Mock resolvers implement an asynchronous callback API. */
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { DIDCore } from '../src/core.js'
 import { parseDIDURL } from '../src/did-url.js'
 import { Resolver, resolve } from '../src/index.js'
@@ -66,6 +67,7 @@ describe('DID resolver', () => {
     const options = { accept: 'application/did+json', versionId: '1' }
     const didUrl = 'did:example:123;service=agent/path?version=1#key'
     const output = result()
+    /** @type {Resolver} */
     const resolver = new Resolver({
       example: async (did, parsed, dispatcher, forwarded) => {
         assert.equal(did, 'did:example:123')

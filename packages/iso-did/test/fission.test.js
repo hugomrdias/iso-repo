@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { after, before, beforeEach, describe, it } from 'node:test'
 import { setup } from 'iso-web/msw'
 import { http } from 'msw'
 import { didFissionResolver, format } from '../src/fission.js'

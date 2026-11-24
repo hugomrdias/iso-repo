@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { resolve as resolveDid } from '../src/index.js'
 
 describe('did pkh ', () => {
