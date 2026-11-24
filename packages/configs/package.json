@@ -29,14 +29,6 @@
   "publishConfig": {
     "provenance": false
   },
-  "depcheck": {
-    "specials": [
-      "bin"
-    ],
-    "ignores": [
-      "@types/*"
-    ]
-  },
   "peerDependencies": {
     "@biomejs/biome": "^2.6.4"
   }
