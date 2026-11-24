@@ -23,6 +23,7 @@ jobs:
       - uses: pnpm/setup@v3
         with:
           cache: true
+          save-cache: false
       - run: pnpm run lint
       - run: pnpm run docs
       - uses: actions/configure-pages@v6

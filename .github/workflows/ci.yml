@@ -1,0 +1,43 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# A new push to a pull request cancels its previous run, runs on main never cancel.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - "@hugomrdias/configs"
+          - "@hugomrdias/docs"
+          - iso-base
+          - iso-conf
+          - iso-did
+          - iso-effect
+          - iso-kv
+          - iso-ledger
+          - iso-passkeys
+          - iso-signatures
+          - iso-ucan
+          - iso-web
+          - iso-websocket
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/setup@v3
+        with:
+          cache: true
+          # only one job writes the cache
+          save-cache: ${{ github.ref == 'refs/heads/main' && matrix.package == 'iso-base' }}
+      - run: pnpm --filter ${{ matrix.package }} --fail-if-no-match run lint
+      # test:node and test:browser in parallel, lint already ran tsc --build
+      - run: pnpm --filter ${{ matrix.package }} --if-present run '/^test:/'
