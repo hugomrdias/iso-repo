@@ -3,8 +3,7 @@ import { setupWorker } from 'msw/browser'
 /**
  * @typedef {object} BrowserWorker
  * @property {import('msw/browser').SetupWorker} server
- * @property {ServiceWorkerRegistration} [registration]
- * @property {Promise<unknown>} [unregistering]
+ * @property {Promise<void>} [stopping]
  */
 
 /**
@@ -28,27 +27,16 @@ export function setup() {
 
   return {
     start: async (options) => {
-      await worker.unregistering
-      const registration = await server.start(
-        options?.browser ?? { quiet: true }
-      )
-      if (registration) {
-        worker.registration = registration
-      }
-      return registration
+      await worker.stopping
+      return server.start(options?.browser ?? { quiet: true })
     },
     stop: () => {
-      server.stop()
-      // msw's stop() makes the worker unregister itself asynchronously when
-      // this page is its only client. A start() racing that unregistration
-      // calls update() on the dying registration, which rejects unhandled with
-      // "Failed to update a ServiceWorker ... Not found". Unregister here and
-      // have start() wait for it so it always registers afresh.
-      const { registration } = worker
-      if (registration) {
-        worker.registration = undefined
-        worker.unregistering = registration.unregister().catch(() => false)
-      }
+      // The worker unregisters itself when this page was its only client, have
+      // start() wait for it. Don't unregister here, pages that are still
+      // controlled by the worker keep the registration alive, and registering
+      // again revives it without controlling the new page.
+      worker.stopping = Promise.resolve(server.stop()).catch(() => undefined)
+      return worker.stopping
     },
     resetHandlers: server.resetHandlers.bind(server),
     use: server.use.bind(server),
