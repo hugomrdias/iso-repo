@@ -1,6 +1,5 @@
 import SQLite from 'better-sqlite3'
 import { SqliteDialect } from 'kysely'
-import { suite } from 'playwright-test/taps'
 import { SqlDriver } from '../src/drivers/sql.js'
 import { KV } from '../src/index.js'
 import { baseTests } from './base.js'
@@ -16,4 +15,4 @@ const kv = new KV({
   }),
 })
 
-baseTests(kv, suite('SQL'))
+baseTests('SQL', kv)
