@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { base58btc } from 'iso-base/base-x'
 import { ES256KSigner } from '../src/signers/es256k.js'
 import * as ECDSA from '../src/verifiers/ecdsa.js'

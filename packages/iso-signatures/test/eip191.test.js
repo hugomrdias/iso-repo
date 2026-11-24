@@ -1,5 +1,6 @@
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { Signature } from '@noble/secp256k1'
-import assert from 'assert'
 import { hex } from 'iso-base/rfc4648'
 import { utf8 } from 'iso-base/utf8'
 import { DIDPkh } from 'iso-did/pkh'

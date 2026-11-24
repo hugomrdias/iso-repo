@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { webcrypto } from 'iso-base/crypto'
 import { base64url, hex } from 'iso-base/rfc4648'
 import { concat } from 'iso-base/utils'
