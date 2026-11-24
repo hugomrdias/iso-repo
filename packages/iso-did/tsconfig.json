@@ -3,7 +3,7 @@
   "compilerOptions": {
     "emitDeclarationOnly": true,
     "outDir": "dist",
-    "types": ["node", "mocha"]
+    "types": ["node"]
   },
   "references": [
     {

@@ -1,4 +1,5 @@
-import assert from 'assert'
+import assert from 'node:assert/strict'
+import { describe, it } from 'node:test'
 import { base64pad } from 'iso-base/rfc4648'
 import { DIDKey } from '../src/key.js'
 

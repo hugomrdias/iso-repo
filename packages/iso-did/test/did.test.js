@@ -1,6 +1,7 @@
+import assert from 'node:assert/strict'
+import { after, before, beforeEach, describe, it } from 'node:test'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { utf8ToBytes } from '@noble/hashes/utils.js'
-import assert from 'assert'
 import * as EC from 'iso-base/ec-compression'
 import { base64pad, base64url } from 'iso-base/rfc4648'
 import { setup } from 'iso-web/msw'
