@@ -46,14 +46,6 @@
   "publishConfig": {
     "provenance": false
   },
-  "depcheck": {
-    "specials": [
-      "bin"
-    ],
-    "ignores": [
-      "@types/*"
-    ]
-  },
   "dependencies": {
     "github-slugger": "^2.0.0",
     "typedoc-plugin-markdown": "^4.14.1",
