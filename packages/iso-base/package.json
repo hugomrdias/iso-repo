@@ -134,7 +134,7 @@
     "@scure/base": "^2.4.0",
     "@types/node": "catalog:",
     "playwright-test": "catalog:",
-    "tinybench": "^6.2.3",
+    "tinybench": "^6.2.5",
     "typescript": "catalog:"
   },
   "publishConfig": {
